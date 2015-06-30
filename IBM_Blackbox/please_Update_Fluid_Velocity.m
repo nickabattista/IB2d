@@ -1,12 +1,38 @@
+%-------------------------------------------------------------------------------------------------------------------%
+%
+% IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
+% 	fluid-structure interaction models. This version of the code is based off of
+%	Peskin's Immersed Boundary Code in Acta Numerica, 1996.
+%
+% Author: Nicholas A. Battista
+% Email:  nick.battista@unc.edu
+% Date Created: May 27th, 2015
+% Institution: UNC-CH
+%
+% This code is capable of creating Lagrangian Structures using:
+% 	1. Springs
+% 	2. Beams (*torsional springs)
+% 	3. Target Points
+%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% 
+% There are a number of built in Examples, mostly used for teaching purposes. 
+% 
+% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+%
+%--------------------------------------------------------------------------------------------------------------------%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function solves the incompressible Navier-Stokes (NS) equations
+% This function solves the incompressible Navier-Stokes (NS) equations using Fast-Fourier Transform (FFT)
 %      
 %      x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + Fx
 %      y-Momentum Conservation: rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) - p_y + Fy
 %      Incompressibility:       u_x + v_y = 0.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function [U_h, V_h, U, V] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt)
  
 
