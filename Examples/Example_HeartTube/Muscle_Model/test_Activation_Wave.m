@@ -1,9 +1,9 @@
-function test_activation_wave()
+function test_Activation_Wave()
 
 xLag = 1:0.025:3;
 
 
-freq = 10;                     % frequency of traveling wave down tube
+freq = 10;                      % frequency of traveling wave down tube
 Ltube = xLag(end ) - xLag(1);   % length of heart tube
 buff = 0.25;                    % percent-buff on each end of heart tube
 L_AR = (1-2*buff)*Ltube;        % length of the actual activation region of tube
