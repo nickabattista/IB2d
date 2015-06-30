@@ -1,4 +1,4 @@
-function fuck_this_shit()
+function test_activation_wave()
 
 xLag = 1:0.025:3;
 
