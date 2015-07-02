@@ -70,6 +70,7 @@ update_Target_Pts = model_Info(4);   % Update_Target_Pts: 0 (for no) or 1 (for y
 beams_Yes = model_Info(5);           % Beams: 0 (for no) or 1 (for yes)
 update_Beams_Flag = model_Info(6);   % Update_Beams: 0 (for no) or 1 (for yes)
 muscles_Yes = model_Info(7);         % Muscles: 0 (for no) or 1 (for yes)
+arb_ext_force_Yes = model_Info(8);   % Arbitrary External Force: 0 (for no) or 1 (for yes)
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -196,7 +197,14 @@ while current_time < T_FINAL
     
     % Step 2: Calculate Force coming from membrane at half time-step
     [Fxh, Fyh] =       please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info);
-   
+    
+    if arb_ext_force_Yes == 1 
+        [Fx_Arb, Fy_Arb] = please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);
+        Fxh = Fxh + Fx_Arb;
+        Fyh = Fyh + Fy_Arb;
+    end
+    
+    
     % Step 3: Solve for Fluid motion
     [Uh, Vh, U, V] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
 
@@ -206,14 +214,16 @@ while current_time < T_FINAL
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
     % Plot Lagrangian/Eulerian Dynamics!
-    please_Plot_Results(dx,dy,X,Y,U,V,xLag,yLag);
+    if mod(ct,10) ==0
+        please_Plot_Results(dx,dy,X,Y,U,V,xLag,yLag);
+    end
     
     % Update current_time value
     current_time = current_time+dt;
-    fprintf('Current Time(s): %d\n',current_time);
-
+    fprintf('Current Time(s): %6.6f\n',current_time);
+    
     %ct = ct + 1;
-    %if mod(ct,125)==0
+    %if mod(ct,200)==0
     %    pause();
     %end
     
