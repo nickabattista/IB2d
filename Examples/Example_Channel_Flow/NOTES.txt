@@ -1,0 +1,11 @@
+NOTE:
+
+-The working simulations are:
+    a. EXAMPLE_PARABOLIC_FLOW_IN_EMPTY_CHANNEL
+    b. EXAMPLE_MIDDLE_CHANNEL_FLOW
+    c. EXAMPLE_FLOW_AROUND_CYLINDER
+    d. EXAMPLE_1_WALL_FLOW_AROUND_CYLINDER
+
+-The plotting routine needs to be amended for: EXAMPLE_HOLE_IN_CYLINDER
+
+-The following simulation parameters have not been optimized: EXAMPLE_TUBE_BLEBBING
