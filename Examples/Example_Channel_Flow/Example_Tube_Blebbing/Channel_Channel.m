@@ -23,13 +23,13 @@
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the BEAM-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the CHANNEL_CHANNEL-EXAMPLE geometry and prints associated input files
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function BeamCurve()
+function Channel_Channel()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
@@ -41,18 +41,31 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
-a = 0.5;         % Length of beam (only in x-coordinate)
-struct_name = 'BeamCurve'; % Name for .vertex, .spring, .beam, .target, etc files.
+ds= min(Lx/(2*Nx),Ly/(2*Ny));  % Lagrangian spacing
+L = 0.9*Lx;                    % Length of Channel
+w = 0.2*Ly;                    % Width of Channel
+struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a);
+[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
 
+%Modify Geo for Half Circle Hump Below Bleb Region
+inds = 36:46;
+xNew = xLag(36:46);
+a = (xLag(46)-xLag(36))/2;
+b = w/16;
+xM = (xLag(46)+xLag(36))/2;
+yNew = b*sqrt( 1 - ((xNew-xM)./a).^2 )+yLag(1);
+yNew';
+yLag(36:46) = yNew;
 
 % Plot Geometry to test
-plot(xLag,yLag,'r-'); hold on;
+plot(xLag(1:end/2),yLag(1:end/2),'r-'); hold on;
+plot(xLag(end/2+1:end),yLag(end/2+1:end),'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
+N = length(xLag);
+plot(xLag(N/2+36:N/2+46),yLag(N/2+36:N/2+46),'ro'); hold on;
 xlabel('x'); ylabel('y');
 axis square;
 
@@ -61,15 +74,19 @@ axis square;
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
+% Prints .spring file!
+k_Spring = 1e-4; ds_Rest = ds;
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+
+
 % Prints .beam file!
-k_Beam = 7.5e10; C = 0.0;
+k_Beam = 1e-4; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
-% Prints .target file! 
-k_Target = 2e8;
-print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
-
+% Prints .target file!
+k_Target = 1e7;
+print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -106,10 +123,14 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
     target_fid = fopen([struct_name '.target'], 'w');
 
-    fprintf(target_fid, '%d\n', 2 );
+    fprintf(target_fid, '%d\n', N-11 );
 
-    fprintf(target_fid, '%d %1.16e\n', 1, k_Target);
-    fprintf(target_fid, '%d %1.16e\n', N, k_Target);
+    %Loops over all Lagrangian Pts.
+    for s = 1:N
+        if (s<(N/2+36) || (s>N/2+46) )
+        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
+        end
+    end
 
     fclose(target_fid); 
     
@@ -125,22 +146,18 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     % k_Beam: beam stiffness
     % C: beam curvature
     
-    N = length(xLag); % NOTE: Total number of beams = Number of Total Lag Pts. - 2
+    N = length(xLag);
+    Nbeams = 11; % NOTE: Total number of beams = Number of Total Lag Pts. - 2
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
-    fprintf(beam_fid, '%d\n', N-2 );
+    fprintf(beam_fid, '%d\n', Nbeams );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
-    for s = 2:N-1
-            if  s <= N-1         
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
-            else
-                %Case s=N
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C);  
-            end
+    for s = N/2+36:N/2+46
+        fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
     end
     fclose(beam_fid); 
 
@@ -154,21 +171,17 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag);
+    Nsprings = 12;
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', N );
+    fprintf(spring_fid, '%d\n', Nsprings );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
     %SPRINGS BETWEEN VERTICES
-    for s = 1:N
-            if s < N         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
-            else
-                %Case s=N
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
-            end
+    for s = N/2+35:N/2+46
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
     end
     fclose(spring_fid); 
     
@@ -180,20 +193,13 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a)
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly)
 
-% The immsersed structure is a curved line %
-ds = a/(N-1);
+% The immsersed structure is a channel %
+x = (Lx-L)/2:ds:(L+(Lx-L)/2);  %xPts
+yBot = (Ly-w)/2;               %yVal for bottom of Channel
+yTop = Ly - (Ly-w)/2;          %yVal for top of Channel
 
-xLag(1) = -a/2;%Lx/2-a/2;
-yLag(1) = 0.0;
-for i=2:N
-    
-    xLag(i) = xLag(i-1) + ds;
-    x = xLag(i);
-    yLag(i) = -2*( (x)^2 - (a/2)^2 );
+xLag = [x x];
+yLag = [yBot*ones(1,length(x)) yTop*ones(1,length(x))];
 
-end
-
-xLag = xLag + Lx/2;
-yLag = yLag + Lx/2;

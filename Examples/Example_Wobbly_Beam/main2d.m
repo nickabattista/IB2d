@@ -23,6 +23,7 @@
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: main2d is the function that gets called to run the code. It
@@ -72,6 +73,7 @@ model_Info(4) = params(13);         % Update_Target_Pts: 0 (for no) or 1 (for ye
 model_Info(5) = params(14);         % Beams: 0 (for no) or 1 (for yes)
 model_Info(6) = params(15);         % Update_Beams: 0 (for no) or 1 (for yes)
 model_Info(7) = params(16);         % Muscle Activation (Length/Tension-Hill Model): % 0 (for no) or 1 (for yes)
+model_Info(8) = params(17);         % Arbirtary External Force Onto Fluid Grid
 
 
 % Path Reference to where Driving code is found %

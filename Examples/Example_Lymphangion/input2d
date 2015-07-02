@@ -23,6 +23,7 @@ update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 1               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 1   % 0 (for no) or 1 (for yes)
+arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 
 % LAGRANGIAN STRUCTURE NAME %
 string_name = Lymphangion % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)

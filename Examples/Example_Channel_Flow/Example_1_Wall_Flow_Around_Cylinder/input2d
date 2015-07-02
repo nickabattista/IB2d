@@ -1,12 +1,12 @@
 %***%***% INPUT2d FILE: DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%***%
 
 % FLUID PARAMETER VALUES %
-mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
+mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 0.015           % Final time of simulation (s)
-dt = 5e-5                % Time-step (s)
+Tfinal = 0.05           % Final time of simulation (s)
+dt = 1e-4               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  32                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -20,10 +20,10 @@ springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 1               % 0 (for no) or 1 (for yes)
+beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 0   % 0 (for no) or 1 (for yes)
-arb_ext_force = 0       % 0 (for no) or 1 (for yes)
+arb_ext_force = 1       % 0 (for no) or 1 (for yes)
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = BeamCurve % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = channel   % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)

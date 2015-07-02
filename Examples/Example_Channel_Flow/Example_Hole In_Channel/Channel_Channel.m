@@ -23,13 +23,13 @@
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the BEAM-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the CHANNEL_CHANNEL-EXAMPLE geometry and prints associated input files
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function BeamCurve()
+function Channel_Channel()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
@@ -41,17 +41,23 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
-a = 0.5;         % Length of beam (only in x-coordinate)
-struct_name = 'BeamCurve'; % Name for .vertex, .spring, .beam, .target, etc files.
+ds= min(Lx/(2*Nx),Ly/(2*Ny));  % Lagrangian spacing
+L = 0.9*Lx;                    % Length of Channel
+w = 0.2*Ly;                    % Width of Channel
+struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a);
+[xLag2,yLag2] = give_Me_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
+N = length(xLag2);
+xLag = [xLag2(1:N/2+N/4) xLag2(N/2+N/4+floor(N/8)-1:end)];
+yLag = [yLag2(1:N/2+N/4) yLag2(N/2+N/4+floor(N/8)-1:end)];
 
 
 % Plot Geometry to test
-plot(xLag,yLag,'r-'); hold on;
+plot(xLag(1:N/2),yLag(1:N/2),'r-'); hold on;
+plot(xLag(N/2+1:end),yLag(N/2+1:end),'r-'); hold on;
+
 plot(xLag,yLag,'*'); hold on;
 xlabel('x'); ylabel('y');
 axis square;
@@ -61,15 +67,19 @@ axis square;
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
+% Prints .spring file!
+%k_Spring = 1e7;
+%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+
+
 % Prints .beam file!
-k_Beam = 7.5e10; C = 0.0;
-print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
-
-% Prints .target file! 
-k_Target = 2e8;
-print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
+%k_Beam = 0.5; C = 0.0;
+%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
+% Prints .target file!
+k_Target = 1e7;
+print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -106,10 +116,12 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
     target_fid = fopen([struct_name '.target'], 'w');
 
-    fprintf(target_fid, '%d\n', 2 );
+    fprintf(target_fid, '%d\n', N );
 
-    fprintf(target_fid, '%d %1.16e\n', 1, k_Target);
-    fprintf(target_fid, '%d %1.16e\n', N, k_Target);
+    %Loops over all Lagrangian Pts.
+    for s = 1:N
+        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
+    end
 
     fclose(target_fid); 
     
@@ -129,7 +141,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
-    fprintf(beam_fid, '%d\n', N-2 );
+    fprintf(beam_fid, '%d\n', N );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
@@ -180,20 +192,13 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a)
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly)
 
-% The immsersed structure is a curved line %
-ds = a/(N-1);
+% The immsersed structure is a channel %
+x = (Lx-L)/2:ds:(L+(Lx-L)/2);  %xPts
+yBot = (Ly-w)/2;               %yVal for bottom of Channel
+yTop = Ly - (Ly-w)/2;          %yVal for top of Channel
 
-xLag(1) = -a/2;%Lx/2-a/2;
-yLag(1) = 0.0;
-for i=2:N
-    
-    xLag(i) = xLag(i-1) + ds;
-    x = xLag(i);
-    yLag(i) = -2*( (x)^2 - (a/2)^2 );
-
-end
-
-xLag = xLag + Lx/2;
-yLag = yLag + Lx/2;
+xLag = [x x];
+yLag = [yBot*ones(1,length(x)) yTop*ones(1,length(x))];
+   
