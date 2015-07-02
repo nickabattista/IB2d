@@ -14,12 +14,16 @@ README
             ex1: - heart tube that pumps via muscle activation using combined length/tension - Hill model
             ex2: - heart tube that pumps via dynamic suction pumping by changing resting lengths of springs
             ex3: - heart tube that pumps via peristaltic waves of contraction by changing resting lengths of springs
+    5. "Channel"
+	    various channel flow examples with parabolic flow being produced by arbitrary force on Eulerian grid
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs (.spring), Torsional Springs (.beam),  
     Target Pts (.target), and Muscle Pts (.muscle)! 
 
 -It has the function for updating target point positions, similar files for updating_springs() and update_beams() 
     can be made analogously. No file for update_beams() exists, yet.
+
+-It can have pseudo-inflow conditions by inducing an arbitrary force onto the Eulerian grid
 
 -It plots the Lagrangian structure along with Eulerian velocity, just the Lagrangian structure itself, 
     and a colormap of vorticity w/ immersed structure overlaid.
