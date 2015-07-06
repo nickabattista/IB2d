@@ -60,6 +60,7 @@ Ly =   grid_Info(4); % Length of Eulerian grid in y-coordinate
 dx =   grid_Info(5); % Spatial-size in x
 dy =   grid_Info(6); % Spatial-size in y
 supp = grid_Info(7); % Delta-function support
+pDump= grid_Info(8); % Print (Plot) Dump interval
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -214,9 +215,10 @@ while current_time < T_FINAL
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
     % Plot Lagrangian/Eulerian Dynamics!
-    if mod(ct,10) ==0
+    if mod(ct,pDump) ==0
         please_Plot_Results(dx,dy,X,Y,U,V,xLag,yLag);
     end
+
     
     % Update current_time value
     current_time = current_time+dt;
