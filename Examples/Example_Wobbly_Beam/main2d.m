@@ -63,6 +63,7 @@ grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
 grid_Info(5) = params(7)/params(5); % Spatial step-size in x
 grid_Info(6) = params(8)/params(6); % Spatial step-size in y
 grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
+grid_Info(8) = params(18);          % Print Dump (How often to plot)
 
 
 % MODEL STRUCTURE DATA STORED %

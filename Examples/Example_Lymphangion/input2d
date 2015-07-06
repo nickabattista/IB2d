@@ -25,5 +25,8 @@ update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 1   % 0 (for no) or 1 (for yes)
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 
+% PRINTING INFORMATION
+print_dump = 1000       % How often to print (PLOT) to screen
+
 % LAGRANGIAN STRUCTURE NAME %
 string_name = Lymphangion % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)

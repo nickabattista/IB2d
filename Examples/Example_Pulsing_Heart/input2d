@@ -1,12 +1,12 @@
 %***%***% INPUT2d FILE: DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%***%
 
 % FLUID PARAMETER VALUES %
-mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
+mu = 1.0                % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 0.015           % Final time of simulation (s)
-dt = 5e-5                % Time-step (s)
+Tfinal = 0.1           % Final time of simulation (s)
+dt = 7.5e-5               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  32                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -19,8 +19,8 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
-update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 1               % 0 (for no) or 1 (for yes)
+update_target = 1       % 0 (for no) or 1 (for yes)
+beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
@@ -29,4 +29,4 @@ arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 print_dump = 1000       % How often to print (PLOT) to screen
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = BeamCurve % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = heart  % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
