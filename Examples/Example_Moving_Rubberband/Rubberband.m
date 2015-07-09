@@ -195,5 +195,5 @@ t = 2*pi/N;
 for i=1:N
     
     xLag(i) = 0.25 + rmax * cos( 2*pi/N*(i-1) );
-    yLag(i) = 0.5 + rmin * sin( 2*pi/N*(i-1) );
+    yLag(i) = 0.25 + rmin * sin( 2*pi/N*(i-1) );
 end

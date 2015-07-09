@@ -47,7 +47,7 @@ struct_name = 'heart'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-frac1 = 0.02;
+frac1 = 0.022;
 [x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,frac1);
 Nb1 = length(x1);
 
@@ -95,7 +95,7 @@ print_Lagrangian_Vertices(x1,y1,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 2e7;
 print_Lagrangian_Target_Pts(x1,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

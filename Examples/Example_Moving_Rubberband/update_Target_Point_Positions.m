@@ -45,6 +45,19 @@ L = 0.5;                            % Distance cylinder moves in each direction
 s = L/(period/2);                   % Speed cylinder moves
 t = rem(current_time,period);       % Time
 
+%
+% Moves cylinder up!
+%    
+for i=1:N_target                    % Loops over all target points!
+    
+        yPts(IDs(i)) = yPts(IDs(i)) + (s/2)*dt;
+        targets(IDs(i),3) = yPts(IDs(i));
+        
+end
+
+%
+% Moves cylinder to the right and then left
+%
 if t < period/2
     for i=1:N_target                    % Loops over all target points!
     
