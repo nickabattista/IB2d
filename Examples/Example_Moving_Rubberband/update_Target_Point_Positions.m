@@ -38,12 +38,24 @@ xPts= targets(:,2);                 % Original x-Values of x-Target Pts.
 yPts= targets(:,3);                 % Original y-Values of y-Target Pts.
 kStiffs = targets(:,4);             % Stores Target Stiffnesses 
 
-N_target = length(targets(:,1));    %Gives total number of target pts!
+N_target = length(targets(:,1));    % Gives total number of target pts!
 
-for i=1:N_target                    % Loops over all target points!
+period = 0.05;                      % Time it takes to move to the right
+L = 0.5;                            % Distance cylinder moves in each direction
+s = L/(period/2);                   % Speed cylinder moves
+t = rem(current_time,period);       % Time
+
+if t < period/2
+    for i=1:N_target                    % Loops over all target points!
     
-    xPts(IDs(i)) = xPts(IDs(i)) + 0.002;
+        xPts(IDs(i)) = xPts(IDs(i)) + s*dt;
+        targets(IDs(i),2) = xPts(IDs(i));
+        
+    end
+else
+    for i=1:N_target                    % Loops over all target points!
     
-    targets(IDs(i),2) = xPts(IDs(i));
+        xPts(IDs(i)) = xPts(IDs(i)) - s*dt;
+        targets(IDs(i),2) = xPts(IDs(i));
+    end
 end
-
