@@ -33,7 +33,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [U_h, V_h, U, V] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt)
+function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt)
  
 
 % Fluid (Eulerian) Grid updated using Peskin's two-step algorithm, where the advection terms
@@ -153,8 +153,10 @@ U_h_V_h_x = D(U_h_V_h,dx,'x');
 U_h_V_h_y = D(U_h_V_h,dy,'y');
 
 % Construct right hand side in linear system
-rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,Uxx,Uyy,'x');
-rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,Vxx,Vyy,'y');
+%rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,Uxx,Uyy,'x');
+%rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,Vxx,Vyy,'y');
+rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,U_h_sq_x,U_h_V_h_y,V,Fx,Uxx,Uyy,'x');
+rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,V_h_sq_y,U_h_V_h_x,U,Fy,Vxx,Vyy,'y');
 
 
 % Perform FFT to take velocities to state space
@@ -171,9 +173,10 @@ u_hat = give_Me_Fluid_Velocity(dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,idX,'x');
 v_hat = give_Me_Fluid_Velocity(dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,idY,'y');
 
 
-% Inverse FFT to Get Velocities in Real Space
+% Inverse FFT to Get Velocities/Pressure in Real Space
 U = real(ifft2(u_hat));
 V = real(ifft2(v_hat));
+p = real(ifft2(p_hat));
 
 
 

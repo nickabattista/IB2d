@@ -207,7 +207,7 @@ while current_time < T_FINAL
     
     
     % Step 3: Solve for Fluid motion
-    [Uh, Vh, U, V] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+    [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
 
     % Step 4: Update Position of Boundary of membrane again for a half time-step
     xLag_P = xLag_h;     % Stores old Lagrangian x-Values (for muscle model)
@@ -215,16 +215,17 @@ while current_time < T_FINAL
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
     % Plot Lagrangian/Eulerian Dynamics!
-    if mod(ct,pDump) ==0
+    if mod(ct,pDump) == 0
         vort = give_Me_Vorticity(U,V,dx,dy);
         uMag = give_Me_Magnitude_Velocity(U,V);
         please_Plot_Results(dx,dy,X,Y,U,V,vort,xLag,yLag);
+        fprintf('Current Time(s): %6.6f\n',current_time);
     end
 
     
     % Update current_time value
     current_time = current_time+dt;
-    fprintf('Current Time(s): %6.6f\n',current_time);
+    %fprintf('Current Time(s): %6.6f\n',current_time);
     
     %ct = ct + 1;
     %if mod(ct,200)==0
