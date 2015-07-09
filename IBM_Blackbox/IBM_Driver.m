@@ -217,6 +217,7 @@ while current_time < T_FINAL
     % Plot Lagrangian/Eulerian Dynamics!
     if mod(ct,pDump) ==0
         vort = give_Me_Vorticity(U,V,dx,dy);
+        uMag = give_Me_Magnitude_Velocity(U,V);
         please_Plot_Results(dx,dy,X,Y,U,V,vort,xLag,yLag);
     end
 
@@ -260,6 +261,23 @@ vort = ( dvdx - dudy );
 
 %Take transpose so all lines up
 vort = vort';
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Computes vorticity from two matrices, U and V, where each
+% matrix is the discretized field of velocity values either for x or y,
+% respectively.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function uMag = give_Me_Magnitude_Velocity(U,V)
+
+% U: x-directed velocity
+% V: y-directed velocity
+
+% Compute magnitude of velocity
+uMag = ( U.^2 + V.^2 ).^(1/2);
 
 
 
