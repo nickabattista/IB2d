@@ -197,7 +197,7 @@ while current_time < T_FINAL
     
     
     % Step 2: Calculate Force coming from membrane at half time-step
-    [Fxh, Fyh] =       please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info);
+    [Fxh, Fyh] =           please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info);
     
     if arb_ext_force_Yes == 1 
         [Fx_Arb, Fy_Arb] = please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);

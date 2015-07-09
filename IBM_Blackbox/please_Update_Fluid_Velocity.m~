@@ -249,7 +249,7 @@ function rhs = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj
 
 % Note: Fj -> j corresponds to either x or y.
 
-rhs = zeros(Ny,Nx); %initialize rhs
+rhs = zeros(Ny,Nx); %initialize rh
 
 if strcmp(string,'x')
     
