@@ -32,7 +32,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function please_Plot_Results(dx,dy,X,Y,U,V,chiX,chiY)
+function please_Plot_Results(dx,dy,X,Y,U,V,vort,chiX,chiY)
 
 %
 % Assumption: Assuming chiX and chiY are column vectors
@@ -104,8 +104,8 @@ xlabel('x'); ylabel('y');
 hold all;
 
 %Compute Vorticity and Plot It against Lagrangian Grid!
-vort = give_Me_Vorticity(U,V,dx,dy); 
-vort = vort';
+%vort = give_Me_Vorticity(U,V,dx,dy); 
+%vort = vort';
 x = X(1,:); y = Y(:,1);
 contourf(x,y,flipud(rot90(vort)),10); hold on;
 
@@ -121,23 +121,3 @@ drawnow;
 hold off;
 set(gca,'Box','on');
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: Computes vorticity from two matrices, U and V, where each
-% matrix is the discretized field of velocity values either for x or y,
-% respectively.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function vort = give_Me_Vorticity(U,V,dx,dy)
-
-% w = ( dv/dx - du/dy )\hat{z}
-
-%Compute dv/dx using central differencing! (maintains periodicity)
-dvdx = D(V,dx,'x');
-
-%Compute du/dy using central differencing! (maintains periodicity)
-dudy = D(U,dy,'y');
-    
-vort = ( dvdx - dudy );

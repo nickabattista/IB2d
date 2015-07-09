@@ -216,7 +216,8 @@ while current_time < T_FINAL
 
     % Plot Lagrangian/Eulerian Dynamics!
     if mod(ct,pDump) ==0
-        please_Plot_Results(dx,dy,X,Y,U,V,xLag,yLag);
+        vort = give_Me_Vorticity(U,V,dx,dy);
+        please_Plot_Results(dx,dy,X,Y,U,V,vort,xLag,yLag);
     end
 
     
@@ -229,8 +230,36 @@ while current_time < T_FINAL
     %    pause();
     %end
     
-end
+end %ENDS TIME-STEPPING LOOP
 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Computes vorticity from two matrices, U and V, where each
+% matrix is the discretized field of velocity values either for x or y,
+% respectively.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function vort = give_Me_Vorticity(U,V,dx,dy)
+
+% w = ( dv/dx - du/dy )\hat{z}
+
+%Compute dv/dx using central differencing! (maintains periodicity)
+dvdx = D(V,dx,'x');
+
+%Compute du/dy using central differencing! (maintains periodicity)
+dudy = D(U,dy,'y');
+
+%Compute vorticity
+vort = ( dvdx - dudy );
+
+%Take transpose so all lines up
+vort = vort';
 
 
 
