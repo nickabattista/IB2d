@@ -183,7 +183,7 @@ V = U;
 
 
 % ACTUAL TIME-STEPPING IBM SCHEME!
-ct = 0;
+cter = 0;
 while current_time < T_FINAL
     
     % Step 1: Update Position of Boundary of membrane at half time-step
@@ -224,7 +224,7 @@ while current_time < T_FINAL
     
     
     % Plot Lagrangian/Eulerian Dynamics!
-    if mod(ct,pDump) == 0
+    if ( ( mod(cter,pDump) == 0  ) && ( cter > pDump ) )
         vort = give_Me_Vorticity(U,V,dx,dy);
         uMag = give_Me_Magnitude_Velocity(U,V);
         please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
@@ -232,11 +232,10 @@ while current_time < T_FINAL
     end
 
     
-    % Update current_time value
+    % Update current_time value & counter
     current_time = current_time+dt;
-    %fprintf('Current Time(s): %6.6f\n',current_time);
+    cter = cter + 1;
     
-    %ct = ct + 1;
     %if mod(ct,200)==0
     %    pause();
     %end
