@@ -32,7 +32,20 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function please_Plot_Results(dx,dy,X,Y,U,V,vort,chiX,chiY)
+function please_Plot_Results(dx,dy,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot)
+
+%X,Y:  (x,y) values
+%U,V:  x-directed, y-directed velocities respectively
+%vort: vorticity
+%uMag: magnitude of velocity
+%p:    pressure
+
+%FLAGS FOR PLOTTING:
+%pressPlot - if you want pressure plot = 1
+%uMagPlot  - if you want mag. velocity plot = 1
+%vortPlot  - if you want vorticity plot = 1
+%velPlot   - if you want velocity plot = 1
+%lagPlot   - if you want lag. point ONLY plot = 1
 
 %
 % Assumption: Assuming chiX and chiY are column vectors
@@ -58,66 +71,183 @@ loc =  sort(unique([locX;locY]));
 clf;
 
 
-% % % % PLOTS THE VELOCITY (EULERIAN) GRID AND LAGRANGIAN MESH % % % % 
+% % % % % PLOTS THE VELOCITY (EULERIAN) GRID AND LAGRANGIAN MESH % % % % 
+% 
+% subplot(1,3,1)
+% axis([0 Lx 0 Ly]);
+% title('VELOCITY');
+% xlabel('x'); ylabel('y');
+% hold all;
+% 
+% quiver(X,Y,U,V);
+% 
+%    loc = [0;loc;length(chiX)];
+%    for i=2:length(loc)
+%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+%    end
+% 
+% axis square;
+% 
+% 
+%  
+% % % % % % % % % PLOTS THE LAGRANGIAN MESH! % % % % % % % %
+% 
+% 
+% subplot(1,3,2)
+% axis([0 Lx 0 Ly]);
+% title('LAGRANGIAN PTS');
+% xlabel('x'); ylabel('y');
+% hold all;
+% 
+%    loc = [0;loc;length(chiX)];
+%    for i=2:length(loc)
+%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+%    end
+% 
+% axis square;
+% 
+% 
+% 
+% % % % % % PLOTS THE VORTICITY AND LAGRANGIAN MESH! % % % % %
+% 
+% subplot(1,3,3)
+% axis([0 Lx 0 Ly]);
+% title('VORTICITY');
+% xlabel('x'); ylabel('y'); 
+% hold all;
+% 
+% %Compute Vorticity and Plot It against Lagrangian Grid!
+% %vort = give_Me_Vorticity(U,V,dx,dy); 
+% %vort = vort';
+% x = X(1,:); y = Y(:,1);
+% contourf(x,y,flipud(rot90(vort)),10); hold on;
+% 
+%    loc = [0;loc;length(chiX)];
+%    for i=2:length(loc)
+%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+%    end
+% 
+% 
+% axis square;
+% drawnow;
+% 
+% hold off;
+% set(gca,'Box','on');
 
-subplot(1,3,1)
-axis([0 Lx 0 Ly]);
-title('VELOCITY');
-xlabel('x'); ylabel('y');
-hold all;
 
-quiver(X,Y,U,V);
+figure(1) 
+numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot;
 
-   loc = [0;loc;length(chiX)];
-   for i=2:length(loc)
+ct = 1;
+
+if lagPlot == 1
+    subplot(1,numPlots,ct)
+    axis([0 Lx 0 Ly]);
+    title('LAGRANGIAN PTS');
+    xlabel('x'); ylabel('y');
+    hold all;
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-   end
+    end
 
-axis square;
+    axis square;
 
+    ct=ct+1;
+end
 
- 
-% % % % % % % % PLOTS THE LAGRANGIAN MESH! % % % % % % % %
+if vortPlot == 1
+    
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('VORTICITY');
+    xlabel('x'); ylabel('y'); 
+    hold all;
 
+    %Compute Vorticity and Plot It against Lagrangian Grid!
+    x = X(1,:); y = Y(:,1);
+    contourf(x,y,flipud(rot90(vort)),10); hold on;
 
-subplot(1,3,2)
-axis([0 Lx 0 Ly]);
-title('LAGRANGIAN PTS');
-xlabel('x'); ylabel('y');
-hold all;
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
+        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+    
+    axis square;
 
-   loc = [0;loc;length(chiX)];
-   for i=2:length(loc)
+    ct=ct+1;
+end
+
+if pressPlot == 1
+    
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('PRESSURE');
+    xlabel('x'); ylabel('y'); 
+    hold all;
+
+    %Use Pressure and Plot It against Lagrangian Grid!
+    x = X(1,:); y = Y(:,1);
+    contourf(x,y,flipud(rot90(p)),10); hold on;
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
+        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+
+    axis square;
+    
+    ct=ct+1;
+end
+
+if uMagPlot == 1
+    
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('MAGNITUDE OF VELOCITY');
+    xlabel('x'); ylabel('y'); 
+    hold all;
+
+    %Use Mag. Velocity and Plot It against Lagrangian Grid!
+    x = X(1,:); y = Y(:,1);
+    contourf(x,y,flipud(rot90(uMag)),10); hold on;
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
+        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+
+    axis square;
+    
+    ct=ct+1;
+end
+
+if velPlot == 1
+    
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('VELOCITY');
+    xlabel('x'); ylabel('y');
+    hold all;
+
+    quiver(X,Y,U,V); %Print Velocity Field
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-   end
+    end
 
-axis square;
+    axis square;
+    
+    ct=ct+1;
+end
 
-
-
-% % % % % PLOTS THE VORTICITY AND LAGRANGIAN MESH! % % % % %
-
-subplot(1,3,3)
-axis([0 Lx 0 Ly]);
-title('VORTICITY');
-xlabel('x'); ylabel('y'); 
-hold all;
-
-%Compute Vorticity and Plot It against Lagrangian Grid!
-%vort = give_Me_Vorticity(U,V,dx,dy); 
-%vort = vort';
-x = X(1,:); y = Y(:,1);
-contourf(x,y,flipud(rot90(vort)),10); hold on;
-
-   loc = [0;loc;length(chiX)];
-   for i=2:length(loc)
-       plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-   end
-
-
-axis square;
 drawnow;
 
 hold off;
 set(gca,'Box','on');
-

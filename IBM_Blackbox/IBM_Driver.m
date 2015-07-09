@@ -214,11 +214,18 @@ while current_time < T_FINAL
     yLag_P = yLag_h;     % Stores old Lagrangian y-Values (for muscle model)
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
+    %TEST FLAGS
+    lagPlot = 0;
+    velPlot = 1;
+    vortPlot = 0;
+    pressPlot = 1;
+    uMagPlot = 1;
+    
     % Plot Lagrangian/Eulerian Dynamics!
     if mod(ct,pDump) == 0
         vort = give_Me_Vorticity(U,V,dx,dy);
         uMag = give_Me_Magnitude_Velocity(U,V);
-        please_Plot_Results(dx,dy,X,Y,U,V,vort,xLag,yLag);
+        please_Plot_Results(dx,dy,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
         fprintf('Current Time(s): %6.6f\n',current_time);
     end
 
