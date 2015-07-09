@@ -207,7 +207,9 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+%uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+uX_Tar = -Umax * (5*abs( sin(10*pi*t) ) ) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 

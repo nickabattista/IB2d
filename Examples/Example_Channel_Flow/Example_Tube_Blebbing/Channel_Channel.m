@@ -51,21 +51,21 @@ struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
 
 %Modify Geo for Half Circle Hump Below Bleb Region
-inds = 36:46;
-xNew = xLag(36:46);
-a = (xLag(46)-xLag(36))/2;
+inds = 36:50;
+xNew = xLag(36:50);
+a = (xLag(50)-xLag(36))/2;
 b = w/16;
-xM = (xLag(46)+xLag(36))/2;
+xM = (xLag(50)+xLag(36))/2;
 yNew = b*sqrt( 1 - ((xNew-xM)./a).^2 )+yLag(1);
 yNew';
-yLag(36:46) = yNew;
+yLag(36:50) = yNew;
 
 % Plot Geometry to test
 plot(xLag(1:end/2),yLag(1:end/2),'r-'); hold on;
 plot(xLag(end/2+1:end),yLag(end/2+1:end),'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
 N = length(xLag);
-plot(xLag(N/2+36:N/2+46),yLag(N/2+36:N/2+46),'ro'); hold on;
+plot(xLag(N/2+36:N/2+50),yLag(N/2+36:N/2+50),'ro'); hold on;
 xlabel('x'); ylabel('y');
 axis square;
 
@@ -123,11 +123,11 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
     target_fid = fopen([struct_name '.target'], 'w');
 
-    fprintf(target_fid, '%d\n', N-11 );
+    fprintf(target_fid, '%d\n', N-15 );
 
     %Loops over all Lagrangian Pts.
     for s = 1:N
-        if (s<(N/2+36) || (s>N/2+46) )
+        if (s<(N/2+36) || (s>N/2+50) )
         fprintf(target_fid, '%d %1.16e\n', s, k_Target);
         end
     end
@@ -147,7 +147,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     % C: beam curvature
     
     N = length(xLag);
-    Nbeams = 11; % NOTE: Total number of beams = Number of Total Lag Pts. - 2
+    Nbeams = 15; % NOTE: Total number of beams = Number of Total Lag Pts. - 2
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
@@ -156,7 +156,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
-    for s = N/2+36:N/2+46
+    for s = N/2+36:N/2+50
         fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
     end
     fclose(beam_fid); 
@@ -171,7 +171,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag);
-    Nsprings = 12;
+    Nsprings = 16;
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
@@ -180,7 +180,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
     %spring_force = kappa_spring*ds/(ds^2);
 
     %SPRINGS BETWEEN VERTICES
-    for s = N/2+35:N/2+46
+    for s = N/2+35:N/2+50
         fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
     end
     fclose(spring_fid); 
