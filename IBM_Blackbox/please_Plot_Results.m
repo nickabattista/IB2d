@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -32,7 +32,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function please_Plot_Results(X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot)
+function please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot)
 
 %X,Y:  (x,y) values
 %U,V:  x-directed, y-directed velocities respectively
@@ -64,81 +64,21 @@ chiY = mod(chiY,Ly);
 diffX = abs([chiX(2:end);chiX(1)]-chiX);
 diffY = abs([chiY(2:end);chiY(1)]-chiY);
 
-locX = find(diffX > Lx/2); % assuming x value can't change more than Lx/2 (without crossing boundary)
-locY = find(diffY > Ly/2); % assuming y value can't change more than Ly/2 (without crossing boundary)
+locX = find(diffX > 5*ds); % assuming x value can't change more than Lx/2 (without crossing boundary)
+locY = find(diffY > 5*ds); % assuming y value can't change more than Ly/2 (without crossing boundary)
 loc =  sort(unique([locX;locY]));
 
-clf;
+clf; %Clear previous plots :)
 
 
-% % % % % PLOTS THE VELOCITY (EULERIAN) GRID AND LAGRANGIAN MESH % % % % 
-% 
-% subplot(1,3,1)
-% axis([0 Lx 0 Ly]);
-% title('VELOCITY');
-% xlabel('x'); ylabel('y');
-% hold all;
-% 
-% quiver(X,Y,U,V);
-% 
-%    loc = [0;loc;length(chiX)];
-%    for i=2:length(loc)
-%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-%    end
-% 
-% axis square;
-% 
-% 
-%  
-% % % % % % % % % PLOTS THE LAGRANGIAN MESH! % % % % % % % %
-% 
-% 
-% subplot(1,3,2)
-% axis([0 Lx 0 Ly]);
-% title('LAGRANGIAN PTS');
-% xlabel('x'); ylabel('y');
-% hold all;
-% 
-%    loc = [0;loc;length(chiX)];
-%    for i=2:length(loc)
-%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-%    end
-% 
-% axis square;
-% 
-% 
-% 
-% % % % % % PLOTS THE VORTICITY AND LAGRANGIAN MESH! % % % % %
-% 
-% subplot(1,3,3)
-% axis([0 Lx 0 Ly]);
-% title('VORTICITY');
-% xlabel('x'); ylabel('y'); 
-% hold all;
-% 
-% %Compute Vorticity and Plot It against Lagrangian Grid!
-% %vort = give_Me_Vorticity(U,V,dx,dy); 
-% %vort = vort';
-% x = X(1,:); y = Y(:,1);
-% contourf(x,y,flipud(rot90(vort)),10); hold on;
-% 
-%    loc = [0;loc;length(chiX)];
-%    for i=2:length(loc)
-%        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-%    end
-% 
-% 
-% axis square;
-% drawnow;
-% 
-% hold off;
-% set(gca,'Box','on');
 
 
 figure(1) 
 numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot;
 
 ct = 1;
+
+% % % % % PLOTS LAGRANGIAN POINTS ONLY (if selected) % % % % %
 
 if lagPlot == 1
     subplot(1,numPlots,ct)
@@ -156,6 +96,8 @@ if lagPlot == 1
 
     ct=ct+1;
 end
+
+% % % % % PLOTS VORTICITY + LAG Pts. (if selected) % % % % %
 
 if vortPlot == 1
     
@@ -180,6 +122,8 @@ if vortPlot == 1
     ct=ct+1;
 end
 
+% % % % % PLOTS PRESSURE + LAG Pts. (if selected) % % % % %
+
 if pressPlot == 1
     
     subplot(1,numPlots,ct)
@@ -203,6 +147,8 @@ if pressPlot == 1
     ct=ct+1;
 end
 
+% % % % % PLOTS MAGNITUDE OF VELOCITY + LAG Pts. (if selected) % % % % %
+
 if uMagPlot == 1
     
     subplot(1,numPlots,ct)
@@ -225,6 +171,8 @@ if uMagPlot == 1
     
     ct=ct+1;
 end
+
+% % % % % PLOTS VELOCITY FIELD + LAG Pts. (if selected) % % % % %
 
 if velPlot == 1
     
