@@ -32,7 +32,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function please_Plot_Results(dx,dy,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot)
+function please_Plot_Results(X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot)
 
 %X,Y:  (x,y) values
 %U,V:  x-directed, y-directed velocities respectively
@@ -191,7 +191,7 @@ if pressPlot == 1
 
     %Use Pressure and Plot It against Lagrangian Grid!
     x = X(1,:); y = Y(:,1);
-    contourf(x,y,flipud(rot90(p)),10); hold on;
+    contourf(x,y,p,6); hold on;
 
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
@@ -214,7 +214,7 @@ if uMagPlot == 1
 
     %Use Mag. Velocity and Plot It against Lagrangian Grid!
     x = X(1,:); y = Y(:,1);
-    contourf(x,y,flipud(rot90(uMag)),10); hold on;
+    contourf(x,y,uMag,6); hold on;
 
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
@@ -244,7 +244,7 @@ if velPlot == 1
 
     axis square;
     
-    ct=ct+1;
+    %ct=ct+1;
 end
 
 drawnow;

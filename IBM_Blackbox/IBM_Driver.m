@@ -225,7 +225,7 @@ while current_time < T_FINAL
     if mod(ct,pDump) == 0
         vort = give_Me_Vorticity(U,V,dx,dy);
         uMag = give_Me_Magnitude_Velocity(U,V);
-        please_Plot_Results(dx,dy,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
+        please_Plot_Results(X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
         fprintf('Current Time(s): %6.6f\n',current_time);
     end
 
