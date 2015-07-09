@@ -60,7 +60,14 @@ Ly =   grid_Info(4); % Length of Eulerian grid in y-coordinate
 dx =   grid_Info(5); % Spatial-size in x
 dy =   grid_Info(6); % Spatial-size in y
 supp = grid_Info(7); % Delta-function support
-pDump= grid_Info(8); % Print (Plot) Dump interval
+
+% PRINTING/PLOTTING INFO %
+pDump = grid_Info(8); % Print (Plot) Dump interval
+lagPlot = grid_Info(9);         % Plot LAGRANGIAN PTs ONLY in Matlab
+velPlot = grid_Info(10);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+vortPlot = grid_Info(11);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+pressPlot = grid_Info(12);      % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+uMagPlot = grid_Info(13);       % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -214,12 +221,7 @@ while current_time < T_FINAL
     yLag_P = yLag_h;     % Stores old Lagrangian y-Values (for muscle model)
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
-    %TEST FLAGS
-    lagPlot = 0;
-    velPlot = 1;
-    vortPlot = 0;
-    pressPlot = 1;
-    uMagPlot = 1;
+    
     
     % Plot Lagrangian/Eulerian Dynamics!
     if mod(ct,pDump) == 0
