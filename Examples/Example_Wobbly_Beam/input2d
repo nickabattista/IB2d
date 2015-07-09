@@ -6,7 +6,7 @@ rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
 Tfinal = 0.015           % Final time of simulation (s)
-dt = 5e-5                % Time-step (s)
+dt = 1e-4                % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  32                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -26,7 +26,7 @@ muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 
 % PRINTING INFORMATION
-print_dump = 1000       % How often to print (PLOT) to screen
+print_dump = 2000       % How often to print (PLOT) to screen
 
 % LAGRANGIAN STRUCTURE NAME %
 string_name = BeamCurve % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
