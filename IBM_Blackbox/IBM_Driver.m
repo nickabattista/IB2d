@@ -201,9 +201,8 @@ cd ..
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
-vort=zeros(Ny,Nx); uMag=vort; p = vort; 
-print_vtk_files(ctsave-1,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny);
-
+vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
+print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts);
 
 
 %
@@ -261,7 +260,8 @@ while current_time < T_FINAL
         [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy);
         
         %Print .vtk files!
-        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny);
+        lagPts = [xLag yLag zeros(length(xLag),1)];
+        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -295,7 +295,7 @@ fclose(vizID);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny)
+function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts)
 
 %Give spacing for grid
 dx = Lx/Nx; 
@@ -313,6 +313,10 @@ pfName = ['P.' strNUM '.vtk'];
 uXName = ['uX.' strNUM '.vtk'];
 uYName = ['uY.' strNUM '.vtk'];
 velocityName = ['u.' strNUM '.vtk'];
+lagPtsName = ['lagsPts.' strNUM '.vtk'];
+
+
+savevtk_points(lagPts, lagPtsName, 'lagPts',dx,dy)
 
 
 % vortfName = ['proc-0.' strNUM '.vtk'];
@@ -407,10 +411,38 @@ function uMag = give_Me_Magnitude_Velocity(U,V)
 % Compute magnitude of velocity
 uMag = ( U.^2 + V.^2 ).^(1/2);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints matrix vector data to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_points( X, filename, vectorName,dx,dy)
+
+%X is matrix of size Nx3
+
+N = length( X(:,1) );
+
+file = fopen (filename, 'w');
+fprintf(file, '# vtk DataFile Version 2.0\n');
+fprintf(file, 'Cube example\n');
+fprintf(file, 'ASCII\n');
+fprintf(file, 'DATASET UNSTRUCTURED_GRID\n');
+fprintf(file, 'POINTS %i float\n', N);
+for i=1:N
+fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+end
+fprintf(file,'POINT_DATA %u \n',N);
+fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
+fprintf(file,'LOOKUP_TABLE default\n');
+%fprintf(file, 'POINT_DATA %i VECTORS magnetization float\n', NN);
+%fprintf(file, '%.15e %.15e %.15e\n', Mag); 
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints matrix to vtk formated file
+% FUNCTION: prints matrix vector data to vtk formated file
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -432,12 +464,11 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n');
+    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
     fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
     fprintf(fid, ['VECTORS ' vectorName ' double\n']);
-    %fprintf(fid, 'LOOKUP_TABLE default\n'); %added to test
     fprintf(fid, '\n');
     for a=1:nz
         for b=1:ny
@@ -455,7 +486,7 @@ return
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints matrix to vtk formated file
+% FUNCTION: prints scalar matrix to vtk formated file
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -473,7 +504,7 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    %fprintf(fid, 'SPACING    1.000   1.000   1.000\n'); %TESTING
+    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
     fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
