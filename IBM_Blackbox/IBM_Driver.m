@@ -196,7 +196,7 @@ cter = 0; ctsave = 1; firstPrint = 1; loc = 1; diffy = 1;
 mkdir('viz_IB2d');
 cd('viz_IB2d');
 vizID = fopen('dumps.visit','w');
-fprintf(vizID,'!NBLOCKS 4\n');
+fprintf(vizID,'!NBLOCKS 6\n');
 cd ..
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
@@ -305,7 +305,11 @@ strNUM = give_String_Number_For_VTK(ctsave);
 vortfName = ['Omega.' strNUM '.vtk'];
 uMagfName = ['uMag.' strNUM '.vtk'];
 pfName = ['P.' strNUM '.vtk'];
+uXName = ['uX.' strNUM '.vtk'];
+uYName = ['uY.' strNUM '.vtk'];
 velocityName = ['u.' strNUM '.vtk'];
+
+
 % vortfName = ['proc-0.' strNUM '.vtk'];
 % uMagfName = ['proc-1.' strNUM '.vtk'];
 % pfName = ['proc-2.' strNUM '.vtk'];
@@ -317,13 +321,17 @@ velocityName = ['u.' strNUM '.vtk'];
 fprintf(vizID,[vortfName '\n']);
 fprintf(vizID,[uMagfName '\n']);
 fprintf(vizID,[pfName '\n']);
+fprintf(vizID,[uXName '\n']);
+fprintf(vizID,[uYName '\n']);
 fprintf(vizID,[velocityName '\n']);
-        
+
 
 %Print Vorticity to .vtk file
 savevtk_scalar(vort, vortfName, 'Omega');
 savevtk_scalar(uMag, uMagfName, 'uMag');
 savevtk_scalar(p, pfName, 'P');
+savevtk_scalar(U, uXName, 'uX');
+savevtk_scalar(V, uYName, 'uY');
 savevtk_vector(U, V, velocityName, 'u')
 
 %Get out of viz_IB2d folder
