@@ -302,21 +302,26 @@ cd('viz_IB2d');
         
 %Find string number for storing files
 strNUM = give_String_Number_For_VTK(ctsave);
-vfName = ['Omega.' strNUM '.vtk'];
+vortfName = ['Omega.' strNUM '.vtk'];
 uMagfName = ['uMag.' strNUM '.vtk'];
 pfName = ['P.' strNUM '.vtk'];
 velocityName = ['u.' strNUM '.vtk'];
+% vortfName = ['proc-0.' strNUM '.vtk'];
+% uMagfName = ['proc-1.' strNUM '.vtk'];
+% pfName = ['proc-2.' strNUM '.vtk'];
+% velocityName = ['proc-3.' strNUM '.vtk'];
+
 
         
 %Print another cycle to .visit file
-fprintf(vizID,[vfName '\n']);
+fprintf(vizID,[vortfName '\n']);
 fprintf(vizID,[uMagfName '\n']);
 fprintf(vizID,[pfName '\n']);
 fprintf(vizID,[velocityName '\n']);
         
 
 %Print Vorticity to .vtk file
-savevtk_scalar(vort, vfName, 'Omega');
+savevtk_scalar(vort, vortfName, 'Omega');
 savevtk_scalar(uMag, uMagfName, 'uMag');
 savevtk_scalar(p, pfName, 'P');
 savevtk_vector(U, V, velocityName, 'u')
@@ -405,7 +410,6 @@ function savevtk_vector(X, Y, filename, vectorName)
         fprint('Error: velocity arrays of unequal size\n'); return;
     end
     [nx, ny, nz] = size(X);
-    nz = 1;
     fid = fopen(filename, 'wt');
     fprintf(fid, '# vtk DataFile Version 2.0\n');
     fprintf(fid, 'Comment goes here\n');
@@ -415,16 +419,16 @@ function savevtk_vector(X, Y, filename, vectorName)
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    fprintf(fid, 'SPACING    1.000   1.000   1.000\n');
+    fprintf(fid, 'SPACING    1.000  1.000   1.000\n');
     fprintf(fid, '\n');
-    fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
+    fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
     fprintf(fid, ['VECTORS ' vectorName ' double\n']);
     fprintf(fid, '\n');
     for a=1:nz
         for b=1:ny
             for c=1:nx
-                fprintf(fid, '%f ', X(c,b,a));
-                fprintf(fid, '%f ', Y(c,b,a));
+                fprintf(fid, '%f ', X(c,b,1));
+                fprintf(fid, '%f ', Y(c,b,1));
                 %fprintf(fid, '%f ', Z(c,b,a));
             end
             fprintf(fid, '\n');
