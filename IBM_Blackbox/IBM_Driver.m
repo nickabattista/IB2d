@@ -191,37 +191,18 @@ V = U;
 % ACTUAL TIME-STEPPING IBM SCHEME!
 cter = 0; ctsave = 1;
 
+
+% CREATE VIZ_IB2D FOLDER and VISIT FILES
 mkdir('viz_IB2d');
 cd('viz_IB2d');
 vizID = fopen('dumps.visit','w');
 fprintf(vizID,'!NBLOCKS 3\n');
 cd ..
 
-vort=zeros(Ny,Nx);
-uMag=vort;
-p = vort;
-        
-cd('viz_IB2d');
-        
-%Find string number for storing files
-strNUM = give_String_Number_For_VTK(ctsave-1);
-vfName = ['Omega.' strNUM '.vtk'];
-uMagfName = ['uMag.' strNUM '.vtk'];
-pfName = ['P.' strNUM '.vtk'];
-
-%Print another cycle to .visit file
-fprintf(vizID,[vfName '\n']);
-fprintf(vizID,[uMagfName '\n']);
-fprintf(vizID,[pfName '\n']);
-        
-%Print Vorticity to .vtk file
-savevtk(vort, vfName, 'Omega');
-savevtk(uMag, uMagfName, 'uMag');
-savevtk(p, pfName, 'P');
-
-
-%Get out of viz_IB2d folder
-cd ..
+%Initialize Vorticity, uMagnitude, and Pressure for initial colormap
+%Print initializations to .vtk
+vort=zeros(Ny,Nx); uMag=vort; p = vort;
+print_vtk_files(ctsave-1,vizID,vort,uMag,p);
 
 
 while current_time < T_FINAL
@@ -265,32 +246,19 @@ while current_time < T_FINAL
     
     % Plot Lagrangian/Eulerian Dynamics!
     if ( ( mod(cter,pDump) == 0  ) && ( cter > pDump ) )
+        
+        %Compute vorticity, uMagnitude
         vort = give_Me_Vorticity(U,V,dx,dy);
         uMag = give_Me_Magnitude_Velocity(U,V);
+        
+        %Plot in Matlab
         please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
+        
+        %Print .vtk files!
+        print_vtk_files(ctsave,vizID,vort,uMag,p);
+        
+        %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
-        
-        %Go into viz_IB2d directory
-        cd('viz_IB2d');
-        
-        %Find string number for storing files
-        strNUM = give_String_Number_For_VTK(ctsave);
-        vfName = ['Omega.' strNUM '.vtk'];
-        uMagfName = ['uMag.' strNUM '.vtk'];
-        pfName = ['P.' strNUM '.vtk'];
-
-        %Print another cycle to .visit file
-        fprintf(vizID,[vfName '\n']);
-        fprintf(vizID,[uMagfName '\n']);
-        fprintf(vizID,[pfName '\n']);
-        
-        %Print Vorticity to .vtk file
-        savevtk(vort, vfName, 'Omega');
-        savevtk(uMag, uMagfName, 'uMag');
-        savevtk(p, pfName, 'P');
-
-        %Get out of viz_IB2d folder
-        cd ..
         
         ctsave=ctsave+1;
         
@@ -305,6 +273,49 @@ while current_time < T_FINAL
 end %ENDS TIME-STEPPING LOOP
 
 fclose(vizID);
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives appropriate string number for filename in printing the
+% .vtk files.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_vtk_files(ctsave,vizID,vort,uMag,p)
+
+%Go into viz_IB2d directory
+cd('viz_IB2d');
+        
+%Find string number for storing files
+strNUM = give_String_Number_For_VTK(ctsave);
+vfName = ['Omega.' strNUM '.vtk'];
+uMagfName = ['uMag.' strNUM '.vtk'];
+pfName = ['P.' strNUM '.vtk'];
+
+        
+%Print another cycle to .visit file
+fprintf(vizID,[vfName '\n']);
+fprintf(vizID,[uMagfName '\n']);
+fprintf(vizID,[pfName '\n']);
+        
+
+%Print Vorticity to .vtk file
+savevtk(vort, vfName, 'Omega');
+savevtk(uMag, uMagfName, 'uMag');
+savevtk(p, pfName, 'P');
+
+%Get out of viz_IB2d folder
+cd ..
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
