@@ -196,15 +196,21 @@ cter = 0; ctsave = 1;
 mkdir('viz_IB2d');
 cd('viz_IB2d');
 vizID = fopen('dumps.visit','w');
-fprintf(vizID,'!NBLOCKS 3\n');
+fprintf(vizID,'!NBLOCKS 4\n');
 cd ..
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
-vort=zeros(Ny,Nx); uMag=vort; p = vort;
-print_vtk_files(ctsave-1,vizID,vort,uMag,p);
+vort=zeros(Ny,Nx); uMag=vort; p = vort; 
+print_vtk_files(ctsave-1,vizID,vort,uMag,p,U,V);
 
 
+
+%
+%
+% * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
+%
+%
 while current_time < T_FINAL
     
     % Step 1: Update Position of Boundary of membrane at half time-step
@@ -255,7 +261,7 @@ while current_time < T_FINAL
         please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
         
         %Print .vtk files!
-        print_vtk_files(ctsave,vizID,vort,uMag,p);
+        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -289,7 +295,7 @@ fclose(vizID);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vizID,vort,uMag,p)
+function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V)
 
 %Go into viz_IB2d directory
 cd('viz_IB2d');
@@ -299,18 +305,21 @@ strNUM = give_String_Number_For_VTK(ctsave);
 vfName = ['Omega.' strNUM '.vtk'];
 uMagfName = ['uMag.' strNUM '.vtk'];
 pfName = ['P.' strNUM '.vtk'];
+velocityName = ['u.' strNUM '.vtk'];
 
         
 %Print another cycle to .visit file
 fprintf(vizID,[vfName '\n']);
 fprintf(vizID,[uMagfName '\n']);
 fprintf(vizID,[pfName '\n']);
+fprintf(vizID,[velocityName '\n']);
         
 
 %Print Vorticity to .vtk file
-savevtk(vort, vfName, 'Omega');
-savevtk(uMag, uMagfName, 'uMag');
-savevtk(p, pfName, 'P');
+savevtk_scalar(vort, vfName, 'Omega');
+savevtk_scalar(uMag, uMagfName, 'uMag');
+savevtk_scalar(p, pfName, 'P');
+savevtk_vector(U, V, velocityName, 'u')
 
 %Get out of viz_IB2d folder
 cd ..
@@ -387,7 +396,51 @@ uMag = ( U.^2 + V.^2 ).^(1/2);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk(array, filename, colorMap)
+function savevtk_vector(X, Y, filename, vectorName)
+%  savevtkvector Save a 3-D vector array in VTK format
+%  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
+%  filename in VTK format. X, Y and Z should be arrays of the same
+%  size, each storing speeds in the a single Cartesian directions.
+    if (size(X) ~= size(Y))
+        fprint('Error: velocity arrays of unequal size\n'); return;
+    end
+    [nx, ny, nz] = size(X);
+    nz = 1;
+    fid = fopen(filename, 'wt');
+    fprintf(fid, '# vtk DataFile Version 2.0\n');
+    fprintf(fid, 'Comment goes here\n');
+    fprintf(fid, 'ASCII\n');
+    fprintf(fid, '\n');
+    fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
+    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
+    fprintf(fid, '\n');
+    fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
+    fprintf(fid, 'SPACING    1.000   1.000   1.000\n');
+    fprintf(fid, '\n');
+    fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
+    fprintf(fid, ['VECTORS ' vectorName ' double\n']);
+    fprintf(fid, '\n');
+    for a=1:nz
+        for b=1:ny
+            for c=1:nx
+                fprintf(fid, '%f ', X(c,b,a));
+                fprintf(fid, '%f ', Y(c,b,a));
+                %fprintf(fid, '%f ', Z(c,b,a));
+            end
+            fprintf(fid, '\n');
+        end
+    end
+    fclose(fid);
+return
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints matrix to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_scalar(array, filename, colorMap)
 %  savevtk Save a 3-D scalar array in VTK format.
 %  savevtk(array, filename) saves a 3-D array of any size to
 %  filename in VTK format.
