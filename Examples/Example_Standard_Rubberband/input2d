@@ -3,11 +3,11 @@
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
 
 % FLUID PARAMETER VALUES %
-mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
+mu = 1.0                % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 0.1            % Final time of simulation (s)
+Tfinal = 0.05            % Final time of simulation (s)
 dt = 1.0e-4             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
