@@ -444,7 +444,7 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
             for c=1:nx
                 fprintf(fid, '%f ', X(c,b,1));
                 fprintf(fid, '%f ', Y(c,b,1));
-                %fprintf(fid, '%f ', Z(c,b,a));
+                fprintf(fid, '%f ', 1);
             end
             fprintf(fid, '\n');
         end

@@ -337,7 +337,7 @@ savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
 savevtk_scalar(p, pfName, 'P',dx,dy);
 savevtk_scalar(U, uXName, 'uX',dx,dy);
 savevtk_scalar(V, uYName, 'uY',dx,dy);
-savevtk_vector(U, V, velocityName, 'u')
+savevtk_vector(U, V, velocityName, 'u',dx,dy)
 
 %Get out of viz_IB2d folder
 cd ..
@@ -414,7 +414,7 @@ uMag = ( U.^2 + V.^2 ).^(1/2);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_vector(X, Y, filename, vectorName)
+function savevtk_vector(X, Y, filename, vectorName,dx,dy)
 %  savevtkvector Save a 3-D vector array in VTK format
 %  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
 %  filename in VTK format. X, Y and Z should be arrays of the same
@@ -433,7 +433,7 @@ function savevtk_vector(X, Y, filename, vectorName)
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
     %fprintf(fid, 'SPACING   1.000   1.000   1.000\n');
-        fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
+    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
     fprintf(fid, ['VECTORS ' vectorName ' double\n']);
@@ -444,7 +444,7 @@ function savevtk_vector(X, Y, filename, vectorName)
             for c=1:nx
                 fprintf(fid, '%f ', X(c,b,1));
                 fprintf(fid, '%f ', Y(c,b,1));
-                %fprintf(fid, '%f ', Z(c,b,a));
+                fprintf(fid, '%f ', 1);
             end
             fprintf(fid, '\n');
         end
