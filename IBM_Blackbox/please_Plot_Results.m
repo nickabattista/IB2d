@@ -68,6 +68,8 @@ locX = find(diffX > 5*ds); % assuming x value can't change more than Lx/2 (witho
 locY = find(diffY > 5*ds); % assuming y value can't change more than Ly/2 (without crossing boundary)
 loc =  sort(unique([locX;locY]));
 
+diffy = sqrt( (chiX(end)-chiX(1) )^2 + ( chiY(end)-chiY(1) )^2 );
+
 clf; %Clear previous plots :)
 
 
@@ -90,6 +92,11 @@ if lagPlot == 1
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
     end
 
     axis square;
@@ -116,6 +123,11 @@ if vortPlot == 1
     for i=2:length(loc)
         plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
     end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
+    end
     
     axis square;
 
@@ -140,6 +152,11 @@ if pressPlot == 1
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
         plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
     end
 
     axis square;
@@ -166,6 +183,11 @@ if uMagPlot == 1
     for i=2:length(loc)
         plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
     end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
+    end
 
     axis square;
     
@@ -188,6 +210,11 @@ if velPlot == 1
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
     end
 
     axis square;
