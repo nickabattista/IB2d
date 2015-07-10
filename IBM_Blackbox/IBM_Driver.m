@@ -189,7 +189,7 @@ V = U;
 
 
 % ACTUAL TIME-STEPPING IBM SCHEME!
-cter = 0; ctsave = 1;
+cter = 0; ctsave = 1; firstPrint = 1; loc = 1; diffy = 1;
 
 
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
@@ -258,7 +258,7 @@ while current_time < T_FINAL
         uMag = give_Me_Magnitude_Velocity(U,V);
         
         %Plot in Matlab
-        please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot);
+        [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy);
         
         %Print .vtk files!
         print_vtk_files(ctsave,vizID,vort,uMag,p,U,V);
@@ -266,7 +266,7 @@ while current_time < T_FINAL
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
         
-        ctsave=ctsave+1;
+        ctsave=ctsave+1; firstPrint = 0;
         
     end
 
