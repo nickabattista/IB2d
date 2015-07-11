@@ -429,7 +429,7 @@ file = fopen (filename, 'w');
 fprintf(file, '# vtk DataFile Version 2.0\n');
 fprintf(file, [vectorName '\n']);
 fprintf(file, 'ASCII\n');
-fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+fprintf(file, 'DATASET STRUCTURED_GRID\n\n');
 %
 fprintf(file, 'POINTS %i float\n', N);
 for i=1:N
@@ -437,40 +437,31 @@ for i=1:N
 end
 fprintf(file,'\n');
 %
-fprintf(file,'CELLS %i %i\n',N,2*N); %First: # of "Cells", Second: Total # of info inputed following
+fprintf(file,'CELLS %i %i\n',N,2*N);
 for s=0:N-1
     fprintf(file,'%i %i\n',1,s);
 end
-fprintf(file,'\n');
-%
-fprintf(file,'CELL_TYPES %i\n',N); % N = # of "Cells"
-for i=1:N
-   fprintf(file,'1 '); 
-end
-fprintf(file,'\n');
-
-
 
 %TRY PRINTING THEM AS POLYGONAL DATA
-% file = fopen (filename, 'w');
-% fprintf(file, '# vtk DataFile Version 2.0\n');
-% fprintf(file, [vectorName '\n']);
-% fprintf(file, 'ASCII\n');
-% fprintf(file, 'DATASET STRUCTURED_GRID\n');
-% fprintf(file, 'DIMENSIONS 64 1 1\n');
-% fprintf(file, 'POINTS %i float\n', N);
-% for i=1:N
-% fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-% end
-% fprintf(file,'1.1 1.1 0\n');
-% fprintf(file,'CELL_DATA 1\n');
-% fprintf(file,'POINT_DATA %u \n',N);
-% fprintf(file,'FIELD FieldData 1\n');
-% fprintf(file,'nodal 1 %i float\n',N);
-% fprintf(file,'0 1 1.1 2\n');
-% fprintf(file,'SCALARS nodal float\n');
-% fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
-% fprintf(file,'LOOKUP_TABLE default\n');
+file = fopen (filename, 'w');
+fprintf(file, '# vtk DataFile Version 2.0\n');
+fprintf(file, [vectorName '\n']);
+fprintf(file, 'ASCII\n');
+fprintf(file, 'DATASET STRUCTURED_GRID\n');
+fprintf(file, 'DIMENSIONS 64 1 1\n');
+fprintf(file, 'POINTS %i float\n', N);
+for i=1:N
+fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+end
+fprintf(file,'1.1 1.1 0\n');
+fprintf(file,'CELL_DATA 1\n');
+fprintf(file,'POINT_DATA %u \n',N);
+fprintf(file,'FIELD FieldData 1\n');
+fprintf(file,'nodal 1 %i float\n',N);
+fprintf(file,'0 1 1.1 2\n');
+fprintf(file,'SCALARS nodal float\n');
+fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
+fprintf(file,'LOOKUP_TABLE default\n');
 
 
 % TRY PRINTING THEM AS POINTS
