@@ -203,8 +203,7 @@ cd ..
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
-connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
-print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat);
+print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,lagConnects);
 
 
 %
@@ -265,7 +264,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat);
+        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -299,7 +298,7 @@ fclose(vizID);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat)
+function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts)
 
 %Give spacing for grid
 dx = Lx/Nx; 
@@ -318,14 +317,16 @@ uXName = ['uX.' strNUM '.vtk'];
 uYName = ['uY.' strNUM '.vtk'];
 velocityName = ['u.' strNUM '.vtk'];
 lagPtsName = ['lagsPts.' strNUM '.vtk'];
-lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
 
 
-%Print Lagrangian Pts to .vtk format
-savevtk_points(lagPts, lagPtsName, 'lagPts');
+savevtk_points(lagPts, lagPtsName, 'lagPts',dx,dy)
 
-%Print Lagrangian Pts w/ CONNECTIONS to .vtk format
-savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
+
+% vortfName = ['proc-0.' strNUM '.vtk'];
+% uMagfName = ['proc-1.' strNUM '.vtk'];
+% pfName = ['proc-2.' strNUM '.vtk'];
+% velocityName = ['proc-3.' strNUM '.vtk'];
+
 
         
 %Print another cycle to .visit file
@@ -337,14 +338,12 @@ fprintf(vizID,[uYName '\n']);
 fprintf(vizID,[velocityName '\n']);
 
 
-%Print SCALAR DATA (i.e., colormap data) to .vtk file
+%Print Vorticity to .vtk file
 savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
 savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
 savevtk_scalar(p, pfName, 'P',dx,dy);
 savevtk_scalar(U, uXName, 'uX',dx,dy);
 savevtk_scalar(V, uYName, 'uY',dx,dy);
-
-%Print VECTOR DATA (i.e., velocity data) to .vtk file
 savevtk_vector(U, V, velocityName, 'u',dx,dy)
 
 %Get out of viz_IB2d folder
@@ -357,31 +356,12 @@ cd ..
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag)
+function connectsVec = give_Me_Lag_Pt_Connects(ds,xLag,yLag)
 
 N = length(xLag);
 
-ct = 1;
-for i=1:N
-    if i<N
-        x1=xLag(i); x2=xLag(i+1);
-        y1=yLag(i); y2=yLag(i+1);
-        dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-        if dist < 5*ds
-            connectsMat(ct,1) = i-1; %For Cpp notation (and .vtk counting)
-            connectsMat(ct,2) = i;   %For Cpp notation (and .vtk counting)
-        ct=ct+1;
-        end
-    elseif i==N
-        x1=xLag(N); x2=xLag(1);
-        y1=yLag(N); y2=yLag(1);
-        dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-        if dist < 5*ds
-            connectsMat(ct,1) = N-1; %For Cpp notation (and .vtk counting)
-            connectsMat(ct,2) = 0;   %For Cpp notation (and .vtk counting)
-        ct=ct+1;
-        end
-    end
+for i=1:N-1
+    
 end
 
 
@@ -449,58 +429,13 @@ function uMag = give_Me_Magnitude_Velocity(U,V)
 % Compute magnitude of velocity
 uMag = ( U.^2 + V.^2 ).^(1/2);
 
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints matrix vector data to vtk formated file
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_points_connects( X, filename, vectorName,connectsMat)
-
-%X is matrix of size Nx3
-
-N = length( X(:,1) );
-Nc = length( connectsMat(:,1) );
-
-%TRY PRINTING THEM AS UNSTRUCTURED_GRID
-file = fopen (filename, 'w');
-fprintf(file, '# vtk DataFile Version 2.0\n');
-fprintf(file, [vectorName '\n']);
-fprintf(file, 'ASCII\n');
-fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
-%
-fprintf(file, 'POINTS %i float\n', N);
-for i=1:N
-    fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELLS %i %i\n',Nc,3*Nc); %First: # of "Cells", Second: Total # of info inputed following
-for s=1:Nc
-    fprintf(file,'%i %i %i\n',2, connectsMat(s,1), connectsMat(s,2) );
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELL_TYPES %i\n',Nc); % N = # of "Cells"
-for i=1:Nc
-   fprintf(file,'3 '); 
-end
-fprintf(file,'\n');
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints matrix vector data to vtk formated file
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function savevtk_points( X, filename, vectorName)
+function savevtk_points( X, filename, vectorName,dx,dy)
 
 %X is matrix of size Nx3
 
