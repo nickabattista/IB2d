@@ -62,12 +62,13 @@ dy =   grid_Info(6); % Spatial-size in y
 supp = grid_Info(7); % Delta-function support
 
 % PRINTING/PLOTTING INFO %
-pDump = grid_Info(8); % Print (Plot) Dump interval
-lagPlot = grid_Info(9);         % Plot LAGRANGIAN PTs ONLY in Matlab
-velPlot = grid_Info(10);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-vortPlot = grid_Info(11);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-pressPlot = grid_Info(12);      % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-uMagPlot = grid_Info(13);       % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+pDump = grid_Info(8);           % Print (Plot) Dump interval
+pMatlab = grid_Info(9);         % Plot in Matlab? (1=YES,0=NO)
+lagPlot = grid_Info(10);        % Plot LAGRANGIAN PTs ONLY in Matlab
+velPlot = grid_Info(11);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+vortPlot = grid_Info(12);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+pressPlot = grid_Info(13);      % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+uMagPlot = grid_Info(14);       % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 % Allocate memory for 3D Matrices %
 %nSaves = floor(NTime/pDump);
@@ -257,7 +258,9 @@ while current_time < T_FINAL
         uMag = give_Me_Magnitude_Velocity(U,V);
         
         %Plot in Matlab
-        [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy);
+        if pMatlab == 1
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy);
+        end
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
