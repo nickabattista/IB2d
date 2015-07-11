@@ -70,11 +70,6 @@ vortPlot = grid_Info(12);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Ma
 pressPlot = grid_Info(13);      % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
 uMagPlot = grid_Info(14);       % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
-% Allocate memory for 3D Matrices %
-%nSaves = floor(NTime/pDump);
-%vort3D = zeros(Nx,Ny,nSaves);
-%uMag3D = vort3D;
-%pressure3D = vort3D;
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -265,7 +260,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat);
+        print_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -448,7 +443,7 @@ function uMag = give_Me_Magnitude_Velocity(U,V)
 
 % Compute magnitude of velocity
 uMag = ( U.^2 + V.^2 ).^(1/2);
-
+ 
 
 
 
