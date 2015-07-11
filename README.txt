@@ -77,3 +77,32 @@ If you use this code for the purposes of teaching, please let Nick know as well 
     plotting)
 
 -NOTE: This code BLOWS UP when Lagrangian points cross a boundary!!!!!
+
+%*****************************************************************************%
+%*******************************% VISUALIZATION %*****************************%
+%*****************************************************************************%
+
+-These examples print data as .vtk files, which can be read by Paraview and VisIt.
+
+-Every example prints the following:
+
+        LAGRANGIAN PTS:     a. Lag. Pts. themselves
+                            b. Lag. Pts. w/ connections!
+
+        SCALARS (colormap): a. Vorticity
+                            b. Magnitude of Velocity
+                            c. uX (x-directed velocity)
+                            d. uY (y-directed velocity)
+                            e. Pressure
+
+        VECTORS: a. velocity data
+
+-There are flags in input2d for the printing interval between saving data
+        -> print_Dump
+
+-There are flags in input2d whether you'd like Matlab to plot various quantities 
+        as simulation progresses:
+
+            -> plot_Matlab     (set = 1, if yes, have Matlab plot)
+            -> plot_<Quantity> (set = 1, if yes for quantity)
+            
