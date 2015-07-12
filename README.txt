@@ -23,7 +23,8 @@ There are a number of built in Examples, mostly used for teaching purposes.
 
 If you would like us to add a specific muscle model, please contact Nick (nick.battista@unc.edu) 
 
-If you use this code for the purposes of teaching, please let Nick know as well :)
+If you use this code for the purposes of teaching or research, please let Nick 
+	know as well :)
 
 %*****************************************************************************%
 %*****************************% HAPPY COMPUTING! %****************************%
