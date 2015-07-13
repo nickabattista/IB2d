@@ -104,8 +104,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 -There are flags in input2d for the printing interval between saving data
         -> print_Dump
 
--There are flags in input2d whether you'd like Matlab to plot various quantities 
-        as simulation progresses:
+-There are flags in input2d whether you'd like Matlab to plot various 
+    quantities as simulation progresses:
 
             -> plot_Matlab     (set = 1, if yes, have Matlab plot)
             -> plot_<Quantity> (set = 1, if yes for quantity)
