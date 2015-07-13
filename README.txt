@@ -41,31 +41,33 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
-    3. "Moving Rubberband" - rubberband moving to the right, via updating target 
-        point positions
+    3. "Moving Rubberband" - rubberband moving to the right, via updating 
+	target point positions
     4. "HeartTube" 
             ex1: - heart tube that pumps via muscle activation using combined 
                    length/tension - Hill model
-            ex2: - heart tube that pumps via dynamic suction pumping by changing 
-                   resting lengths of springs
-            ex3: - heart tube that pumps via peristaltic waves of contraction by 
-                   changing resting lengths of springs
+            ex2: - heart tube that pumps via dynamic suction pumping by 
+		   changing resting lengths of springs
+            ex3: - heart tube that pumps via peristaltic waves of contraction 
+		   by changing resting lengths of springs
     5. "Channel_Flow" - various channel flow examples with parabolic flow being 
                         produced by arbitrary force on Eulerian grid
     6. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
 
--It has the ability to read in Lagrangian Point Data (.vertex), Springs (.spring), 
-    Torsional Springs (.beam),  Target Pts (.target), and Muscle Pts (.muscle)! 
+-It has the ability to read in Lagrangian Point Data (.vertex), Springs 
+	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
+	Muscle Pts (.muscle)! 
 
 -It has the capabilitiy for updating model data:
-    a. updating target point positions -> Example in Moving_Rubberband & Pulsing_Heart
+    a. updating target point positions -> Example in Moving_Rubberband & 
+       Pulsing_Heart
     b. updating_springs() -> Examples in HeartTube
     c. update_beams() [can be made analogously] 
     d. update_muscles() [can be made analogously]
 
--It can have pseudo-inflow conditions by inducing an arbitrary force onto the Eulerian 
-    grid (e.g., Channel Flow Examples)
+-It can have pseudo-inflow conditions by inducing an arbitrary force onto the 
+    Eulerian grid (e.g., Channel Flow Examples)
 
 -It can plot the following things in Matlab, if plot_Matlab flag = 1 in input2d:
     a. Vorticity (colormap) + Lagrangian Pts.
@@ -74,8 +76,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     d. Velocity (vector form) + Lagrangian Pts.
     e. Lagrangian Pts. themselves 
 
--It has a flag for print dump interval (shared between printing to .vtk format + Matlab 
-    plotting)
+-It has a flag for print dump interval (shared between printing to .vtk format 
+    + Matlab plotting)
 
 -NOTE: This code BLOWS UP when Lagrangian points cross a boundary!!!!!
 
@@ -83,7 +85,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 %*******************************% VISUALIZATION %*****************************%
 %*****************************************************************************%
 
--These examples print data as .vtk files, which can be read by Paraview and VisIt.
+-These examples print data as .vtk files, which can be read by Paraview and 
+    VisIt.
 
 -Every example prints the following:
 
