@@ -34,8 +34,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     1. Go into "Examples" Directory
     2. Choose which example you want to run and enter directory
     3. Type "main2d"
-    4. You can change input data in the input2d data folder, or modify the geometry in 
-       the specified geometry file
+    4. You can change input data in the input2d data folder, or modify the 
+       geometry in the specified geometry file
 
 -THIS CAN RUN 5 DIFFERENT EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
