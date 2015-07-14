@@ -81,6 +81,7 @@ beams_Yes = model_Info(5);           % Beams: 0 (for no) or 1 (for yes)
 update_Beams_Flag = model_Info(6);   % Update_Beams: 0 (for no) or 1 (for yes)
 muscles_Yes = model_Info(7);         % Muscles: 0 (for no) or 1 (for yes)
 arb_ext_force_Yes = model_Info(8);   % Arbitrary External Force: 0 (for no) or 1 (for yes)
+tracers_Yes = model_Info(9);         % Tracers: 0 (for no) or 1 (for yes)
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -110,6 +111,14 @@ end
 grid_Info(8) = Nb;          % # Total Number of Lagrangian Pts.
 xLag_P = xLag;              % Initialize previous Lagrangian x-Values (for use in muscle-model)
 yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use in muscle-model)
+
+
+% READ IN TRACERS (IF THERE ARE TRACERS) %
+if (tracers_Yes == 1)
+   [Ntracers,xT,yT] = read_Tracer_Points(struct_name);
+        %tracers_info: col 1: xPt of Tracers
+        %              col 2: yPt of Tracers
+end
 
 
 % READ IN SPRINGS (IF THERE ARE SPRINGS) %
@@ -682,6 +691,40 @@ for i=1:N
    yLag(i,1) = vertices(i+1,2); %Stores y-values of Lagrangian Mesh
    
 end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in the # of tracer pts and all the tracer pts from the
+%           .tracer file.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [N,xLag,yLag] = read_Tracer_Points(struct_name)
+
+filename = [struct_name '.tracer'];  %Name of file to read in
+fileID = fopen(filename);
+
+% Read in the file, use 'CollectOutput' to gather all similar data together
+% and 'CommentStyle' to to end and be able to skip lines in file.
+C = textscan(fileID,'%f %f','CollectOutput',1);
+
+
+fclose(fileID);     %Close the data file.
+
+tracers = C{1};    %Stores all read in data in vertices (N+1,2) array
+
+N = tracers(1,1);  % # of Lagrangian Pts
+xLag = zeros(N,1);  % Initialize storage for Lagrangian Pts.
+yLag = xLag;        % Initialize storage for Lagrangian Pts.
+
+for i=1:N
+   xLag(i,1) = tracers(i+1,1); %Stores x-values of Tracer Lagrangian Mesh
+   yLag(i,1) = tracers(i+1,2); %Stores y-values of Tracer Lagrangian Mesh
+   
+end
+
 
 
 
