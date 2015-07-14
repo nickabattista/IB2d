@@ -63,7 +63,7 @@ yMin = 0.41;
 yMax = 0.59;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
-kStiff = 1e2;
+kStiff = 2.5e4;
 
 % Width of Channel
 w = 0.2;

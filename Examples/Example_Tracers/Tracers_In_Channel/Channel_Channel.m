@@ -112,7 +112,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints VERTEX points to a file called rubberband.vertex
 %

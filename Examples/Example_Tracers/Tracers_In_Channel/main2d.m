@@ -85,7 +85,7 @@ model_Info(9) = params(18);         % Tracer Particles
 
 
 % Path Reference to where Driving code is found %
-addpath('../../IBM_Blackbox/');
+addpath('../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
