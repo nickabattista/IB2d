@@ -199,7 +199,8 @@ U = zeros(Ny,Nx);
 V = U;
 
 
-% ACTUAL TIME-STEPPING IBM SCHEME!
+% ACTUAL TIME-STEPPING IBM SCHEME! 
+%(flags for storing structure connects for printing and printing to .vtk)
 cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 
@@ -215,8 +216,9 @@ cd ..
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
-
 ctsave = ctsave+1;
+
+
 %
 %
 % * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
@@ -259,6 +261,7 @@ while current_time < T_FINAL
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
+    
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
         [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info);
@@ -266,9 +269,9 @@ while current_time < T_FINAL
         tracers(:,3) = yT;
     end
     
+    
     % Plot Lagrangian/Eulerian Dynamics!
     if ( ( mod(cter,pDump) == 0  ) && ( cter > pDump ) )
-        
         
         %Compute vorticity, uMagnitude
         vort = give_Me_Vorticity(U,V,dx,dy);
@@ -286,6 +289,7 @@ while current_time < T_FINAL
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
         
+        %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
         
     end
