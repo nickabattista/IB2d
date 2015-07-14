@@ -115,9 +115,15 @@ yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use i
 
 % READ IN TRACERS (IF THERE ARE TRACERS) %
 if (tracers_Yes == 1)
-   [Ntracers,xT,yT] = read_Tracer_Points(struct_name);
+   [~,xT,yT] = read_Tracer_Points(struct_name);
+   tracers = zeros(length(xT),4);
+   tracers(1,1) = 1;
+   tracers(:,2) = xT;
+   tracers(:,3) = yT;
         %tracers_info: col 1: xPt of Tracers
         %              col 2: yPt of Tracers
+else
+   tracers = 0; 
 end
 
 
@@ -208,7 +214,7 @@ cd ..
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
-print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat);
+print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 
 
 %
@@ -249,14 +255,20 @@ while current_time < T_FINAL
     [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
 
     % Step 4: Update Position of Boundary of membrane again for a half time-step
-    xLag_P = xLag_h;     % Stores old Lagrangian x-Values (for muscle model)
-    yLag_P = yLag_h;     % Stores old Lagrangian y-Values (for muscle model)
+    xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
+    yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
 
-    
+    % If there are tracers, update tracer positions %
+    if tracers_Yes == 1
+        [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info);
+        tracers(:,2) = xT;
+        tracers(:,3) = yT;
+    end
     
     % Plot Lagrangian/Eulerian Dynamics!
     if ( ( mod(cter,pDump) == 0  ) && ( cter > pDump ) )
+        
         
         %Compute vorticity, uMagnitude
         vort = give_Me_Vorticity(U,V,dx,dy);
@@ -269,7 +281,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat);
+        print_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -303,7 +315,7 @@ fclose(vizID);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat)
+function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers)
 
 %Give spacing for grid
 dx = Lx/Nx; 
@@ -324,13 +336,18 @@ velocityName = ['u.' strNUM '.vtk'];
 lagPtsName = ['lagsPts.' strNUM '.vtk'];
 lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
 
-
 %Print Lagrangian Pts to .vtk format
 savevtk_points(lagPts, lagPtsName, 'lagPts');
 
 %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
 savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
 
+%Print Tracer Pts (*if tracers*)
+if tracers(1,1) == 1
+    tracersPtsName = ['tracer.' strNUM '.vtk'];
+    %tMatrix = tracers(:,2:4);
+    savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
+end
         
 %Print another cycle to .visit file
 fprintf(vizID,[vortfName '\n']);
