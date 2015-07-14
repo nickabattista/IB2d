@@ -80,7 +80,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 -It has a flag for print dump interval (shared between printing to .vtk format 
     + Matlab plotting)
 
--NOTE: This code BLOWS UP when Lagrangian points cross a boundary!!!!!
+-NOTE: This code *may* BLOW UP when Lagrangian points cross a boundary!!!!!
 
 %*****************************************************************************%
 %*******************************% VISUALIZATION %*****************************%
