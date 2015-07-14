@@ -63,13 +63,13 @@ grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
 grid_Info(5) = params(7)/params(5); % Spatial step-size in x
 grid_Info(6) = params(8)/params(6); % Spatial step-size in y
 grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
-grid_Info(8) = params(18);          % Print Dump (How often to plot)
-grid_Info(9) = params(19);          % Plot in Matlab? (1=YES,0=NO) 
-grid_Info(10) = params(20);         % Plot LAGRANGIAN PTs ONLY in Matlab
-grid_Info(11) = params(21);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-grid_Info(12) = params(22);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-grid_Info(13) = params(23);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-grid_Info(14) = params(24);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+grid_Info(8) = params(19);          % Print Dump (How often to plot)
+grid_Info(9) = params(20);          % Plot in Matlab? (1=YES,0=NO) 
+grid_Info(10) = params(21);         % Plot LAGRANGIAN PTs ONLY in Matlab
+grid_Info(11) = params(22);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+grid_Info(12) = params(23);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+grid_Info(13) = params(24);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+grid_Info(14) = params(25);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -81,6 +81,7 @@ model_Info(5) = params(14);         % Beams: 0 (for no) or 1 (for yes)
 model_Info(6) = params(15);         % Update_Beams: 0 (for no) or 1 (for yes)
 model_Info(7) = params(16);         % Muscle Activation (Length/Tension-Hill Model): % 0 (for no) or 1 (for yes)
 model_Info(8) = params(17);         % Arbirtary External Force Onto Fluid Grid
+model_Info(9) = params(18);         % Tracer Particles
 
 
 % Path Reference to where Driving code is found %
