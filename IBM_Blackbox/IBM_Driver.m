@@ -200,7 +200,7 @@ V = U;
 
 
 % ACTUAL TIME-STEPPING IBM SCHEME!
-cter = 0; ctsave = 1; firstPrint = 1; loc = 1; diffy = 1;
+cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
@@ -216,7 +216,7 @@ vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),
 connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 
-
+ctsave = ctsave+1;
 %
 %
 % * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
