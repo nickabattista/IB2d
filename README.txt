@@ -37,7 +37,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS CAN RUN 5 DIFFERENT EXAMPLES:
+-THIS CAN RUN 7 DIFFERENT EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
@@ -54,10 +54,11 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                         produced by arbitrary force on Eulerian grid
     6. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
+    7. "Tracers" - examples of inserting tracer particles into simulations
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
-	Muscle Pts (.muscle)! 
+	Muscle Pts (.muscle), and Tracer Particles (.tracer)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Example in Moving_Rubberband & 
@@ -100,6 +101,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                             e. Pressure
 
         VECTORS: a. velocity data
+
+        TRACERS: a. tracer particle locations
 
 -There are flags in input2d for the printing interval between saving data
         -> print_Dump
