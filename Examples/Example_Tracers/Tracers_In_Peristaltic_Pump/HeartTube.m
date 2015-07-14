@@ -69,7 +69,7 @@ print_Lagrangian_Tracers(xT,yT,struct_name)
 
 % Prints .spring file!
 k_Spring = 1e7;
-print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds,struct_name);
 
 % Prints .muscle file!
 %LFO = d; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e5;
@@ -250,7 +250,7 @@ function print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,d,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag); %Number of Lagrangian Pts. Total
 
@@ -271,7 +271,10 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,d,struct_name)
     end
     
     for s = 1:N/2
-        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+N/2,   k_Spring/100, d); 
+        x1 = xLag(s);   x2 = xLag(s+N/2);
+        y1 = yLag(s);   y2 = yLag(s+N/2);
+        d = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+N/2,   k_Spring/175, d); 
     end
     fclose(spring_fid); 
     
@@ -301,6 +304,22 @@ y2 = y2 + Ly/2;               % Shift into correct box
 xLag = [x1 x2];
 yLag = [y1 y2];
 
+N = length(xLag);             % Number of Lagrangian Pts.
+L = 2.0;
+
+xM = xLag(N/4);
+for i=2:N/2-1
+   x = xLag(i);
+   delta = sin( (2*pi/L)*( (x - xM) ) );
+   if x > xM
+        if delta >= 0
+            yLag(i) = y1(i) + 0.475*delta;
+            yLag(N/2+i) = y2(i) - 0.475*delta;
+        end
+   end
+    
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: gives Tracer (x,y) locations (arbitrarily set)
@@ -325,4 +344,3 @@ xL = xL*ones(1,length(y));
 
 xT = [xR xRM xM xLM xL];
 yT = [y y y y y];
-
