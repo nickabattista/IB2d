@@ -58,7 +58,7 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 % Compute Where You Want to Apply Force
 xMin = 0.1;
-xMax = 0.16;
+xMax = 0.13;
 yMin = 0.41;
 yMax = 0.59;
 
@@ -69,7 +69,7 @@ kStiff = 1e4;
 w = 0.2;
 
 % Max Velocity Desired
-uMax = 2.0;
+uMax = 200.0;
 
 inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
