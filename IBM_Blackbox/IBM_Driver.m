@@ -67,8 +67,8 @@ pMatlab = grid_Info(9);         % Plot in Matlab? (1=YES,0=NO)
 lagPlot = grid_Info(10);        % Plot LAGRANGIAN PTs ONLY in Matlab
 velPlot = grid_Info(11);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
 vortPlot = grid_Info(12);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-pressPlot = grid_Info(13);      % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-uMagPlot = grid_Info(14);       % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+uMagPlot = grid_Info(13);       % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+pressPlot = grid_Info(14);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 
@@ -216,7 +216,8 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
-%print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
+print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
+fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
 
 
@@ -272,7 +273,7 @@ while current_time < T_FINAL
     
     
     % Plot Lagrangian/Eulerian Dynamics!
-    if ( ( mod(cter,pDump) == 0  ) && ( cter > pDump ) )
+    if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )
         
         %Compute vorticity, uMagnitude
         vort = give_Me_Vorticity(U,V,dx,dy);
@@ -299,6 +300,7 @@ while current_time < T_FINAL
     % Update current_time value & counter
     current_time = current_time+dt;
     cter = cter + 1;
+    %pause();
     
     
 end %ENDS TIME-STEPPING LOOP

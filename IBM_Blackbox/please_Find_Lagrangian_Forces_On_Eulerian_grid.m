@@ -401,6 +401,7 @@ for i=1:supp
    ind_Lag = [ind_Lag indLagAux]; 
 end
 
+
 % Compute distance between Eulerian Pts. and Lagrangian Pts. by passing correct indices for each
 distX = give_Eulerian_Lagrangian_Distance(x(indX),xLag(ind_Lag),Lx);
 distY = give_Eulerian_Lagrangian_Distance(y(indY),yLag(ind_Lag'),Ly);
@@ -409,6 +410,7 @@ distY = give_Eulerian_Lagrangian_Distance(y(indY),yLag(ind_Lag'),Ly);
 % Initialize delta_X and delta_Y matrices for storing delta-function info for each Lag. Pt.
 delta_X = zeros(Nb, Nx);
 delta_Y = zeros(Ny, Nb);
+
 delta_1D_x = give_Delta_Kernel(distX, dx);
 delta_1D_y = give_Delta_Kernel(distY, dy);
 
