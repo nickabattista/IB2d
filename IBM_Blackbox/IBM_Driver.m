@@ -206,8 +206,9 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
 mkdir('viz_IB2d');
+vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 %cd('viz_IB2d');
-%vizID = fopen('dumps.visit','w');
+%vizID = fopen('dumps.visit','w'); 
 %fprintf(vizID,'!NBLOCKS 6\n');
 %cd ..
 
@@ -215,7 +216,7 @@ mkdir('viz_IB2d');
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
-print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
+%print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 ctsave = ctsave+1;
 
 
@@ -514,7 +515,7 @@ for i=1:Nc
    fprintf(file,'3 '); 
 end
 fprintf(file,'\n');
-fclose(filename);
+fclose(file);
 
 
 
