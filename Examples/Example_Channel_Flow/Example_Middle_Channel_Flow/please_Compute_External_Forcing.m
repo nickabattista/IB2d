@@ -63,13 +63,13 @@ yMin = 0.4025;
 yMax = 0.5975;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
-kStiff = 1e2;
+kStiff = 1e4;
 
 % Width of Channel
 w = 0.2;
 
 % Max Velocity Desired
-uMax = 1.0;
+uMax = 200.0;
 
 inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
