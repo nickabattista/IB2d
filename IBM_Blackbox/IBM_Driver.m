@@ -206,10 +206,10 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
 mkdir('viz_IB2d');
-cd('viz_IB2d');
-vizID = fopen('dumps.visit','w');
-fprintf(vizID,'!NBLOCKS 6\n');
-cd ..
+%cd('viz_IB2d');
+%vizID = fopen('dumps.visit','w');
+%fprintf(vizID,'!NBLOCKS 6\n');
+%cd ..
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
@@ -302,7 +302,7 @@ while current_time < T_FINAL
     
 end %ENDS TIME-STEPPING LOOP
 
-fclose(vizID);
+%fclose(vizID);
 
 
 
@@ -354,12 +354,12 @@ if tracers(1,1) == 1
 end
         
 %Print another cycle to .visit file
-fprintf(vizID,[vortfName '\n']);
-fprintf(vizID,[uMagfName '\n']);
-fprintf(vizID,[pfName '\n']);
-fprintf(vizID,[uXName '\n']);
-fprintf(vizID,[uYName '\n']);
-fprintf(vizID,[velocityName '\n']);
+%fprintf(vizID,[vortfName '\n']);
+%fprintf(vizID,[uMagfName '\n']);
+%fprintf(vizID,[pfName '\n']);
+%fprintf(vizID,[uXName '\n']);
+%fprintf(vizID,[uYName '\n']);
+%fprintf(vizID,[velocityName '\n']);
 
 
 %Print SCALAR DATA (i.e., colormap data) to .vtk file
@@ -514,6 +514,7 @@ for i=1:Nc
    fprintf(file,'3 '); 
 end
 fprintf(file,'\n');
+fclose(filename);
 
 
 
@@ -556,6 +557,7 @@ for i=1:N
    fprintf(file,'1 '); 
 end
 fprintf(file,'\n');
+fclose(file);
 
 
 
