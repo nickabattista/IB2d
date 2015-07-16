@@ -59,6 +59,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                          (interpolates between two phases)
     7. "Tracers" - examples of inserting tracer particles into simulations
     8. "Mass_Points" - 'massive' cell in pulsatile channel flow
+                     - 'massive' cell race!
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
