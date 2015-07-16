@@ -71,8 +71,8 @@ yLag = [yLag_C yLag_T]; % Add xLagPts from Circle to xLag Pt. Vector (*no spring
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .mass file!
-k_Mass = 1e6;        % 'spring' stiffness parameter for tethering
-Mass = 100;          % "MASS" value for 'ghost' nodal movement
+k_Mass = 1e6;         % 'spring' stiffness parameter for tethering
+Mass = 1e-2;          % "MASS" value for 'ghost' nodal movement
 print_Lagrangian_Mass_Pts(xLag_C,k_Mass,Mass,struct_name);
 
 % Prints .spring file!
