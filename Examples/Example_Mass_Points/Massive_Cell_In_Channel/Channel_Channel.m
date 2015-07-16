@@ -71,8 +71,9 @@ yLag = [yLag_C yLag_T]; % Add xLagPts from Circle to xLag Pt. Vector (*no spring
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .mass file!
-Mass = 100;
-print_Lagrangian_Mass_Pts(xLag_C,Mass,struct_name);
+k_Mass = 1e6;        % 'spring' stiffness parameter for tethering
+Mass = 100;          % "MASS" value for 'ghost' nodal movement
+print_Lagrangian_Mass_Pts(xLag_C,k_Mass,Mass,struct_name);
 
 % Prints .spring file!
 k_Spring = 1e7; ds_Rest = sqrt( ( xLag_C(1)-xLag_C(2)  )^2 + ( yLag_C(1)-yLag_C(2)  )^2    );
@@ -136,7 +137,7 @@ function print_Lagrangian_Target_Pts(xLag,Noff,k_Target,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     
-function print_Lagrangian_Mass_Pts(xLag,Mass,struct_name)
+function print_Lagrangian_Mass_Pts(xLag,kMass,Mass,struct_name)
 
     %LOOP OVER LAG PTS FOR MASS PTS IN LAGRANGIAN INDEXING
 
@@ -148,7 +149,7 @@ function print_Lagrangian_Mass_Pts(xLag,Mass,struct_name)
 
     %Loops over all Lagrangian Pts.
     for s = 1:N
-        fprintf(mass_fid, '%d %1.16e\n', s, Mass);
+        fprintf(mass_fid, '%d %1.16e %1.16e\n', s, kMass,Mass);
     end
 
     fclose(mass_fid); 
