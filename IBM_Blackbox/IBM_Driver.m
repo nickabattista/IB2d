@@ -255,13 +255,15 @@ ctsave = ctsave+1;
 %
 while current_time < T_FINAL
     
+    %
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
-    % Variables end with h if it is a half-step
+    %                           (Variables end with h if it is a half-step)
+    %
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info);
-    if mass_Yes == 1
-       %[mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
-    end
     
+    if mass_Yes == 1
+       [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
+    end
     
     if ( ( update_Springs_Flag == 1 ) && ( springs_Yes == 1 ) )
        springs_info = update_Springs(dt,current_time,xLag,springs_info); 
@@ -275,12 +277,26 @@ while current_time < T_FINAL
        beams_info = update_Beams(dt,current_time,beams_info); 
     end
     
+    %
+    %**************** Step 2: Calculate Force coming from membrane at half time-step ****************
+    %
+    [Fxh, Fyh, F_Mass_Bnd] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, mass_info);
     
-    % Step 2: Calculate Force coming from membrane at half time-step
-    [Fxh, Fyh] =           please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, mass_info);
+    % once force is calculated, can finish time-step for massive boundary
+    if mass_Yes == 1    
+        % Update Massive Boundary Velocity
+        mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,mVelocity,F_Mass_Bnd);
+        
+        % Update Massive Boundary Position for Time-step
+        mass_info(:,[2 3]) = massLagsOld;
+        [mass_info,~] = please_Move_Massive_Boundary(dt,mass_info,mVelocity_h); 
+
+        % Update Massive Boundary Velocity for Time-step
+        mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,mVelocity,F_Mass_Bnd); 
+    end
     
     if arb_ext_force_Yes == 1 
-        [Fx_Arb, Fy_Arb] = please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);
+        [Fx_Arb, Fy_Arb] =    please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);
         Fxh = Fxh + Fx_Arb;
         Fyh = Fyh + Fy_Arb;
     end

@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
+function [Fx, Fy, F_Mass] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
 
 %
 % The components of the force are given by
@@ -114,11 +114,11 @@ end
 % Compute MASS PT FORCE DENSITIES (if there are mass points!)
 if ( mass_Yes == 1)
     % Compute the Lagrangian MASS PT force densities!
-    [fx_mass, fy_mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses); 
-    
+    [fx_mass, fy_mass, F_Mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses); 
 else
     fx_mass = zeros(Nb,1); %No x-forces coming from mass points
     fy_mass = fx_mass;     %No y-forces coming from mass points
+    F_Mass = 0;            %Dummy to pass along  
 end
 
 
@@ -351,7 +351,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx_mass, fy_mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses)
+function [fx_mass, fy_mass, F_Mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses)
 
 IDs = masses(:,1);                 % Stores Lag-Pt IDs in col vector
 xPts= masses(:,2);                 % Original x-Values of x-Mass Pts.
@@ -372,6 +372,9 @@ end
 
 fx_mass = fx;
 fy_mass = fy;
+
+F_Mass(:,1) = fx;  % Store for updating massive boundary pts
+F_Mass(:,2) = fy;  % Store for updating massive boundary pts
 
 % MIGHT NOT NEED THESE!
 %fx_target = fx/ds^2;
