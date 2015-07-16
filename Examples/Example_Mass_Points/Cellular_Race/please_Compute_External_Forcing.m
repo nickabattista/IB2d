@@ -56,11 +56,6 @@ Nb =    grid_Info(8); % # of Lagrangian pts.
 ds =    grid_Info(9); % Lagrangian spacing
 
 
-% Compute Where You Want to Apply Force
-xMin = 0.1;
-xMax = 0.16;
-yMin = 0.41;
-yMax = 0.59;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
 kStiff = 1e4;
@@ -71,14 +66,31 @@ w = 0.2;
 % Max Velocity Desired
 uMax = 250.0;
 
-inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+% Compute Where You Want to Apply Force
+xMin = 0.1;  xMax = 0.16; yMin = 0.41; yMax = 0.59;
+inds1 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+
+% Compute Where You Want to Apply Force
+xMin = 0.1;  xMax = 0.16; yMin = 0.41+0.3; yMax = 0.59+0.3;
+inds2 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+
+% Compute Where You Want to Apply Force
+xMin = 0.1;  xMax = 0.16; yMin = 0.41-0.3; yMax = 0.59-0.3;
+inds3 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
 % Compute External Forces from Desired Target Velocity
-[fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds);
+yShift = 0;
+[fx1, fy1] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds1,yShift);
+
+yShift = 0.3;
+[fx2, fy2] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds2,yShift);
+
+yShift = -0.3;
+[fx3, fy3] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds3,yShift);
     
 % Compute Total External Forces
-Fx = fx;
-Fy = fy;
+Fx = fx1+fx2+fx3;
+Fy = fy1+fy2+fy3;
 
 
 
@@ -151,7 +163,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds)
+function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds,yShift)
 
 % t:  current time in simulation
 % Nx: # of nodes in x-direction on Eulerian grid
@@ -169,7 +181,7 @@ for n=1:length(inds(:,1))
     i = inds(n,1);
     j = inds(n,2);
     
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
+    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax,yShift);    
         
     fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
     fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
@@ -191,24 +203,25 @@ fy_exts = fy;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax)
+function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax,yShift)
 
-% t:     current time in simulation
-% dx:    x-Grid spacing
-% dy:    y-Grid spacing
-% xGrid: vector of xPts in Eulerian grid
-% yGrid: vector of yPts in Eulerian grid
-% Lx:    x-Length of Eulerian Grid
-% Ly:    y-Length of Eulerian Grid
-% i:     ith component in x-Grid
-% j:     jth component in y-Grid
-% w:     width of Channel
-% Umax:  maximum velocity
+% t:      current time in simulation
+% dx:     x-Grid spacing
+% dy:     y-Grid spacing
+% xGrid:  vector of xPts in Eulerian grid
+% yGrid:  vector of yPts in Eulerian grid
+% Lx:     x-Length of Eulerian Grid
+% Ly:     y-Length of Eulerian Grid
+% i:      ith component in x-Grid
+% j:      jth component in y-Grid
+% w:      width of Channel
+% Umax:   maximum velocity
+% yShift: shift up or down
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
-uY_Tar = 0;                                                           % No external forces in y-direction
+uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2+yShift) - y )*( (Lx/2-w/2+yShift) - y ); % Only external forces in x-direction
+uY_Tar = 0;                                                                         % No external forces in y-direction
 
 
 
