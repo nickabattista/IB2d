@@ -105,11 +105,11 @@ print_Lagrangian_Mass_Pts(xLag_C1,k_Mass,Mass,struct_name);
 
 % Prints .spring file!
 k_Spring = 5e7; ds_Rest = sqrt( ( xLag_C(1)-xLag_C(2)  )^2 + ( yLag_C(1)-yLag_C(2)  )^2    );
-print_Lagrangian_Springs(xLag_C,yLag_C,k_Spring,ds_Rest,struct_name);
+print_Lagrangian_Springs(xLag_C,yLag_C,k_Spring,ds_Rest,r,struct_name);
 
 % Prints .beam file!
-%k_Beam = 0.5; C = 0.0;
-%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
+k_Beam = 1e7; C = 0;%1/r; %(curvature of a circle)
+print_Lagrangian_Beams(xLag_C,yLag_C,k_Beam,C,struct_name);
 
 % Prints .target file!
 k_Target = 1e7; Noff = 3*length(xLag_C);
@@ -204,17 +204,38 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
-    fprintf(beam_fid, '%d\n', N );
+    fprintf(beam_fid, '%d\n', 3*N );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
-    for s = 2:N-1
-            if  s <= N-1         
+    for s = 1:N
+            if s==1 
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N, s, s+1,   k_Beam, C);  
+            elseif  s <= N-1         
                 fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
-            else
-                %Case s=N
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C);  
+            elseif s==N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C);
+            end
+    end
+    
+    for s = N+1:2*N
+            if s==N+1 
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',2*N, s, s+1,   k_Beam, C);  
+            elseif  s <= 2*N-1         
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
+            elseif s==2*N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, N+1,   k_Beam, C);
+            end
+    end
+    
+    for s = 2*N+1:3*N
+            if s==2*N+1 
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',3*N, s, s+1,   k_Beam, C);  
+            elseif  s <= 3*N-1         
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
+            elseif s==3*N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 2*N+1,   k_Beam, C);
             end
     end
     fclose(beam_fid); 
@@ -226,13 +247,13 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,struct_name)
 
     N = length(xLag);
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', 3*N );
+    fprintf(spring_fid, '%d\n', 3*N + 3/2*N ); %N MUST BE EVEN!
 
     %spring_force = kappa_spring*ds/(ds^2);
 
@@ -252,6 +273,16 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
             elseif s==3*N
                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 2*N+1,   k_Spring, ds_Rest); 
             end
+    end
+    
+    for s=1:N/2
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+N/2, k_Spring/100, 2*r);  
+    end
+    for s=1:N/2
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', N+s, N + s+N/2, k_Spring/100, 2*r);  
+    end
+    for s=1:N/2
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 2*N+s, 2*N + s+N/2, k_Spring/100, 2*r);  
     end
     fclose(spring_fid); 
     
