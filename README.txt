@@ -17,6 +17,7 @@ This code is capable of creating Lagrangian Structures using:
  	3. Target Points
 	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-
 	   Tension)")
+    5. Mass Points
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -55,6 +56,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     6. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
     7. "Tracers" - examples of inserting tracer particles into simulations
+    8. "Mass_Points" - 'massive' cell in pulsatile channel flow
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
