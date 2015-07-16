@@ -17,7 +17,7 @@ This code is capable of creating Lagrangian Structures using:
  	3. Target Points
 	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-
                     Tension)")
-    5. Mass Points
+        5. Mass Points
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
