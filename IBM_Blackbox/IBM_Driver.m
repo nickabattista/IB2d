@@ -221,8 +221,9 @@ end
 
 
 % Initialize the initial velocities to zero.
-U = zeros(Ny,Nx);
-V = U;
+U = zeros(Ny,Nx);                                % x-Eulerian grid velocity
+V = U;                                           % y-Eulerian grid velocity
+mVelocity = zeros( length(mass_info(:,1)), 2 );  % mass-Pt velocity 
 
 
 % ACTUAL TIME-STEPPING IBM SCHEME! 
@@ -254,9 +255,13 @@ ctsave = ctsave+1;
 %
 while current_time < T_FINAL
     
-    % Step 1: Update Position of Boundary of membrane at half time-step
+    %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     % Variables end with h if it is a half-step
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info);
+    if mass_Yes == 1
+       %[mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
+    end
+    
     
     if ( ( update_Springs_Flag == 1 ) && ( springs_Yes == 1 ) )
        springs_info = update_Springs(dt,current_time,xLag,springs_info); 
