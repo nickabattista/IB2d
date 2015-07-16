@@ -166,8 +166,7 @@ end
 if ( mass_Yes == 1)
     mass_aux = read_Mass_Points(struct_name);
     %target_aux: col 1: Lag Pt. ID w/ Associated Mass Pt.
-    %            col 2: "Mass-spring" stiffness parameter
-    %            col 3: "MASS" value parameter
+    %            col 2: "MASS" value parameter
     mass_info(:,1) = mass_aux(:,1); %Stores Lag-Pt IDs in col vector
     for i=1:length(mass_info(:,1))
         id = mass_info(i,1);
@@ -175,8 +174,7 @@ if ( mass_Yes == 1)
         mass_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Mass Pt. Identities
     end
    
-    mass_info(:,4) = mass_aux(:,2);   %Stores "mass-spring" parameter 
-    mass_info(:,5) = mass_aux(:,3);   %Stores "MASS" value parameter
+    mass_info(:,4) = mass_aux(:,2);   %Stores "MASS" parameter 
 else
     mass_info = 0;
 end
@@ -835,9 +833,8 @@ mass_info = C{1};    %Stores all read in data in vertices (N+1,2) array
 %Store all elements on .mass file into a matrix starting w/ 2nd row of read in data.
 masses = mass_info(2:end,1:3);
 
-%masses:  col 1: Lag Pt. ID w/ Associated Mass Pt.
+%targets: col 1: Lag Pt. ID w/ Associated Mass Pt.
 %         col 2: "Mass-Spring" stiffness Parameter
-%         col 3: Mass Value Parameter
 
 
 

@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles)
+function [Fx, Fy] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
 
 %
 % The components of the force are given by
@@ -47,7 +47,8 @@ function [Fx, Fy] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_t
 % model_Info:   Stores if springs, if update_springs, if target_pts, if update_target_pts (as 0 (no) or 1 (yes) )
 % springs:      Stores Master Node, Slave Node, Spring Stiffness, Restling-Lengths, all in column vecs
 % beams:        Stores 1st Node, 2nd (MIDDLE-MAIN) Node, 3rd Nodes, Beam Stiffnesses, and Beam curvatures
-% target:       Stores target point index, and target point stiffness
+% targets:      Stores target point index, correponding xLag, yLag and target point stiffness
+% masses:       Stores mass point index, correponding xLag, yLag, "spring" stiffness, and mass value parameter
 % current_time: Current time of simulation (in seconds)
 
 
@@ -73,7 +74,7 @@ springs_Yes = model_Info(1);        % Springs: 0 (for no) or 1 (for yes)
 target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
 muscle_activation = model_Info(7);  % Muscle Activation: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
-
+mass_Yes = model_Info(10);          % Mass Pts: 0 (for no) or 1 (for yes)
 
 
 % Compute MUSCLE ACTIVATION (if using combined length/tension-Hill model) %
@@ -109,6 +110,19 @@ else
 end
 
 
+
+% Compute MASS PT FORCE DENSITIES (if there are mass points!)
+if ( mass_Yes == 1)
+    % Compute the Lagrangian MASS PT force densities!
+    [fx_mass, fy_mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses); 
+    
+else
+    fx_mass = zeros(Nb,1); %No x-forces coming from mass points
+    fy_mass = fx_mass;     %No y-forces coming from mass points
+end
+
+
+
 % Compute TARGET FORCE DENSITIES (if there are target points!)
 if ( target_pts_Yes == 1)
     % Compute the Lagrangian TARGET force densities!
@@ -136,8 +150,8 @@ end
 
 
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_muscles;
-fy = fy_springs + fy_target + fy_beams + fy_muscles;
+fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_mass;
+fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_mass;
     
     
 % Give me delta-function approximations!
@@ -329,6 +343,39 @@ end
 
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes the Target-Pt Force Densities! 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [fx_mass, fy_mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses)
+
+IDs = masses(:,1);                 % Stores Lag-Pt IDs in col vector
+xPts= masses(:,2);                 % Original x-Values of x-Mass Pts.
+yPts= masses(:,3);                 % Original y-Values of y-Mass Pts.
+kStiffs = masses(:,4);             % Stores "spring" stiffness parameter
+
+N_masses = length(IDs);            % # of target points!
+
+fx = zeros(length(xLag),1);         % Initialize storage for x-force density from TARGET PTS
+fy = fx;                            % Initialize storage for y-force density from TARGET PTS
+
+for i=1:N_masses
+   
+    fx(IDs(i),1) = fx(IDs(i),1) + kStiffs(i)*( xPts(i) - xLag(IDs(i)) );
+    fy(IDs(i),1) = fy(IDs(i),1) + kStiffs(i)*( yPts(i) - yLag(IDs(i)) ); 
+   
+end
+
+fx_mass = fx;
+fy_mass = fy;
+
+% MIGHT NOT NEED THESE!
+%fx_target = fx/ds^2;
+%fy_target = fy/ds^2;
 
 
 
