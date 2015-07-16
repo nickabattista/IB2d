@@ -242,7 +242,7 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
-connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag);
+connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
@@ -432,9 +432,16 @@ cd ..
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag)
+function connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
 
 N = length(xLag);
+
+if Nx > 32
+   space = 5*ds; 
+elseif Nx <= 32
+   space = 5*ds;
+end
+    
 
 ct = 1;
 for i=1:N
@@ -442,7 +449,7 @@ for i=1:N
         x1=xLag(i); x2=xLag(i+1);
         y1=yLag(i); y2=yLag(i+1);
         dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-        if dist < 5*ds
+        if dist < space
             connectsMat(ct,1) = i-1; %For Cpp notation (and .vtk counting)
             connectsMat(ct,2) = i;   %For Cpp notation (and .vtk counting)
         ct=ct+1;
@@ -451,7 +458,7 @@ for i=1:N
         x1=xLag(N); x2=xLag(1);
         y1=yLag(N); y2=yLag(1);
         dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-        if dist < 5*ds
+        if dist < space
             connectsMat(ct,1) = N-1; %For Cpp notation (and .vtk counting)
             connectsMat(ct,2) = 0;   %For Cpp notation (and .vtk counting)
         ct=ct+1;
