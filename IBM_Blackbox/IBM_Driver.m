@@ -82,6 +82,7 @@ update_Beams_Flag = model_Info(6);   % Update_Beams: 0 (for no) or 1 (for yes)
 muscles_Yes = model_Info(7);         % Muscles: 0 (for no) or 1 (for yes)
 arb_ext_force_Yes = model_Info(8);   % Arbitrary External Force: 0 (for no) or 1 (for yes)
 tracers_Yes = model_Info(9);         % Tracers: 0 (for no) or 1 (for yes)
+mass_Yes = model_Info(10);           % Mass Points: 0 (for no) or 1 (for yes)
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
