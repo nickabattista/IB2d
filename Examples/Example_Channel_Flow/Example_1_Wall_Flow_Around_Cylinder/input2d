@@ -27,6 +27,8 @@ update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 1       % 0 (for no) or 1 (for yes)
 tracers = 0             % 0 (for no) or 1 (for yes)
+mass_pts = 0            % 0 (for no) or 1 (for yes)
+
 
 % PRINTING INFORMATION
 print_dump = 100         % How often to print (PLOT) to screen

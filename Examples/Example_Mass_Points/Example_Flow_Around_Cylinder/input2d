@@ -18,7 +18,7 @@ Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
-springs = 0             % 0 (for no) or 1 (for yes)
+springs = 1             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
@@ -27,8 +27,7 @@ update_beams = 0        % 0 (for no) or 1 (for yes)
 muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 1       % 0 (for no) or 1 (for yes)
 tracers = 0             % 0 (for no) or 1 (for yes)
-mass_pts = 0            % 0 (for no) or 1 (for yes)
-
+mass_pts = 1            % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
