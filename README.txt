@@ -9,7 +9,9 @@ IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear
 Author: Nicholas A. Battista
 Email:  nick.battista@unc.edu
 Date Created: May 27th, 2015
-Institution: UNC-CH
+Institution: University of North Carolina at Chapel Hill
+Website: http://battista.web.unc.edu
+GitHub: http://www.github.com/nickabattista
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
