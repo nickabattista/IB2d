@@ -11,9 +11,13 @@ function mVelocity_h = please_Update_Massive_Boundary_Velocity(dt_step,mass_info
 % F_Mass_Bnd col 1: x-directed Lagrangian force
 %            col 2: y-directed Lagrangian force
 
+
+ids = mass_info(:,1);
+
+
 % update x-Velocity
-mVelocity_h(:,1) = mVelocity(:,1) - dt_step*F_Mass_Bnd(:,1)./mass_info(:,5);
+mVelocity_h(:,1) = mVelocity(:,1) - dt_step*F_Mass_Bnd(ids,1)./mass_info(:,5);
 
 % update y-Velocity
-mVelocity_h(:,2) = mVelocity(:,2) - dt_step*F_Mass_Bnd(:,2)./mass_info(:,5);
+mVelocity_h(:,2) = mVelocity(:,2) - dt_step*F_Mass_Bnd(ids,2)./mass_info(:,5);
 
