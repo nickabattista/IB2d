@@ -85,7 +85,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .mass file!
 k_Mass = 1e6;                    % 'spring' stiffness parameter for tethering
-Mass = [1e-2 2e-1 1e0];          % "MASS" value for 'ghost' nodal movement
+Mass = [5e-2 2e-1 1e0];          % "MASS" value for 'ghost' nodal movement
 print_Lagrangian_Mass_Pts(xLag_C1,k_Mass,Mass,struct_name);
 
 % Prints .spring file!
