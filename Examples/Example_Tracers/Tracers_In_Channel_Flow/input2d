@@ -28,6 +28,9 @@ muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 1       % 0 (for no) or 1 (for yes)
 tracers = 1             % 0 (for no) or 1 (for yes)
 mass_pts = 0            % 0 (for no) or 1 (for yes)
+gravity = 0             % 0 (for no) or 1 (for yes) %PLEASE CHECK GRAVITY VECTOR BELOW
+x_gravity_vec_comp = 0  % x-Component of Gravity Vector
+y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 
 
 % PRINTING INFORMATION

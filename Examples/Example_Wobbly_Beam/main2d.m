@@ -63,13 +63,13 @@ grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
 grid_Info(5) = params(7)/params(5); % Spatial step-size in x
 grid_Info(6) = params(8)/params(6); % Spatial step-size in y
 grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
-grid_Info(8) = params(20);          % Print Dump (How often to plot)
-grid_Info(9) = params(21);          % Plot in Matlab? (1=YES,0=NO) 
-grid_Info(10) = params(22);         % Plot LAGRANGIAN PTs ONLY in Matlab
-grid_Info(11) = params(23);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-grid_Info(12) = params(24);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-grid_Info(13) = params(25);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-grid_Info(14) = params(26);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+grid_Info(8) = params(23);          % Print Dump (How often to plot)
+grid_Info(9) = params(24);          % Plot in Matlab? (1=YES,0=NO) 
+grid_Info(10) = params(25);         % Plot LAGRANGIAN PTs ONLY in Matlab
+grid_Info(11) = params(26);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+grid_Info(12) = params(27);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+grid_Info(13) = params(28);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+grid_Info(14) = params(29);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -79,11 +79,13 @@ model_Info(3) = params(12);         % Target_Pts: 0 (for no) or 1 (for yes)
 model_Info(4) = params(13);         % Update_Target_Pts: 0 (for no) or 1 (for yes)
 model_Info(5) = params(14);         % Beams: 0 (for no) or 1 (for yes)
 model_Info(6) = params(15);         % Update_Beams: 0 (for no) or 1 (for yes)
-model_Info(7) = params(16);         % Muscle Activation (Length/Tension-Hill Model): % 0 (for no) or 1 (for yes)
-model_Info(8) = params(17);         % Arbirtary External Force Onto Fluid Grid
-model_Info(9) = params(18);         % Tracer Particles
-model_Info(10)= params(19);         % Mass Points
-
+model_Info(7) = params(16);         % Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
+model_Info(8) = params(17);         % Arbirtary External Force Onto Fluid Grid  0 (for no) or 1 (for yes)
+model_Info(9) = params(18);         % Tracer Particles  0 (for no) or 1 (for yes)
+model_Info(10)= params(19);         % Mass Points  0 (for no) or 1 (for yes)
+model_Info(11)= params(20);         % Gravity  0 (for no) or 1 (for yes)
+model_Info(12)= params(21);         % x-Component of Gravity vector
+model_Info(13)= params(22);         % y-Component of Gravity Vector
 
 % Path Reference to where Driving code is found %
 addpath('../../IBM_Blackbox/');
@@ -104,17 +106,15 @@ addpath('../../IBM_Blackbox/');
 function [params,struct_name] = give_Me_input2d_Parameters()
 
 filename= 'input2d';  %Name of file to read in
+
 fileID = fopen(filename); %Opens file for 'textscan' function
-
-% Read in the file, use 'CollectOutput' to gather all similar data together
-% and 'CommentStyle' to to end and be able to skip lines in file.
-C1 = textscan(fileID,'%s %s %f','CollectOutput',1,'CommentStyle','%');
-
-C2 = textscan(fileID,'%s %s %s','CollectOutput',1,'CommentStyle','%');
-
-fclose(fileID);           %Close the data file.
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C1 = textscan(fileID,'%s %s %f','CollectOutput',1,'CommentStyle','%');
+    C2 = textscan(fileID,'%s %s %s','CollectOutput',1,'CommentStyle','%');
+fclose(fileID);
 
 params = C1{2};
 
 struct_name = C2{1,1};
- 
+
