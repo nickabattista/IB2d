@@ -19,7 +19,7 @@ This code is capable of creating Lagrangian Structures using:
  	3. Target Points
 	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-
                         Tension)")
-        5. Mass Points
+        5. Mass Points (with or without influence of gravity)
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -59,11 +59,12 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                          (interpolates between two phases)
     7. "Tracers" - examples of inserting tracer particles into simulations
     8. "Mass_Points" - 'massive' cell in pulsatile channel flow
-                     - 'massive' cell race!
+                     - 'massive' cells racing due to underlying fluid velocity!
+                     - 'massive' cells racing under gravity
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
-	Muscle Pts (.muscle), and Tracer Particles (.tracer)! 
+	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Example in Moving_Rubberband & 
@@ -74,6 +75,10 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -It can have pseudo-inflow conditions by inducing an arbitrary force onto the 
     Eulerian grid (e.g., Channel Flow Examples)
+
+-You can choose to have gravity exerting forced (yes/no) as well as prescribe
+    the direction of gravitational influence in any direction you'd wish, 
+    in input2d
 
 -It can plot the following things in Matlab, if plot_Matlab flag = 1 in input2d:
     a. Vorticity (colormap) + Lagrangian Pts.
