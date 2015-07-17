@@ -71,7 +71,6 @@ uMagPlot = grid_Info(13);       % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY co
 pressPlot = grid_Info(14);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
-
 % MODEL STRUCTURE DATA STORED %
 springs_Yes = model_Info(1);         % Springs: 0 (for no) or 1 (for yes) 
 update_Springs_Flag = model_Info(2); % Update_Springs: 0 (for no) or 1 (for yes)
@@ -83,6 +82,10 @@ muscles_Yes = model_Info(7);         % Muscles: 0 (for no) or 1 (for yes)
 arb_ext_force_Yes = model_Info(8);   % Arbitrary External Force: 0 (for no) or 1 (for yes)
 tracers_Yes = model_Info(9);         % Tracers: 0 (for no) or 1 (for yes)
 mass_Yes = model_Info(10);           % Mass Points: 0 (for no) or 1 (for yes)
+gravity_Yes = model_Info(11);        % Gravity: 0 (for no) or 1 (for yes)
+
+
+
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -218,6 +221,23 @@ else
 end
 
 
+% CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) %
+if gravity_Yes == 1
+    %gravity_Vec(1) = model_Info(12);     % x-Component of Gravity Vector
+    %gravity_Vec(2) = model_Info(13);     % y-Component of Gravity Vector
+    xG = model_Info(12);
+    yG = model_Info(13);
+    normG = sqrt( xG^2 + yG^2 );
+    gravity_Info = [gravity_Yes xG/normG yG/normG];
+    %   col 1: flag if considering gravity
+    %   col 2: x-component of gravity vector (normalized)
+    %   col 3: y-component of gravity vector (normalized)
+    
+    clear xG yG normG;
+    
+else
+    gravity_Info = 0;
+end
 
 
 % Initialize the initial velocities to zero.
@@ -285,14 +305,14 @@ while current_time < T_FINAL
     % once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
         % Update Massive Boundary Velocity
-        mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,mVelocity,F_Mass_Bnd);
+        mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,mVelocity,F_Mass_Bnd,gravity_Info);
         
         % Update Massive Boundary Position for Time-step
         mass_info(:,[2 3]) = massLagsOld;
         [mass_info,~] = please_Move_Massive_Boundary(dt,mass_info,mVelocity_h); 
 
         % Update Massive Boundary Velocity for Time-step
-        mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,mVelocity,F_Mass_Bnd); 
+        mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,mVelocity,F_Mass_Bnd,gravity_Info); 
     end
     
     if arb_ext_force_Yes == 1 
