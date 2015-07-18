@@ -61,6 +61,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     8. "Mass_Points" - 'massive' cell in pulsatile channel flow
                      - 'massive' cells racing due to underlying fluid velocity!
                      - 'massive' cells racing under gravity
+                     - 'massive' cells in 'gravity vs. pulsating flow'
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
