@@ -17,7 +17,7 @@ This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-
+	4. Muscle-Model (combined Force-Length-Velocity model, "Hill(Length-
                         Tension)")
         5. Mass Points (with or without influence of gravity)
 
