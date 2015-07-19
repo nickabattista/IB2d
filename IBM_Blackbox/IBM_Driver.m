@@ -462,6 +462,12 @@ elseif Nx <= 64
    space = 10*ds; 
 elseif Nx <=128
    space = 20*ds;
+elseif Nx <=256
+    space = 40*ds;
+elseif Nx <= 512
+    space = 80*ds;
+else
+    space = 120*ds;
 end
     
 
