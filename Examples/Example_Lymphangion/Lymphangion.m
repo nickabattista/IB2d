@@ -13,7 +13,7 @@
 % 	1. Springs
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
-%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%	4. Muscle-Model (combined Force-Length-Velocity model, "Hill+(Length-Tension)")
 %
 % One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
 % 
@@ -23,26 +23,24 @@
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the LYMPHANGION-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the HEART-TUBE-EXAMPLE geometry and prints associated input files
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-function Lymphangion()
+function HeartTube()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  32;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  32;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 5.0;        % Length of Eulerian Grid in x-Direction
 Ly = 5.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
 ds = Lx/(2*Nx);  % Lagrangian Spacing
 d = 1.0;         % Diameter of the tube
 L = 3.0;         % Length of the heart-tube
@@ -66,17 +64,21 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1.0e6;
+k_Spring = 1e7;
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
+
+% Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
+LFO = d; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e5;
+print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name)
 
 
 % Prints .beam file!
-k_Beam = 1e7; C = 0.0;
+k_Beam = 7.5e7; C = 0.0;
 print_Lagrangian_Beams(xLag,k_Beam,C,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 1e6;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,6 +180,41 @@ function print_Lagrangian_Beams(xLag,k_Beam,C,struct_name)
             end
     end
     fclose(beam_fid); 
+    
+    
+    
+
+    
+    
+
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints MUSCLE points to a file called "struct_name".muscle
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name)
+
+    N = length(xLag); %Number of Lagrangian Pts. Total
+
+    muscle_fid = fopen([struct_name '.muscle'], 'w');
+
+    fprintf(muscle_fid, '%d\n', N/2-2 );
+
+    %spring_force = kappa_spring*ds/(ds^2);
+
+    %MUSCLES BETWEEN VERTICES
+    for s = 2:N/2-1
+            fprintf(muscle_fid, '%d %d %1.16e %1.16e %1.16e %1.16e %1.16e\n', s, s+N/2, LFO, SK, a,b,Fmax);  
+    end
+    fclose(muscle_fid);
+    
+    
+    
+    
+    
+    
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

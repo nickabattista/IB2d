@@ -1,56 +1,48 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: Returns vector of muscle activation forces for all xLag Pts.
+% FUNCTION: Returns vector of muscle activation forces for a single Lag.Pt.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Fm = give_Muscle_Activation(current_time,xLag,yLag)
+function Fm = give_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
 
 % current_time: current time in simulation (s)
 % xLag: vector of all x-Lagrangian Pts
 
 % Fm = a_f * Fmax * F1(Lf) * F2(Vf) 
-%    = a_f * F_IO*exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO
+%    = a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO
 %
 
 % a_f: coefficient that triggers contraction (traveling square or Gaussian wave?)
 
 % Length Tension Model Parameters (F1)
-% F_IO: maximum isometric force produced at the optimum length of the muscle fibers
+% Fmax: maximum isometric force produced at the optimum length of the muscle fibers
 % LF:   length of the muscle fibers
 % LFO:  length at which the muscle fibers exert their maximum tension
 % SK:   constant specific for each muscle where SK > 0.28.
+
 
 % Hill Model Parameters (F2)
 % P0:   maximum load w/ NO contraction
 % a:    
 % b:    
-% v:
+% v:    velocity of muscle expansion/contraction
 
-D = 1.0;     % diameter (width) of HeartTube
-Fmax = 5e2;  % Max Force
 
 % Length Tension Model Parameters %
-LFO = D;
-LF = D; %*********should be the current length of the muscle****************
 Q = LF/LFO;
-SK = 0.3;
 F1 = exp( - ( (Q-1)/SK )^2 );
 
 % Hill Model %
-v = 0; %**************should be the current velocity of the muscle*********
-a = 0.25;
-b = 4.0;
-
-% OTHER PIECES TO COMBINED MODEL %
-%Fmax = 1.0; %TRY MULTIPLE VALUES!
 P0 = Fmax;   %Same as Fmax
 F2 = (1/P0)*(b*P0-a*v)/(v+b);
 
-af_Vec = give_Traveling_Triggering_Coefficient(current_time,xLag);
-Fm = zeros(length(xLag),1);      %initialize storage
+% Get Activation Coefficient %
+af_Val = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt);
+
+% Actually Compute Muscle Force %
 for i=1:length(xLag)
-   Fm(i,1) = af_Vec(i)*Fmax*F1*F2; 
+   Fm = af_Val*Fmax*F1*F2; 
 end
 
 
@@ -61,35 +53,44 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function af_Vec = give_Traveling_Triggering_Coefficient(current_time,xLag)
+function af_Val = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt)
 
 % current_time: current_time in simulation
 % xLag:         x-Lagrangian pts (both bottom and top of tube)
+% xPt: x-Pt of interest
 
 t = current_time;               % current time
-freq = 1.0;                     % frequency of traveling wave down tube
+freq = 10;                      % frequency of traveling wave down tube
 Ltube = xLag(end/2) - xLag(1);  % length of heart tube
-buff = 0.5;                     % percent-buff/2 on each end of heart tube
-L_AR = Ltube*(1-buff);          % length of the actual activation region of tube
-SqWidth = L_AR/12;              % width of the square traveling activation wave 
+buff = 0.25;                    % percent-buff on each end of heart tube
+L_AR = Ltube*(1-2*buff);        % length of the actual activation region of tube
+SqWidth = L_AR/10;              % width of the square traveling activation wave 
 v = (L_AR-SqWidth) * freq;      % traveling wave velocity
+k = 2*pi*freq/v;                % Wave-number for traveling wave
 
-t = rem(t,freq);                 % gives remainder after division ("fmod" in C++)
+t = rem(t,1/freq);              % Gives remainder after "modular arithmetic" ("fmod" in C++)
 
-xL = xLag(1)+ (buff/2)*L_AR;  %+ (v*t);
-xR = xLag(1)+ (buff/2)*L_AR  +L_AR; % SqWidth + (v*t);
-
-
-af_Vec = zeros(1,length(xLag)); %initialize storage for activation coefficients
-for i=1:length(xLag)
-    x = xLag(i);
-
+xL = xLag(1) + (buff)*Ltube; 
+xR = xLag(1) + (buff)*Ltube + L_AR;
+    x = xPt;
     if ( ( x >= xL ) && ( x <= xR ) )
-        af_Vec(i) = (1/2)*(sin(2*pi*freq*current_time-pi/2)+1);
+        af_Val = 0.75*( sin( 1/(L_AR)*( 2*pi*freq*t + k*x) - pi/2 ) +1 );
     else
-        af_Vec(i) = 0.0;
+        af_Val = 0.0;
     end
-end
+
+
+xL = xLag(1) + (buff)*Ltube + (v*t);
+xR = xLag(1) + (buff)*Ltube + SqWidth + (v*t);
+xM = (xL+xR)/2;
+c = SqWidth/1.5;
+    x = xPt;
+    if ( ( x >= xL ) && ( x <= xR ) )
+        af_Val = 1;                         % Traveling Square Wave
+        %af_Val = exp( -(x-xM)^2 / (2*c)^2 ); % Traveling Gaussian Wave
+    else
+        af_Val = 0.0;
+    end
 
 
 

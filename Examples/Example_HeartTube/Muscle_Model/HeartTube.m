@@ -34,8 +34,8 @@ function HeartTube()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  64;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 5.0;        % Length of Eulerian Grid in x-Direction
 Ly = 5.0;        % Length of Eulerian Grid in y-Direction
 
@@ -67,7 +67,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 k_Spring = 1e7;
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
-% Prints .muscle file!
+% Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
 LFO = d; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e5;
 print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name)
 
