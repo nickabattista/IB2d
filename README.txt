@@ -40,7 +40,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS CAN RUN 7 DIFFERENT EXAMPLES:
+-THIS CAN RUN 8 DIFFERENT EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
