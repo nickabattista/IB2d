@@ -7,8 +7,8 @@ mu = 1.0               % Dynamic Viscosity (N*s/m^2)
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 0.5              % Final time of simulation (s)
-dt = 5e-4               % Time-step (s)
+Tfinal = 0.25              % Final time of simulation (s)
+dt = 0.0005               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -44,4 +44,4 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = HeartTube % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = Lymphangion % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
