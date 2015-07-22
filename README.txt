@@ -46,7 +46,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
         via target points
     3. "Moving Rubberband" - rubberband moving along a zig-zag pattern, via 
         updating target point positions
-    4. "HeartTube" - tubular heart pumping examples
+    4. "HeartTube" - examples of pumping in tubular hearts via updating_springs()
             ex1: - heart tube that pumps via muscle activation using combined 
                    length/tension - Hill model
             ex2: - heart tube that pumps via dynamic suction pumping by 
@@ -69,10 +69,11 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex1: - Tracers in channel flow 
             ex2: - Tracers in an impedance pump
             ex3: - Tracers in a peristaltic pump
-    9. "Mass_Points" - 'massive' cell in pulsatile channel flow
-                     - 'massive' cells racing due to underlying fluid velocity!
-                     - 'massive' cells racing under gravity
-                     - 'massive' cells in 'gravity vs. pulsating flow'
+    9. "Mass_Points" - "adding artificial mass" to the Lagrangian structure
+            ex1: - 'massive' cell in pulsatile channel flow
+            ex2: - 'massive' cells racing due to underlying fluid velocity only!
+            ex3: - 'massive' cells racing under gravity only
+            ex4: - 'massive' cells in 'gravity vs. pulsating flow'
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
