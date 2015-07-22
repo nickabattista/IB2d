@@ -51,6 +51,11 @@ GitHub: http://www.github.com/nickabattista
                      - 'massive' cells racing under gravity
                      - 'massive' cells in 'gravity vs. pulsating flow'
 
+
+%*****************************************************************************%
+%*********************************% NOTES! %**********************************%
+%*****************************************************************************%
+
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass)! 
@@ -69,46 +74,3 @@ GitHub: http://www.github.com/nickabattista
     the direction of gravitational influence in any direction you'd wish, 
     in input2d
 
--It can plot the following things in Matlab, if plot_Matlab flag = 1 in input2d:
-    a. Vorticity (colormap) + Lagrangian Pts.
-    b. Magnitude Velocity (colormap) + Lagrangian Pts.
-    c. Pressure (colormap) + Lagrangian Pts.
-    d. Velocity (vector form) + Lagrangian Pts.
-    e. Lagrangian Pts. themselves 
-
--It has a flag for print dump interval (shared between printing to .vtk format 
-    + Matlab plotting)
-
--NOTE: This code *may* BLOW UP when Lagrangian points cross a boundary!!!!!
-
-%*****************************************************************************%
-%*******************************% VISUALIZATION %*****************************%
-%*****************************************************************************%
-
--These examples print data as .vtk files, which can be read by Paraview and 
-    VisIt.
-
--Every example prints the following:
-
-        LAGRANGIAN PTS:     a. Lag. Pts. themselves
-                            b. Lag. Pts. w/ connections!
-
-        SCALARS (colormap): a. Vorticity
-                            b. Magnitude of Velocity
-                            c. uX (x-directed velocity)
-                            d. uY (y-directed velocity)
-                            e. Pressure
-
-        VECTORS: a. velocity data
-
-        TRACERS: a. tracer particle locations
-
--There are flags in input2d for the printing interval between saving data
-        -> print_Dump
-
--There are flags in input2d whether you'd like Matlab to plot various 
-    quantities as simulation progresses:
-
-            -> plot_Matlab     (set = 1, if yes, have Matlab plot)
-            -> plot_<Quantity> (set = 1, if yes for quantity)
-            
