@@ -40,25 +40,36 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS CAN RUN 8 DIFFERENT EXAMPLES:
+-THIS VERSION HAS 8 DIFFERENT FLAVORS OF EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
-    3. "Moving Rubberband" - rubberband moving to the right, via updating 
-	target point positions
-    4. "HeartTube" 
+    3. "Moving Rubberband" - rubberband moving along a zig-zag pattern, via 
+        updating target point positions
+    4. "HeartTube" - tubular heart pumping examples
             ex1: - heart tube that pumps via muscle activation using combined 
                    length/tension - Hill model
             ex2: - heart tube that pumps via dynamic suction pumping by 
-		   changing resting lengths of springs
+                   changing resting lengths of springs
             ex3: - heart tube that pumps via peristaltic waves of contraction 
-		   by changing resting lengths of springs
-    5. "Channel_Flow" - various channel flow examples with parabolic flow being 
+                   by changing resting lengths of springs
+    5. "Lymphangion" - tube that pumps via muscle activation using combined a
+                   hybrid length/tension and Hill model
+    6. "Channel_Flow" - various channel flow examples with parabolic flow being 
                         produced by arbitrary force on Eulerian grid
-    6. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
+            ex1: - Flow around a cylinder in a channel
+            ex2: - Flow around a cylinder with only one wall of channel
+            ex3: - Flow in a channel with a hole in the channel
+            ex4: - Flow produced in the middle of the channel
+            ex5: - Flow produced in an empty channel
+            ex6: - Flow in a channel, mocking an aneurism
+    7. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
-    7. "Tracers" - examples of inserting tracer particles into simulations
-    8. "Mass_Points" - 'massive' cell in pulsatile channel flow
+    8. "Tracers" - examples of inserting tracer particles into simulations
+            ex1: - Tracers in channel flow 
+            ex2: - Tracers in an impedance pump
+            ex3: - Tracers in a peristaltic pump
+    9. "Mass_Points" - 'massive' cell in pulsatile channel flow
                      - 'massive' cells racing due to underlying fluid velocity!
                      - 'massive' cells racing under gravity
                      - 'massive' cells in 'gravity vs. pulsating flow'
