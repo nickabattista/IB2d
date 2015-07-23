@@ -62,7 +62,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex3: - Flow in a channel with a hole in the channel
             ex4: - Flow produced in the middle of the channel
             ex5: - Flow produced in an empty channel
-            ex6: - Flow in a channel, mocking an aneurism
+            ex6: - Flow in a channel, mocking an aneurysm
     7. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
     8. "Tracers" - examples of inserting tracer particles into simulations
