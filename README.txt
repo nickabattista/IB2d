@@ -86,8 +86,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     a. updating target point positions -> Examples in Moving_Rubberband & 
        Pulsing_Heart
     b. updating_springs() -> Examples in HeartTube
-    c. update_beams() [can be made analogously] 
-    d. update_muscles() [can be made analogously]
+    c. update_beams()    [can be made analogously] 
+    d. update_muscles()  [can be made analogously]
     e. update_porosity() [can be made analogously]
 
 -It can have pseudo-inflow conditions by inducing an arbitrary force onto the 
