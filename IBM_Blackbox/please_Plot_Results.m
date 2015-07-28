@@ -32,7 +32,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [loc, diffy] =  please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy)
+function [loc, diffy] =  please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy,spacing)
 
 %X,Y:  (x,y) values
 %U,V:  x-directed, y-directed velocities respectively
@@ -66,8 +66,8 @@ if firstPrint == 1
     diffX = abs([chiX(2:end);chiX(1)]-chiX);
     diffY = abs([chiY(2:end);chiY(1)]-chiY);
 
-    locX = find(diffX > 5*ds); % assuming x value can't change more than Lx/2 (without crossing boundary)
-    locY = find(diffY > 5*ds); % assuming y value can't change more than Ly/2 (without crossing boundary)
+    locX = find(diffX > spacing ); % assuming x value can't change more than Lx/2 (without crossing boundary)
+    locY = find(diffY > spacing ); % assuming y value can't change more than Ly/2 (without crossing boundary)
     loc =  sort(unique([locX;locY]));
 
     diffy = sqrt( (chiX(end)-chiX(1) )^2 + ( chiY(end)-chiY(1) )^2 );

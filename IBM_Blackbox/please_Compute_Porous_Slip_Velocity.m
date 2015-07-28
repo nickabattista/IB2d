@@ -53,9 +53,10 @@ Np = length( porous_info(:,1) );
 % Compute Normal Vector (unit normals)
 [nX,nY,sqrtNorm] = give_Me_Lagrangian_Normal_Vectors(xL_s,yL_s);
 
+
 % Compute Porous Slip Velocity
-Up_X = - ( porous_info(:,4) ) .* F_Lag(:,1).*nX / sqrtNorm;
-Up_Y = - ( porous_info(:,4) ) .* F_Lag(:,2).*nY / sqrtNorm;
+Up_X = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,1).*nX / sqrtNorm;
+Up_Y = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,2).*nY / sqrtNorm;
 Por_Mat = [Up_X Up_Y];
 
 % Store porous slip velocities in appropriate vector for adding to current Lagrangian Velocity Computation

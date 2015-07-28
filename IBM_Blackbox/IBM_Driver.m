@@ -283,7 +283,7 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
-connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
+[connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
@@ -382,7 +382,7 @@ while current_time < T_FINAL
         
         %Plot in Matlab
         if pMatlab == 1
-            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy);
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy,spacing);
         end
         
         %Print .vtk files!
@@ -486,7 +486,7 @@ cd ..
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function connectsMat = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
+function [connectsMat,space] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
 
 N = length(xLag);
 
