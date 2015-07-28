@@ -76,7 +76,7 @@ k_Spring = 1e7;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 % Prints .porous file!
-alpha = 5e-5; 
+alpha = 1e-3; 
 print_Lagrangian_Porosity(xLag,alpha,struct_name)
 
 
