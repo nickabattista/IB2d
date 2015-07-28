@@ -31,7 +31,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xL_Next, yL_Next] = please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y, dt, grid_Info)
+function [xL_Next, yL_Next] = please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y, dt, grid_Info,porous_Yes)
 
 
 % Grid Info
@@ -73,9 +73,13 @@ delta_Y = give_Delta_Kernel( distY, dy);
 xL_Next = xL_P + (dt) * move_X;
 yL_Next = yL_P + (dt) * move_Y;
 
+
 % Shift so that all values are in [0,Lx or Ly).
-xL_Next = mod(xL_Next, Lx);
-yL_Next = mod(yL_Next, Ly);
+if porous_Yes == 0
+    xL_Next = mod(xL_Next, Lx);
+    yL_Next = mod(yL_Next, Ly);
+end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

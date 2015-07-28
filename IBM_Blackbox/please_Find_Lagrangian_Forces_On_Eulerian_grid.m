@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
 
 %
 % The components of the force are given by
@@ -152,7 +152,10 @@ end
 % SUM TOTAL FORCE DENSITY! %
 fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_mass;
 fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_mass;
-    
+
+% SAVE LAGRANGIAN FORCES
+F_Lag(:,1) = fx;
+F_Lag(:,2) = fy;
     
 % Give me delta-function approximations!
 [delta_X delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);

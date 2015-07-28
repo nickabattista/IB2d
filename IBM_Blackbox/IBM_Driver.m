@@ -83,6 +83,8 @@ arb_ext_force_Yes = model_Info(8);   % Arbitrary External Force: 0 (for no) or 1
 tracers_Yes = model_Info(9);         % Tracers: 0 (for no) or 1 (for yes)
 mass_Yes = model_Info(10);           % Mass Points: 0 (for no) or 1 (for yes)
 gravity_Yes = model_Info(11);        % Gravity: 0 (for no) or 1 (for yes)
+%NOTE: model_Info(12)/(13) - components of gravity vector
+porous_Yes = model_Info(14);         % Porous Media: 0 (for no) or 1 (for yes)
 
 
 
@@ -208,6 +210,25 @@ end
 
 
 
+% READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
+if ( porous_Yes == 1)
+    porous_aux = read_Porous_Points(struct_name);
+    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+    %            col 2: Porosity coefficient
+    porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(porous_info(:,1))
+        id = porous_info(i,1);
+        porous_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
+        porous_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
+    end
+   
+    porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+else
+    porous_info = 0;
+end
+
+
+
 % READ IN BEAMS (IF THERE ARE BEAMS) %
 if ( beams_Yes == 1)
     beams_info = read_Beam_Points(struct_name);
@@ -279,7 +300,7 @@ while current_time < T_FINAL
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
     %
-    [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info);
+    [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0);
     
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
@@ -298,11 +319,11 @@ while current_time < T_FINAL
     end
     
     %
-    %**************** Step 2: Calculate Force coming from membrane at half time-step ****************
+    %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
-    [Fxh, Fyh, F_Mass_Bnd] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, mass_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, mass_info);
     
-    % once force is calculated, can finish time-step for massive boundary
+    % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
         % Update Massive Boundary Velocity
         mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,mVelocity,F_Mass_Bnd,gravity_Info);
@@ -315,25 +336,38 @@ while current_time < T_FINAL
         mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,mVelocity,F_Mass_Bnd,gravity_Info); 
     end
     
+    % Add artificial force from fluid boundary, if desired. 
     if arb_ext_force_Yes == 1 
         [Fx_Arb, Fy_Arb] =    please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);
         Fxh = Fxh + Fx_Arb;
         Fyh = Fyh + Fy_Arb;
     end
     
-    
-    % Step 3: Solve for Fluid motion
+    %
+    %***************** STEP 3: Solve for Fluid motion ******************************************
+    %
     [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
 
-    % Step 4: Update Position of Boundary of membrane again for a half time-step
+    
+    %
+    %***************** STEP 4: Update Position of Boundary of membrane again for a half time-step *******
+    %
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
-    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info);
+    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
+    %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
+    if porous_Yes == 1
+       [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
+       xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) + dt*Por_Mat(:,1).*nX;
+       yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) + dt*Por_Mat(:,2).*nY;
+       xLag = mod(xLag, Lx); % If structure goes outside domain
+       yLag = mod(yLag, Ly); % If structure goes outside domain
+    end
     
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
-        [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info);
+        [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info,0); %0 for always no porous tracers
         tracers(:,2) = xT;
         tracers(:,3) = yT;
     end
@@ -925,6 +959,41 @@ targets = targets_info(2:end,1:2);
 
 %targets: col 1: Lag Pt. ID w/ Associated Target Pt.
 %         col 2: target STIFFNESSES
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in the # of POROUS PTS, POROUS-PT-NODEs, and their
+%           POROUSITY-COEFFICIENTS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function porosity = read_Porous_Points(struct_name)
+
+filename = [struct_name '.porous'];  %Name of file to read in
+
+fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,'%f %f','CollectOutput',1);
+
+fclose(fileID);        %Close the data file.
+
+porous_info = C{1};    %Stores all read in data in vertices (N+1,2) array
+
+%Store all elements on .spring file into a matrix starting w/ 2nd row of read in data.
+porosity = porous_info(2:end,1:2);
+
+%porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
+%         col 2: Porosity coefficient
+
+
 
 
 
