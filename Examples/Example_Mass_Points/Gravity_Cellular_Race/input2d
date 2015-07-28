@@ -31,6 +31,7 @@ mass_pts = 1            % 0 (for no) or 1 (for yes)
 gravity = 1             % 0 (for no) or 1 (for yes) %PLEASE CHECK GRAVITY VECTOR BELOW
 x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
+porous_media = 0        % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
