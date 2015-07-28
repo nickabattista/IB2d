@@ -76,6 +76,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex3: - 'massive' cells racing under gravity only
             ex4: - 'massive' cells in 'gravity vs. pulsating flow'
     10. "Porous_Rubberband" - added porosity to standard rubberband problem
+            ex1: - Single porous rubberband example
+            ex2: - Comparing porous to non-porous rubberband
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
