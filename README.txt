@@ -17,8 +17,8 @@ This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model, "Hill(Length-
-                        Tension)")
+	4. Muscle-Model (combined Force-Length-Velocity model with a 
+                        Hill (i.e.,Length-Tension) Model )
         5. Mass Points (with or without influence of gravity)
         6. Porous Structures 
 
@@ -80,7 +80,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass), and
-    Porous Media (.porous)! 
+        Porous Media (.porous)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Examples in Moving_Rubberband & 
