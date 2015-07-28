@@ -89,7 +89,7 @@ model_Info(13)= params(22);         % y-Component of Gravity Vector
 model_Info(14)= params(23);         % Porous Media: 0 (for no) or 1 (for yes)
 
 % Path Reference to where Driving code is found %
-addpath('../../IBM_Blackbox/');
+addpath('../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
