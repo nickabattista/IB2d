@@ -359,8 +359,8 @@ while current_time < T_FINAL
     %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
-       xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) + dt*Por_Mat(:,1).*nX;
-       yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) + dt*Por_Mat(:,2).*nY;
+       xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*Por_Mat(:,1).*nX;
+       yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) - dt*Por_Mat(:,2).*nY;
        xLag = mod(xLag, Lx); % If structure goes outside domain
        yLag = mod(yLag, Ly); % If structure goes outside domain
     end
