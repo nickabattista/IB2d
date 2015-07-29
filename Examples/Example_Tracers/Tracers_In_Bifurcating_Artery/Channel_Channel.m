@@ -116,20 +116,36 @@ plot(xBif3(end/4+1:end/2),yBif3(end/4+1:end/2),'k-'); hold on;
 plot(xBif3(end/2+1:3*end/4),yBif3(end/2+1:3*end/4),'k-'); hold on;
 plot(xBif3(3*end/4+1:end),yBif3(3*end/4+1:end),'k-'); hold on;
 %
-plot(xLag_C,yLag_C,'r-'); hold on;
+%plot(xLag_C,yLag_C,'r-'); hold on;
 
 plot(xLag,yLag,'*'); hold on;
-plot(xLag_C,yLag_C,'g*'); hold on;
+%plot(xLag_C,yLag_C,'g*'); hold on;
 plot(xBif1,yBif1,'r*'); hold on;
 plot(xT,yT,'m*'); hold on;
 xlabel('x'); ylabel('y');
 axis([0 Lx 0 Ly]);
 
-%xLag = [xLag xLag_C xBif1 xR1 xBif2 xR2 xBif3 xR3]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
-%yLag = [yLag yLag_C yBif1 yR1 yBif2 yR2 yBif3 yR3]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
 
-xLag = [xLag xBif1 xR1 xBif2 xR2 xBif3 xR3]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
-yLag = [yLag yBif1 yR1 yBif2 yR2 yBif3 yR3]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
+
+
+%Bottom Branches
+XBot = [xLag(1:end/2) xBif1(1:end/4) xBif3(1:end/4) xBif3(end/2:-1:end/4+1) xR3(end:-1:1) xBif3(3*end/4+1:end) xBif3(3*end/4:-1:end/2+1) xBif1(end/2:-1:end/4+1) xR1(end:-1:1) ];
+YBot = [yLag(1:end/2) yBif1(1:end/4) yBif3(1:end/4) yBif3(end/2:-1:end/4+1) yR3(end:-1:1) yBif3(3*end/4+1:end) yBif3(3*end/4:-1:end/2+1) yBif1(end/2:-1:end/4+1) yR1(end:-1:1) ];
+
+XTop = [xBif1(3*end/4+1:end) xBif2(1:end/4) xBif2(end/2:-1:end/4+1) xR2(end:-1:1) xBif2(3*end/4+1:end) xBif2(3*end/4:-1:end/2+1) xBif1(3*end/4:-1:end/2+1) xLag(end:-1:end/2+1) ];
+YTop = [yBif1(3*end/4+1:end) yBif2(1:end/4) yBif2(end/2:-1:end/4+1) yR2(end:-1:1) yBif2(3*end/4+1:end) yBif2(3*end/4:-1:end/2+1) yBif1(3*end/4:-1:end/2+1) yLag(end:-1:end/2+1) ];
+
+xLag = [XBot XTop];
+yLag = [YBot YTop];
+
+% Test Ordering!
+figure(2)
+for i=1:length(xLag)
+   plot(xLag(i),yLag(i),'*'); hold on;
+   axis([0 Lx 0 Ly]);
+   pause(0.0001)
+end
+
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
@@ -148,7 +164,7 @@ print_Lagrangian_Tracers(xT,yT,struct_name)
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 1.2e7;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,10 +340,11 @@ end
 
 function [xBif,yBif] = compute_Bifurcation_Tanh(ds,A,L,x0,y0_t,y0_b,w1,w2)
 
-x = -L/2:2*ds/3:L/2;
-y = A*tanh(10*x);
+% Compute one leg of branch using tanh function
+[x,y] = compute_Tanh_Branch(A,L,ds);
 
 xBif_T1 = L/2 + x0 + ds + x;
+
 yBif_T1 = A + y0_t + y; 
 yBif_T2 = A + y0_t + y - w1;
 
@@ -341,6 +358,64 @@ yBif_B2 = y0_b - y - A + w2;
 
 xBif = [xBif_T1 xBif_T1 xBif_T1 xBif_T1];
 yBif = [yBif_B1 yBif_B2 yBif_T1 yBif_T2];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives actually tanh pieces
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [x,y] = compute_Tanh_Branch(A,L,ds)
+
+%initiate
+ct = 1;
+xN = -L/2;             x(ct) = xN;
+yN = A*tanh(10*xN);    y(ct) = yN;
+
+while xN <= L/2 
+    
+    %update counter
+    ct = ct+1;
+    
+    xP = x(ct-1);           % x-Prev
+    yP = y(ct-1);           % y-Prev
+    
+    xN = xP;                % left  bound 
+    xF = xN+2*ds;           % far guess (right bound)
+    xN1 = xN+ds;            % x-guess 
+    yN1 = A*tanh(10*xN1);   % y-guess
+    err = ( ds - sqrt( (xN1-xN)^2 + (yN1-yN)^2 ) );
+    
+    while abs(err) > 1e-6
+       
+       if err > 0
+          
+          xN = xN1;             % Update LEFT PT. [xN,xN1,xF]
+          xN1 = (xN1+xF)/2;     % New Guess
+          yN1 = A*tanh(10*xN1); % New Guess
+          
+          
+       elseif err < 0
+           
+          xF = xN1;             % Update RIGHT PT. [xN,xN1,xF] 
+          xN1 = (xN1+xN)/2;     % New Guess
+          yN1 = A*tanh(10*xN1); % New Guess
+           
+       end
+        
+       %compute error
+       err = ( ds - sqrt( (xN1-xP)^2 + (yN1-yP)^2 ) );
+        
+    end
+
+    %save values
+    x(ct) = xN1;
+    y(ct) = yN1;
+    
+    %redefine parameters
+    xN = xN1; yN=yN1;
+    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -379,6 +454,17 @@ xR2= xR+4*ds;
 xR3= xR+6*ds;
 xR4= xR+8*ds;
 xR5= xR+10*ds;
+xR6= xR+12*ds;
+xR7= xR+14*ds;
+xR8= xR+16*ds;
+xR9= xR+18*ds;
+xR10= xR+20*ds;
+xR11= xR+22*ds;
+xR12= xR+24*ds;
+xR13= xR+26*ds;
+xR14= xR+28*ds;
+xR15= xR+30*ds;
+xR16= xR+32*ds;
 
 y = (y0-w/2+2*ds:2*ds:y0+w/2-2*ds);
 
@@ -392,9 +478,20 @@ xR2 = xR2*ones(1,length(y));
 xR3 = xR3*ones(1,length(y));
 xR4 = xR4*ones(1,length(y));
 xR5 = xR5*ones(1,length(y));
+xR6 = xR6*ones(1,length(y));
+xR7 = xR7*ones(1,length(y));
+xR8 = xR8*ones(1,length(y));
+xR9 = xR9*ones(1,length(y));
+xR10 = xR10*ones(1,length(y));
+xR11 = xR11*ones(1,length(y));
+xR12 = xR12*ones(1,length(y));
+xR13 = xR13*ones(1,length(y));
+xR14 = xR14*ones(1,length(y));
+xR15 = xR15*ones(1,length(y));
+xR16 = xR16*ones(1,length(y));
 
 
-xT = [xR xRM xM xLM xL xR1 xR2 xR3 xR4 xR5];
-yT = [y y y y y y y y y y];
+xT = [xR xRM xM xLM xL xR1 xR2 xR3 xR4 xR5 xR6 xR7 xR8 xR9 xR10 xR11 xR12 xR13 xR14 xR15 xR16];
+yT = [y y y y y y y y y y y y y y y y y y y y y];
 
    
