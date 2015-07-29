@@ -493,15 +493,15 @@ N = length(xLag);
 if Nx <= 32
     space = 5*ds;
 elseif Nx <= 64 
-   space = 10*ds; 
+   space = 5*ds; 
 elseif Nx <=128
-   space = 20*ds;
+   space = 5*ds;
 elseif Nx <=256
-    space = 40*ds;
+    space = 10*ds;
 elseif Nx <= 512
-    space = 80*ds;
+    space = 20*ds;
 else
-    space = 120*ds;
+    space = 40*ds;
 end
     
 
