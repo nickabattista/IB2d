@@ -70,6 +70,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex1: - Tracers in channel flow 
             ex2: - Tracers in an impedance pump
             ex3: - Tracers in a peristaltic pump
+            ex4: - Tracers in bifurcating artery
     9. "Mass_Points" - "adding artificial mass" to the Lagrangian structure
             ex1: - 'massive' cell in pulsatile channel flow
             ex2: - 'massive' cells racing due to underlying fluid velocity only!
