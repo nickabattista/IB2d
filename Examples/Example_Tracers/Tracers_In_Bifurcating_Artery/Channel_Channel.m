@@ -164,7 +164,7 @@ print_Lagrangian_Tracers(xT,yT,struct_name)
 
 
 % Prints .target file!
-k_Target = 1.2e7;
+k_Target = 1.25e7;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
