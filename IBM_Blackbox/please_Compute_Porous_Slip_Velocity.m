@@ -92,6 +92,32 @@ for i=1:Np
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% % FUNCTION: compute Porous Connections
+% %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% function connects_Por = give_Me_Porous_Connections(ds,Np,porous_info)
+% 
+% xL = porous_info(:,2);
+% yL = porous_info(:,3);
+% 
+% start = 1; 
+% last = Np;
+% prev = last;
+% for i=1:Np
+%     
+%     x0 = xL(i); y0 = yL(i);        % central node value
+%     xm1= xL(prev); ym1 = yL(prev); % 'previous' values
+%     xp1 =xL(i+1); yp1=yL(i+1);     % 'next' values
+%     
+%     distL = sqrt( (x0-xm1)^2 + (y0-ym1)^2 );
+%     distR = sqrt( (x0-xp1)^2 + (y0-yp1)^2 );
+%     
+%     
+% end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: computes Lagrangian UNIT Normal Vectors
 %

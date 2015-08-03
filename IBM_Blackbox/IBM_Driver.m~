@@ -136,11 +136,9 @@ end
 
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
 if ( concentration_Yes == 1 )
-    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
+    [C,kDiffusion] = read_In_Concentration(struct_name);
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
-else
-    C = 0; % placeholder for plotting 
 end
 
 
@@ -295,7 +293,7 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 %Print initializations to .vtk
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
-print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C);
+print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
 
@@ -365,8 +363,7 @@ while current_time < T_FINAL
     %
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
-    %Uh, Vh instead of U,V
-    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
+    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
     %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
     if porous_Yes == 1
@@ -379,12 +376,12 @@ while current_time < T_FINAL
     
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
-        [xT, yT] = please_Move_Lagrangian_Point_Positions(U, V, xT, yT, xT, yT, x, y, dt, grid_Info,0); %0 for always no porous tracers
+        [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info,0); %0 for always no porous tracers
         tracers(:,2) = xT;
         tracers(:,3) = yT;
     end
     
-    % If there is a background concentration, update concentration-% gradient %
+    % If there is a background concentration, update concentration % gradient %
     if concentration_Yes == 1
        C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
@@ -403,7 +400,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C);
+        print_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -439,7 +436,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C)
+function print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers)
 
 %Give spacing for grid
 dx = Lx/Nx; 
@@ -488,11 +485,6 @@ savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
 savevtk_scalar(p, pfName, 'P',dx,dy);
 savevtk_scalar(U, uXName, 'uX',dx,dy);
 savevtk_scalar(V, uYName, 'uY',dx,dy);
-
-if concentration_Yes == 1
-    confName = ['concentration.' strNUM '.vtk'];
-    savevtk_scalar(C, confName, 'Concentration',dx,dy);
-end
 
 %Print VECTOR DATA (i.e., velocity data) to .vtk file
 savevtk_vector(U, V, velocityName, 'u',dx,dy)
@@ -894,32 +886,29 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: Reads in the diffusion coefficient and initial concentration, C
+% FUNCTION: Reads in the # of springs and all MASTER NODEs, SLAVE NODEs,
+%           spring STIFFNESSES, spring RESTING LENGTHS
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,kDiff] = read_In_Concentration_Info(struct_name,N)
+function springs = read_In_Concentration_Info(struct_name,Nx)
 
 filename = [struct_name '.concentration'];  %Name of file to read in
 
-strstr = '%f';
-for i=1:N-1
-   strstr = [strstr ' %f'];
-end
-
 fileID = fopen(filename);
 
+    strstr = [strstr '%f ']
     % Read in the file, use 'CollectOutput' to gather all similar data together
     % and 'CommentStyle' to to end and be able to skip lines in file.
-    C = textscan(fileID,strstr,'CollectOutput',1);
+    C = textscan(fileID,'%f %f %f %f','CollectOutput',1);
 
 fclose(fileID);        %Close the data file.
 
 con_info = C{1};    %Stores all read in data 
 
-%Store all elements on .concentration file 
-kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info(2:end,1:end); %initial concentration
+%Store all elements on .sconcentration file 
+kDiffusion = con_info(1,1);
+C = con_info(2:end,1:end);
 
 
 
