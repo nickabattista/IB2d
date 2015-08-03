@@ -152,7 +152,7 @@ yLag = [YBot YTop];
 %
 % GIVES INITIAL CONCENTRATION 
 %
-C = give_Me_Initial_Concentration(Nx,Ny,dx,dy);
+C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy);
 
 
 
@@ -535,13 +535,17 @@ yT = [y y y y y y y y y y y y y y y y y y y y y];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = give_Me_Initial_Concentration(Nx,Ny,dx,dy)
+function C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy)
 
 %WHERE OUTER TUBE LIES
-xMin = 0.15; xMax = 0.45;
+%xMin = 0.15; xMax = 0.45;
+%yMin = 0.85; yMax = 1.15;
+
+xMin = 0.15; xMax = 0.2;
 yMin = 0.85; yMax = 1.15;
-x = 0:dx:2;
-y = 0:dy:2;
+
+x = 0:dx:Lx;
+y = 0:dy:Ly;
 inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
 C = zeros(Ny,Nx);
