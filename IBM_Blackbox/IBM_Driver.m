@@ -365,7 +365,7 @@ while current_time < T_FINAL
     %
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
-    %Uh, Vh instead of U,V
+    %Uh, Vh instead of U,V?
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
     %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
@@ -379,6 +379,7 @@ while current_time < T_FINAL
     
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
+        %Uh, Vh instead of U,V?
         [xT, yT] = please_Move_Lagrangian_Point_Positions(U, V, xT, yT, xT, yT, x, y, dt, grid_Info,0); %0 for always no porous tracers
         tracers(:,2) = xT;
         tracers(:,3) = yT;
