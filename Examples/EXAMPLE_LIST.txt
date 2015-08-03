@@ -56,6 +56,7 @@ GitHub: http://www.github.com/nickabattista
             ex1: - Single porous rubberband example
             ex2: - Comparing porous to non-porous rubberband
     11. "Concentration_Gradients"
+            ex1: - Concentration gradient in birfuracting artery
 
 %*****************************************************************************%
 %*********************************% NOTES! %**********************************%
@@ -64,7 +65,7 @@ GitHub: http://www.github.com/nickabattista
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass), and
-    Porous Media (.porous)!  
+    Porous Media (.porous), and initial concentration (.concentration)!  
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Example in Moving_Rubberband & 
@@ -80,4 +81,7 @@ GitHub: http://www.github.com/nickabattista
 -You can choose to have gravity exerting forced (yes/no) as well as prescribe
     the direction of gravitational influence in any direction you'd wish, 
     in input2d
+
+-You can have a background concentration gradient that is advected and diffused
+    via the background flow.
 
