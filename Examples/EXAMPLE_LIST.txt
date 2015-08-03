@@ -57,6 +57,7 @@ GitHub: http://www.github.com/nickabattista
             ex2: - Comparing porous to non-porous rubberband
     11. "Concentration_Gradients"
             ex1: - Concentration gradient in birfuracting artery
+            ex2: - Pure Diffusion of Passive Scalar in Box
 
 %*****************************************************************************%
 %*********************************% NOTES! %**********************************%

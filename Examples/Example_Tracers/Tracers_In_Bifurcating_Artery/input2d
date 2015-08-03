@@ -46,4 +46,4 @@ plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = channel   % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = artery   % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)

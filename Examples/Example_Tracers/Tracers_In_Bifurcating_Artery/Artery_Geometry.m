@@ -25,11 +25,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the CHANNEL_CHANNEL-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the BIFURCATING_ARTERY-EXAMPLE geometry and prints associated input files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Channel_Channel()
+function Artery_Geometry()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
@@ -47,7 +47,7 @@ w = 0.15*Ly;                    % Width of Channel
 x0 = 0.4;                      % x-Center for Cylinder
 y0 = 1.0;                      % y-Center for Cylinder
 r = w/6;                       % Radii of Cylinder
-struct_name = 'channel'; % Name for .vertex, .spring, etc files.
+struct_name = 'artery'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct BASE CHANNEL geometry
