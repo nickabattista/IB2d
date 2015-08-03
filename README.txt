@@ -81,6 +81,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex2: - Comparing porous to non-porous rubberband
     11. "Concentration_Gradients"
             ex1: - Concentration gradient in birfuracting artery
+            ex2: - Pure Diffusion of Passive Scalar in Box
+
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
