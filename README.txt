@@ -79,11 +79,13 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     10. "Porous_Rubberband" - added porosity to standard rubberband problem
             ex1: - Single porous rubberband example
             ex2: - Comparing porous to non-porous rubberband
+    11. "Concentration_Gradients"
+            ex1: - Concentration gradient in birfuracting artery
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass), and
-        Porous Media (.porous)! 
+        Porous Media (.porous), and initial concentration (.concentration)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Examples in Moving_Rubberband & 
@@ -99,6 +101,9 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 -You can choose to have gravity exerting forced (yes/no) as well as prescribe
     the direction of gravitational influence in any direction you'd wish, 
     in input2d
+
+-You can have a background concentration gradient that is advected and diffused
+    via the background flow.
 
 -It can plot the following things in Matlab, if plot_Matlab flag = 1 in input2d:
     a. Vorticity (colormap) + Lagrangian Pts.
