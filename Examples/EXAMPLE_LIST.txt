@@ -17,7 +17,7 @@ GitHub: http://www.github.com/nickabattista
 %****************************% LIST OF EXAMPLES! %****************************%
 %*****************************************************************************%
 
--THIS VERSION HAS 9 DIFFERENT FLAVORS OF EXAMPLES:
+-THIS VERSION HAS 11 DIFFERENT FLAVORS OF EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
