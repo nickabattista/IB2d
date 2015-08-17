@@ -541,8 +541,14 @@ function C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy)
 %xMin = 0.15; xMax = 0.45;
 %yMin = 0.85; yMax = 1.15;
 
-xMin = 0.15; xMax = 0.2;
+xMin = 0.15; xMax = 0.45;
 yMin = 0.85; yMax = 1.15;
+
+xMid = (xMin+xMax)/2;
+yMid = (yMin+yMax)/2;
+
+xDiff = (xMax-xMin)/2;
+yDiff = (yMax-yMin)/2;
 
 x = 0:dx:Lx;
 y = 0:dy:Ly;
@@ -550,7 +556,13 @@ inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
 C = zeros(Ny,Nx);
 for i=1:length( inds(:,1) )
-    C(inds(i,1), inds(i,2) ) = 1.0;
+    xInd = inds(i,1);
+    yInd = inds(i,2);
+    xPt = x(xInd);
+    yPt = y(yInd);
+    %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+    C(xInd,yInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
