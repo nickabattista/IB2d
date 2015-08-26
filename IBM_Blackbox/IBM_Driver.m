@@ -385,12 +385,12 @@ while current_time < T_FINAL
         tracers(:,3) = yT;
     end
     
-    % If there is a background concentration, update concentration-% gradient %
+    % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1
        C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
     
-    % Plot Lagrangian/Eulerian Dynamics!
+    % Plot Lagrangian/Eulerian Dynamics! %
     if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )
         
         %Compute vorticity, uMagnitude
