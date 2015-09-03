@@ -3,12 +3,12 @@
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
 
 % FLUID PARAMETER VALUES %
-mu = 0.005               % Dynamic Viscosity (N*s/m^2) 
+mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 1.0           % Final time of simulation (s)
-dt = 5e-5               % Time-step (s)
+Tfinal = 1.25           % Final time of simulation (s)
+dt = 5.0e-5               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
