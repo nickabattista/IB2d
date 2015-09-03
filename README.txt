@@ -82,6 +82,13 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     11. "Concentration_Gradients"
             ex1: - Concentration gradient in birfuracting artery
             ex2: - Pure Diffusion of Passive Scalar in Box
+    12. "Jellyfish_Swimming"
+            ex1: - Bell composed entirely of springs, motion driven by updating
+                   resting lengths sinusoidally
+            ex2: - Bell composed of beams and springs
+            ex3: - Bell motion driven by interpolating between resting lengths
+                   for two phases.
+            NOTE: not entirely debugged, yet. 
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
