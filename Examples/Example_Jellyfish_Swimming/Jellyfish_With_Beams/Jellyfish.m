@@ -25,11 +25,11 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the CHANNEL_CHANNEL-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the RUBBERBAND-EXAMPLE geometry and prints associated input files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Channel_Channel()
+function Jellyfish()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
@@ -41,49 +41,42 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-ds= min(Lx/(2*Nx),Ly/(2*Ny));  % Lagrangian spacing
-L = 0.9*Lx;                    % Length of Channel
-w = 0.2*Ly;                    % Width of Channel
-x0 = 0.3;                      % x-Center for Cylinder
-y0 = 0.5;                      % y-Center for Cylinder
-r = w/6;                       % Radii of Cylinder
-struct_name = 'channel'; % Name for .vertex, .spring, etc files.
+ds = Lx/(2*Nx);  % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
+rmax = 0.5/4;         % Length of semi-major axis.
+rmin = 0.2/4;         % Length of semi-minor axis.
+struct_name = 'jelly'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Channel_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
-[xLag_C,yLag_C] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r,x0,y0);
+[xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax);
+
+% Translate Geometry
+yLag = yLag + 2*rmax;
+xLag = xLag + Lx/2;
 
 % Plot Geometry to test
-plot(xLag(1:end/2),yLag(1:end/2),'r-'); hold on;
-plot(xLag(end/2+1:end),yLag(end/2+1:end),'r-'); hold on;
-plot(xLag_C,yLag_C,'r-'); hold on;
-
+plot(xLag,yLag,'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
-plot(xLag_C,yLag_C,'g*'); hold on;
 xlabel('x'); ylabel('y');
-axis square;
-
-xLag = [xLag xLag_C]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
-yLag = [yLag yLag_C]; % Add xLagPts from Circle to xLag Pt. Vector (*no springs or beams*)
+axis([0 1 0 1]);
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-%k_Spring = 1e7;
-%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+k_Spring = 1e7;
+print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name);
 
 
 % Prints .beam file!
-%k_Beam = 0.5; C = 0.0;
-%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
+k_Beam = 1e3;
+print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
-print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
+%k_Target = 1e7;
+%print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -145,17 +138,17 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
-    fprintf(beam_fid, '%d\n', N );
+    fprintf(beam_fid, '%d\n', N-2 );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
     for s = 2:N-1
             if  s <= N-1         
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C(s) );  
             else
                 %Case s=N
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C(s) );  
             end
     end
     fclose(beam_fid); 
@@ -167,7 +160,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name)
 
     N = length(xLag);
 
@@ -180,50 +173,139 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
     %SPRINGS BETWEEN VERTICES
     for s = 1:N
             if s < N         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
-            else
-                %Case s=N
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
+                x1 = xLag(s);    y1 = yLag(s);
+                x2 = xLag(s+1);  y2 = yLag(s+1);
+                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);  
             end
+            
+            % GEOMETRY IS NOT CLOSED!
+            %else
+            %    %Case s=N
+            %    x1 = xLag(s);   y1 = yLag(s);
+            %    x2 = xLag(1);   y2 = yLag(1);
+            %    ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+            %    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds);  
+            %end
+            
     end
+    
+    % TETHER ENDS OF JELLYFISH BELL
+    x1 = xLag(1);   y1 = yLag(1);
+    x2 = xLag(s);   y2 = yLag(s);
+    ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, s,   k_Spring, ds);
+    
+    fprintf('\n HEADS UP! Print dist = %d into update_Springs file!\n\n ',ds);
+    
     fclose(spring_fid); 
     
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the Lagrangian structure geometry for channel
+% FUNCTION: gives actually ELLIPTICAL piece
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = give_Me_Channel_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly)
+function [x,y,t] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang)
 
-% The immsersed structure is a channel %
-x = (Lx-L)/2:ds:(L+(Lx-L)/2);  %xPts
-yBot = (Ly-w)/2;               %yVal for bottom of Channel
-yTop = Ly - (Ly-w)/2;          %yVal for top of Channel
-
-xLag = [x x];
-yLag = [yBot*ones(1,length(x)) yTop*ones(1,length(x))];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: creates the Lagrangian structure geometry for cylinder
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [xLag,yLag] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r,x0,y0)
-
-% The immsersed structure is a cylinder %
-
-dtheta = ds/ (2*r);
-theta = 0; i=1;
-while theta < 2*pi
-   xLag(i) = x0 - r*cos(theta);
-   yLag(i) = y0 - r*sin(theta);
-   theta = theta + dtheta;
-   i=i+1;
+% ang: angle below positive x-axis where ellipse is to start
+if ang < 0
+    angEnd = abs(ang) + pi;
+elseif ang == 0
+    angEnd = pi;
 end
 
-   
-   
+%initiate
+ct = 1;
+t(1) = ang;
+xN = rmin*cos(ang);   x(ct) = xN;
+yN = rmax*sin(ang);   y(ct) = yN;
+
+while t <= angEnd-ds; 
+    
+    %update counter
+    ct = ct+1;
+    
+    xP = x(ct-1);           % x-Prev
+    yP = y(ct-1);           % y-Prev
+    
+    tN = t(ct-1);                 % previous angle
+    tF = tN + pi/20;         % far guess
+    tGuess = (tN + tF)/2;   % guess
+    
+    xN1 = rmin*cos(tGuess);   % x-guess 
+    yN1 = rmax*sin(tGuess);   % y-guess
+    err = ( ds - sqrt( (xN1-xP)^2 + (yN1-yP)^2 ) );
+    
+    while abs(err) > 1e-6
+       
+       if err > 0
+          
+          tN = tGuess;              % Update 'close' PT. [tN,tGuess,tF]
+          tGuess = (tN+tF)/2;       % New Guess
+          xN1 = rmin*cos(tGuess);   % x-guess 
+          yN1 = rmax*sin(tGuess);   % y-guess          
+          
+       elseif err < 0
+           
+          tF = tGuess;             % Update FAR PT. [tN,tGuess,tF] 
+          tGuess = (tF+tN)/2;     % New Guess
+          xN1 = rmin*cos(tGuess);   % x-guess 
+          yN1 = rmax*sin(tGuess);   % y-guess  
+          
+       end
+        
+       %compute error
+       err = ( ds - sqrt( (xN1-xP)^2 + (yN1-yP)^2 ) );
+        
+    end
+
+    %save values
+    x(ct) = xN1;
+    y(ct) = yN1;
+    
+    %update
+    t(ct)=tGuess;
+    
+end
+
+%x(ct+1) = rmin*cos(angEnd);  
+%y(ct+1) = rmax*sin(angEnd);  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes curvature of ellipse
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = compute_Curvatures(angs,rmin,rmax)
+
+%a-x component (rmin)
+%b-y component (rmax)
+%C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
+
+C = zeros( length(angs) );
+for i=1:length(angs)
+   t = angs(i);
+   %t = atan( rmin/rmax * tan(t) ); %phi parameter?
+   C(i) = -rmin*rmax / ( sqrt( (rmax*cos(t))^2 + (rmin*sin(t))^2 ) )^3;
+end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax)
+
+% The immsersed structure is HALF an ellipse %
+
+ang = -pi/6;
+[xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang);
+
+C = compute_Curvatures(angs,rmin,rmax);
+
