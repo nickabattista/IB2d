@@ -293,17 +293,14 @@ N = length(xLag);
 C = zeros( length(angs) );
 
 for i=2:N-1
-   
-    %t = angs(i);
+   %t = angs(i);
    %t = atan( rmin/rmax * tan(t) ); %phi parameter?
    %C(i) = -rmin*rmax / ( sqrt( (rmax*cos(t))^2 + (rmin*sin(t))^2 ) )^3;
    
-   % Pts Xp -> Xq -> Xr (same as beam force calc.)
    Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
    Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
    
-   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
-   
+   cro(Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp)
    
 end
 
