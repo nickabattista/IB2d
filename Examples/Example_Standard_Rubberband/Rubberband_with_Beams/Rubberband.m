@@ -69,7 +69,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e6;
+k_Beam = 1e7;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
@@ -276,31 +276,65 @@ function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,N,rmin,rmax)
 xLag = xLag + 0.5;
 yLag = yLag + 0.5;
 
-% t = 2*pi/N;
-% for i=1:N
-%     
-%     xLag(i) = 0.5 + rmax * cos( 2*pi/N*(i-1) );
-%     yLag(i) = 0.5 + rmin * sin( 2*pi/N*(i-1) );
-%     
-% end
+% COMPUTES CURAVTURE IF WANT TO STAY IN INITIAL CONFIGURATION
+C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag);
 
-% Compute effective radius (from areas!)
-r = sqrt(rmin*rmax);
+N = length(xLag);
+r_eff = sqrt(rmin*rmax);
+for i=1:N
+    
+    xLag2(i) = 0.5 + r_eff * cos( 2*pi/N*(i-1) );
+    yLag2(i) = 0.5 + r_eff * sin( 2*pi/N*(i-1) );
+    
+end
 
-% Compute curvature
-% C = (1/r)*ones(1,length(xLag));
+% COMPUTES CURAVTURE IF WANT TO SETTLE INTO A CIRCLE
+C = compute_Curvatures(ds,angs,rmin,rmax,xLag2,yLag2);
 
-ellicArc = length(xLag)*ds
-circum = 2*pi*r
 
-ds2 = (2*pi*r) / length(xLag);
-ang = ds2 / r;
-w = 2*r*sin( ang/2 );
-alpha = 2*acos( (ds2/2) / r );
-alpha2 =  2 * ( pi - (ds2/r) ) / 2;
-%C = zeros(1,length(xLag));%
-C = ds2^2*sin( alpha2 )*ones(1,length(xLag));
-%C = 1e-7*ones(1,length(xLag));
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes "curvature" of ellipse
+% 
+% NOTE: not curvature in the traditional geometric sense, in the 'discrete'
+% sense through cross product.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-C(1)
-C(1)/ds2
+function C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag)
+
+%a-x component (rmin)
+%b-y component (rmax)
+%C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
+
+N = length(xLag);
+C = zeros( length(angs) );
+
+%Note: -needs to be done same order as you print .beam file!
+%      -THIS MAKES INITIAL BEAM CONFIGURATION THE DESIRED CURAVTURE!!
+for i=1:N
+   
+   if i==1
+   
+        % Pts Xp -> Xq -> Xr (same as beam force calc.)
+        Xp = xLag(N); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(N); Yq = yLag(i); Yr = yLag(i+1);
+   
+   elseif i<N
+   
+        % Pts Xp -> Xq -> Xr (same as beam force calc.)
+        Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
+       
+   else
+       
+        % Pts Xp -> Xq -> Xr (same as beam force calc.)
+        Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(1);
+        Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(1);
+        
+   end
+   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
+   
+   
+end
+

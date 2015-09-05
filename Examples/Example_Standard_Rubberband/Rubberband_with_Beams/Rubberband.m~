@@ -69,7 +69,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e8;
+k_Beam = 1e6;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
@@ -137,12 +137,16 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
+    v=1:2:N-1;
+    
     fprintf(beam_fid, '%d\n', N );
+    %fprintf(beam_fid, '%d\n', length(v) );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
-    for s = 1:N
+    %for s = 1:2:N-1
+    for s=1:N
             if s==1
                 fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N, s, s+1, k_Beam, C(s) );  
             elseif  s <= N-1         
@@ -272,6 +276,8 @@ function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,N,rmin,rmax)
 xLag = xLag + 0.5;
 yLag = yLag + 0.5;
 
+C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag);
+
 % t = 2*pi/N;
 % for i=1:N
 %     
@@ -280,13 +286,54 @@ yLag = yLag + 0.5;
 %     
 % end
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes "curvature" of ellipse
+% 
+% NOTE: not curvature in the traditional geometric sense, in the 'discrete'
+% sense through cross product.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag)
+
+%a-x component (rmin)
+%b-y component (rmax)
+%C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
+
+N = length(xLag);
+C = zeros( length(angs) );
+
+for i=1:N
+   
+   if i==1
+   
+   % Pts Xp -> Xq -> Xr (same as beam force calc.)
+        Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
+   
+   elseif i<N
+   
+        % Pts Xp -> Xq -> Xr (same as beam force calc.)
+        Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
+       
+   else
+   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
+   
+   
+end
+
+
+% Compute curvature using curvature for circle (WRONG! -> not this traditional curavture definition!)
+% C = (1/r)*ones(1,length(xLag));
+
 % Compute effective radius (from areas!)
 r = sqrt(rmin*rmax);
 
-% Compute curvature
-% C = (1/r)*ones(1,length(xLag));
-
-ang = 
-w = 2*r*sin( ang/2 );
-alpha = 2*asin( (w/2) / ds );
-C = ds^2*sin(pi/3)*ones(1,length(xLag));
+% Computes discretized curvature for circle!
+ds2 = (2*pi*r) / length(xLag);
+alpha2 =  2 * ( pi - (ds2/r) ) / 2;
+C = ds2^2*sin( alpha2 )*ones(1,length(xLag));
