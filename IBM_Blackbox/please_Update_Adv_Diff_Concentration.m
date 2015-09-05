@@ -20,4 +20,7 @@ Cxx = DD(C,dx,'x');
 Cyy = DD(C,dy,'y');
     
 % Update Concentration 
-C = C + dt * ( k*(Cxx+Cyy) - uX'.*Cx - uY'.*Cy );
+% C = C + dt * ( k*(Cxx+Cyy) - uX'.*Cx - uY'.*Cy );
+
+C = C + dt * ( k*(Cxx+Cyy) - uX.*Cx - uY.*Cy );
+
