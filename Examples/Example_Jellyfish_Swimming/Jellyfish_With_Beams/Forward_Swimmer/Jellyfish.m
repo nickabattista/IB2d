@@ -65,12 +65,12 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e7;
+k_Spring = 1e4;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e3;
+k_Beam = 1e10;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
@@ -283,24 +283,28 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag)
+function C = compute_Curvatures(xLag,yLag)
 
 %a-x component (rmin)
 %b-y component (rmax)
 %C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
 
 N = length(xLag);
-C = zeros( length(angs) );
+C = zeros( N );
 
+%Note: needs to be done same order as you print .beam file!
 for i=2:N-1
-   %t = angs(i);
+   
+    %t = angs(i);
    %t = atan( rmin/rmax * tan(t) ); %phi parameter?
    %C(i) = -rmin*rmax / ( sqrt( (rmax*cos(t))^2 + (rmin*sin(t))^2 ) )^3;
    
+   % Pts Xp -> Xq -> Xr (same as beam force calc.)
    Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
    Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
    
-   cro(Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp)
+   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
+   
    
 end
 
@@ -318,5 +322,5 @@ function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax)
 ang = -pi/6;
 [xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang);
 
-C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag);
+C = compute_Curvatures(xLag,yLag);
 
