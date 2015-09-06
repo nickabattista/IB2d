@@ -325,7 +325,7 @@ while current_time < T_FINAL
        target_info = update_Target_Point_Positions(dt,current_time,target_info); 
     end
     
-    if ( ( update_Beams_Flag == 1 ) && ( Beams_Yes == 1) )
+    if ( ( update_Beams_Flag == 1 ) && ( beams_Yes == 1) )
        beams_info = update_Beams(dt,current_time,beams_info); 
     end
     
