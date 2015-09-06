@@ -1,14 +1,14 @@
 %*****%***%***%***%***%***% INPUT2d FILE: %***%***%***%***%***%*****%
-%****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
-%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
+%****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%*****%
+%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%****%
 
 % FLUID PARAMETER VALUES %
-mu = 0.0                % Dynamic Viscosity (N*s/m^2) 
+mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 2.0            % Final time of simulation (s)
-dt = 1.0e-3             % Time-step (s)
+Tfinal = 1.0            % Final time of simulation (s)
+dt = 5e-4             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -19,11 +19,11 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 springs = 1             % 0 (for no) or 1 (for yes)
-update_springs = 1      % 0 (for no) or 1 (for yes)
+update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 0          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 1               % 0 (for no) or 1 (for yes)
-update_beams = 0        % 0 (for no) or 1 (for yes)
+update_beams = 1        % 0 (for no) or 1 (for yes)
 muscle_activation = 0   % 0 (for no) or 1 (for yes)
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 tracers = 0             % 0 (for no) or 1 (for yes)
@@ -36,7 +36,7 @@ concentration = 0       % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 10          % How often to print (PLOT) to screen
+print_dump = 20          % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

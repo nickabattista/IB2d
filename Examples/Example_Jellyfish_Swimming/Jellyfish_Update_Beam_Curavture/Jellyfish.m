@@ -42,35 +42,63 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 % Immersed Structure Geometric / Dynamic Parameters %
 ds = Lx/(2*Nx);  % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
-rmax = 0.5/4;         % Length of semi-major axis.
-rmin = 0.35/4;         % Length of semi-minor axis.
+rmax_1 = 0.5/4;         % Length of semi-major axis for PHASE ONE.
+rmin_1 = 0.3/4;         % Length of semi-minor axis for PHASE ONE.
+rmax_2 = 0.5/4;         % Length of semi-major axis for PHASE TWO.
+rmin_2 = 0.15/4;        % Length of semi-minor axis for PHASE TWO.
 struct_name = 'jelly'; % Name for .vertex, .spring, etc files.
 
 
-% Call function to construct geometry
-[xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax);
+% Call function to construct geometry for PHASE ONE
+[xLag_1,yLag_1,C1] = give_Me_Immsersed_Boundary_Geometry_P1(ds,rmin_1,rmax_1);
+N_lag = length(xLag_1);
+
+% Call function construct geometry for PHASE TWO
+[xLag_2,yLag_2,C2,ds2] = give_Me_Immsersed_Boundary_Geometry_P2(N_lag,rmin_2,rmax_2);
+
+
+% Reflect Geometry
+xLag_1 = [xLag_1 -xLag_1(end-1:-1:1)];
+yLag_1 = [yLag_1  yLag_1(end-1:-1:1)];
+xLag_2 = [xLag_2 -xLag_2(end-1:-1:1)];
+yLag_2 = [yLag_2  yLag_2(end-1:-1:1)];
+
 
 % Translate Geometry
-yLag = yLag + 2*rmax;
-xLag = xLag + Lx/2;
+yLag_1 = yLag_1 + 2*rmax_1;
+xLag_1 = xLag_1 + Lx/2;
+yLag_2 = yLag_2 + 2*rmax_1;
+xLag_2 = xLag_2 + Lx/2;
+
+% Gives RESTING-LENGTHS for each phase if interpolating resting lengths for springs
+% [RL_Bell,RL_Body] = give_Me_Phase_Resting_Lengths(xLag_1,yLag_1,xLag_2,yLag_2);
+
+% Gives CURVATURES for each phase if interpolating beam curvatures
+C1 = compute_Curvatures(xLag_1,yLag_1); 
+C2 = compute_Curvatures(xLag_2,yLag_2);
+
+
 
 % Plot Geometry to test
-plot(xLag,yLag,'r-'); hold on;
-plot(xLag,yLag,'*'); hold on;
+plot(xLag_1,yLag_1,'r-'); hold on;
+plot(xLag_1,yLag_1,'*'); hold on;
+plot(xLag_2,yLag_2,'r-'); hold on;
+plot(xLag_2,yLag_2,'g*'); hold on;
 xlabel('x'); ylabel('y');
 axis([0 1 0 1]);
 
 % Prints .vertex file!
-print_Lagrangian_Vertices(xLag,yLag,struct_name);
+print_Lagrangian_Vertices(xLag_1,yLag_1,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e4;
-print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name);
+k_Spring = 1e5;
+print_Lagrangian_Springs(xLag_1,yLag_1,k_Spring,struct_name,ds,ds2);
+
 
 % Prints .beam file!
-k_Beam = 2e9;
-print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
+k_Beam = 1e9;
+print_Lagrangian_Beams(xLag_1,yLag_1,k_Beam,C1,C2,struct_name);
 
 
 % Prints .target file!
@@ -128,7 +156,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
+function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,C2,struct_name)
 
     % k_Beam: beam stiffness
     % C: beam curvature
@@ -152,6 +180,12 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     end
     fclose(beam_fid); 
 
+    fprintf('\n\nHEADS UP! Print following into the update_Beams file!\n');
+    fprintf('\nFIRST COL: C1  2ND COL: C2 = \n');
+    for i=2:length(C2)-1  %HAVE ZEROs on ends for printing .beam files
+       fprintf('%d %d\n',C(i),C2(i));
+    end
+    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -159,13 +193,15 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,ds1,ds2)
 
     N = length(xLag);
 
+    N_springs = (N-1);   %(N-1) for around jellybell, (N-1)/2 for btwn bell sides
+    
     spring_fid = fopen([struct_name '.spring'], 'w');
-
-    fprintf(spring_fid, '%d\n', N );
+    
+    fprintf(spring_fid, '%d\n', N_springs );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
@@ -189,13 +225,36 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name)
             
     end
     
-    % TETHER ENDS OF JELLYFISH BELL
-    x1 = xLag(1);   y1 = yLag(1);
-    x2 = xLag(N);   y2 = yLag(N);
-    ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, N,   k_Spring, ds);
+    %SPRINGS BETWEEN ENDS OF JELLYFISH BELL
+%     for s=1:(N-1)/2
+%             x1 = xLag(s);    y1 = yLag(s);
+%             id2 = length(xLag) - (s-1);
+%             x2 = xLag( id2 );  y2 = yLag( id2 );
+%             ds(s) = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+%             if s<=25
+%                 strength = k_Spring/5e4;
+%             else
+%                 strength = k_Spring/1e2;
+%             end
+%             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, id2, strength, ds(s) );  
+%     end
     
-    fprintf('\n HEADS UP! Print dist = %d into update_Springs file!\n\n ',ds);
+    % TETHER ENDS OF JELLYFISH BELL
+    % x1 = xLag(1);   y1 = yLag(1);
+    % x2 = xLag(s);   y2 = yLag(s);
+    % ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+    % fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, s,   k_Spring, ds);
+    
+    %fprintf('\nHEADS UP! Print following into the update_Springs file!\n\n');
+    
+    %fprintf('N_lagpts = %d (start of springs btwn bell sides)\n\n',N);
+    %fprintf('ds1 = %d and ds2 = %d\n\n',ds1,ds2);
+    %fprintf('MAKE SURE TO HARDCODE RESTING LENGTHS FOR BOTH PHASES IN UPDATE!\n\n');
+    %fprintf('dist_Vector = \n');
+    %for i=1:25 
+    %    fprintf('%d\n',ds(i));
+    %end
+    %fprintf('\n');
     
     fclose(spring_fid); 
     
@@ -222,7 +281,7 @@ t(1) = ang;
 xN = rmin*cos(ang);   x(ct) = xN;
 yN = rmax*sin(ang);   y(ct) = yN;
 
-while t <= angEnd-ds; 
+while t <= pi/2-ds; 
     
     %update counter
     ct = ct+1;
@@ -270,8 +329,56 @@ while t <= angEnd-ds;
     
 end
 
-%x(ct+1) = rmin*cos(angEnd);  
-%y(ct+1) = rmax*sin(angEnd);  
+x(ct) = rmin*cos(pi/2);  
+y(ct) = rmax*sin(pi/2);  
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry for PHASE ONE
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry_P1(ds,rmin,rmax)
+
+% The immsersed structure is HALF an ellipse %
+
+ang = 0;
+[xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang);
+
+C = compute_Curvatures(xLag,yLag);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: compute ELLIPTIC CIRCUMFERENCE
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function arcLength = compute_Ellipse_Circumference(a,b)
+
+h = (a-b)^2 / (a+b)^2;
+arcLength = pi*(a+b)*( 1 + 3*h / (10 + sqrt(4-3*h) ) );
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry for PHASE TWO
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag,C,ds2] = give_Me_Immsersed_Boundary_Geometry_P2(N_lag,rmin2,rmax2)
+
+% The immsersed structure is HALF an ellipse %
+
+arcLength = compute_Ellipse_Circumference(rmin2,rmax2);
+
+ds2 = (arcLength/4) / (N_lag-1);
+
+ang = 0;
+[xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds2,rmin2,rmax2,ang);
+
+C = compute_Curvatures(xLag,yLag);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -308,18 +415,56 @@ for i=2:N-1
 end
 
 
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the Lagrangian structure geometry
+% FUNCTION: finds distances between all two phase for spring resting
+%           lengths
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax)
+function [RL_Bell,RL_Body] = give_Me_Phase_Resting_Lengths(xLag_1,yLag_1,xLag_2,yLag_2)
 
-% The immsersed structure is HALF an ellipse %
+N = length(xLag_1);
+Ntest=length(xLag_2);
 
-ang = 0.0;
-[xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang);
+if N~=Ntest
+   error('NUMBER OF LAG PTS BETWEEN PHASES ARE DIFFERENT!!!!!!');
+end
 
-C = compute_Curvatures(xLag,yLag);
+RL_Bell = zeros( (N-1)/2,2);
+RL_Body = zeros(N-1,2);
 
+for s=1:(N-1)/2
+   
+   x1 = xLag_1(s); y1 = yLag_1(s);
+   id2 = N - (s-1);
+   x2 = xLag_1(id2); y2 = yLag_1(id2);
+   dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+   RL_Bell(s,1) = dist; 
+   
+   x1 = xLag_2(s); y1 = yLag_2(s);
+   id2 = N - (s-1);
+   x2 = xLag_2(id2); y2 = yLag_2(id2);
+   dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+   RL_Bell(s,2) = dist; 
+   
+end
+
+for s=1:N-1
+   
+   x1 = xLag_1(s); y1 = yLag_1(s);
+   x2 = xLag_1(s+1); y2 = yLag_1(s+1);
+   dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+   RL_Body(s,1) = dist; 
+   
+   x1 = xLag_2(s); y1 = yLag_2(s);
+   x2 = xLag_2(s+1); y2 = yLag_2(s+1);
+   dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+   RL_Body(s,2) = dist; 
+    
+end

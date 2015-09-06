@@ -70,9 +70,10 @@ xLag_1 = xLag_1 + Lx/2;
 yLag_2 = yLag_2 + 2*rmax_1;
 xLag_2 = xLag_2 + Lx/2;
 
+% Gives RESTING-LENGTHS for each phase if interpolating resting lengths for springs
 [RL_Bell,RL_Body] = give_Me_Phase_Resting_Lengths(xLag_1,yLag_1,xLag_2,yLag_2);
 
-RL_Bell
+
 
 
 
@@ -94,8 +95,8 @@ print_Lagrangian_Springs(xLag_1,yLag_1,k_Spring,struct_name,ds,ds2);
 
 
 % Prints .beam file!
-% k_Beam = 1e3;
-% print_Lagrangian_Beams(xLag_1,yLag_1,k_Beam,C1,struct_name);
+%k_Beam = 1e9;
+%print_Lagrangian_Beams(xLag_1,yLag_1,k_Beam,C1,C2,struct_name);
 
 
 % Prints .target file!
@@ -153,7 +154,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
+function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,C2,struct_name)
 
     % k_Beam: beam stiffness
     % C: beam curvature
@@ -177,6 +178,12 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     end
     fclose(beam_fid); 
 
+    %fprintf('\nHEADS UP! Print following into the update_Beams file!\n\n');
+    %fprintf('\n\nFIRST COL: C1  2ND COL: C2 = \n');
+    %for i=1:length(C2)
+    %   fprintf('%d %d\n',C(i),C2(i));
+    %end
+    
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -188,7 +195,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,ds1,ds2)
 
     N = length(xLag);
 
-    N_springs = (N-1) + (N-1)/2;   %(N-1) for around jellybell, (N-1)/2 for btwn bell sides
+    N_springs = (N-1);   %(N-1) for around jellybell, (N-1)/2 for btwn bell sides
     
     spring_fid = fopen([struct_name '.spring'], 'w');
     
@@ -230,22 +237,17 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,ds1,ds2)
             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, id2, strength, ds(s) );  
     end
     
-    % TETHER ENDS OF JELLYFISH BELL
-    % x1 = xLag(1);   y1 = yLag(1);
-    % x2 = xLag(s);   y2 = yLag(s);
-    % ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-    % fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, s,   k_Spring, ds);
     
     fprintf('\nHEADS UP! Print following into the update_Springs file!\n\n');
     
     fprintf('N_lagpts = %d (start of springs btwn bell sides)\n\n',N);
     fprintf('ds1 = %d and ds2 = %d\n\n',ds1,ds2);
-    fprintf('MAKE SURE TO HARDCORE RESTING LENGTHS FOR BOTH PHASES IN UPDATE!\n\n');
-    %fprintf('dist_Vector = \n');
-    %for i=1:25 
-    %    fprintf('%d\n',ds(i));
-    %end
-    %fprintf('\n');
+    fprintf('MAKE SURE TO HARDCODE RESTING LENGTHS FOR BOTH PHASES IN UPDATE!\n\n');
+    fprintf('dist_Vector = \n');
+    for i=1:25 
+       fprintf('%d\n',ds(i));
+    end
+    fprintf('\n');
     
     fclose(spring_fid); 
     
@@ -323,24 +325,6 @@ end
 x(ct) = rmin*cos(pi/2);  
 y(ct) = rmax*sin(pi/2);  
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: computes curvature of ellipse
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function C = compute_Curvatures(angs,rmin,rmax)
-
-%a-x component (rmin)
-%b-y component (rmax)
-%C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
-
-C = zeros( length(angs) );
-for i=1:length(angs)
-   t = angs(i);
-   %t = atan( rmin/rmax * tan(t) ); %phi parameter?
-   C(i) = -rmin*rmax / ( sqrt( (rmax*cos(t))^2 + (rmin*sin(t))^2 ) )^3;
-end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -356,7 +340,7 @@ function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry_P1(ds,rmin,rmax)
 ang = 0;
 [xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds,rmin,rmax,ang);
 
-C = compute_Curvatures(angs,rmin,rmax);
+C = compute_Curvatures(xLag,yLag);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -387,7 +371,46 @@ ds2 = (arcLength/4) / (N_lag-1);
 ang = 0;
 [xLag,yLag,angs] = compute_ELLIPTIC_Branch(ds2,rmin2,rmax2,ang);
 
-C = compute_Curvatures(angs,rmin2,rmax2);
+C = compute_Curvatures(xLag,yLag);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes "curvature" of ellipse
+% 
+% NOTE: not curvature in the traditional geometric sense, in the 'discrete'
+% sense through cross product.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = compute_Curvatures(xLag,yLag)
+
+%a-x component (rmin)
+%b-y component (rmax)
+%C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
+
+N = length(xLag);
+C = zeros( N );
+
+%Note: needs to be done same order as you print .beam file!
+for i=2:N-1
+   
+    %t = angs(i);
+   %t = atan( rmin/rmax * tan(t) ); %phi parameter?
+   %C(i) = -rmin*rmax / ( sqrt( (rmax*cos(t))^2 + (rmin*sin(t))^2 ) )^3;
+   
+   % Pts Xp -> Xq -> Xr (same as beam force calc.)
+   Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
+   Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
+   
+   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
+   
+   
+end
+
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
