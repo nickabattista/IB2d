@@ -92,12 +92,12 @@ print_Lagrangian_Vertices(xLag_1,yLag_1,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e5;
+k_Spring = 1e3;
 print_Lagrangian_Springs(xLag_1,yLag_1,k_Spring,struct_name,ds,ds2);
 
 
 % Prints .beam file!
-k_Beam = 1e9;
+k_Beam = 1e10;
 print_Lagrangian_Beams(xLag_1,yLag_1,k_Beam,C1,C2,struct_name);
 
 

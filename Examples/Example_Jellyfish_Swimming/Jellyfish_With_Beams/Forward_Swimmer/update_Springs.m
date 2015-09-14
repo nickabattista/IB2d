@@ -38,8 +38,8 @@ function springs_info = update_Springs(dt,current_time,xLag,springs_info)
 
 %RL = springs_info(:,4); % resting-length vector
 
-dist = 1.75e-01; %coming from Jellyfish.m (distance between ends of jellyfish bell)
+dist = 1.250077e-01; %coming from Jellyfish.m (distance between ends of jellyfish bell)
 
 % CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL
-springs_info(end,4) = dist*abs( cos(10*pi*current_time) );
+springs_info(end,4) = dist*( 1 - 0.5*abs( sin(10*pi*current_time) ) );
 

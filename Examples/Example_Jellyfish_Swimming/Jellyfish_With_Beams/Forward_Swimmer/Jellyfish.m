@@ -43,7 +43,7 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 % Immersed Structure Geometric / Dynamic Parameters %
 ds = Lx/(2*Nx);  % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
 rmax = 0.5/4;         % Length of semi-major axis.
-rmin = 0.35/4;         % Length of semi-minor axis.
+rmin = 0.25/4;         % Length of semi-minor axis.
 struct_name = 'jelly'; % Name for .vertex, .spring, etc files.
 
 
@@ -51,7 +51,7 @@ struct_name = 'jelly'; % Name for .vertex, .spring, etc files.
 [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry(ds,rmin,rmax);
 
 % Translate Geometry
-yLag = yLag + 2*rmax;
+yLag = yLag + 6*rmax;
 xLag = xLag + Lx/2;
 
 % Plot Geometry to test
@@ -65,11 +65,11 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e4;
+k_Spring = 2.5e5;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name);
 
 % Prints .beam file!
-k_Beam = 2e9;
+k_Beam = 2e8;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
@@ -163,9 +163,11 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name)
 
     N = length(xLag);
 
+    Total_Springs = N;%(N-1) + (N-1)/2;   %(N-1) for around jellybell, (N-1)/2 for btwn bell sides
+    
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', N );
+    fprintf(spring_fid, '%d\n', Total_Springs );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
@@ -189,13 +191,34 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name)
             
     end
     
+     %SPRINGS BETWEEN ENDS OF JELLYFISH BELL
+%     for s=1:(N-1)/2
+%             x1 = xLag(s);    y1 = yLag(s);
+%             id2 =  N - (s-1);
+%             x2 = xLag( id2 );  y2 = yLag( id2 );
+%             ds(s) = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+%             if s<=25
+%                 strength = k_Spring/5e0;
+%             else
+%                 strength = k_Spring/5e0;
+%             end
+%             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, id2, strength, ds(s) );  
+%     end
+    
     % TETHER ENDS OF JELLYFISH BELL
     x1 = xLag(1);   y1 = yLag(1);
     x2 = xLag(N);   y2 = yLag(N);
     ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, N,   k_Spring, ds);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, N,  k_Spring, ds);
     
     fprintf('\n HEADS UP! Print dist = %d into update_Springs file!\n\n ',ds);
+    
+%     fprintf('N_lagpts = %d (start of springs btwn bell sides)\n\n',N);
+%     fprintf('dist_Vector = \n');
+%     for i=1:25 
+%         fprintf('%d\n',ds(i));
+%     end
+%     fprintf('\n');
     
     fclose(spring_fid); 
     
