@@ -3,14 +3,15 @@
 %
 % * * * * * * * * % IB2d To Do List % * * * * * * * * % 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
 % LAGRANGIAN STRUCTURE 
 %
-1. Update porous connections
-2. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
-3. Add non-invariant beams (now just have torsional springs)
+1. Finish force calculation for 3-Element Hill Model
+2. Update porous connections
+3. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
+4. Add non-invariant beams (now just have torsional springs)
 
 %
 % FLUID SOLVER / BLACK-BOX
