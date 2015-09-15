@@ -47,4 +47,4 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = Lymphangion % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = HeartTube % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
