@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses)
 
 %
 % The components of the force are given by
@@ -73,17 +73,30 @@ ds =    grid_Info(9); % Lagrangian spacing
 springs_Yes = model_Info(1);        % Springs: 0 (for no) or 1 (for yes) 
 target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
-muscle_activation = model_Info(7);  % Muscle Activation: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
 mass_Yes = model_Info(10);          % Mass Pts: 0 (for no) or 1 (for yes)
 
 
-% Compute MUSCLE ACTIVATION (if using combined length/tension-Hill model) %
-if ( muscle_activation == 1)
+% Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY (if using combined length/tension-Hill model) %
+if ( muscle_LT_FV_Yes == 1)
     [fx_muscles, fy_muscles] = give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt);
 else
     fx_muscles = zeros(length(xLag),1);
     fy_muscles = fx_muscles;
 end
+
+
+
+
+% Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) %
+if ( muscle_3_Hill_Yes == 1)
+    [fx_muscles3, fy_muscles3] = give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt);
+else
+    fx_muscles3 = zeros(length(xLag),1);
+    fy_muscles3 = fx_muscles3;
+end
+
 
 
 
@@ -150,8 +163,8 @@ end
 
 
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_mass;
-fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_mass;
+fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass;
+fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass;
 
 % SAVE LAGRANGIAN FORCES
 F_Lag(:,1) = fx;

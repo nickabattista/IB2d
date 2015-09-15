@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, masses)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses)
 
 %
 % The components of the force are given by
@@ -73,7 +73,8 @@ ds =    grid_Info(9); % Lagrangian spacing
 springs_Yes = model_Info(1);        % Springs: 0 (for no) or 1 (for yes) 
 target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
-muscle_activation = model_Info(7);  % Muscle Activation: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+muscle_3
 mass_Yes = model_Info(10);          % Mass Pts: 0 (for no) or 1 (for yes)
 
 
@@ -329,17 +330,18 @@ for i=1:Nbeams
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
     
-    %bF_x =  k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
-    %bF_y = -k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) );
+    bF_x =  k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
+    bF_y = -k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) );
     
-    bF_x = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
-    bF_y = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) );
+    %bF_x = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
+    %bF_y = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  -(Xr-Xq) - (Xq-Xp) );
     
     fx(id_2,1) = fx(id_2,1) + bF_x;  % Sum total forces for middle node, in x-direction (this is MIDDLE node for this beam)
     fy(id_2,1) = fy(id_2,1) + bF_y;  % Sum total forces for middle node, in y-direction (this is MIDDLE node for this beam)
     
     
 end
+
 
 % MIGHT NOT NEED THESE!
 %fx = fx/ds^2;
