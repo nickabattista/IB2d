@@ -49,15 +49,15 @@ If you use this code for the purposes of teaching, research, or recreation pleas
         via target points
     3. "Moving Rubberband" - rubberband moving along a zig-zag pattern, via 
         updating target point positions
-    4. "HeartTube" - examples of pumping in tubular hearts via updating_springs()
+    4. "HeartTube" - examples of pumping in tubular hearts
             ex1: - heart tube that pumps via muscle activation using combined 
                    length/tension - Hill model
             ex2: - heart tube that pumps via dynamic suction pumping by 
                    changing resting lengths of springs
             ex3: - heart tube that pumps via peristaltic waves of contraction 
                    by changing resting lengths of springs
-            ex4: - heart that pumps via muscle activation by 3-element Hill Model
-                   combined with a length-tension/force-velocity
+            ex4: - heart tube that pumps via muscle activation by 3-element 
+                   Hill Model combined w/ length-tension/force-velocity model
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
@@ -97,8 +97,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
-    Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media (.porous), 
-    and initial concentration (.concentration)! 
+        Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media 
+        (.porous), and initial concentration (.concentration)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Examples in Moving_Rubberband & 
