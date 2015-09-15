@@ -19,10 +19,10 @@ This code is capable of creating Lagrangian Structures using:
  	3. Target Points
 	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
                         Hill (i.e.,Length-Tension) Model )
-    5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
+        5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
                         Force-Velocity/Length-Tension Model)
-        5. Mass Points (with or without influence of gravity)
-        6. Porous Structures 
+        6. Mass Points (with or without influence of gravity)
+        7. Porous Structures 
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -96,7 +96,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
-	Muscle1 Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
+	Muscle Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
     Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media (.porous), 
     and initial concentration (.concentration)! 
 
