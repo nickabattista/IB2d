@@ -17,8 +17,10 @@ This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model with a 
+	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
                         Hill (i.e.,Length-Tension) Model )
+    5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
+                        Force-Velocity/Length-Tension Model)
         5. Mass Points (with or without influence of gravity)
         6. Porous Structures 
 
@@ -54,6 +56,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                    changing resting lengths of springs
             ex3: - heart tube that pumps via peristaltic waves of contraction 
                    by changing resting lengths of springs
+            ex4: - heart that pumps via muscle activation by 3-element Hill Model
+                   combined with a length-tension/force-velocity
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
@@ -92,8 +96,9 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
-	Muscle Pts (.muscle), Tracer Particles (.tracer), Mass Points (.mass), and
-        Porous Media (.porous), and initial concentration (.concentration)! 
+	Muscle1 Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
+    Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media (.porous), 
+    and initial concentration (.concentration)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Examples in Moving_Rubberband & 
