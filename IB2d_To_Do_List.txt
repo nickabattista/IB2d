@@ -17,10 +17,11 @@
 % FLUID SOLVER / BLACK-BOX
 % 
 1. Optimize muscle model force computations
-2. Stoke's Fluid Solver
-3. Non-Newtonian Fluid Solver
-4. Parallelization
-5. Port code to Python
+2. Add neuro-mechanical coupling via FitzHugh-Nagumo
+3. Stoke's Fluid Solver
+4. Non-Newtonian Fluid Solver
+5. Parallelization
+6. Port code to Python
 
 %
 % EXAMPLES
