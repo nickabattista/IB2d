@@ -75,7 +75,7 @@ target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
 muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
 muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
-mass_Yes = model_Info(10);          % Mass Pts: 0 (for no) or 1 (for yes)
+mass_Yes = model_Info(11);          % Mass Pts: 0 (for no) or 1 (for yes)
 
 
 %
