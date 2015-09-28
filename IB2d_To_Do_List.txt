@@ -12,6 +12,7 @@
 2. Update porous connections
 3. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
 4. Add non-invariant beams (now just have torsional springs)
+5. Allow for one than one boundary to be read in
 
 %
 % FLUID SOLVER / BLACK-BOX
