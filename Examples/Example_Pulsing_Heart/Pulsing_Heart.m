@@ -95,7 +95,7 @@ print_Lagrangian_Vertices(x1,y1,struct_name);
 
 
 % Prints .target file!
-k_Target = 2e7;
+k_Target = 1e8;
 print_Lagrangian_Target_Pts(x1,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
