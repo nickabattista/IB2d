@@ -309,6 +309,10 @@ U = zeros(Ny,Nx);                                % x-Eulerian grid velocity
 V = U;                                           % y-Eulerian grid velocity
 mVelocity = zeros( length(mass_info(:,1)), 2 );  % mass-Pt velocity 
 
+if arb_ext_force_Yes == 1 
+    firstExtForce = 1;                           % initialize external forcing
+    indsExtForce = 0;                            % initialize for external forcing computation
+end
 
 % ACTUAL TIME-STEPPING IBM SCHEME! 
 %(flags for storing structure connects for printing and printing to .vtk)
@@ -350,7 +354,7 @@ while current_time < T_FINAL
     end
     
     if ( ( update_Springs_Flag == 1 ) && ( springs_Yes == 1 ) )
-       springs_info = update_Springs(dt,current_time,xLag,springs_info); 
+       springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info); 
     end
     
     if ( ( update_Target_Pts == 1 ) && ( target_pts_Yes == 1) )
@@ -381,7 +385,7 @@ while current_time < T_FINAL
     
     % Add artificial force from fluid boundary, if desired. 
     if arb_ext_force_Yes == 1 
-        [Fx_Arb, Fy_Arb] =    please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V);
+        [Fx_Arb, Fy_Arb, firstExtForce, indsExtForce] = please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V, firstExtForce, indsExtForce);
         Fxh = Fxh + Fx_Arb;
         Fyh = Fyh + Fy_Arb;
     end
