@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function springs_info = update_Springs(dt,current_time,xLag,springs_info)
+function springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
 
 %springs_info: col 1: starting spring pt (by lag. discretization)
 %              col 2: ending spring pt. (by lag. discretization)

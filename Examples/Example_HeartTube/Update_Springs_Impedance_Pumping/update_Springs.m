@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function springs = update_Springs(dt,current_time,xLag,springs)
+function springs = update_Springs(dt,current_time,xLag,xLag,springs)
 
 % dt: time-step
 % current_time: current time of simulation
