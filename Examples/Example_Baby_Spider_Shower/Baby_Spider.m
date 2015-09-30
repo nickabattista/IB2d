@@ -71,7 +71,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .mass file!
 k_Mass = 1e6;         % 'spring' stiffness parameter for tethering
-Mass =   3;          % "MASS" value for 'MASSIVE' nodal movement
+Mass =   3.25;          % "MASS" value for 'MASSIVE' nodal movement
 print_Lagrangian_Mass_Pts(xLag,k_Mass,Mass,struct_name,Ninfo);
 
 
@@ -81,7 +81,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,Ninfo,ds);
 
 
 % Prints .beam file!
-k_Beam = 1e4; C = 0.0;
+k_Beam = 1.5e4; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo);
 
 
