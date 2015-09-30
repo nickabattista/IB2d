@@ -34,14 +34,14 @@ function Baby_Spiders()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  32;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  32;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  64;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-Ls = 0.2;        % Length of baby-spider web
+Ls = 0.175;        % Length of baby-spider web
 ds = Lx/(2*Nx);  % Lagrangian spacing, ds
 struct_name = 'spider'; % Name for .vertex, .spring, etc files.
 
@@ -71,17 +71,17 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .mass file!
 k_Mass = 1e6;         % 'spring' stiffness parameter for tethering
-Mass =   1.25;          % "MASS" value for 'MASSIVE' nodal movement
+Mass =   3;          % "MASS" value for 'MASSIVE' nodal movement
 print_Lagrangian_Mass_Pts(xLag,k_Mass,Mass,struct_name,Ninfo);
 
 
 % Prints .spring file!
-k_Spring = 250;
+k_Spring = 650;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,Ninfo,ds);
 
 
 % Prints .beam file!
-k_Beam = 25e0; C = 0.0;
+k_Beam = 1e4; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo);
 
 
@@ -220,7 +220,7 @@ function [xLag,yLag,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Ny,Ly,Ls)
 %
 % Create Spider Web Geometry (springs, beams, and 1-mass pt)
 %
-yS =   0.85*Ly;                       % Highest Point of Web
+yS =   0.78*Ly;                       % Highest Point of Web
 yWeb = yS:-ds:yS-Ls;                  % yPts of web
 Nweb = length(yWeb);                  % # of Lag. Pts in Web
 xWeb = (Ly/7)*ones(1,Nweb);           % xPts of web
