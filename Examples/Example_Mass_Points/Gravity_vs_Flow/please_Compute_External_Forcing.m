@@ -66,17 +66,30 @@ w = 0.2;
 % Max Velocity Desired
 uMax = 250.0;
 
-% Compute Where You Want to Apply Force
-yMin = 0.1;  yMax = 0.16; xMin = 0.41; xMax = 0.59;
-inds1 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+if first == 1
 
-% Compute Where You Want to Apply Force
-yMin = 0.1;  yMax = 0.16; xMin = 0.41+0.3; xMax = 0.59+0.3;
-inds2 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+    % Compute Where You Want to Apply Force
+    yMin = 0.1;  yMax = 0.16; xMin = 0.41; xMax = 0.59;
+    ids1 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+    N1 = length(ids1);
+    
+    % Compute Where You Want to Apply Force
+    yMin = 0.1;  yMax = 0.16; xMin = 0.41+0.3; xMax = 0.59+0.3;
+    ids2 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+    N2 = length(ids2);
+    
+    % Compute Where You Want to Apply Force
+    yMin = 0.1;  yMax = 0.16; xMin = 0.41-0.3; xMax = 0.59-0.3;
+    ids3 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+        
+    inds = [N1 N2; ids1; ids2; ids3];
+    first = 0;
+end
 
-% Compute Where You Want to Apply Force
-yMin = 0.1;  yMax = 0.16; xMin = 0.41-0.3; xMax = 0.59-0.3;
-inds3 = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+inds1 = inds(2:2+inds(1)-1,1:2);
+inds2 = inds(2+inds(1):2+inds(1)+inds(2)-1,1:2);
+inds3 = inds(2+inds(1)+inds(2):end,1:2);
+
 
 % Compute External Forces from Desired Target Velocity
 yShift = 0;

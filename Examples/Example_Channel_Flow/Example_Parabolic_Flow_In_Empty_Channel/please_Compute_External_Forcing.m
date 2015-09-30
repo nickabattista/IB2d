@@ -56,11 +56,6 @@ Nb =    grid_Info(8); % # of Lagrangian pts.
 ds =    grid_Info(9); % Lagrangian spacing
 
 
-% Compute Where You Want to Apply Force
-xMin = 0.1;
-xMax = 0.16;
-yMin = 0.41;
-yMax = 0.59;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
 kStiff = 1e4;
@@ -71,7 +66,17 @@ w = 0.2;
 % Max Velocity Desired
 uMax = 250.0;
 
-inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+if first == 1
+    
+    % Compute Where You Want to Apply Force
+    xMin = 0.1;
+    xMax = 0.16;
+    yMin = 0.41;
+    yMax = 0.59;
+    
+    inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+    first = 0;
+end
 
 % Compute External Forces from Desired Target Velocity
 [fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds);
