@@ -32,7 +32,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy] = please_Compute_External_Forcing(dt,current_time,x,y, grid_Info, uX, uY)
+function [Fx, Fy, first, inds] = please_Compute_External_Forcing(dt,current_time,x,y, grid_Info, uX, uY, first, inds)
 
 %
 % dt:           time-step 
