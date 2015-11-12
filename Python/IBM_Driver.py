@@ -26,6 +26,8 @@
 
 ----------------------------------------------------------------------------'''
 
+import numpy as np
+
 ###############################################################################
 #
 # FUNCTION: Actual DRIVER of the code, where the time-stepping occurs ->
@@ -67,7 +69,7 @@ def IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }'''
 
     # Temporal Information
-    NTime = floor(T_FINAL/dt)+1 # number of total time-steps,
+    NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
                                 # (floored, so exact number of time-steps)
     dt = T_FINAL/NTime #time-step (slightly perturbed dt, so exact number of 
                        #time-steps are used
@@ -120,3 +122,13 @@ def IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # Create EULERIAN Mesh (these assume periodicity in x and y)
+    x = np.arange(0,Lx,dx)
+    y = np.arange(0,Ly,dy)
+    # Create x-Mesh
+    X = np.empty(Nx,len(x))
+    for ii in range(Nx):
+        X[ii,] = x
+    # Create y-Mesh
+    Y = np.empty(len(y),Ny)
+    for ii in range(Ny):
+        Y[:,ii] = y
