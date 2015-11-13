@@ -28,6 +28,9 @@
 
 import numpy as np
 import sys
+# Path Reference to where Driving code is found #
+sys.path.append('../')
+import IBM_Driver as Driver
 
 ###############################################################################
 #
@@ -138,11 +141,9 @@ def main2d():
     model_Info[15]= params[24]         # Background Concentration Gradient: 
                                        #     0 (for no) or 1 (for yes)
 
-    # Path Reference to where Driving code is found #
-    sys.path.append('../')
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
-    [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
+    [X, Y, U, V, xLags, yLags] = Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
     
 if __name__ == "__main__":
     main2d()

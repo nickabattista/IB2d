@@ -35,18 +35,18 @@ import numpy as np
 #
 ###############################################################################
 
-def IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
+def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
     ''' 2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 
     Args:
-        struct_name: Structure name
-        mu: mu
-        rho: rho
-        grid_Info: grid info
-        dt: dt
-        T_FINAL: spam
-        model_Info: eggs
+        struct_name: structure name
+        mu: dynamic viscosity
+        rho: density
+        grid_Info: list of grid properties
+        dt: time-step
+        T_FINAL: final simulation time
+        model_Info: list of model structure properties
         
     Returns:
         X: here
@@ -125,10 +125,12 @@ def IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     x = np.arange(0,Lx,dx)
     y = np.arange(0,Ly,dy)
     # Create x-Mesh
-    X = np.empty(Nx,len(x))
-    for ii in range(Nx):
+    X = np.empty((Nx,len(x)))
+    for ii in range(int(Nx)):
         X[ii,] = x
     # Create y-Mesh
-    Y = np.empty(len(y),Ny)
-    for ii in range(Ny):
+    Y = np.empty((len(y),Ny))
+    for ii in range(int(Ny)):
         Y[:,ii] = y
+        
+    pass
