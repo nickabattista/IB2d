@@ -108,37 +108,39 @@ def main2d():
     grid_Info[6] = params[8]           # num of pts used in delta-function support 
                                        #    (supp/2 in each direction)
     grid_Info[7] = params[25]          # Print Dump (How often to plot)
-    grid_Info[8] = params[26]          # Plot in Matlab? (1=YES,0=NO) 
-    grid_Info[9] = params[27]          # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info[10] = params[28]         # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
-    grid_Info[11] = params[29]         # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
-    grid_Info[12] = params[30]         # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY 
-                                       #     colormap in Matlab
-    grid_Info[13] = params[31]         # Plot LAGRANGIAN PTs + PRESSURE colormap in matplotlib
+    grid_Info[8] = int(params[26])     # Plot in matplotlib? (1=YES,0=NO) 
+    grid_Info[9] = int(params[27])     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info[10] = int(params[28])    # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
+    grid_Info[11] = int(params[29])    # Plot LAGRANGIAN PTs + VORTICITY colormap 
+                                       #   in matplotlib
+    grid_Info[12] = int(params[30])    # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY 
+                                       #     colormap in matplotlib
+    grid_Info[13] = int(params[31])    # Plot LAGRANGIAN PTs + PRESSURE colormap 
+                                       #    in matplotlib
 
 
     # MODEL STRUCTURE DATA STORED #
     model_Info = list(range(16))
-    model_Info[0] = params[9]          # Springs: 0 (for no) or 1 (for yes) 
-    model_Info[1] = params[10]         # Update_Springs: 0 (for no) or 1 (for yes)
-    model_Info[2] = params[11]         # Target_Pts: 0 (for no) or 1 (for yes)
-    model_Info[3] = params[12]         # Update_Target_Pts: 0 (for no) or 1 (for yes)
-    model_Info[4] = params[13]         # Beams: 0 (for no) or 1 (for yes)
-    model_Info[5] = params[14]         # Update_Beams: 0 (for no) or 1 (for yes)
-    model_Info[6] = params[15]         # Muscle Activation (Length/Tension-Hill Model): 
+    model_Info[0] = int(params[9])     # Springs: 0 (for no) or 1 (for yes) 
+    model_Info[1] = int(params[10])    # Update_Springs: 0 (for no) or 1 (for yes)
+    model_Info[2] = int(params[11])    # Target_Pts: 0 (for no) or 1 (for yes)
+    model_Info[3] = int(params[12])    # Update_Target_Pts: 0 (for no) or 1 (for yes)
+    model_Info[4] = int(params[13])    # Beams: 0 (for no) or 1 (for yes)
+    model_Info[5] = int(params[14])    # Update_Beams: 0 (for no) or 1 (for yes)
+    model_Info[6] = int(params[15])    # Muscle Activation (Length/Tension-Hill Model): 
                                        #     0 (for no) or 1 (for yes)
-    model_Info[7] = params[16]         # Muscle Activation 3-ELEMENT HILL MODEL w/
+    model_Info[7] = int(params[16])    # Muscle Activation 3-ELEMENT HILL MODEL w/
                                        #     Length-Tension/Force-Velocity: 
                                        #     0 (for no) or 1 (for yes)
-    model_Info[8] = params[17]         # Arbirtary External Force Onto Fluid Grid: 
+    model_Info[8] = int(params[17])    # Arbirtary External Force Onto Fluid Grid: 
                                        #     0 (for no) or 1 (for yes)
-    model_Info[9] = params[18]         # Tracer Particles: 0 (for no) or 1 (for yes)
-    model_Info[10]= params[19]         # Mass Points: 0 (for no) or 1 (for yes)
-    model_Info[11]= params[20]         # Gravity: 0 (for no) or 1 (for yes)
+    model_Info[9] = int(params[18])    # Tracer Particles: 0 (for no) or 1 (for yes)
+    model_Info[10]= int(params[19])    # Mass Points: 0 (for no) or 1 (for yes)
+    model_Info[11]= int(params[20])    # Gravity: 0 (for no) or 1 (for yes)
     model_Info[12]= params[21]         # x-Component of Gravity vector
     model_Info[13]= params[22]         # y-Component of Gravity Vector
-    model_Info[14]= params[23]         # Porous Media: 0 (for no) or 1 (for yes)
-    model_Info[15]= params[24]         # Background Concentration Gradient: 
+    model_Info[14]= int(params[23])    # Porous Media: 0 (for no) or 1 (for yes)
+    model_Info[15]= int(params[24])    # Background Concentration Gradient: 
                                        #     0 (for no) or 1 (for yes)
 
 

@@ -144,7 +144,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     yLag_P = yLag              # Initialize previous Lagrangian y-Values 
                                #   (for use in muscle-model)
                             
-    pass
+    # READ IN TRACERS (IF THERE ARE TRACERS) #
+    if (tracers_Yes == 1):
+       [nulvar,xT,yT] = read_Tracer_Points(struct_name)
+       tracers = np.zeros((len(xT),4))
+       tracers[0,0] = 1
+       tracers[:,1] = xT
+       tracers[:,2] = yT
+            #tracers_info: col 1: xPt of Tracers
+            #              col 2: yPt of Tracers
+    else:
+       tracers = 0
+    
     
 ###########################################################################
 #
@@ -171,4 +182,31 @@ def  read_Vertex_Points(struct_name):
         # Read in the Lagrangian mesh points
         xLag,yLag = np.loadtxt(f,unpack=True)
        
+    return (N,xLag,yLag)
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of tracer pts and all the tracer pts from the
+#           .tracer file.
+#
+###########################################################################
+
+def read_Tracer_Points(struct_name):
+    '''Reads in the num of tracer pts and all the tracer pts from .tracer
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        N: number of tracer points
+        xLag: x-values of tracer points
+        yLag: y-values of tracer points'''
+
+    filename = struct_name+'.tracer'  #Name of file to read in
+    with open(filename) as f:
+        # First line is the number of tracer points
+        N = int(f.readline().strip())
+        # Now read in the tracer points
+        xLag,yLag = np.loadtxt(f,unpack=True)
+        
     return (N,xLag,yLag)
