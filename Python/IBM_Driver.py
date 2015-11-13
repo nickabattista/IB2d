@@ -214,6 +214,60 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         muscles3_info = 0  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
     
+    
+    
+    
+    # READ IN MASS POINTS (IF THERE ARE MASS PTS) #
+    if ( mass_Yes == 1):
+        mass_aux = read_Mass_Points(struct_name)
+        #target_aux: col 0: Lag Pt. ID w/ Associated Mass Pt.
+        #            col 1: "Mass-spring" stiffness parameter
+        #            col 2: "MASS" value parameter
+        
+        # initialize mass_info
+        mass_info = np.empty((len(mass_aux[:,0]),5))
+        
+        mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
+        
+        for ii in range(len(mass_info[:,0])):
+            id = mass_info[ii,0]
+            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
+            mass_info[ii,1] = xLag[int(id)-1]  #Stores Original x-Lags as x-Mass Pt. Identities
+            mass_info[ii,2] = yLag[int(id)-1]  #Stores Original y-Lags as y-Mass Pt. Identities
+       
+        mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
+        mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
+        
+    else:
+        mass_info = 0;
+
+
+
+
+
+    # READ IN TARGET POINTS (IF THERE ARE TARGET PTS) #
+    if ( target_pts_Yes == 1):
+        target_aux = read_Target_Points(struct_name)
+        #target_aux: col 0: Lag Pt. ID w/ Associated Target Pt.
+        #            col 1: target STIFFNESSES
+        
+        # initialize target_info
+        target_info = np.empty((len(target_aux[:,0]),5))
+        
+        target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
+        for ii in range(len(target_info[:,0])):
+            id = target_info[ii,0]
+            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
+            target_info[ii,1] = xLag[int(id)-1] #Stores Original x-Lags as 
+                                                #  x-Target Pt. Identities
+            target_info[ii,2] = yLag[int(id)-1] #Stores Original y-Lags as 
+                                                #  y-Target Pt. Identities
+       
+        target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
+    else:
+        target_info = 0
+    
+    
     pass
     
 ###########################################################################
@@ -301,7 +355,7 @@ def read_In_Concentration_Info(struct_name): #untested
 #
 ###########################################################################
 
-def springs = read_Spring_Points(struct_name): #untested
+def read_Spring_Points(struct_name): #untested
     ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths
     
     Args:
@@ -341,7 +395,7 @@ def read_Muscle_Points(struct_name): #untested
 
     filename = struct_name+'.muscle'  #Name of file to read in
     with open(filename) as f:
-        muscles = np.loadtxt(f,skiprows=1,usecols(1,2,3,4,5,6,7))
+        muscles = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4,5,6))
 
     #muscles: col 1: MASTER NODE (by lag. discretization)
     #         col 2: SLAVE NODE (by lag. discretization)
@@ -375,7 +429,7 @@ def read_Hill_3Muscle_Points(struct_name): #untested
 
     filename = struct_name+'.muscle'  #Name of file to read in
     with open(filename) as f:
-        muscles = np.loadtxt(f,skiprows=1,usecols=(1,2,3,4,5,6,7))
+        muscles = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4,5,6))
 
     #muscles: col 1: MASTER NODE (by lag. discretization)
     #         col 2: SLAVE NODE (by lag. discretization)
@@ -386,3 +440,57 @@ def read_Hill_3Muscle_Points(struct_name): #untested
     #         col 7: force maximum!
     
     return muscles
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of MASS PTS, Mass-STIFFNESSES, and Mass-VALUE
+#           
+#
+###########################################################################
+
+def read_Mass_Points(struct_name): #untested
+    ''' Reads in the num of mass pts, mass-spring stiffness, and mass-value
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        masses: array of mass info'''
+
+    filename = struct_name+'.mass'  #Name of file to read in
+    with open(filename) as f:
+        masses = np.loadtxt(f,skiprows=1,usecols=(0,1,2))
+
+    #masses:  col 1: Lag Pt. ID w/ Associated Mass Pt.
+    #         col 2: "Mass-Spring" stiffness Parameter
+    #         col 3: Mass Value Parameter
+    
+    return masses
+
+
+
+
+
+###########################################################################
+#
+# FUNCTION: Reads in the # of TARGET PTS, TARGET-PT-NODEs, and their
+#           Target-STIFFNESSES
+#
+###########################################################################
+
+def read_Target_Points(struct_name): #untested
+    ''' Reads in the num of target pts, target-pt-nodes, and target-stiffness
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        targets: array of target info'''
+    filename = struct_name+'.target'  #Name of file to read in
+    with open(filename) as f:
+        targets = np.txtload(f,skiprows=1,usecols=(0,1))
+
+    #targets: col 1: Lag Pt. ID w/ Associated Target Pt.
+    #         col 2: target STIFFNESSES
+    
+    return targets
