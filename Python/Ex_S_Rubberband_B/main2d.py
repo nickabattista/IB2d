@@ -68,13 +68,8 @@ def give_Me_input2d_Parameters():
                         struct_name = words[n+1]
                         break
                 break
-    # catch name error from no struct_name
-    try:
-        return (params,struct_name)
-    except NameError:
-        print('No struct_name found. Using empty string...')
-        struct_name = ''
-        return (params,struct_name)
+    
+    return (params,struct_name)
 
 ###############################################################################
 #
@@ -148,7 +143,10 @@ def main2d():
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
-    [X, Y, U, V, xLags, yLags] = Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
+    #[X, Y, U, V, xLags, yLags] = Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
+    
+    #For debugging only!
+    Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
     
 if __name__ == "__main__":
     main2d()

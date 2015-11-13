@@ -133,4 +133,42 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     for ii in range(int(Ny)):
         Y[:,ii] = y
         
+    # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
+
+
+    # READ IN LAGRANGIAN POINTS #
+    [Nb,xLag,yLag] = read_Vertex_Points(struct_name)
+    grid_Info[7] = Nb          # num Total Number of Lagrangian Pts.
+    xLag_P = xLag              # Initialize previous Lagrangian x-Values 
+                               #   (for use in muscle-model)
+    yLag_P = yLag              # Initialize previous Lagrangian y-Values 
+                               #   (for use in muscle-model)
+                            
     pass
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of vertex pts and all the vertex pts from the
+#           .vertex file.
+#
+###########################################################################
+
+def  read_Vertex_Points(struct_name):
+    ''' Reads in the number of vertex pts and all the vertex pts from .vertex
+    
+    Args: 
+        struct_name: structure name
+        
+    Returns:
+        N: number of Lagrangian points
+        xLag: x-values of Lagrangian mesh
+        yLab: y-values of Lagrangian mesh'''
+
+    filename = struct_name+'.vertex'  #Name of file to read in
+    with open(filename) as f:
+        # First line in the file contains the number of Lagrangian points
+        N = int(f.readline().strip())
+        # Read in the Lagrangian mesh points
+        xLag,yLag = np.loadtxt(f,unpack=True)
+       
+    return (N,xLag,yLag)
