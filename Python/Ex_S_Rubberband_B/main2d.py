@@ -27,6 +27,7 @@
 ----------------------------------------------------------------------------'''
 
 import numpy as np
+import sys
 
 ###############################################################################
 #
@@ -77,11 +78,71 @@ def give_Me_input2d_Parameters():
 
 def main2d():
     
-    '''This is the "main" file, which ets called to run the Immersed Boundary Simulation. 
-    It reads in all the parameters from "input2d", and sends them 
-    off to the "IBM_Driver" function to actual perform the simulation.'''
+    '''This is the "main" function, which ets called to run the 
+    Immersed Boundary Simulation. It reads in all the parameters from 
+    "input2d", and sends them off to the "IBM_Driver" function to actually 
+    perform the simulation.'''
     
     # READ-IN INPUT PARAMTERS #
-    params,strName = give_Me_input2d_Parameters()
+    params,struct_name = give_Me_input2d_Parameters()
     
+    # FLUID PARAMETER VALUES STORED #
+    mu = params[0]      # Dynamic Viscosity
+    rho = params[1]     # Density
+
+    # TEMPORAL INFORMATION VALUES STORED #
+    T_final = params[2] # Final simulation time
+    dt = params[3]      # Time-step
+
+    # GRID INFO STORED #
+    grid_Info = list(range(14))
+    grid_Info[0] = params[4]           # num of Eulerian Pts in x-Direction
+    grid_Info[1] = params[5]           # num of Eulerian Pts in y-Direction 
+    grid_Info[2] = params[6]           # Length of Eulerian domain in x-Direction
+    grid_Info[3] = params[7]           # Length of Eulerian domain in y-Direction
+    grid_Info[4] = params[6]/params[4] # Spatial step-size in x
+    grid_Info[5] = params[7]/params[5] # Spatial step-size in y
+    grid_Info[6] = params[8]           # num of pts used in delta-function support 
+                                       #    (supp/2 in each direction)
+    grid_Info[7] = params[25]          # Print Dump (How often to plot)
+    grid_Info[8] = params[26]          # Plot in Matlab? (1=YES,0=NO) 
+    grid_Info[9] = params[27]          # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info[10] = params[28]         # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
+    grid_Info[11] = params[29]         # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
+    grid_Info[12] = params[30]         # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY 
+                                       #     colormap in Matlab
+    grid_Info[13] = params[31]         # Plot LAGRANGIAN PTs + PRESSURE colormap in matplotlib
+
+
+    # MODEL STRUCTURE DATA STORED #
+    model_Info = list(range(16))
+    model_Info[0] = params[9]          # Springs: 0 (for no) or 1 (for yes) 
+    model_Info[1] = params[10]         # Update_Springs: 0 (for no) or 1 (for yes)
+    model_Info[2] = params[11]         # Target_Pts: 0 (for no) or 1 (for yes)
+    model_Info[3] = params[12]         # Update_Target_Pts: 0 (for no) or 1 (for yes)
+    model_Info[4] = params[13]         # Beams: 0 (for no) or 1 (for yes)
+    model_Info[5] = params[14]         # Update_Beams: 0 (for no) or 1 (for yes)
+    model_Info[6] = params[15]         # Muscle Activation (Length/Tension-Hill Model): 
+                                       #     0 (for no) or 1 (for yes)
+    model_Info[7] = params[16]         # Muscle Activation 3-ELEMENT HILL MODEL w/
+                                       #     Length-Tension/Force-Velocity: 
+                                       #     0 (for no) or 1 (for yes)
+    model_Info[8] = params[17]         # Arbirtary External Force Onto Fluid Grid: 
+                                       #     0 (for no) or 1 (for yes)
+    model_Info[9] = params[18]         # Tracer Particles: 0 (for no) or 1 (for yes)
+    model_Info[10]= params[19]         # Mass Points: 0 (for no) or 1 (for yes)
+    model_Info[11]= params[20]         # Gravity: 0 (for no) or 1 (for yes)
+    model_Info[12]= params[21]         # x-Component of Gravity vector
+    model_Info[13]= params[22]         # y-Component of Gravity Vector
+    model_Info[14]= params[23]         # Porous Media: 0 (for no) or 1 (for yes)
+    model_Info[15]= params[24]         # Background Concentration Gradient: 
+                                       #     0 (for no) or 1 (for yes)
+
+    # Path Reference to where Driving code is found #
+    sys.path.append('../')
+
+    #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
+    [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
     
+if __name__ == "__main__":
+    main2d()
