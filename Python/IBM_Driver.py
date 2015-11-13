@@ -144,9 +144,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     yLag_P = yLag              # Initialize previous Lagrangian y-Values 
                                #   (for use in muscle-model)
                             
+                            
     # READ IN TRACERS (IF THERE ARE TRACERS) #
     if (tracers_Yes == 1):
-       [nulvar,xT,yT] = read_Tracer_Points(struct_name)
+       nulvar,xT,yT = read_Tracer_Points(struct_name)
        tracers = np.zeros((len(xT),4))
        tracers[0,0] = 1
        tracers[:,1] = xT
@@ -155,7 +156,65 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #              col 2: yPt of Tracers
     else:
        tracers = 0
+       
+       
+    # READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) #
+    if ( concentration_Yes == 1 ):
+        C,kDiffusion = read_In_Concentration_Info(struct_name)
+            #C:           Initial background concentration
+            #kDiffusion:  Diffusion constant for Advection-Diffusion
+    else:
+        C = 0 # placeholder for plotting 
+        
+        
+    # READ IN SPRINGS (IF THERE ARE SPRINGS) #
+    if ( springs_Yes == 1 ):
+        springs_info = read_Spring_Points(struct_name)
+            #springs_info: col 1: starting spring pt (by lag. discretization)
+            #              col 2: ending spring pt. (by lag. discretization)
+            #              col 3: spring stiffness
+            #              col 4: spring resting lengths
+    else:
+        springs_info = 0  #just to pass placeholder into 
+            # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
+    
+    
+    
+    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
+    if ( muscles_Yes == 1 ):
+        muscles_info = read_Muscle_Points(struct_name)
+            #         muscles: col 1: MASTER NODE (by lag. discretization)
+            #         col 2: SLAVE NODE (by lag. discretization)
+            #         col 3: length for max. muscle tension
+            #         col 4: muscle constant
+            #         col 5: hill parameter, a
+            #         col 6: hill parameters, b
+            #         col 7: force maximum!
+    else:
+        muscles_info = 0  #just to pass placeholder into 
+            # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+
+    
+    
+    
+    
+    
+    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
+    if ( hill_3_muscles_Yes == 1 ):
+        muscles3_info = read_Hill_3Muscle_Points(struct_name)
+            #         muscles: col 1: MASTER NODE (by lag. discretization)
+            #         col 2: SLAVE NODE (by lag. discretization)
+            #         col 3: length for max. muscle tension
+            #         col 4: muscle constant
+            #         col 5: hill parameter, a
+            #         col 6: hill parameters, b
+            #         col 7: force maximum!
+    else:
+        muscles3_info = 0  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+    
+    
+    pass
     
 ###########################################################################
 #
@@ -210,3 +269,120 @@ def read_Tracer_Points(struct_name):
         xLag,yLag = np.loadtxt(f,unpack=True)
         
     return (N,xLag,yLag)
+    
+###########################################################################
+#
+# FUNCTION: Reads in the diffusion coefficient and initial concentration, C
+#
+###########################################################################
+
+def read_In_Concentration_Info(struct_name): #untested
+    ''' Reads in the diffusion coefficient and initial concentration, C
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        C: concentration
+        kDiff: coefficient of diffusion'''
+
+    filename = struct_name+'.concentration'  #Name of file to read in
+    
+    with open(filename) as f:
+        kDiff = float(f.readline().strip()) #first line contains coeff of diff
+        C = np.loadtxt(f)
+
+    return (C,kDiff)
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of springs and all MASTER NODEs, SLAVE NODEs,
+#           spring STIFFNESSES, spring RESTING LENGTHS
+#
+###########################################################################
+
+def springs = read_Spring_Points(struct_name): #untested
+    ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        springs: above info stored in columns'''
+
+    filename = struct_name+'.spring'  #Name of file to read in
+    with open(filename) as f:
+    #Store elements on .spring file into a matrix starting w/ 2nd row of read in data.
+        springs = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3))
+
+    #springs: col 1: starting spring pt (by lag. discretization)
+    #         col 2: ending spring pt. (by lag. discretization)
+    #         col 3: spring stiffness
+    #         col 4: spring resting lengths
+    
+    return springs
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of muscles and all MASTER NODEs, SLAVE NODEs,
+#           length for max. muscle tension, muscle constant, hill
+#           parameters (a and b), and Force-Max
+#
+###########################################################################
+
+def read_Muscle_Points(struct_name): #untested
+    ''' Reads in the # of muscles and other information
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        muscles: array of muscle info'''
+
+    filename = struct_name+'.muscle'  #Name of file to read in
+    with open(filename) as f:
+        muscles = np.loadtxt(f,skiprows=1,usecols(1,2,3,4,5,6,7))
+
+    #muscles: col 1: MASTER NODE (by lag. discretization)
+    #         col 2: SLAVE NODE (by lag. discretization)
+    #         col 3: length for max. muscle tension
+    #         col 4: muscle constant
+    #         col 5: hill parameter, a
+    #         col 6: hill parameters, b
+    #         col 7: force maximum!
+    
+    return muscles
+    
+
+
+
+###########################################################################
+#
+# FUNCTION: Reads in the # of muscles and all MASTER NODEs, SLAVE NODEs,
+#           length for max. muscle tension, muscle constant, hill
+#           parameters (a and b), and Force-Max
+#
+###########################################################################
+
+def read_Hill_3Muscle_Points(struct_name): #untested
+    ''' Reads in the num of muscles and other info
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        muscles: muscle info'''
+
+    filename = struct_name+'.muscle'  #Name of file to read in
+    with open(filename) as f:
+        muscles = np.loadtxt(f,skiprows=1,usecols=(1,2,3,4,5,6,7))
+
+    #muscles: col 1: MASTER NODE (by lag. discretization)
+    #         col 2: SLAVE NODE (by lag. discretization)
+    #         col 3: length for max. muscle tension
+    #         col 4: muscle constant
+    #         col 5: hill parameter, a
+    #         col 6: hill parameters, b
+    #         col 7: force maximum!
+    
+    return muscles
