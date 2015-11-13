@@ -68,8 +68,13 @@ def give_Me_input2d_Parameters():
                         struct_name = words[n+1]
                         break
                 break
-    
-    return (params,struct_name)
+    # catch name error from no struct_name
+    try:
+        return (params,struct_name)
+    except NameError:
+        print('No struct_name found. Using empty string...')
+        struct_name = ''
+        return (params,struct_name)
 
 ###############################################################################
 #
