@@ -252,7 +252,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 1: target STIFFNESSES
         
         # initialize target_info
-        target_info = np.empty((len(target_aux[:,0]),5))
+        target_info = np.empty((len(target_aux[:,0]),4))
         
         target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
         for ii in range(len(target_info[:,0])):
@@ -268,6 +268,43 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         target_info = 0
     
     
+    
+    # READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) #
+    if ( porous_Yes == 1):
+        porous_aux = read_Porous_Points(struct_name)
+        #porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+        #            col 2: Porosity coefficient
+        
+        # initizlize porous_info
+        porous_info = np.empty((len(porous_aux),4))
+        
+        porous_info[:,0] = porous_aux[:,0] #Stores Lag-Pt IDs in col vector
+        for ii in range(porous_info[:,0]):
+            id = porous_info[ii,0]
+            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
+            porous_info[ii,1] = xLag[int(id)-1] #Stores Original x-Lags as 
+                                                #    x-Porous Pt. Identities
+            porous_info[ii,2] = yLag[int(id)-1] #Stores Original y-Lags as 
+                                                #    y-Porous Pt. Identities
+        
+        porous_info[:,3] = porous_aux[:,1] #Stores Porosity Coefficient 
+    else:
+        porous_info = 0
+
+
+
+    # READ IN BEAMS (IF THERE ARE BEAMS) #
+    if ( beams_Yes == 1):
+        beams_info = read_Beam_Points(struct_name)
+        #beams:      col 1: 1ST PT.
+        #            col 2: MIDDLE PT. (where force is exerted)
+        #            col 3: 3RD PT.
+        #            col 4: beam stiffness
+        #            col 5: curavture
+    else:
+        beams_info = 0
+
+
     pass
     
 ###########################################################################
@@ -296,7 +333,10 @@ def  read_Vertex_Points(struct_name):
         xLag,yLag = np.loadtxt(f,unpack=True)
        
     return (N,xLag,yLag)
-    
+ 
+
+
+ 
 ###########################################################################
 #
 # FUNCTION: Reads in the # of tracer pts and all the tracer pts from the
@@ -323,6 +363,9 @@ def read_Tracer_Points(struct_name):
         xLag,yLag = np.loadtxt(f,unpack=True)
         
     return (N,xLag,yLag)
+
+
+
     
 ###########################################################################
 #
@@ -375,6 +418,9 @@ def read_Spring_Points(struct_name): #untested
     #         col 4: spring resting lengths
     
     return springs
+
+
+
     
 ###########################################################################
 #
@@ -440,6 +486,10 @@ def read_Hill_3Muscle_Points(struct_name): #untested
     #         col 7: force maximum!
     
     return muscles
+
+
+
+
     
 ###########################################################################
 #
@@ -494,3 +544,62 @@ def read_Target_Points(struct_name): #untested
     #         col 2: target STIFFNESSES
     
     return targets
+    
+
+    
+###########################################################################
+#
+# FUNCTION: Reads in the # of POROUS PTS, POROUS-PT-NODEs, and their
+#           POROUSITY-COEFFICIENTS
+#
+###########################################################################
+
+def read_Porous_Points(struct_name): #untested
+    ''' Reads in the num of porous pts, pt-nodes, and porousity coefficients
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        porosity: array of porosity info'''
+
+    filename = struct_name+'.porous'  #Name of file to read in
+    with open(filename) as f:
+        porosity = np.loadtxt(f,skiprows=1,usecols=(0,1))
+
+    #porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
+    #         col 2: Porosity coefficient
+    
+    return porosity
+
+
+
+
+
+###########################################################################
+#
+# FUNCTION: Reads in the # of beams and all 1st Pt, MIDDLE Pt, and 3rd Pt
+#           beam STIFFNESSES, and CURVATURE
+#
+###########################################################################
+
+def read_Beam_Points(struct_name):
+    ''' Reads in the num of beams, 1st pt, middle pt, 3 pt stiffness, curvature
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        beams: array of beam info'''
+
+    filename = struct_name+'.beam'  #Name of file to read in
+    with open(filename) as f:
+        beams = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4))
+
+    #beams:      col 1: 1ST PT.
+    #            col 2: MIDDLE PT. (where force is exerted)
+    #            col 3: 3RD PT.
+    #            col 4: beam stiffness
+    #            col 5: curavture
+    
+    return beams

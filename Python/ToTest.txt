@@ -6,3 +6,4 @@ List of subfunctions of IBM_Driver.py that need to be tested
 .muscle (muscle and Hill_3Muscle)
 .mass
 .target
+.porous
