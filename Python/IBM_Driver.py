@@ -27,6 +27,8 @@
 ----------------------------------------------------------------------------'''
 
 import numpy as np
+from math import sqrt
+import os
 
 ###############################################################################
 #
@@ -51,8 +53,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     Returns:
         X: here
         Y: are
-        U: some
-        V: variables
+        U: x-Eulerian grid velocity
+        V: y-Eulerian grid velocity
         xLag: what do
         yLag: they do?
         
@@ -76,8 +78,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     current_time = 0.0
     
     # GRID INFO #
-    Nx = grid_Info[0]   # num of Eulerian pts. in x-direction
-    Ny = grid_Info[1]   # num of Eulerian pts. in y-direction
+    Nx = int(grid_Info[0])   # num of Eulerian pts. in x-direction
+    Ny = int(grid_Info[1])   # num of Eulerian pts. in y-direction
     Lx = grid_Info[2]   # Length of Eulerian grid in x-coordinate
     Ly = grid_Info[3]   # Length of Eulerian grid in y-coordinate
     dx = grid_Info[4]   # Spatial-size in x
@@ -126,11 +128,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     y = np.arange(0,Ly,dy)
     # Create x-Mesh
     X = np.empty((Nx,len(x)))
-    for ii in range(int(Nx)):
+    for ii in range(Nx):
         X[ii,] = x
     # Create y-Mesh
     Y = np.empty((len(y),Ny))
-    for ii in range(int(Ny)):
+    for ii in range(Ny):
         Y[:,ii] = y
         
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
@@ -303,8 +305,59 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 5: curavture
     else:
         beams_info = 0
+        
+    
+    # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
+    if gravity_Yes == 1:
+        #gravity_Vec[0] = model_Info[11]     # x-Component of Gravity Vector
+        #gravity_Vec[1] = model_Info[12]     # y-Component of Gravity Vector
+        xG = model_Info[12]
+        yG = model_Info[13]
+        normG = sqrt( xG**2 + yG**2 )
+        gravity_Info = [gravity_Yes, xG/normG, yG/normG]
+        #   col 1: flag if considering gravity
+        #   col 2: x-component of gravity vector (normalized)
+        #   col 3: y-component of gravity vector (normalized)
+        
+        del xG, yG, normG
+        
+    else:
+        gravity_Info = 0
 
+    
+    # Initialize the initial velocities to zero.
+    U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
+    V = U                                           # y-Eulerian grid velocity
+    mVelocity = np.zeros((len(mass_info[:,0]),2));  # mass-Pt velocity 
 
+    if arb_ext_force_Yes == 1:
+        firstExtForce = 1                           # initialize external forcing
+        indsExtForce = 0                            # initialize for external forcing computation
+    
+    # ACTUAL TIME-STEPPING IBM SCHEME! 
+    #(flags for storing structure connects for printing and printing to .vtk)
+    cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
+    
+    # CREATE VIZ_IB2D FOLDER and VISIT FILES
+    os.mkdir('viz_IB2d')
+    #I'm going to expect that vizID is a file object with write permission...?
+    vizID = 1 #JUST INITIALIZE BC dumps.visit isn't working correctly...yet
+    os.chdir('viz_IB2d');
+    #vizID = open('dumps.visit','w')
+    #vizID.write('!NBLOCKS 6\n')
+    #os.chdir('..')
+    
+    #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
+    #Print initializations to .vtk
+    vort = np.zeros((Ny,Nx)); uMag = np.ndarray(vort); p = np.ndarray(vort)
+    lagPts = np.zeros((len(xLag)+2,3))
+    lagPts[:,0] = xLag; lagPts[:,1] = yLag
+    connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
+    print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
+    connectsMat,tracers,concentration_Yes,C)
+    print('Current Time(s): {0}\n'.format(current_time))
+    ctsave = ctsave+1
+    
     pass
     
 ###########################################################################
@@ -603,3 +656,359 @@ def read_Beam_Points(struct_name):
     #            col 5: curavture
     
     return beams
+    
+    
+##############################################################################
+#
+# FUNCTION: give me Connects Vector for printing Lagrangian .vtk info!
+#
+##############################################################################
+
+def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
+    ''' Give me Connects Vector for printing Lagrangian .vtk info!
+
+    Args:
+        ds:
+        xLag:
+        yLag:
+        Nx:
+        
+    Returns:
+        connectsMat:
+        space:'''
+
+    N = len(xLag)
+
+    if Nx <= 32:
+        space = 5*ds
+    elif Nx <= 64:
+       space = 5*ds
+    elif Nx <=128:
+       space = 5*ds
+    elif Nx <=256:
+        space = 10*ds
+    elif Nx <= 512:
+        space = 20*ds
+    else:
+        space = 40*ds
+        
+
+    #need to instantiate connectsMat or something...
+    connectsMat0 = []; connectsMat1 = []
+    for ii in range(N): #for i=1:N
+        if ii<N-1:
+            x1=xLag[ii]; x2=xLag[ii+1]
+            y1=yLag[ii]; y2=yLag[ii+1]
+            dist = sqrt( (x1-x2)**2 + (y1-y2)**2 )
+            if dist < space:
+                #The note here refers to Cpp notation (and .vtk counting)...
+                #   I'm guessing that means counting starts at 0 as in Python
+                connectsMat0.append(ii)   #For Cpp notation (and .vtk counting)
+                connectsMat1.append(ii+1) #For Cpp notation (and .vtk counting)
+        elif i==N-1:
+            x1=xLag[ii]; x2=xLag[0]
+            y1=yLag[ii]; y2=yLag[0]
+            dist = sqrt( (x1-x2)**2 + (y1-y2)**2 )
+            if dist < space:
+                connectsMat0.append(N-1) #For Cpp notation (and .vtk counting)
+                connectsMat1.append(0)   #For Cpp notation (and .vtk counting)
+    connectsMat = np.array([connectsMat0,connectsMat1]).T
+    
+    return (connectsMat,space)
+
+
+##############################################################################
+#
+# FUNCTION: gives appropriate string number for filename in printing the
+# .vtk files.
+#
+##############################################################################
+
+def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
+    connectsMat,tracers,concentration_Yes,C):
+    ''' Gives appropriate string number for filename in printing the .vtk files'''
+
+    #Give spacing for grid
+    dx = Lx/Nx 
+    dy = Ly/Ny
+
+
+    #Go into viz_IB2d directory
+    os.chdir('viz_IB2d')
+
+    #Find string number for storing files
+    strNUM = give_String_Number_For_VTK(ctsave)
+    vortfName = 'Omega.'+strNUM+'.vtk'
+    uMagfName = 'uMag.'+strNUM+'.vtk'
+    pfName = 'P.'+strNUM+'.vtk'
+    uXName = 'uX.'+strNUM+'.vtk'
+    uYName = 'uY.'+strNUM+'.vtk'
+    velocityName = 'u.'+strNUM+'.vtk'
+    lagPtsName = 'lagsPts.'+strNUM+'.vtk'
+    lagPtsConName = 'lagPtsConnect.'+strNUM+'.vtk'
+
+    #Print Lagrangian Pts to .vtk format
+    savevtk_points(lagPts, lagPtsName, 'lagPts')
+
+    #Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+    savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat)
+
+    #Print Tracer Pts (*if tracers*)
+    if tracers[0,0] == 1:
+        tracersPtsName = 'tracer.'+strNUM+'.vtk'
+        #tMatrix = tracers[:,1:4]
+        savevtk_points(tracers[:,1:4],tracersPtsName, 'tracers') 
+    end
+            
+    #Print another cycle to .visit file
+    #vizID.write(vortfName+'\n')
+    #vizID.write(uMagfName+'\n')
+    #vizID.write(pfName+'\n')
+    #vizID.write(uXName+'\n')
+    #vizID.write(uYName+'\n')
+    #vizID.write(velocityName+'\n')
+
+
+    #Print SCALAR DATA (i.e., colormap data) to .vtk file
+    savevtk_scalar(vort, vortfName, 'Omega',dx,dy)
+    savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy)
+    savevtk_scalar(p, pfName, 'P',dx,dy)
+    savevtk_scalar(U, uXName, 'uX',dx,dy)
+    savevtk_scalar(V, uYName, 'uY',dx,dy)
+
+    if concentration_Yes == 1:
+        confName = 'concentration.'+strNUM+'.vtk'
+        savevtk_scalar(C, confName, 'Concentration',dx,dy)
+
+    #Print VECTOR DATA (i.e., velocity data) to .vtk file
+    savevtk_vector(U, V, velocityName, 'u',dx,dy)
+
+    #Get out of viz_IB2d folder
+    os.chdir('..')
+    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives appropriate string number for filename in printing the
+% .vtk files.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function strNUM = give_String_Number_For_VTK(num)
+
+%num: # of file to be printed
+
+if num < 10
+    strNUM = ['000' num2str(num)];
+elseif num < 100
+    strNUM = ['00' num2str(num)];
+elseif num<1000
+    strNUM = ['0' num2str(num)];
+else
+    strNUM = num2str(num);
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints matrix vector data to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_points_connects( X, filename, vectorName,connectsMat)
+
+%X is matrix of size Nx3
+
+N = length( X(:,1) );
+Nc = length( connectsMat(:,1) );
+
+%TRY PRINTING THEM AS UNSTRUCTURED_GRID
+file = fopen (filename, 'w');
+fprintf(file, '# vtk DataFile Version 2.0\n');
+fprintf(file, [vectorName '\n']);
+fprintf(file, 'ASCII\n');
+fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+%
+fprintf(file, 'POINTS %i float\n', N);
+for i=1:N
+    fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+end
+fprintf(file,'\n');
+%
+fprintf(file,'CELLS %i %i\n',Nc,3*Nc); %First: # of "Cells", Second: Total # of info inputed following
+for s=1:Nc
+    fprintf(file,'%i %i %i\n',2, connectsMat(s,1), connectsMat(s,2) );
+end
+fprintf(file,'\n');
+%
+fprintf(file,'CELL_TYPES %i\n',Nc); % N = # of "Cells"
+for i=1:Nc
+   fprintf(file,'3 '); 
+end
+fprintf(file,'\n');
+fclose(file);
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints matrix vector data to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_points( X, filename, vectorName)
+
+%X is matrix of size Nx3
+
+N = length( X(:,1) );
+
+
+%TRY PRINTING THEM AS UNSTRUCTURED_GRID
+file = fopen (filename, 'w');
+fprintf(file, '# vtk DataFile Version 2.0\n');
+fprintf(file, [vectorName '\n']);
+fprintf(file, 'ASCII\n');
+fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+%
+fprintf(file, 'POINTS %i float\n', N);
+for i=1:N
+    fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+end
+fprintf(file,'\n');
+%
+fprintf(file,'CELLS %i %i\n',N,2*N); %First: # of "Cells", Second: Total # of info inputed following
+for s=0:N-1
+    fprintf(file,'%i %i\n',1,s);
+end
+fprintf(file,'\n');
+%
+fprintf(file,'CELL_TYPES %i\n',N); % N = # of "Cells"
+for i=1:N
+   fprintf(file,'1 '); 
+end
+fprintf(file,'\n');
+fclose(file);
+
+
+
+%TRY PRINTING THEM AS POLYGONAL DATA
+% file = fopen (filename, 'w');
+% fprintf(file, '# vtk DataFile Version 2.0\n');
+% fprintf(file, [vectorName '\n']);
+% fprintf(file, 'ASCII\n');
+% fprintf(file, 'DATASET STRUCTURED_GRID\n');
+% fprintf(file, 'DIMENSIONS 64 1 1\n');
+% fprintf(file, 'POINTS %i float\n', N);
+% for i=1:N
+% fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+% end
+% fprintf(file,'1.1 1.1 0\n');
+% fprintf(file,'CELL_DATA 1\n');
+% fprintf(file,'POINT_DATA %u \n',N);
+% fprintf(file,'FIELD FieldData 1\n');
+% fprintf(file,'nodal 1 %i float\n',N);
+% fprintf(file,'0 1 1.1 2\n');
+% fprintf(file,'SCALARS nodal float\n');
+% fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
+% fprintf(file,'LOOKUP_TABLE default\n');
+
+
+% TRY PRINTING THEM AS POINTS
+% file = fopen (filename, 'w');
+% fprintf(file, '# vtk DataFile Version 2.0\n');
+% fprintf(file, 'Cube example\n');
+% fprintf(file, 'ASCII\n');
+% fprintf(file, 'DATASET UNSTRUCTURED_GRID\n');
+% fprintf(file, 'POINTS %i float\n', N);
+% for i=1:N
+% fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
+% end
+% fprintf(file,'POINT_DATA %u \n',N);
+% fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
+% fprintf(file,'LOOKUP_TABLE default\n');
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints matrix vector data to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_vector(X, Y, filename, vectorName,dx,dy)
+%  savevtkvector Save a 3-D vector array in VTK format
+%  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
+%  filename in VTK format. X, Y and Z should be arrays of the same
+%  size, each storing speeds in the a single Cartesian directions.
+    if (size(X) ~= size(Y))
+        fprint('Error: velocity arrays of unequal size\n'); return;
+    end
+    [nx, ny, nz] = size(X);
+    fid = fopen(filename, 'wt');
+    fprintf(fid, '# vtk DataFile Version 2.0\n');
+    fprintf(fid, 'Comment goes here\n');
+    fprintf(fid, 'ASCII\n');
+    fprintf(fid, '\n');
+    fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
+    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
+    fprintf(fid, '\n');
+    fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
+    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
+    fprintf(fid, '\n');
+    fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
+    fprintf(fid, ['VECTORS ' vectorName ' double\n']);
+    fprintf(fid, '\n');
+    for a=1:nz
+        for b=1:ny
+            for c=1:nx
+                fprintf(fid, '%f ', X(c,b,1));
+                fprintf(fid, '%f ', Y(c,b,1));
+                fprintf(fid, '%f ', 1);
+            end
+            fprintf(fid, '\n');
+        end
+    end
+    fclose(fid);
+return
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints scalar matrix to vtk formated file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function savevtk_scalar(array, filename, colorMap,dx,dy)
+%  savevtk Save a 3-D scalar array in VTK format.
+%  savevtk(array, filename) saves a 3-D array of any size to
+%  filename in VTK format.
+    [nx, ny, nz] = size(array);
+    fid = fopen(filename, 'wt');
+    fprintf(fid, '# vtk DataFile Version 2.0\n');
+    fprintf(fid, 'Comment goes here\n');
+    fprintf(fid, 'ASCII\n');
+    fprintf(fid, '\n');
+    fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
+    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
+    fprintf(fid, '\n');
+    fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
+    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
+    fprintf(fid, '\n');
+    fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
+    fprintf(fid, ['SCALARS ' colorMap ' double\n']);
+    fprintf(fid, 'LOOKUP_TABLE default\n');
+    fprintf(fid, '\n');
+    for a=1:nz
+        for b=1:ny
+            for c=1:nx
+                fprintf(fid, '%d ', array(c,b,a));
+            end
+            fprintf(fid, '\n');
+        end
+    end
+    fclose(fid);
+return
