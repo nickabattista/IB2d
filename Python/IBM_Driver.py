@@ -788,160 +788,166 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     
     
     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: gives appropriate string number for filename in printing the
-% .vtk files.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##############################################################################
+#
+# FUNCTION: gives appropriate string number for filename in printing the
+# .vtk files.
+#
+##############################################################################
 
-function strNUM = give_String_Number_For_VTK(num)
+def give_String_Number_For_VTK(num):
+    ''' Gives appropriate string number for filename in printing .vtk files
+    
+    Args:
+        num: number of file to be printed
+        
+    Returns:
+        strNUM: string number for filename'''
 
-%num: # of file to be printed
+    if num < 10:
+        strNUM = '000'+str(num)
+    elif num < 100:
+        strNUM = '00'+str(num)
+    elif num<1000:
+        strNUM = '0'+str(num)
+    else:
+        strNUM = str(num)
+        
+    return strNUM
 
-if num < 10
-    strNUM = ['000' num2str(num)];
-elseif num < 100
-    strNUM = ['00' num2str(num)];
-elseif num<1000
-    strNUM = ['0' num2str(num)];
-else
-    strNUM = num2str(num);
-end
+##############################################################################
+#
+# FUNCTION: prints matrix vector data to vtk formated file
+#
+##############################################################################
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints matrix vector data to vtk formated file
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+def savevtk_points_connects( X, filename, vectorName,connectsMat):
+    '''Prints matrix vector data to vtk formated file
+    
+    Args:
+        X: Matrix of size Nx3
+        filename: File name
+        vectorname:
+        connectsMat:'''
 
-function savevtk_points_connects( X, filename, vectorName,connectsMat)
+    N = len(X[:,0])
+    Nc = len(connectsMat[:,0])
 
-%X is matrix of size Nx3
-
-N = length( X(:,1) );
-Nc = length( connectsMat(:,1) );
-
-%TRY PRINTING THEM AS UNSTRUCTURED_GRID
-file = fopen (filename, 'w');
-fprintf(file, '# vtk DataFile Version 2.0\n');
-fprintf(file, [vectorName '\n']);
-fprintf(file, 'ASCII\n');
-fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
-%
-fprintf(file, 'POINTS %i float\n', N);
-for i=1:N
-    fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELLS %i %i\n',Nc,3*Nc); %First: # of "Cells", Second: Total # of info inputed following
-for s=1:Nc
-    fprintf(file,'%i %i %i\n',2, connectsMat(s,1), connectsMat(s,2) );
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELL_TYPES %i\n',Nc); % N = # of "Cells"
-for i=1:Nc
-   fprintf(file,'3 '); 
-end
-fprintf(file,'\n');
-fclose(file);
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints matrix vector data to vtk formated file
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function savevtk_points( X, filename, vectorName)
-
-%X is matrix of size Nx3
-
-N = length( X(:,1) );
-
-
-%TRY PRINTING THEM AS UNSTRUCTURED_GRID
-file = fopen (filename, 'w');
-fprintf(file, '# vtk DataFile Version 2.0\n');
-fprintf(file, [vectorName '\n']);
-fprintf(file, 'ASCII\n');
-fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
-%
-fprintf(file, 'POINTS %i float\n', N);
-for i=1:N
-    fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELLS %i %i\n',N,2*N); %First: # of "Cells", Second: Total # of info inputed following
-for s=0:N-1
-    fprintf(file,'%i %i\n',1,s);
-end
-fprintf(file,'\n');
-%
-fprintf(file,'CELL_TYPES %i\n',N); % N = # of "Cells"
-for i=1:N
-   fprintf(file,'1 '); 
-end
-fprintf(file,'\n');
-fclose(file);
+    #TRY PRINTING THEM AS UNSTRUCTURED_GRID
+    with open(filename,'w') as file:
+        file.write('# vtk DataFile Version 2.0\n')
+        file.write(vectorName+'\n')
+        file.write('ASCII\n')
+        file.write('DATASET UNSTRUCTURED_GRID\n\n')
+        #
+        file.write('POINTS {0} float\n'.format(N))
+        for ii in range(N):
+            file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        file.write('\n')
+        #
+        #First: # of "Cells", Second: Total # of info inputed following
+        file.write('CELLS {0} {1}\n'.format(Nc,3*Nc))
+        for s in range(Nc):
+            file.write('{0} {1:d} {2:d}\n'.format(2,connectsMat[s,0],connectsMat[s,1]))
+        file.write('\n')
+        #
+        file.write('CELL_TYPES {0}\n'.format(Nc)) # N = # of "Cells"
+        for ii in range(Nc):
+           file.write('3 ')
+        file.write('\n')
 
 
 
-%TRY PRINTING THEM AS POLYGONAL DATA
-% file = fopen (filename, 'w');
-% fprintf(file, '# vtk DataFile Version 2.0\n');
-% fprintf(file, [vectorName '\n']);
-% fprintf(file, 'ASCII\n');
-% fprintf(file, 'DATASET STRUCTURED_GRID\n');
-% fprintf(file, 'DIMENSIONS 64 1 1\n');
-% fprintf(file, 'POINTS %i float\n', N);
-% for i=1:N
-% fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-% end
-% fprintf(file,'1.1 1.1 0\n');
-% fprintf(file,'CELL_DATA 1\n');
-% fprintf(file,'POINT_DATA %u \n',N);
-% fprintf(file,'FIELD FieldData 1\n');
-% fprintf(file,'nodal 1 %i float\n',N);
-% fprintf(file,'0 1 1.1 2\n');
-% fprintf(file,'SCALARS nodal float\n');
-% fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
-% fprintf(file,'LOOKUP_TABLE default\n');
+
+##############################################################################
+#
+# FUNCTION: prints matrix vector data to vtk formated file
+#
+##############################################################################
+
+def savevtk_points( X, filename, vectorName):
+    ''' Prints matrix vector data to vtk formated file
+    
+    Args:
+        X: Matrix of size Nx3
+        filename:
+        vectorName:'''
+
+    N = len(X[:,0])
 
 
-% TRY PRINTING THEM AS POINTS
-% file = fopen (filename, 'w');
-% fprintf(file, '# vtk DataFile Version 2.0\n');
-% fprintf(file, 'Cube example\n');
-% fprintf(file, 'ASCII\n');
-% fprintf(file, 'DATASET UNSTRUCTURED_GRID\n');
-% fprintf(file, 'POINTS %i float\n', N);
-% for i=1:N
-% fprintf(file, '%.15e %.15e %.15e\n', X(i,1),X(i,2),X(i,3));
-% end
-% fprintf(file,'POINT_DATA %u \n',N);
-% fprintf(file,['SCALARS ' vectorName ' float 1 \n']);
-% fprintf(file,'LOOKUP_TABLE default\n');
+    #TRY PRINTING THEM AS UNSTRUCTURED_GRID
+    with open(filename,'w') as file:
+        file.write('# vtk DataFile Version 2.0\n')
+        file.write(vectorName+'\n')
+        file.write('ASCII\n')
+        file.write('DATASET UNSTRUCTURED_GRID\n\n')
+        #
+        file.write('POINTS {0} float\n'.format(N))
+        for ii in range(N):
+            file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        file.write('\n')
+        #
+        #First: # of "Cells", Second: Total # of info inputed following
+        file.write('CELLS {0} {1}\n'.format(N,2*N))
+        for s in range(N):
+            file.write('{0} {1}\n'.format(1,s))
+        file.write('\n')
+        #
+        file.write('CELL_TYPES {0}\n'.format(N)) # N = # of "Cells"
+        for ii in range(N):
+           file.write('1 ')
+        file.write('\n')
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints matrix vector data to vtk formated file
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    #TRY PRINTING THEM AS POLYGONAL DATA
+    # with open(filename,'w') as file:
+        # file.write('# vtk DataFile Version 2.0\n')
+        # file.write(vectorName+'\n')
+        # file.write('ASCII\n')
+        # file.write('DATASET STRUCTURED_GRID\n')
+        # file.write('DIMENSIONS 64 1 1\n')
+        # file.write('POINTS {0} float\n', N)
+        # for ii in range(N):
+            # file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        # file.write('1.1 1.1 0\n')
+        # file.write('CELL_DATA 1\n')
+        # file.write('POINT_DATA {0} \n',N)
+        # file.write('FIELD FieldData 1\n')
+        # file.write('nodal 1 {0} float\n'.format(N)
+        # file.write('0 1 1.1 2\n')
+        # file.write('SCALARS nodal float\n')
+        # file.write('SCALARS '+vectorName+' float 1 \n')
+        # file.write('LOOKUP_TABLE default\n')
+
+
+    # TRY PRINTING THEM AS POINTS
+    # with open(filename,'w') as file:
+        # file.write('# vtk DataFile Version 2.0\n')
+        # file.write('Cube example\n')
+        # file.write('ASCII\n')
+        # file.write('DATASET UNSTRUCTURED_GRID\n')
+        # file.write('POINTS {0} float\n'.format(N))
+        # for ii in range(N):
+            # file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        # file.write('POINT_DATA {0} \n'.format(N)
+        # file.write('SCALARS '+vectorName+' float 1 \n')
+        # file.write('LOOKUP_TABLE default\n')
+
+
+
+##############################################################################
+#
+# FUNCTION: prints matrix vector data to vtk formated file
+#
+##############################################################################
 
 function savevtk_vector(X, Y, filename, vectorName,dx,dy)
-%  savevtkvector Save a 3-D vector array in VTK format
-%  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
-%  filename in VTK format. X, Y and Z should be arrays of the same
-%  size, each storing speeds in the a single Cartesian directions.
+#  savevtkvector Save a 3-D vector array in VTK format
+#  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
+#  filename in VTK format. X, Y and Z should be arrays of the same
+#  size, each storing speeds in the a single Cartesian directions.
     if (size(X) ~= size(Y))
         fprint('Error: velocity arrays of unequal size\n'); return;
     end
@@ -955,7 +961,7 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+    #fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
     fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
@@ -975,16 +981,16 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
 return
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints scalar matrix to vtk formated file
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##############################################################################
+#
+# FUNCTION: prints scalar matrix to vtk formated file
+#
+##############################################################################
 
 function savevtk_scalar(array, filename, colorMap,dx,dy)
-%  savevtk Save a 3-D scalar array in VTK format.
-%  savevtk(array, filename) saves a 3-D array of any size to
-%  filename in VTK format.
+#  savevtk Save a 3-D scalar array in VTK format.
+#  savevtk(array, filename) saves a 3-D array of any size to
+#  filename in VTK format.
     [nx, ny, nz] = size(array);
     fid = fopen(filename, 'wt');
     fprintf(fid, '# vtk DataFile Version 2.0\n');
@@ -995,7 +1001,7 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+    #fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
     fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
