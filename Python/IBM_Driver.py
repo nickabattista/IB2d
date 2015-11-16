@@ -356,7 +356,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     connectsMat,tracers,concentration_Yes,C)
     print('Current Time(s): {0}\n'.format(current_time))
-    ctsave = ctsave+1
+    ctsave += 1
     
     pass
     
@@ -943,42 +943,56 @@ def savevtk_points( X, filename, vectorName):
 #
 ##############################################################################
 
-function savevtk_vector(X, Y, filename, vectorName,dx,dy)
-#  savevtkvector Save a 3-D vector array in VTK format
-#  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
-#  filename in VTK format. X, Y and Z should be arrays of the same
-#  size, each storing speeds in the a single Cartesian directions.
-    if (size(X) ~= size(Y))
-        fprint('Error: velocity arrays of unequal size\n'); return;
-    end
-    [nx, ny, nz] = size(X);
-    fid = fopen(filename, 'wt');
-    fprintf(fid, '# vtk DataFile Version 2.0\n');
-    fprintf(fid, 'Comment goes here\n');
-    fprintf(fid, 'ASCII\n');
-    fprintf(fid, '\n');
-    fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
-    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
-    fprintf(fid, '\n');
-    fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    #fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
-    fprintf(fid, '\n');
-    fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
-    fprintf(fid, ['VECTORS ' vectorName ' double\n']);
-    fprintf(fid, '\n');
-    for a=1:nz
-        for b=1:ny
-            for c=1:nx
-                fprintf(fid, '%f ', X(c,b,1));
-                fprintf(fid, '%f ', Y(c,b,1));
-                fprintf(fid, '%f ', 1);
-            end
-            fprintf(fid, '\n');
-        end
-    end
-    fclose(fid);
-return
+def savevtk_vector(X, Y, filename, vectorName,dx,dy):
+    ''' Prints matrix vector data to vtk formated file.
+    
+    Args:
+        X: 2-D ndarray
+        Y: 2-D ndarray
+        filename: file name
+        vectorName:
+        dx:
+        dy:'''
+    #  ?? Legacy:
+    #  savevtkvector Save a 3-D vector array in VTK format
+    #  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
+    #  filename in VTK format. X, Y and Z should be arrays of the same
+    #  size, each storing speeds in the a single Cartesian directions.
+    
+    #  Christopher's note:
+    #   3-D is clearly broken in this code, but there were still some reminants 
+    #   in the matlab version. Given the choice of doing try/except blocks to
+    #   keep these reminants or to kill them entirely, I'm choosing to kill them.
+    #   So, specifically, nz is now gone. I will keep the output the same,
+    #   however, for compatibility. So 1 will be pritned in the Z column.
+    
+    #I'm changing the fprintf that was here to an error. If you want, you can
+    #   catch it in the following function.
+    assert (X.shape == Y.shape), 'Error: velocity arrays of unequal size'
+    nx, ny = X.shape
+    #Python 3.5 automatically opens in text mode unless otherwise specified
+    with open(filename,'w') as fid:
+        fid.write('# vtk DataFile Version 2.0\n')
+        fid.write('Comment goes here\n')
+        fid.write('ASCII\n')
+        fid.write('\n')
+        fid.write('DATASET STRUCTURED_POINTS\n')
+        # 1 below was nz
+        fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+        fid.write('\n')
+        fid.write('ORIGIN    0.000   0.000   0.000\n')
+        #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+        fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+        fid.write('\n')
+        fid.write('POINT_DATA   {0}\n'.format(nx*ny))
+        fid.write('VECTORS '+vectorName+' double\n')
+        fid.write('\n')
+        for b in range(ny):
+            for c in range(nx):
+                fid.write('{0} '.format(X[c,b]))
+                fid.write('{0} '.format(Y[c,b]))
+                fid.write('1 ')
+            fid.write('\n')
 
 
 ##############################################################################
@@ -987,34 +1001,47 @@ return
 #
 ##############################################################################
 
-function savevtk_scalar(array, filename, colorMap,dx,dy)
-#  savevtk Save a 3-D scalar array in VTK format.
-#  savevtk(array, filename) saves a 3-D array of any size to
-#  filename in VTK format.
-    [nx, ny, nz] = size(array);
-    fid = fopen(filename, 'wt');
-    fprintf(fid, '# vtk DataFile Version 2.0\n');
-    fprintf(fid, 'Comment goes here\n');
-    fprintf(fid, 'ASCII\n');
-    fprintf(fid, '\n');
-    fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
-    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
-    fprintf(fid, '\n');
-    fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
-    #fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
-    fprintf(fid, '\n');
-    fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
-    fprintf(fid, ['SCALARS ' colorMap ' double\n']);
-    fprintf(fid, 'LOOKUP_TABLE default\n');
-    fprintf(fid, '\n');
-    for a=1:nz
-        for b=1:ny
-            for c=1:nx
-                fprintf(fid, '%d ', array(c,b,a));
-            end
-            fprintf(fid, '\n');
-        end
-    end
-    fclose(fid);
-return
+def savevtk_scalar(array, filename, colorMap,dx,dy):
+    ''' Prints scalar matrix to vtk formatted file.
+    
+    Args:
+        array: 2-D ndarray
+        filename: file name
+        colorMap:
+        dx:
+        dy:'''
+    #  ?? Legacy:
+    #  savevtk Save a 3-D scalar array in VTK format.
+    #  savevtk(array, filename) saves a 3-D array of any size to
+    #  filename in VTK format.
+    
+    #  Christopher's note:
+    #   3-D is clearly broken in this code, but there were still some reminants 
+    #   in the matlab version. Given the choice of doing try/except blocks to
+    #   keep these reminants or to kill them entirely, I'm choosing to kill them.
+    #   So, specifically, nz is now gone. I will keep the output the same,
+    #   however, for compatibility. So 1 will be pritned in the Z column.
+    nx,ny = array.shape
+    #Python 3.5 automatically opens in text mode unless otherwise specified
+    with open(filename,'w') as fid:
+        fid.write('# vtk DataFile Version 2.0\n')
+        fid.write('Comment goes here\n')
+        fid.write('ASCII\n')
+        fid.write('\n')
+        fid.write('DATASET STRUCTURED_POINTS\n')
+        # 1 below was nz
+        fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+        fid.write('\n')
+        fid.write('ORIGIN    0.000   0.000   0.000\n')
+        #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+        fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+        fid.write('\n')
+        # The 1 below was nz
+        fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
+        fid.write('SCALARS '+colorMap+' double\n')
+        fid.write('LOOKUP_TABLE default\n')
+        fid.write('\n')
+        for b in range(ny):
+            for c in range(nx):
+                fid.write('{0} '.format(array[c,b]))
+            fid.write('\n')
