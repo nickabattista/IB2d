@@ -37,7 +37,7 @@
 ----------------------------------------------------------------------------'''
 
 import numpy as np
-from math import sqrt, floor
+from math import sqrt
 
 ################################################################################
 #
@@ -63,7 +63,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     Ly =   grid_Info[3]
     dx =   grid_Info[4]
     dy =   grid_Info[5]
-    supp = grid_Info[6]
+    supp = int(grid_Info[6])
     Nb =   grid_Info[7]
     ds =   grid_Info[8]
 
@@ -78,6 +78,9 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     for ii in range(supp**2):
        xL_H_ReSize.append(xLH_aux)
        yL_H_ReSize.append(yLH_aux)
+    #xL_H and yL_H are vectors. stack them along a new column axis 
+    xL_H_ReSize = np.stack(xL_H_ReSize,axis=-1)
+    yL_H_ReSize = np.stack(yL_H_ReSize,axis=-1)
 
     # Finds distance between specified Eulerian data and nearby Lagrangian data
     distX = give_Eulerian_Lagrangian_Distance(x[xInds], xL_H_ReSize, Lx)
@@ -174,6 +177,8 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     xInds = []
     for ii in range(supp):
        xInds.append(xIndsAux) #Sets up x-INDEX matrix bc we consider BOTH dimensions
+    #this is a list of matrices. concatenate in horiz direction
+    xInds = np.concatenate(xInds,1)
 
 
     #Give y-dimension Non-Zero Delta Indices
@@ -185,8 +190,11 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
         for jj in range(supp):
             yInds.append(yIndsAux[:,ii]) #Sets up y-INDEX matrix bc we consider
                                          #  BOTH dimensions
+    #this is a list of 1-D arrays. stack them along a new column axis
+    yInds = np.stack(yInds,axis=-1)
     
-    return (xInds,yInds)
+    #these are indices, so return ints
+    return (xInds.astype('int'),yInds.astype('int'))
 
 
 
@@ -227,7 +235,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
-def compute_delta_kernel(x,dx):
+def give_Delta_Kernel(x,dx):
     ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
     
     Args:
@@ -251,9 +259,9 @@ def compute_delta_kernel(x,dx):
             r = RMAT[ii,jj]
             
             if r<1:
-                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) )
+                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
             elif ( (r<2) and (r>=1) ):
-                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) )
+                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
 
     return delta
 
@@ -280,17 +288,19 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
 
 
     # Finds the index of the lower left Eulerian pt. to Lagrangian pt..
-    ind_Aux = floor(lagPts_j/dx + 1)
+    ind_Aux = np.floor(lagPts_j/dx + 1)
 
     # Get all the different x indices that must be considered.
     indices = []
     for ii in range(supp):
         indices.append(ind_Aux)
+    #this is a list of 1-D arrays. stack them along a new column axis
+    indices = np.stack(indices,axis=-1)
     #
     for ii in range(supp):
         indices[:,ii] = indices[:,ii] + -supp/2+1+ii
 
-    # Translate indices between {1,2,..,N}
-    indices = (indices-1 % N) + 1
+    # Translate indices between {0,2,..,N-1}
+    indices = (indices-1 % N)
 
     return indices
