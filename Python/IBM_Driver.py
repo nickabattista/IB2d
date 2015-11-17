@@ -362,7 +362,21 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
     
-    pass
+    #
+    #
+    # * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
+    #
+    #
+    while current_time < T_FINAL:
+        
+        #
+        #******Step 1: Update Position of Boundary of membrane at half time-step ******
+        #                 (Variables end with h if it is a half-step)
+        #
+        xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
+            xLag, yLag, x, y, dt/2, grid_Info, 0)
+        
+
     
 ###########################################################################
 #
