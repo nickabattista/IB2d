@@ -157,7 +157,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #tracers_info: col 1: xPt of Tracers
             #              col 2: yPt of Tracers
     else:
-       tracers = 0
+       tracers = np.zeros((1,1))
        
        
     # READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) #
@@ -177,7 +177,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #              col 3: spring stiffness
             #              col 4: spring resting lengths
     else:
-        springs_info = 0  #just to pass placeholder into 
+        springs_info = np.zeros((1,1))  #just to pass placeholder into 
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
     
@@ -194,7 +194,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #         col 6: hill parameters, b
             #         col 7: force maximum!
     else:
-        muscles_info = 0  #just to pass placeholder into 
+        muscles_info = np.zeros((1,1))  #just to pass placeholder into 
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 
     
@@ -213,7 +213,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #         col 6: hill parameters, b
             #         col 7: force maximum!
     else:
-        muscles3_info = 0  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+        muscles3_info = np.zeros((1,1))  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
     
     
@@ -241,7 +241,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
         
     else:
-        mass_info = 0;
+        mass_info = np.zeros((1,1))
 
 
 
@@ -267,7 +267,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
        
         target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
     else:
-        target_info = 0
+        target_info = np.zeros((1,1))
     
     
     
@@ -291,7 +291,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
         porous_info[:,3] = porous_aux[:,1] #Stores Porosity Coefficient 
     else:
-        porous_info = 0
+        porous_info = np.zeros((1,1))
 
 
 
@@ -322,13 +322,13 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         del xG, yG, normG
         
     else:
-        gravity_Info = 0
+        gravity_Info = np.zeros((1,1))
 
     
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
     V = U                                           # y-Eulerian grid velocity
-    mVelocity = np.zeros((len(mass_info[:,0]),2));  # mass-Pt velocity 
+    mVelocity = np.zeros((len(mass_info[:,0]),2))  # mass-Pt velocity 
 
     if arb_ext_force_Yes == 1:
         firstExtForce = 1                           # initialize external forcing
@@ -336,21 +336,25 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     # ACTUAL TIME-STEPPING IBM SCHEME! 
     #(flags for storing structure connects for printing and printing to .vtk)
-    cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
+    cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1
     
     # CREATE VIZ_IB2D FOLDER and VISIT FILES
-    os.mkdir('viz_IB2d')
+    try:
+        os.mkdir('viz_IB2d')
+    except FileExistsError:
+        #File already exists
+        pass
     #I'm going to expect that vizID is a file object with write permission...?
     vizID = 1 #JUST INITIALIZE BC dumps.visit isn't working correctly...yet
-    os.chdir('viz_IB2d');
+    os.chdir('viz_IB2d')
     #vizID = open('dumps.visit','w')
     #vizID.write('!NBLOCKS 6\n')
     #os.chdir('..')
     
     #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
     #Print initializations to .vtk
-    vort = np.zeros((Ny,Nx)); uMag = np.ndarray(vort); p = np.ndarray(vort)
-    lagPts = np.zeros((len(xLag)+2,3))
+    vort = np.zeros((Ny,Nx)); uMag = np.array(vort); p = np.array(vort)
+    lagPts = np.zeros((len(xLag),3))
     lagPts[:,0] = xLag; lagPts[:,1] = yLag
     connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
@@ -705,7 +709,7 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
                 #   I'm guessing that means counting starts at 0 as in Python
                 connectsMat0.append(ii)   #For Cpp notation (and .vtk counting)
                 connectsMat1.append(ii+1) #For Cpp notation (and .vtk counting)
-        elif i==N-1:
+        elif ii==N-1:
             x1=xLag[ii]; x2=xLag[0]
             y1=yLag[ii]; y2=yLag[0]
             dist = sqrt( (x1-x2)**2 + (y1-y2)**2 )
@@ -733,8 +737,9 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     dy = Ly/Ny
 
 
-    #Go into viz_IB2d directory
-    os.chdir('viz_IB2d')
+    #Go into viz_IB2d directory. This was throwing an error because we're already there!
+    if os.path.split(os.getcwd())[1] != 'viz_IB2d':
+        os.chdir('viz_IB2d')
 
     #Find string number for storing files
     strNUM = give_String_Number_For_VTK(ctsave)
@@ -758,7 +763,6 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
         tracersPtsName = 'tracer.'+strNUM+'.vtk'
         #tMatrix = tracers[:,1:4]
         savevtk_points(tracers[:,1:4],tracersPtsName, 'tracers') 
-    end
             
     #Print another cycle to .visit file
     #vizID.write(vortfName+'\n')
