@@ -32,10 +32,12 @@
     -- give_NonZero_Delta_Indices_XY
     -- give_Eulerian_Lagrangian_Distance
     -- give_Delta_Kernel
+    -- give_1D_NonZero_Delta_Indices
 
 ----------------------------------------------------------------------------'''
 
-
+import numpy as np
+from math import sqrt, floor
 
 ################################################################################
 #
@@ -106,134 +108,189 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
 # FUNCTION: Computes the integral to move each Lagrangian Pt!
 ################################################################################
 
-function [move_X move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds)
+def give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds):
+    ''' Computes the integral to move each Lagrangian Pt.
+    
+    Args:
+        u:        x-component of velocity
+        v:        y-component of velocity
+        delta_X:  values of Dirac-delta function in x-direction
+        delta_Y:  values of Dirac-delta function in y-direction
+        xInds:    x-Indices on fluid grid
+        yInds:    y-Indices on fluid grid'''
 
-# u:        x-component of velocity
-# v:        y-component of velocity
-# delta_X:  values of Dirac-delta function in x-direction
-# delta_Y:  values of Dirac-delta function in y-direction
-# xInds:    x-Indices on fluid grid
-# yInds:    y-Indices on fluid grid
+    row,col = xInds.shape
+    mat_X = np.zeros((row,col))  # Initialize matrix for storage
+    mat_Y = np.zeros((row,col))  # Initialize matrix for storage
+    for ii in range(row):
+        for jj in range(col):
+            
+            # Get Eulerian indices to use for velocity grids, u and 
+            xID = xInds[ii,jj]
+            yID = yInds[ii,jj]
+            
+            # Compute integrand 'stencil' of velocity x delta for each Lagrangian Pt!
+            mat_X[ii,jj] = u[yID,xID]*delta_X[ii,jj]*delta_Y[ii,jj]
+            mat_Y[ii,jj] = v[yID,xID]*delta_X[ii,jj]*delta_Y[ii,jj]
+
+            
+    # Approximate Integral of Velocity x Delta for each Lagrangian Pt!
+    move_X = mat_X.sum(1) * (dx*dy)
+    move_Y = mat_Y.sum(1) * (dx*dy)
+
+    return (move_X, move_Y)
 
 
-[row,col] = size(xInds);
-mat_X = zeros(row,col);  # Initialize matrix for storage
-mat_Y = zeros(row,col);  # Initialize matrix for storage
-for i=1:row
-    for j=1:col
+
+
+############################################################################################
+#
+# FUNCTION: finds the indices on the Eulerian grid where the 1D Dirac-delta
+# kernel is possibly non-zero in BOTH (x,y) directions
+#
+############################################################################################
+
+def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
+    ''' Find indices where 1D Dirac-delta kernel is non-zero in both (x,y)
+    
+    Args:
+        xLag: gives x-coordinate of Lagrangian position
+        yLag: gives y-coordinate of Lagrangian position
+        Nx:   # of Eulerian grid pts. in x-dimension
+        Ny:   # of Eulerian grid pts. in y-dimension
+        dx:   spatial-step along x-dimension of Eulerian grid
+        dy:   spatial-step along y-dimension of Eulerian grid
+        supp: size of support of the Dirac-delta kernel (should be even)
         
-        # Get Eulerian indices to use for velocity grids, u and 
-        xID = xInds(i,j);
-        yID = yInds(i,j);
+    Returns:
+        xInds: x index
+        yInds: y index'''
+
+
+    #Give x-dimension Non-Zero Delta Indices
+    xIndsAux = give_1D_NonZero_Delta_Indices(xLag, Nx, dx, supp)
+
+    #Repeat x-Indices for Non-Zero y-Indices!
+    xInds = []
+    for ii in range(supp):
+       xInds.append(xIndsAux) #Sets up x-INDEX matrix bc we consider BOTH dimensions
+
+
+    #Give y-dimension Non-Zero Delta Indices
+    yIndsAux = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp)
+
+    #Repeat y-Indices for Non-Zero x-Indices!
+    yInds = []
+    for ii in range(supp):
+        for jj in range(supp):
+            yInds.append(yIndsAux[:,ii]) #Sets up y-INDEX matrix bc we consider
+                                         #  BOTH dimensions
+    
+    return (xInds,yInds)
+
+
+
+################################################################################
+#
+# FUNCTION distance between Eulerian grid data, x, and Lagrangian grid data, y, 
+#          at specifed pts typically and makes sure the distance are [0,L] accordingly.
+#
+################################################################################
+
+def give_Eulerian_Lagrangian_Distance(x, y, L):
+    ''' Find dist. between Eulerian grid data and Lagrangian grid data.
+    
+    Args:
+        x,y: two matrices that you find the distance between
+            (x-typically Eulerian data, y-typically Lagrangian data)
+        L: length of domain, i.e., [0,L]
         
-        # Compute integrand 'stencil' of velocity x delta for each Lagrangian Pt!
-        mat_X(i,j) = u(yID,xID)*delta_X(i,j)*delta_Y(i,j);
-        mat_Y(i,j) = v(yID,xID)*delta_X(i,j)*delta_Y(i,j);
+    Returns:
+        distance: distance'''
 
-    end
-end
-
-# Approximate Integral of Velocity x Delta for each Lagrangian Pt!
-move_X = sum( mat_X , 2) * (dx*dy);
-move_Y = sum( mat_Y , 2) * (dx*dy);
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: finds the indices on the Eulerian grid where the 1D Dirac-delta
-% kernel is possibly non-zero in BOTH (x,y) directions
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [xInds,yInds] = give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp)
-
-%xLag: gives x-coordinate of Lagrangian position
-%yLag: gives y-coordinate of Lagrangian position
-%Nx:   # of Eulerian grid pts. in x-dimension
-%Ny:   # of Eulerian grid pts. in y-dimension
-%dx:   spatial-step along x-dimension of Eulerian grid
-%dy:   spatial-step along y-dimension of Eulerian grid
-%supp: size of support of the Dirac-delta kernel (should be even)
-
-
-%Give x-dimension Non-Zero Delta Indices
-xIndsAux = give_1D_NonZero_Delta_Indices(xLag, Nx, dx, supp);
-
-%Repeat x-Indices for Non-Zero y-Indices!
-xInds = [];
-for i=1:supp
-   xInds = [xInds xIndsAux]; %Sets up x-INDEX matrix bc we consider BOTH dimensions
-end
-
-
-%Give y-dimension Non-Zero Delta Indices
-yIndsAux = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp);
-
-%Repeat y-Indices for Non-Zero x-Indices!
-yInds = [];
-for i=1:supp
-    for j=1:supp
-        yInds = [yInds yIndsAux(:,i)]; %Sets up y-INDEX matrix bc we consider BOTH dimensions
-    end
-end
+    row,col = x.shape
+    distance = abs( x - y )
+    for ii in range(row):
+        for jj in range(col):
+            #Note: need to make sure that taking correct value
+            distance[ii,jj] = min(distance[ii,jj],L-distance[ii,jj]) 
+    
+    return distance
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION distance between Eulerian grid data, x, and Lagrangian grid data, y, 
-%          at specifed pts typically and makes sure the distance are [0,L] accordingly.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+###########################################################################
+#
+# FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
+# specified matrix, x, and spatial step-size, dx. It will have support in
+# [x-2dx, x+2dx]
+#
+###########################################################################
 
-function distance = give_Eulerian_Lagrangian_Distance(x, y, L)
-
-%x,y: two matrices that you find the distance between (x-typically Eulerian data, y-typically Lagrangian data)
-%L:   length of domain, i.e., [0,L]
-
-[row,col] = size(x);
-distance = abs( x - y );
-for i=1:row
-    for j=1:col
-        distance(i,j) = min( distance(i,j), L-distance(i,j) ); %Note: need to make sure that taking correct value
-    end
-end
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
-% specified matrix, x, and spatial step-size, dx. It will have support in
-% [x-2dx, x+2dx]
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function delta = compute_delta_kernel(x,dx)
-
-% x:  Values in which the delta function will be evaulated
-% dx: Spatial step-size of grid
-
-% Computes Dirac-delta Approximation.
-RMAT = abs(x)/dx;
-
-%Initialize delta
-delta = RMAT;
-
-%Loops over to find delta approximation
-[row,col] = size(x);
-for i=1:row
-    for j=1:col
+def compute_delta_kernel(x,dx):
+    ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
+    
+    Args:
+        x:  Values in which the delta function will be evaulated
+        dx: Spatial step-size of grid
         
-        r = RMAT(i,j);
+    Returns:
+        delta: delta function with support [x-2dx,x+2dx]'''
+
+    # Computes Dirac-delta Approximation.
+    RMAT = abs(x)/dx
+
+    #Initialize delta
+    delta = RMAT
+
+    #Loops over to find delta approximation
+    row,col = x.shape
+    for ii in range(row):
+        for jj in range(col):
+            
+            r = RMAT[ii,jj]
+            
+            if r<1:
+                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) )
+            elif ( (r<2) and (r>=1) ):
+                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) )
+
+    return delta
+
+
+
+###########################################################################
+#
+# FUNCTION finds the indices on the Eulerian grid where the 1D Dirac-delta
+# kernel is possibly non-zero is x-dimension.
+#
+###########################################################################
+
+def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
+    ''' Find the indices on Eulerian grid where 1D delta is non-zero in x dim.
+    
+    Args:
+        lagPts_j: matrix of lagrangian pts for specific coordinate, j= x or y.
+        N:        # spatial resolution of Eulerian grid in each dimension
+        dx:       Spatial step-size on Eulerian (fluid) grid
+        supp:     Size of support of the Dirac-delta kernel (should be even)
         
-        if r<1
-            delta(i,j) = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) );
-        elseif ( (r<2) && (r>=1) )
-            delta(i,j) = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) );
-        end
-        
-    end
-end
+    Returns:
+        indices'''
+
+
+    # Finds the index of the lower left Eulerian pt. to Lagrangian pt..
+    ind_Aux = floor(lagPts_j/dx + 1)
+
+    # Get all the different x indices that must be considered.
+    indices = []
+    for ii in range(supp):
+        indices.append(ind_Aux)
+    #
+    for ii in range(supp):
+        indices[:,ii] = indices[:,ii] + -supp/2+1+ii
+
+    # Translate indices between {1,2,..,N}
+    indices = (indices-1 % N) + 1
+
+    return indices

@@ -367,7 +367,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
     #
     #
-    while current_time < T_FINAL:
+    
+    #This line commented for debugging
+    #while current_time < T_FINAL:
         
         #
         #******Step 1: Update Position of Boundary of membrane at half time-step ******
