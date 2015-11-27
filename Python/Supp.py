@@ -304,3 +304,36 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     indices = (indices-1 % N)
 
     return indices
+    
+################################################################################
+#
+# FUNCTION: update 'massive' immersed boundary position
+#
+################################################################################
+
+def please_Move_Massive_Boundary(dt_step,mass_info,mVelocity):
+    ''' Update 'massive' immersed boundary position
+    
+    Args:
+        dt_step: desired time-step for this position
+        mass_info: col 1: lag index for mass pt
+                   col 2: massive x-Lag Value
+                   col 3: massive y-Lag Value
+                   col 4: 'mass-spring' stiffness parameter
+                   col 5: MASS parameter value
+        mVelocity  col 1: x-directed Lagrangian velocity
+                   col 2: y-directed Lagrangian velocity
+
+    Returns:
+        mass_info:
+        massLagsOld:'''
+
+    massLagsOld = mass_info[:,(1, 2)]
+
+    # update x-Positions
+    mass_info[:,1] = mass_info[:,1] + dt_step*mVelocity[:,0]
+
+    # update y-Positions
+    mass_info[:,2] = mass_info[:,2] + dt_step*mVelocity[:,1]
+    
+    return (mass_info, massLagsOld)

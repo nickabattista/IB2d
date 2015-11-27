@@ -379,6 +379,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
         xLag, yLag, x, y, dt/2, grid_Info, 0)
         
+    if mass_Yes == 1:
+       mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
+       mass_info,mVelocity)
+        
 
     
 ###########################################################################
