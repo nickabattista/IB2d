@@ -57,7 +57,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
         yL_Next:'''
 
 
-    # Grid Info
+    # Grid Info. grid_Info is a list
     Nx =   grid_Info[0]
     Ny =   grid_Info[1]
     Lx =   grid_Info[2]
@@ -329,7 +329,7 @@ def please_Move_Massive_Boundary(dt_step,mass_info,mVelocity):
         mass_info:
         massLagsOld:'''
 
-    massLagsOld = mass_info[:,(1, 2)]
+    massLagsOld = np.array(mass_info[:,(1, 2)])
 
     # update x-Positions
     mass_info[:,1] = mass_info[:,1] + dt_step*mVelocity[:,0]
