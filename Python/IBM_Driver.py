@@ -876,8 +876,8 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
         vectorname:
         connectsMat:'''
 
-    N = len(X[:,0])
-    Nc = len(connectsMat[:,0])
+    N = X.shape[0]
+    Nc = connectsMat.shape[0]
 
     #TRY PRINTING THEM AS UNSTRUCTURED_GRID
     with open(filename,'w') as file:
@@ -919,7 +919,7 @@ def savevtk_points( X, filename, vectorName):
         filename:
         vectorName:'''
 
-    N = len(X[:,0])
+    N = X.shape[0]
 
 
     #TRY PRINTING THEM AS UNSTRUCTURED_GRID
