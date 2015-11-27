@@ -30,6 +30,8 @@ import numpy as np
 from math import sqrt
 import os
 from Supp import *
+from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
+    please_Find_Lagrangian_Forces_On_Eulerian_grid
 
 ###############################################################################
 #
@@ -398,7 +400,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #
     #*******STEP 2: Calculate Force coming from membrane at half time-step ********
     #
-        
+    Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
+    dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
+    springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
 
     
 ###########################################################################

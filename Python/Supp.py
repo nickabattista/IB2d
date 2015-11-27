@@ -25,7 +25,7 @@
  please let Nick (nick.battista@unc.edu) know.
  
  For the Python port, I am going to throw a lot of supporting functions into
-    here for convinence. That way they got loaded all at once, and are called
+    here for convinence. That way they get loaded all at once, and are called
     by their name in an intuitive way. The functions (with their subfunctions
     following) are here in this order:
     -- please_Move_Lagrangian_Point_Positions
@@ -33,6 +33,7 @@
     -- give_Eulerian_Lagrangian_Distance
     -- give_Delta_Kernel
     -- give_1D_NonZero_Delta_Indices
+    -- please_Move_Massive_Boundary
 
 ----------------------------------------------------------------------------'''
 
