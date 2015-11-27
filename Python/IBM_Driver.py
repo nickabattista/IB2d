@@ -26,12 +26,13 @@
 
 ----------------------------------------------------------------------------'''
 
+import pdb
 import numpy as np
 from math import sqrt
 import os
 from Supp import *
-from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
-    please_Find_Lagrangian_Forces_On_Eulerian_grid
+#from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
+#    please_Find_Lagrangian_Forces_On_Eulerian_grid
 
 ###############################################################################
 #
@@ -73,6 +74,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
     F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }'''
 
+    
     # Temporal Information
     NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
                                 # (floored, so exact number of time-steps)
@@ -139,7 +141,6 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         Y[:,ii] = y
         
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
-
 
     # READ IN LAGRANGIAN POINTS #
     [Nb,xLag,yLag] = read_Vertex_Points(struct_name)
@@ -230,15 +231,15 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 2: "MASS" value parameter
         
         # initialize mass_info
-        mass_info = np.empty((len(mass_aux[:,0]),5))
+        mass_info = np.empty((mass_aux.shape[0],5))
         
         mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
         
-        for ii in range(len(mass_info[:,0])):
-            id = mass_info[ii,0]
+        for ii in range(mass_info.shape[0]):
+            id = int(mass_info[ii,0])
             #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            mass_info[ii,1] = xLag[int(id)-1]  #Stores Original x-Lags as x-Mass Pt. Identities
-            mass_info[ii,2] = yLag[int(id)-1]  #Stores Original y-Lags as y-Mass Pt. Identities
+            mass_info[ii,1] = xLag[id-1]  #Stores Original x-Lags as x-Mass Pt. Identities
+            mass_info[ii,2] = yLag[id-1]  #Stores Original y-Lags as y-Mass Pt. Identities
        
         mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
         mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
@@ -257,15 +258,15 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 1: target STIFFNESSES
         
         # initialize target_info
-        target_info = np.empty((len(target_aux[:,0]),4))
+        target_info = np.empty((target_aux.shape[0],4))
         
         target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
-        for ii in range(len(target_info[:,0])):
-            id = target_info[ii,0]
+        for ii in range(target_info.shape[0]):
+            id = int(target_info[ii,0])
             #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            target_info[ii,1] = xLag[int(id)-1] #Stores Original x-Lags as 
+            target_info[ii,1] = xLag[id-1] #Stores Original x-Lags as 
                                                 #  x-Target Pt. Identities
-            target_info[ii,2] = yLag[int(id)-1] #Stores Original y-Lags as 
+            target_info[ii,2] = yLag[id-1] #Stores Original y-Lags as 
                                                 #  y-Target Pt. Identities
        
         target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
@@ -284,12 +285,12 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         porous_info = np.empty((len(porous_aux),4))
         
         porous_info[:,0] = porous_aux[:,0] #Stores Lag-Pt IDs in col vector
-        for ii in range(porous_info[:,0]):
-            id = porous_info[ii,0]
+        for ii in range(porous_info.shape[0]):
+            id = int(porous_info[ii,0])
             #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            porous_info[ii,1] = xLag[int(id)-1] #Stores Original x-Lags as 
+            porous_info[ii,1] = xLag[id-1] #Stores Original x-Lags as 
                                                 #    x-Porous Pt. Identities
-            porous_info[ii,2] = yLag[int(id)-1] #Stores Original y-Lags as 
+            porous_info[ii,2] = yLag[id-1] #Stores Original y-Lags as 
                                                 #    y-Porous Pt. Identities
         
         porous_info[:,3] = porous_aux[:,1] #Stores Porosity Coefficient 
@@ -331,7 +332,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
     V = U                                           # y-Eulerian grid velocity
-    mVelocity = np.zeros((len(mass_info[:,0]),2))  # mass-Pt velocity 
+    mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
 
     if arb_ext_force_Yes == 1:
         firstExtForce = 1                           # initialize external forcing
@@ -400,9 +401,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #
     #*******STEP 2: Calculate Force coming from membrane at half time-step ********
     #
-    Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
-    dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
-    springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
+    # Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
+    # dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
+    # springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
 
     
 ###########################################################################
