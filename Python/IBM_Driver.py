@@ -380,8 +380,24 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         xLag, yLag, x, y, dt/2, grid_Info, 0)
         
     if mass_Yes == 1:
-       mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
-       mass_info,mVelocity)
+        mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
+        mass_info,mVelocity)
+       
+    if ( ( update_Springs_Flag == 1 ) and ( springs_Yes == 1 ) ):
+        #This function is application specific, located with main2d
+        springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
+        
+    if ( ( update_Target_Pts == 1 ) and ( target_pts_Yes == 1) ):
+        #This function is application specific, located with main2d
+        target_info = update_Target_Point_Positions(dt,current_time,target_info)
+        
+    if ( ( update_Beams_Flag == 1 ) and ( beams_Yes == 1) ):
+        #This function is application specific, located with main2d
+        beams_info = update_Beams(dt,current_time,beams_info)
+        
+    #
+    #*******STEP 2: Calculate Force coming from membrane at half time-step ********
+    #
         
 
     
