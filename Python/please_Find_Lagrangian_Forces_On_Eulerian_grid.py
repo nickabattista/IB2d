@@ -301,3 +301,90 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
                         # i in y-direction (this is SLAVE node for this spring)
                         
         return (fx,fy)
+        
+        
+
+################################################################################
+#
+# FUNCTION: computes the Lagrangian MUSCLE Force Densities for 3-ELEMENT
+#           HILL MODEL! ( coupled w/ force-velocity/length-tension model for
+#           contractile element!)
+#
+################################################################################
+
+def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
+    current_time,dt):
+    ''' Computes the Lagrangian MUSCLE force densities for 3-element hill model
+    
+    Args:
+        Nb:
+        xLag:
+        yLag:
+        xLag_P:
+        yLag_P:
+        muscles3:
+        current_time:
+        dt:
+        
+    Returns:
+        fx:
+        fy:'''
+
+
+    Nmuscles = muscles3.shape[0]       # # of Muscles
+    m_1 = np.array(muscles3[:,0])      # Initialize storage for MASTER NODE Muscle Connection
+    m_2 = np.array(muscles3[:,1])      # Initialize storage for SLAVE NODE Muscle Connection
+    LFO_Vec = np.array(muscles3[:,2])  # Stores length for max. muscle tension
+    SK_Vec = np.array(muscles3[:,3])   # Stores muscle constant
+    a_Vec = np.array(muscles3[:,4])    # Stores Hill Parameter, a
+    b_Vec = np.array(muscles3[:,5])    # Stores Hill Parameter, b
+    FMAX_Vec = np.array(muscles3[:,6]) # Stores Force-Maximum for Muscle
+
+    fx = np.zeros(Nb)                 # Initialize storage for x-forces
+    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+
+    for ii in range(Nmuscles):
+        
+        id_Master = m_1[ii]          # Master Node index for i-th muscle
+        id_Slave = m_2[ii]           # Slave Node index for i-th muscle
+        LFO = LFO_Vec[ii]            # Length for max. muscle tension for i-th muscle
+        sk = SK_Vec[ii]              # Muscle constant for i-th muscle
+        a = a_Vec[ii]                # Hill parameter, a, for i-th muscle
+        b = b_Vec[ii]                # Hill parameter, b, for i-th muscle
+        Fmax = FMAX_Vec[ii]          # Force-Maximum for i-th muscle
+        
+        xPt = xLag[ id_Master ]     # x-Pt of interest at the moment to drive muscle contraction
+        
+        dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
+        dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
+        LF = sqrt( dx**2 + dy**2 )            # Euclidean DISTANCE between 
+                                              #   master and slave node
+        
+        
+        dx_P = xLag_P[id_Slave] - xLag_P[id_Master] # x-Distance btwn slave and master node
+        dy_P = yLag_P[id_Slave] - yLag_P[id_Master] # y-Distance btwn slave and master node
+        LF_P = sqrt( dx_P**2 + dy_P**2 )            # Euclidean DISTANCE between 
+                                                    #   master and slave node
+        
+        v =  abs(LF-LF_P)/dt         # How fast the muscle is contracting/expanding 
+
+        # Find actual muscle activation magnitude
+        # This function is user defined and included with main2d
+        # BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
+        Fm = give_3_Element_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,\
+            xPt,np.array(xLag))
+        
+        mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
+        mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
+        
+        fx[id_Master] = fx[id_Master] + mF_x  # Sum total forces for node,
+                        # i in x-direction (this is MASTER node for this spring)
+        fy[id_Master] = fy[id_Master] + mF_y  # Sum total forces for node, 
+                        # i in y-direction (this is MASTER node for this spring)
+        
+        fx[id_Slave] = fx[id_Slave] - mF_x    # Sum total forces for node, 
+                        # i in x-direction (this is SLAVE node for this spring)
+        fy[id_Slave] = fy[id_Slave] - mF_y    # Sum total forces for node, 
+                        # i in y-direction (this is SLAVE node for this spring)
+        
+    return (fx,fy)
