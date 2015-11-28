@@ -128,7 +128,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # Compute SPRING FORCE DENSITIES (if there are springs!)
-    if ( springs_Yes == 1 )
+    if ( springs_Yes == 1 ):
         
         # Compute "Connections Matrix" for what springs are attached to whom     #
         # (and "Connections Stiffness Matrix" and "Connections Restling Lengths" #
@@ -142,14 +142,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         #[Tx Ty] = give_Me_Spring_Lagrangian_Tension(Nb,dLag_x,dLag_y,springs);
 
         # Compute the Lagrangian SPRING force densities!
-        [fx_springs, fy_springs] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs);
+        fx_springs, fy_springs = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,\
+            xLag,yLag,springs)
         
-    else
-        fx_springs = zeros(Nb,1); #No x-forces coming from springs
-        fy_springs = fx_springs;  #No y-forces coming from springs
-    end
+    else:
+        fx_springs = np.zeros(Nb) #No x-forces coming from springs
+        fy_springs = np.zeros(Nb) #No y-forces coming from springs
 
-
+    pass
 
     # Compute MASS PT FORCE DENSITIES (if there are mass points!)
     if ( mass_Yes == 1)
@@ -393,3 +393,67 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
                         # i in y-direction (this is SLAVE node for this spring)
         
     return (fx,fy)
+    
+    
+    
+###########################################################################
+#
+# FUNCTION computes the Lagrangian SPRING Force Densities .
+#
+###########################################################################
+
+def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
+    ''' Computes the Lagrangian spring force densities
+    
+    Args:
+        ds:
+        Nb:
+        xLag:
+        yLag:
+        springs:
+        
+    Returns:
+        fx:
+        fy:'''
+
+    #leng = Tx.shape[0]               # # of Lagrangian Pts.
+
+    Nsprings = springs.shape[0]  # # of Springs
+    sp_1 = springs[:,0]   # Initialize storage for MASTER NODE Spring Connection
+    sp_2 = springs[:,1]   # Initialize storage for SLAVE NODE Spring Connection
+    K_Vec = springs[:,2]  # Stores spring stiffness associated with each spring
+    RL_Vec = springs[:,3] # Stores spring resting length associated with each spring
+
+    fx = np.zeros(Nb)                 # Initialize storage for x-forces
+    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+
+    for ii in range(Nsprings):
+        
+        id_Master = sp_1[ii]          # Master Node index
+        id_Slave = sp_2[ii]           # Slave Node index
+        k_Spring = K_Vec[ii]          # Spring stiffness of i-th spring
+        L_r = RL_Vec[ii]              # Resting length of i-th spring
+        
+        dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
+        dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
+        
+        sF_x = k_Spring * ( sqrt(dx**2 + dy**2) - L_r ) * ( dx / sqrt(dx**2+dy**2) )
+        sF_y = k_Spring * ( sqrt(dx**2 + dy**2) - L_r ) * ( dy / sqrt(dx**2+dy**2) )
+        
+        fx[id_Master] = fx[id_Master] + sF_x  # Sum total forces for node,
+                        # i in x-direction (this is MASTER node for this spring)
+        fy[id_Master] = fy[id_Master] + sF_y  # Sum total forces for node, 
+                        # i in y-direction (this is MASTER node for this spring)
+        
+        fx[id_Slave] = fx[id_Slave] - sF_x    # Sum total forces for node, 
+                        # i in x-direction (this is SLAVE node for this spring)
+        fy[id_Slave] = fy[id_Slave] - sF_y    # Sum total forces for node, 
+                        # i in y-direction (this is SLAVE node for this spring)
+
+    # MIGHT NOT NEED THESE!
+    #fx = fx/ds**2
+    #fy = dy/ds**2
+    
+    return (fx, fy)
+
+    
