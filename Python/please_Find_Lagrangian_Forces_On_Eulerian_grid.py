@@ -613,3 +613,189 @@ def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
     #fy = dy/ds**2
 
     return (fx, fy)
+    
+    
+    
+################################################################################
+#
+# FUNCTION computes the Delta-Function Approximations 
+#
+################################################################################
+
+def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag):
+    '''Computes the Delta-Function Approximations
+    
+    Args:
+        x: np.arange
+        y: np.arange
+        grid_Info: list
+        xLag:
+        yLag:
+        
+    Returns:
+        delta_X:
+        delta_Y:'''
+
+    # Grid Info
+    Nx =   grid_Info[0]
+    Ny =   grid_Info[1]
+    Lx =   grid_Info[2]
+    Ly =   grid_Info[3]
+    dx =   grid_Info[4]
+    dy =   grid_Info[5]
+    supp = grid_Info[6]
+    Nb =   grid_Info[7]
+
+    # Find the indices of the points (xi, yj) where the 1D delta functions are 
+    # non-zero in EULERIAN FRAME
+    # NOTE: THESE ARE 2D ARRAYS!
+    indX = give_1D_NonZero_Delta_Indices(xLag, Nx, dx, supp)
+    indY = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp).T
+
+    # Matrix of possible indices, augmented by "supp"-copies to perform subtractions later in LAGRANGIAN FRAME
+    indLagAux = np.arange(Nb)
+    # Create copies of indLagAux row vector, stacked vertically.
+    # Then transpose to agree with current column major code
+    ind_Lag = np.vstack(indLagAux for ii in range(supp)).T
+
+
+    # Compute distance between Eulerian Pts. and Lagrangian Pts. by passing correct indices for each
+    distX = give_Eulerian_Lagrangian_Distance(x[indX.astype('int')],\
+        xLag[ind_Lag.astype('int')],Lx)
+    distY = give_Eulerian_Lagrangian_Distance(y[indY.astype('int')],\
+        yLag[ind_Lag.astype('int')],Ly)
+
+
+    # Initialize delta_X and delta_Y matrices for storing delta-function info for each Lag. Pt.
+    delta_X = np.zeros((Nb, Nx))
+    delta_Y = np.zeros((Ny, Nb))
+    
+    pass
+
+    delta_1D_x = give_Delta_Kernel(distX, dx)
+    delta_1D_y = give_Delta_Kernel(distY, dy)
+
+
+    [row,col] = size(ind_Lag);
+    for i=1:row
+        for j=1:col
+            
+            # Get Eulerian/Lagrangian indices to use for saving non-zero delta-function values
+            xID = indX(i,j);
+            indy= ind_Lag(i,j);
+            yID = indY(j,i);
+            
+            # Store non-zero delta-function values into delta_X / delta_Y matrices at correct indices!
+            delta_X(indy,xID) = delta_1D_x(i,j);
+            delta_Y(yID,indy) = delta_1D_y(j,i);
+            
+        end
+    end
+
+    return (delta_X delta_Y)
+    
+    
+    
+###########################################################################
+#
+# FUNCTION finds the indices on the Eulerian grid where the 1D Dirac-delta
+# kernel is possibly non-zero is x-dimension.
+#
+###########################################################################
+
+def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
+    '''Find the indices on Eulerian grid where 1D delta kernel is poss. non-zero
+    
+    Args:
+        lagPts_j: 2D array of lagrangian pts for specific coordinate, j= x or y.
+        N: # spatial resolution of Eulerian grid in each dimension
+        dx: Spatial step-size on Eulerian (fluid) grid
+        supp: Size of support of the Dirac-delta kernel (should be even)
+        
+    Returns:
+        indices:''' 
+
+    # Finds the index of the lower left Eulerian pt. to Lagrangian pt..
+    ind_Aux = np.floor(lagPts_j/dx + 1)
+
+    # Get all the different x indices that must be considered.
+    indices = np.vstack(ind_Aux for ii in range(supp)) #ind_Aux is each row
+    #
+    for ii in range(supp):
+        indices[ii,:] = indices[ii,:] + -supp/2+1+ii
+
+    # Translate indices between {0,2,..,N-1}
+    indices = indices-1 % N
+    
+    # Transpose to work with current column-major code
+    return indices.T
+    
+
+    
+################################################################################
+#
+# FUNCTION distance between Eulerian grid data, x, and Lagrangian grid data, y, 
+#          at specifed pts typically and makes sure the distance are [0,L] accordingly.
+#
+################################################################################
+
+def give_Eulerian_Lagrangian_Distance(x, y, L):
+    ''' Distance between Eulerian grid data x and Lagrangian grid data y within [0,L]
+    
+    Args:
+        x: 2D ndarray (Eulerian data)
+        y: 2D ndarray (Lagrangian data)
+        L: Length of domain, [0,L]
+        
+    Returns:
+        distance:'''
+
+    row,col = x.shape
+    distance = np.abs( x - y )
+    for ii in range(row):
+        for jj in range(col):
+            distance[ii,jj] = min( distance(ii,jj), L-distance(ii,jj) ) 
+            #Note: need to make sure that taking correct value
+            #CHRISTOPHER'S NOTE: This looks like an error to me!
+
+    return distance
+
+    
+
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
+% specified matrix, x, and spatial step-size, dx. It will have support in
+% [x-2dx, x+2dx]
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function delta = compute_delta_kernel(x,dx)
+
+% x:  Values in which the delta function will be evaulated
+% dx: Spatial step-size of grid
+
+% Computes Dirac-delta Approximation.
+RMAT = abs(x)/dx;
+
+%Initialize delta
+delta = RMAT;
+
+%Loops over to find delta approximation
+[row,col] = size(x);
+for i=1:row
+    for j=1:col
+        
+        r = RMAT(i,j);
+        
+        if r<1
+            delta(i,j) = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) );
+        elseif ( (r<2) && (r>=1) )
+            delta(i,j) = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) );
+        end
+        
+    end
+end
+
+
