@@ -155,7 +155,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     if ( mass_Yes == 1):
         # Compute the Lagrangian MASS PT force densities!
         fx_mass, fy_mass, F_Mass = give_Me_Mass_Lagrangian_Force_Densities(ds,\
-            xLag,yLag,masses); 
+            xLag,yLag,masses)
     else:
         fx_mass = np.zeros(Nb) #No x-forces coming from mass points
         fy_mass = np.zeros(Nb) #No y-forces coming from mass points
@@ -164,14 +164,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # Compute TARGET FORCE DENSITIES (if there are target points!)
-    if ( target_pts_Yes == 1)
+    if ( target_pts_Yes == 1):
         # Compute the Lagrangian TARGET force densities!
-        [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets); 
+        fx_target, fy_target = give_Me_Target_Lagrangian_Force_Densities(ds,\
+            xLag,yLag,targets)
         
-    else
-        fx_target = zeros(Nb,1); #No x-forces coming from target points
-        fy_target = fx_target;   #No y-forces coming from target points
-    end
+    else:
+        fx_target = np.zeros(Nb) #No x-forces coming from target points
+        fy_target = np.zeros(Nb) #No y-forces coming from target points
 
 
 
@@ -500,3 +500,48 @@ def give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses):
     F_Mass[:,2] = fy  # Store for updating massive boundary pts
     
     return (fx_mass, fy_mass, F_Mass)
+    
+    
+    
+################################################################################
+#
+# FUNCTION: computes the Target-Pt Force Densities! 
+#
+################################################################################
+
+def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
+    ''' Computes the Target-Pt Densities
+    
+    Args:
+        ds:
+        xLag:
+        yLag:
+        targets:
+        
+    Returns:
+        fx_target:
+        fy_target:'''
+
+    IDs = targets[:,0]                 # Stores Lag-Pt IDs in col vector
+    xPts= targets[:,1]                 # Original x-Values of x-Target Pts.
+    yPts= targets[:,2]                 # Original y-Values of y-Target Pts.
+    kStiffs = targets[:,3]             # Stores Target Stiffnesses 
+
+    N_targets = targets.shape[0]            # # of target points!
+
+    fx = np.zeros(len(xLag))  # Initialize storage for x-force density from TARGET PTS
+    fy = np.zeros(len(xLag))  # Initialize storage for y-force density from TARGET PTS
+
+    for ii in range(N_targets):
+        fx[int(IDs[ii])] = fx[int(IDs[ii])] + kStiffs[ii]*( xPts[ii] - xLag[int(IDs[ii])] )
+        fy[int(IDs[ii])] = fy[int(IDs[ii])] + kStiffs[ii]*( yPts[ii] - yLag[int(IDs[ii])] ) 
+
+
+    fx_target = fx  # alias only
+    fy_target = fy  # alias only
+
+    # MIGHT NOT NEED THESE!
+    #fx_target = fx/ds**2
+    #fy_target = fy/ds**2
+
+    return fx_target, fy_target
