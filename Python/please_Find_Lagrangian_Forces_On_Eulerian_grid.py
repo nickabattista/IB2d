@@ -78,7 +78,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     This leads to a force density of the form,
                    f = ( \LagPts_s * ( 1 - L / abs(\LagPts_s) )  )/ds^2'''
 
-    # Grid Info #
+    # Grid Info - list#
     Nx =    grid_Info[0] # # of Eulerian pts. in x-direction
     Ny =    grid_Info[1] # # of Eulerian pts. in y-direction
     Lx =    grid_Info[2] # Length of Eulerian grid in x-coordinate
@@ -104,16 +104,15 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     #(if using combined length/tension-Hill model) #
     #
     
-    pass
     
     if ( muscle_LT_FV_Yes == 1):
-        [fx_muscles, fy_muscles] = give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt);
-    else
-        fx_muscles = zeros(length(xLag),1);
-        fy_muscles = fx_muscles;
-    end
+        fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
+            xLag_P,yLag_P,muscles,current_time,dt)
+    else:
+        fx_muscles = zeros(len(xLag))
+        fy_muscles = zeros(len(xLag))
 
-
+    pass
 
     #
     # Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) #
@@ -237,15 +236,15 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
         yLag:
         xLag_P:
         yLag_P:
-        muscles:
+        muscles: ndarray
         current_time:
         dt:
         
     Returns:
         fx:
         fy:'''
-
-    Nmuscles = len(muscles[:,0])     # # of Muscles
+    # Need np.array() to get assignment by value
+    Nmuscles = muscles.shape[0]      # # of Muscles
     m_1 = np.array(muscles[:,0])     # Initialize storage for MASTER NODE Muscle Connection
     m_2 = np.array(muscles[:,1])     # Initialize storage for SLAVE NODE Muscle Connection
     LFO_Vec = np.array(muscles[:,2]) # Stores length for max. muscle tension
@@ -255,7 +254,7 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
     FMAX_Vec = np.array(muscles[:,6])# Stores Force-Maximum for Muscle
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
-    fy = np.array(fx)                 # Initialize storage for y-forces
+    fy = np.zeros(Nb)                 # Initialize storage for y-forces
 
     for ii in range(Nmuscles):
         
@@ -267,37 +266,38 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
         b = b_Vec[ii]                # Hill parameter, b, for i-th muscle
         Fmax = FMAX_Vec[ii]          # Force-Maximum for i-th muscle
         
-        xPt = xLag( id_Master )      # x-Pt of interest at the moment to drive 
+        xPt = xLag[id_Master]        # x-Pt of interest at the moment to drive 
                                      #  muscle contraction
         
         dx = xLag[id_Slave] - xLag[id_Master]  # x-Distance btwn slave and master node
         dy = yLag[id_Slave] - yLag[id_Master]  # y-Distance btwn slave and master node
-        LF = sqrt( dx^2 + dy^2 );              # Euclidean DISTANCE between master and slave node
+        LF = sqrt( dx**2 + dy**2 )             # Euclidean DISTANCE between master and slave node
         
         
-        dx_P = xLag_P(id_Slave) - xLag_P(id_Master)  # x-Distance btwn slave and master node
-        dy_P = yLag_P(id_Slave) - yLag_P(id_Master)  # y-Distance btwn slave and master node
+        dx_P = xLag_P[id_Slave] - xLag_P[id_Master]  # x-Distance btwn slave and master node
+        dy_P = yLag_P[id_Slave] - yLag_P[id_Master]  # y-Distance btwn slave and master node
         LF_P = sqrt( dx_P**2 + dy_P**2 )             # Euclidean DISTANCE between master and slave node
         
         v =  abs(LF-LF_P)/dt        # How fast the muscle is contracting/expanding
         
-        pass
-        ###################
-        # WHERE IS give_Muscle_Activation ???
-        ###################
-        
         
         # Find actual muscle activation magnitude
-        Fm = give_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,xPt,xLag);
+        # This function is user defined and included with main2d
+        # BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
+        Fm = give_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,xPt,\
+                                    np.array(xLag))
         
-        mF_x = Fm*(dx/LF);           # cos(theta) = dx / LF;
-        mF_y = Fm*(dy/LF);           # sin(theta) = dy / LF;
+        mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
+        mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
         
-        fx(id_Master,1) = fx(id_Master,1) + mF_x;  # Sum total forces for node, i in x-direction (this is MASTER node for this spring)
-        fy(id_Master,1) = fy(id_Master,1) + mF_y;  # Sum total forces for node, i in y-direction (this is MASTER node for this spring)
+        fx[id_Master] = fx[id_Master] + mF_x  # Sum total forces for node,
+                        # i in x-direction (this is MASTER node for this spring)
+        fy[id_Master] = fy[id_Master] + mF_y  # Sum total forces for node,
+                        # i in y-direction (this is MASTER node for this spring)
         
-        fx(id_Slave,1) = fx(id_Slave,1) - mF_x;    # Sum total forces for node, i in x-direction (this is SLAVE node for this spring)
-        fy(id_Slave,1) = fy(id_Slave,1) - mF_y;    # Sum total forces for node, i in y-direction (this is SLAVE node for this spring)
-
-        
-    end
+        fx[id_Slave] = fx[id_Slave] - mF_x    # Sum total forces for node,
+                        # i in x-direction (this is SLAVE node for this spring)
+        fy[id_Slave] = fy[id_Slave] - mF_y    # Sum total forces for node,
+                        # i in y-direction (this is SLAVE node for this spring)
+                        
+        return (fx,fy)
