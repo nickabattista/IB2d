@@ -112,19 +112,19 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_muscles = zeros(len(xLag))
         fy_muscles = zeros(len(xLag))
 
-    pass
+    
 
     #
     # Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) #
     #
-    if ( muscle_3_Hill_Yes == 1)
-        [fx_muscles3, fy_muscles3] = give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt);
-    else
-        fx_muscles3 = zeros(length(xLag),1);
-        fy_muscles3 = fx_muscles3;
-    end
+    if ( muscle_3_Hill_Yes == 1):
+        fx_muscles3, fy_muscles3 = give_3_Element_Muscle_Force_Densities(Nb,\
+            xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
+    else:
+        fx_muscles3 = np.zeros(len(xLag))
+        fy_muscles3 = np.zeros(len(xLag))
 
-
+    pass
 
 
     # Compute SPRING FORCE DENSITIES (if there are springs!)
@@ -243,15 +243,18 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
     Returns:
         fx:
         fy:'''
-    # Need np.array() to get assignment by value
+    
+    # These just provide views (by reference) into slices of muscles.
+    #   They are not assigned to, so aliasing is faster.
+    
     Nmuscles = muscles.shape[0]      # # of Muscles
-    m_1 = np.array(muscles[:,0])     # Initialize storage for MASTER NODE Muscle Connection
-    m_2 = np.array(muscles[:,1])     # Initialize storage for SLAVE NODE Muscle Connection
-    LFO_Vec = np.array(muscles[:,2]) # Stores length for max. muscle tension
-    SK_Vec = np.array(muscles[:,3])  # Stores muscle constant
-    a_Vec = np.array(muscles[:,4])   # Stores Hill Parameter, a
-    b_Vec = np.array(muscles[:,5])   # Stores Hill Parameter, b
-    FMAX_Vec = np.array(muscles[:,6])# Stores Force-Maximum for Muscle
+    m_1 = muscles[:,0]     # Initialize storage for MASTER NODE Muscle Connection
+    m_2 = muscles[:,1]     # Initialize storage for SLAVE NODE Muscle Connection
+    LFO_Vec = muscles[:,2] # Stores length for max. muscle tension
+    SK_Vec = muscles[:,3]  # Stores muscle constant
+    a_Vec = muscles[:,4]   # Stores Hill Parameter, a
+    b_Vec = muscles[:,5]   # Stores Hill Parameter, b
+    FMAX_Vec = muscles[:,6]# Stores Force-Maximum for Muscle
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
@@ -330,15 +333,17 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
         fx:
         fy:'''
 
-
+    # These just provide views (by reference) into slices of muscles3.
+    #   They are not assigned to, so aliasing is faster.
+        
     Nmuscles = muscles3.shape[0]       # # of Muscles
-    m_1 = np.array(muscles3[:,0])      # Initialize storage for MASTER NODE Muscle Connection
-    m_2 = np.array(muscles3[:,1])      # Initialize storage for SLAVE NODE Muscle Connection
-    LFO_Vec = np.array(muscles3[:,2])  # Stores length for max. muscle tension
-    SK_Vec = np.array(muscles3[:,3])   # Stores muscle constant
-    a_Vec = np.array(muscles3[:,4])    # Stores Hill Parameter, a
-    b_Vec = np.array(muscles3[:,5])    # Stores Hill Parameter, b
-    FMAX_Vec = np.array(muscles3[:,6]) # Stores Force-Maximum for Muscle
+    m_1 = muscles3[:,0]      # Initialize storage for MASTER NODE Muscle Connection
+    m_2 = muscles3[:,1]      # Initialize storage for SLAVE NODE Muscle Connection
+    LFO_Vec = muscles3[:,2]  # Stores length for max. muscle tension
+    SK_Vec = muscles3[:,3]   # Stores muscle constant
+    a_Vec = muscles3[:,4]    # Stores Hill Parameter, a
+    b_Vec = muscles3[:,5]    # Stores Hill Parameter, b
+    FMAX_Vec = muscles3[:,6] # Stores Force-Maximum for Muscle
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
