@@ -124,7 +124,6 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_muscles3 = np.zeros(len(xLag))
         fy_muscles3 = np.zeros(len(xLag))
 
-    pass
 
 
     # Compute SPRING FORCE DENSITIES (if there are springs!)
@@ -177,15 +176,15 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # Compute BEAM FORCE DENSITIES (if there are beams!)
-    if ( beams_Yes == 1 )
+    if ( beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
-        [fx_beams, fy_beams] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams);
+        fx_beams, fy_beams = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,\
+            xLag,yLag,beams)
         
-    else
-        fx_beams = zeros(Nb,1); #No x-forces coming from beams
-        fy_beams = fx_beams;    #No y-forces coming from beams
-    end
+    else:
+        fx_beams = np.zeros(Nb) #No x-forces coming from beams
+        fy_beams = np.zeros(Nb) #No y-forces coming from beams
 
 
 
@@ -545,3 +544,71 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
     #fy_target = fy/ds**2
 
     return fx_target, fy_target
+    
+
+    
+###########################################################################
+#
+# FUNCTION computes the Lagrangian BEAM Force Densities 
+#
+###########################################################################
+
+def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
+    '''Computes the Lagrangian BEAM Force Densities
+    
+    Args:
+        ds:
+        Nb:
+        xLag:
+        yLag:
+        beams:
+        
+    Returns:
+        fx:
+        fy:'''
+
+
+    Nbeams = beams.shape[0]     # # of Beams
+    pts_1 = beams[:,0]  # Initialize storage for 1ST NODE for BEAM
+    pts_2 = beams[:,1]  # Initialize storage for MIDDLE NODE (2ND Node) for BEAM
+    pts_3 = beams[:,2]  # Initialize storage for 3RD NODE for BEAM
+    K_Vec = beams[:,3]  # Stores spring stiffness associated with each spring
+    C_Vec = beams[:,4]  # Stores spring resting length associated with each spring
+
+    fx = np.zeros(Nb)                # Initialize storage for x-forces
+    fy = np.zeros(Nb)                # Initialize storage for y-forces
+
+    for ii in range(Nbeams):
+        
+        id_1 = int(pts_1[ii])  # 1ST Node index
+        id_2 = int(pts_2[ii])  # (MIDDLE) 2nd Node index -> 
+                               #           index that gets force applied to it!
+        id_3 = int(pts_3[ii])  # 3RD Node index
+        k_Beam = K_Vec[ii]     # Beam stiffness of i-th spring
+        C = C_Vec[ii]          # Curvature of the beam between these three nodes 
+        
+        Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
+        Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
+        Xr = xLag[id_3]          # xPt of 3RD Node Pt. in beam
+        
+        Yp = yLag[id_1]         # yPt of 1ST Node Pt. in beam
+        Yq = yLag[id_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
+        Yr = yLag[id_3]         # yPt of 3RD Node Pt. in beam
+        
+        bF_x =  k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) )
+        bF_y = -k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) )
+        
+        #bF_x = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) )
+        #bF_y = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  -(Xr-Xq) - (Xq-Xp) )
+        
+        fx[id_2] = fx[id_2] + bF_x  # Sum total forces for middle node,
+                            # in x-direction (this is MIDDLE node for this beam)
+        fy[id_2] = fy[id_2] + bF_y  # Sum total forces for middle node, 
+                            # in y-direction (this is MIDDLE node for this beam)
+
+
+    # MIGHT NOT NEED THESE!
+    #fx = fx/ds**2
+    #fy = dy/ds**2
+
+    return (fx, fy)
