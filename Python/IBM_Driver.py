@@ -132,18 +132,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     x = np.arange(0,Lx,dx)
     y = np.arange(0,Ly,dy)
     # Create x-Mesh
-    X = np.empty((Nx,len(x)))
+    X = np.empty((Nx,x.size))
     for ii in range(Nx):
         X[ii,] = x
     # Create y-Mesh
-    Y = np.empty((len(y),Ny))
+    Y = np.empty((y.size,Ny))
     for ii in range(Ny):
         Y[:,ii] = y
         
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
 
     # READ IN LAGRANGIAN POINTS #
-    [Nb,xLag,yLag] = read_Vertex_Points(struct_name)
+    Nb,xLag,yLag = read_Vertex_Points(struct_name)
     grid_Info[7] = Nb          # num Total Number of Lagrangian Pts.
     xLag_P = xLag              # Initialize previous Lagrangian x-Values 
                                #   (for use in muscle-model)
@@ -154,7 +154,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # READ IN TRACERS (IF THERE ARE TRACERS) #
     if (tracers_Yes == 1):
        nulvar,xT,yT = read_Tracer_Points(struct_name)
-       tracers = np.zeros((len(xT),4))
+       tracers = np.zeros((xT.size,4))
        tracers[0,0] = 1
        tracers[:,1] = xT
        tracers[:,2] = yT
@@ -282,7 +282,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 2: Porosity coefficient
         
         # initizlize porous_info
-        porous_info = np.empty((len(porous_aux),4))
+        porous_info = np.empty((porous_aux.size,4))
         
         porous_info[:,0] = porous_aux[:,0] #Stores Lag-Pt IDs in col vector
         for ii in range(porous_info.shape[0]):
@@ -358,7 +358,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
     #Print initializations to .vtk
     vort = np.zeros((Ny,Nx)); uMag = np.array(vort); p = np.array(vort)
-    lagPts = np.zeros((len(xLag),3))
+    lagPts = np.zeros((xLag.size,3))
     lagPts[:,0] = xLag; lagPts[:,1] = yLag
     connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
@@ -723,7 +723,7 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
         connectsMat:
         space:'''
 
-    N = len(xLag)
+    N = xLag.size
 
     if Nx <= 32:
         space = 5*ds

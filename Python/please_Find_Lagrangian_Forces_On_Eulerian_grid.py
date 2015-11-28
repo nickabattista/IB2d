@@ -109,8 +109,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
             xLag_P,yLag_P,muscles,current_time,dt)
     else:
-        fx_muscles = zeros(len(xLag))
-        fy_muscles = zeros(len(xLag))
+        fx_muscles = zeros(xLag.size)
+        fy_muscles = zeros(xLag.size)
 
     
 
@@ -121,8 +121,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_muscles3, fy_muscles3 = give_3_Element_Muscle_Force_Densities(Nb,\
             xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
     else:
-        fx_muscles3 = np.zeros(len(xLag))
-        fy_muscles3 = np.zeros(len(xLag))
+        fx_muscles3 = np.zeros(xLag.size)
+        fy_muscles3 = np.zeros(xLag.size)
 
 
 
@@ -189,13 +189,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # SUM TOTAL FORCE DENSITY! #
-    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass;
-    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass;
+    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass
+    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass
 
 
     # SAVE LAGRANGIAN FORCES
-    F_Lag(:,1) = fx;
-    F_Lag(:,2) = fy;
+    F_Lag = np.empty((fx.size,2))
+    F_Lag[:,1] = fx
+    F_Lag[:,2] = fy
         
 
     # Give me delta-function approximations!
@@ -484,8 +485,8 @@ def give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses):
 
     N_masses = masses.shape[0]            # # of target points!
 
-    fx = np.zeros(len(xLag)) # Initialize storage for x-force density from TARGET PTS
-    fy = np.zeros(len(xLag)) # Initialize storage for y-force density from TARGET PTS
+    fx = np.zeros(xLag.size) # Initialize storage for x-force density from TARGET PTS
+    fy = np.zeros(xLag.size) # Initialize storage for y-force density from TARGET PTS
 
     for ii in range(N_masses):
         fx[int(IDs[ii])] = fx[int(IDs[ii])] + kStiffs[ii]*( xPts[ii] - xLag[int(IDs[ii])] )
@@ -528,8 +529,8 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
 
     N_targets = targets.shape[0]            # # of target points!
 
-    fx = np.zeros(len(xLag))  # Initialize storage for x-force density from TARGET PTS
-    fy = np.zeros(len(xLag))  # Initialize storage for y-force density from TARGET PTS
+    fx = np.zeros(xLag.size)  # Initialize storage for x-force density from TARGET PTS
+    fy = np.zeros(xLag.size)  # Initialize storage for y-force density from TARGET PTS
 
     for ii in range(N_targets):
         fx[int(IDs[ii])] = fx[int(IDs[ii])] + kStiffs[ii]*( xPts[ii] - xLag[int(IDs[ii])] )
