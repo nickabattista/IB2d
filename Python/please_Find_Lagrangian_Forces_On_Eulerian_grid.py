@@ -200,21 +200,19 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         
 
     # Give me delta-function approximations!
-    [delta_X delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
+    delta_X delta_Y = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,\
+    grid_Info,xLag,yLag)
 
 
     # Transform the force density vectors into diagonal matrices
-    fxds = zeros(Nb,Nb); fyds = zeros(Nb,Nb);
-    for i=1:Nb
-       fxds(i,i) = fx(i,1)*ds; 
-       fyds(i,i) = fy(i,1)*ds;
-    end
+    fxds = np.diag(fx*ds)
+    fyds = np.diag(fy*ds)
 
 
     # Find Eulerian forces on grids by approximating the line integral, 
     #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    Fx = delta_Y * fxds * delta_X;
-    Fy = delta_Y * fyds * delta_X;
+    Fx = delta_Y @ fxds @ delta_X
+    Fy = delta_Y @ fyds @ delta_X
 
     return (Fx, Fy, F_Mass, F_Lag)
     
@@ -650,7 +648,7 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     # non-zero in EULERIAN FRAME
     # NOTE: THESE ARE 2D ARRAYS!
     indX = give_1D_NonZero_Delta_Indices(xLag, Nx, dx, supp)
-    indY = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp).T
+    indY = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp) #Python: remove transpose
 
     # Matrix of possible indices, augmented by "supp"-copies to perform subtractions later in LAGRANGIAN FRAME
     indLagAux = np.arange(Nb)
@@ -663,34 +661,31 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     distX = give_Eulerian_Lagrangian_Distance(x[indX.astype('int')],\
         xLag[ind_Lag.astype('int')],Lx)
     distY = give_Eulerian_Lagrangian_Distance(y[indY.astype('int')],\
-        yLag[ind_Lag.astype('int')],Ly)
+        yLag[ind_Lag.astype('int')],Ly) #Python: remove transpose - matches indY
+                                        # Result is now tranpose of original code
 
 
     # Initialize delta_X and delta_Y matrices for storing delta-function info for each Lag. Pt.
     delta_X = np.zeros((Nb, Nx))
     delta_Y = np.zeros((Ny, Nb))
     
-    pass
 
     delta_1D_x = give_Delta_Kernel(distX, dx)
     delta_1D_y = give_Delta_Kernel(distY, dy)
 
 
-    [row,col] = size(ind_Lag);
-    for i=1:row
-        for j=1:col
+    row,col = ind_Lag.shape
+    for ii in range(row):
+        for jj in range(col):
             
             # Get Eulerian/Lagrangian indices to use for saving non-zero delta-function values
-            xID = indX(i,j);
-            indy= ind_Lag(i,j);
-            yID = indY(j,i);
+            xID = indX[ii,jj]
+            indy= ind_Lag[ii,jj]
+            yID = indY[ii,jj] #Python: now indicies don't need to be switched
             
             # Store non-zero delta-function values into delta_X / delta_Y matrices at correct indices!
-            delta_X(indy,xID) = delta_1D_x(i,j);
-            delta_Y(yID,indy) = delta_1D_y(j,i);
-            
-        end
-    end
+            delta_X[indy,xID] = delta_1D_x[ii,jj]
+            delta_Y[yID,indy] = delta_1D_y[ii,jj] #now return transpose
 
     return (delta_X delta_Y)
     
@@ -763,39 +758,43 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
     
 
     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
-% specified matrix, x, and spatial step-size, dx. It will have support in
-% [x-2dx, x+2dx]
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+###########################################################################
+#
+# FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
+# specified matrix, x, and spatial step-size, dx. It will have support in
+# [x-2dx, x+2dx]
+#
+###########################################################################
 
-function delta = compute_delta_kernel(x,dx)
-
-% x:  Values in which the delta function will be evaulated
-% dx: Spatial step-size of grid
-
-% Computes Dirac-delta Approximation.
-RMAT = abs(x)/dx;
-
-%Initialize delta
-delta = RMAT;
-
-%Loops over to find delta approximation
-[row,col] = size(x);
-for i=1:row
-    for j=1:col
+def give_Delta_Kernel(x,dx):
+    ''' Compute discrete approx. to 1D delta function over x, dx.
+    Support is in [x-2dx, x+2dx].
+    
+    Args:
+        x:  Values in which the delta function will be evaulated
+        dx: Spatial step-size of grid
         
-        r = RMAT(i,j);
-        
-        if r<1
-            delta(i,j) = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) );
-        elseif ( (r<2) && (r>=1) )
-            delta(i,j) = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) );
-        end
-        
-    end
-end
+    Returns:
+        delta:'''
+
+    # Computes Dirac-delta Approximation.
+    RMAT = np.abs(x)/dx
+
+    #Initialize delta
+    delta = np.array(RMAT)
+
+    #Loops over to find delta approximation
+    row,col = x.shape
+    for ii in range(row):
+        for jj in range(col):
+            
+            r = RMAT[ii,jj]
+            
+            if r<1:
+                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
+            elif ( (r<2) and (r>=1) ):
+                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
+
+    return delta
 
 
