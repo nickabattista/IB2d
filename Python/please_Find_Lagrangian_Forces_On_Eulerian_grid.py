@@ -26,6 +26,7 @@
  ----------------------------------------------------------------------------'''
 
 from math import sqrt
+import numpy as np
  
 ################################################################################
 #
@@ -109,8 +110,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
             xLag_P,yLag_P,muscles,current_time,dt)
     else:
-        fx_muscles = zeros(xLag.size)
-        fy_muscles = zeros(xLag.size)
+        fx_muscles = np.zeros(xLag.size)
+        fy_muscles = np.zeros(xLag.size)
 
     
 
@@ -200,7 +201,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         
 
     # Give me delta-function approximations!
-    delta_X delta_Y = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,\
+    delta_X, delta_Y = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,\
     grid_Info,xLag,yLag)
 
 
@@ -687,7 +688,7 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
             delta_X[indy,xID] = delta_1D_x[ii,jj]
             delta_Y[yID,indy] = delta_1D_y[ii,jj] #now return transpose
 
-    return (delta_X delta_Y)
+    return (delta_X, delta_Y)
     
     
     
