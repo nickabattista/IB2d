@@ -34,6 +34,7 @@
     -- give_Delta_Kernel
     -- give_1D_NonZero_Delta_Indices
     -- please_Move_Massive_Boundary
+    -- please_Update_Massive_Boundary_Velocity
 
 ----------------------------------------------------------------------------'''
 
@@ -338,3 +339,60 @@ def please_Move_Massive_Boundary(dt_step,mass_info,mVelocity):
     mass_info[:,2] = mass_info[:,2] + dt_step*mVelocity[:,1]
     
     return (mass_info, massLagsOld)
+    
+    
+    
+############################################################################################
+#
+# FUNCTION: update 'massive' immersed boundary velocity
+#
+############################################################################################
+
+def please_Update_Massive_Boundary_Velocity(dt_step,mass_info,mVelocity,\
+    F_Mass_Bnd,gravity_Info):
+    ''' Update 'massive' immersed boundary velocity
+    
+    Args:
+        dt_step: desired time-step for this position
+        mass_info:   col 1: lag index for mass pt
+                     col 2: massive x-Lag Value
+                     col 3: massive y-Lag Value
+                     col 4: 'mass-spring' stiffness parameter
+                     col 5: MASS parameter value
+        mVelocity    col 1: x-directed Lagrangian velocity
+                     col 2: y-directed Lagrangian velocity
+        F_Mass_Bnd   col 1: x-directed Lagrangian force
+                     col 2: y-directed Lagrangian force
+        gravity_Info col 1: flag if considering gravity (0 = NO, 1 = YES)
+                     col 2: x-component of gravity vector (NORMALIZED PREVIOUSLY)
+                     col 3: y-component of gravity vector (NORMALIZED PREVIOUSLY)
+                     
+    Returns:
+        mVelocity_h:'''
+
+    ids = mass_info[:,0]
+
+    if gravity_Info[0] == 1:
+         
+        g = 9.80665 #m/s^2
+        
+        # update x-Velocity
+        mVelocity_h[:,0] = mVelocity[:,0] - dt_step * \
+        ( F_Mass_Bnd[ids,0]/mass_info[:,4] - g*gravity_Info[1] )
+
+        # update y-Velocity
+        mVelocity_h[:,1] = mVelocity[:,1] - dt_step * \
+        ( F_Mass_Bnd[ids,1]/mass_info[:,4] - g*gravity_Info[2] )
+        
+    else:
+        
+        # update x-Velocity
+        mVelocity_h[:,0] = mVelocity[:,0] - dt_step*F_Mass_Bnd[ids,0]/mass_info[:,4]
+
+        # update y-Velocity
+        mVelocity_h[:,1] = mVelocity[:,1] - dt_step*F_Mass_Bnd[ids,1]/mass_info[:,4]
+        
+    return mVelocity_h
+
+
+

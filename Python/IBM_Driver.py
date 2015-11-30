@@ -404,6 +404,20 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
     dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
     springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
+    
+    # Once force is calculated, can finish time-step for massive boundary
+    if mass_Yes == 1:   
+        # Update Massive Boundary Velocity
+        mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,\
+        mVelocity,F_Mass_Bnd,gravity_Info)
+        
+        # Update Massive Boundary Position for Time-step
+        mass_info[:,[1,2]] = massLagsOld
+        mass_info,unused = please_Move_Massive_Boundary(dt,mass_info,mVelocity_h)
+
+        # Update Massive Boundary Velocity for Time-step
+        mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,\
+        mVelocity,F_Mass_Bnd,gravity_Info)
 
     
 ###########################################################################
