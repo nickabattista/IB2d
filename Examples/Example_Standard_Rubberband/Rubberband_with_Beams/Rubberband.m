@@ -308,7 +308,7 @@ function C = compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag)
 %C = ab / ( sqrt( a^2*sin(t)^2 + b^2*cos(t)^2  )  )^3
 
 N = length(xLag);
-C = zeros( length(angs) );
+C = zeros(length(angs),1);
 
 %Note: -needs to be done same order as you print .beam file!
 %      -THIS MAKES INITIAL BEAM CONFIGURATION THE DESIRED CURAVTURE!!
