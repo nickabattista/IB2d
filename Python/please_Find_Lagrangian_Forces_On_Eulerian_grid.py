@@ -196,8 +196,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # SAVE LAGRANGIAN FORCES
     F_Lag = np.empty((fx.size,2))
-    F_Lag[:,1] = fx
-    F_Lag[:,2] = fy
+    F_Lag[:,0] = fx
+    F_Lag[:,1] = fy
         
 
     # Give me delta-function approximations!
@@ -655,7 +655,7 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     indLagAux = np.arange(Nb)
     # Create copies of indLagAux row vector, stacked vertically.
     # Then transpose to agree with current column major code
-    ind_Lag = np.vstack(indLagAux for ii in range(supp)).T
+    ind_Lag = np.vstack(indLagAux for ii in range(int(supp))).T
 
 
     # Compute distance between Eulerian Pts. and Lagrangian Pts. by passing correct indices for each
@@ -715,9 +715,9 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     ind_Aux = np.floor(lagPts_j/dx + 1)
 
     # Get all the different x indices that must be considered.
-    indices = np.vstack(ind_Aux for ii in range(supp)) #ind_Aux is each row
+    indices = np.vstack(ind_Aux for ii in range(int(supp))) #ind_Aux is each row
     #
-    for ii in range(supp):
+    for ii in range(int(supp)):
         indices[ii,:] = indices[ii,:] + -supp/2+1+ii
 
     # Translate indices between {0,2,..,N-1}
@@ -750,7 +750,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
     distance = np.abs( x - y )
     for ii in range(row):
         for jj in range(col):
-            distance[ii,jj] = min( distance(ii,jj), L-distance(ii,jj) ) 
+            distance[ii,jj] = min( distance[ii,jj], L-distance[ii,jj] ) 
             #Note: need to make sure that taking correct value
             #CHRISTOPHER'S NOTE: This looks like an error to me!
 
