@@ -59,11 +59,10 @@ def Rubberband():
 
 
     # Plot Geometry to test
-    # Commented because it seems to be broken in Windows 10 at the moment...
-    # plt.plot(xLag,yLag,'r-',xLag,yLag,'*')
-    # plt.xlabel('x'); plt.ylabel('y')
-    # plt.axis('equal')
-    # plt.show()
+    plt.plot(xLag,yLag,'r-',xLag,yLag,'*')
+    plt.xlabel('x'); plt.ylabel('y')
+    plt.axis('square')
+    plt.show(block=True)
 
 
     # Prints .vertex file!
