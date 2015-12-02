@@ -33,6 +33,7 @@ import os
 from Supp import *
 from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
     please_Find_Lagrangian_Forces_On_Eulerian_grid
+from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 
 ###############################################################################
 #
@@ -83,8 +84,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     current_time = 0.0
     
     # GRID INFO #
-    Nx = int(grid_Info[0])   # num of Eulerian pts. in x-direction
-    Ny = int(grid_Info[1])   # num of Eulerian pts. in y-direction
+    Nx = grid_Info[0]   # num of Eulerian pts. in x-direction (int)
+    Ny = grid_Info[1]   # num of Eulerian pts. in y-direction (int)
     Lx = grid_Info[2]   # Length of Eulerian grid in x-coordinate
     Ly = grid_Info[3]   # Length of Eulerian grid in y-coordinate
     dx = grid_Info[4]   # Spatial-size in x
@@ -331,12 +332,12 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
-    V = U                                           # y-Eulerian grid velocity
+    V = np.zeros((Ny,Nx))                           # y-Eulerian grid velocity
     mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
 
     if arb_ext_force_Yes:
-        firstExtForce = 1                           # initialize external forcing
-        indsExtForce = 0                            # initialize for external forcing computation
+        firstExtForce = 1       # initialize external forcing
+        indsExtForce = 0        # initialize for external forcing computation
     
     # ACTUAL TIME-STEPPING IBM SCHEME! 
     #(flags for storing structure connects for printing and printing to .vtk)
@@ -429,6 +430,12 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         U, V, firstExtForce, indsExtForce)
         Fxh = Fxh + Fx_Arb
         Fyh = Fyh + Fy_Arb
+        
+    #
+    #******************* STEP 3: Solve for Fluid motion ************************
+    #
+    Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
+    grid_Info, dt)
 
     
 ###########################################################################

@@ -101,8 +101,8 @@ def main2d():
 
     # GRID INFO STORED #
     grid_Info = list(range(14))
-    grid_Info[0] = params[4]           # num of Eulerian Pts in x-Direction
-    grid_Info[1] = params[5]           # num of Eulerian Pts in y-Direction 
+    grid_Info[0] = int(params[4])      # num of Eulerian Pts in x-Direction
+    grid_Info[1] = int(params[5])      # num of Eulerian Pts in y-Direction 
     grid_Info[2] = params[6]           # Length of Eulerian domain in x-Direction
     grid_Info[3] = params[7]           # Length of Eulerian domain in y-Direction
     grid_Info[4] = params[6]/params[4] # Spatial step-size in x

@@ -79,12 +79,11 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
 
     # Construct EULERIAN Index Matrices
     idX = np.vstack(range(Nx) for ii in range(Nx))
-    idY = np.vstack(range(Ny) for ii in range(Ny))
+    idY = np.vstack(range(Ny) for ii in range(Ny)).T
 
 
     # Create FFT Operator (used for both half time-step and full time-step computations)
-    # NOTE: idY is transposed from the original code, so use transpose here
-    A_hat = 1 + 2*mu*dt/rho*( (sin(PI*idX/Nx)/dx)**2 + (sin(PI*idY.T/Ny)/dy)**2 )
+    A_hat = 1 + 2*mu*dt/rho*( (sin(PI*idX/Nx)/dx)**2 + (sin(PI*idY/Ny)/dy)**2 )
 
 
     # # # # # # EVOLVE THE FLUID THROUGH HALF A TIME-STEP # # # # # # #
@@ -154,7 +153,7 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
     # Computed derivatives of products U^2, V^2, and U*V at half step.
     U_h_sq = U_h**2
     V_h_sq = V_h**2
-    U_h_V_h = U_h**V_h
+    U_h_V_h = U_h*V_h
     U_h_sq_x = D(U_h_sq,dx,'x')
     V_h_sq_y = D(V_h_sq,dy,'y')
     U_h_V_h_x = D(U_h_V_h,dx,'x')
@@ -199,7 +198,7 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
 ################################################################################
 
 def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string):
-''' Calculates the fluid velocity
+    ''' Calculates the fluid velocity
 
     Args:
         dt:
@@ -216,7 +215,7 @@ def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string)
     Returns:
         vel_hat: fluid velocity'''
 
-    vel_hat = np.zeros((Ny,Nx)) #initialize fluid velocity
+    vel_hat = np.zeros((Ny,Nx),dtype='complex') #initialize fluid velocity
 
 
     if string=='x':
@@ -359,7 +358,7 @@ def give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat):
     Returns:
         p_hat:'''
 
-    p_hat = np.zeros((Ny,Nx)) #initialize fluid pressure
+    p_hat = np.zeros((Ny,Nx),dtype='complex') #initialize fluid pressure
 
     for ii in range(Ny):
         for jj in range(Nx):
@@ -367,7 +366,8 @@ def give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat):
                      1j/dy*sin(2*PI*idY[ii,jj]/Ny)*rhs_v_hat[ii,jj] )
             den = ( dt/rho*( (sin(2*PI*idX[ii,jj]/Nx)/dx)**2 + \
                              (sin(2*PI*idY[ii,jj]/Ny)/dy)**2 ))
-            p_hat[ii,jj] = num/den
+            if ii != 0 and jj != 0: #this one is nan, and will be zeroed out anyway
+                p_hat[ii,jj] = num/den
 
     # Zero out modes.
     p_hat[0,0] = 0

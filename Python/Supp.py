@@ -35,6 +35,8 @@
     -- give_1D_NonZero_Delta_Indices
     -- please_Move_Massive_Boundary
     -- please_Update_Massive_Boundary_Velocity
+    -- D
+    -- DD
 
 ----------------------------------------------------------------------------'''
 
@@ -395,4 +397,103 @@ def please_Update_Massive_Boundary_Velocity(dt_step,mass_info,mVelocity,\
     return mVelocity_h
 
 
+
+########################################################################
+#
+# FUNCTION: Finds CENTERED finite difference approximation to 1ST
+# Derivative in specified direction by input, dz, and 'string'. 
+# Note: It automatically accounts for periodicity of the domain.
+#
+########################################################################
+
+def D(u,dz,string):
+    ''' Finds centered 1st derivative in specified direction
+    
+    Args:
+        u:      velocity 
+        dz:     spatial step in "z"-direction
+        string: specifies which 1ST derivative to take (to enforce periodicity)
+        
+    Returns:
+        u_z:'''
+
+    length = u.shape[0]
+    u_z = np.zeros((length,length))
+
+    if string=='x':
+
+        #For periodicity on ends
+        u_z[:,0] = ( u[:,1] - u[:,length-1] ) / (2*dz)
+        u_z[:,-1]= ( u[:,0] - u[:,length-2] ) / (2*dz)
+
+        #Standard Centered Difference 
+        for jj in range(1,length-1):
+            u_z[:,jj] = ( u[:,jj+1] - u[:,jj-1] ) / (2*dz)
+
+    elif string=='y':
+        
+        #For periodicity on ends
+        u_z[0,:] = ( u[1,:] - u[length-1,:] ) / (2*dz)
+        u_z[length-1,:] = ( u[0,:] - u[length-2,:] ) / (2*dz)
+
+        #Standard Centered Difference 
+        for jj in range(1,length-1):
+            u_z[jj,:] = ( u[jj+1,:] - u[jj-1,:] ) / (2*dz)
+        
+    else:
+        
+        print('\n\n\n ERROR IN FUNCTION D FOR COMPUTING 1ST DERIVATIVE\n')
+        print('Need to specify which desired derivative, x or y.\n\n\n')
+           
+    return u_z
+
+
+########################################################################
+#
+# FUNCTION: Finds CENTERED finite difference approximation to 2ND
+# DERIVATIVE in z direction, specified by input and 'string' 
+# Note: It automatically accounts for periodicity of the domain.
+#
+########################################################################
+
+def DD(u,dz,string):
+    ''' Finds centered 2nd derivative in z direction, specified by input & string
+    
+    Args:
+        u:      velocity 
+        dz:     spatial step in "z"-direction
+        string: specifies which 2ND derivative to take (to enforce periodicity)
+        
+    Returns:
+        u_zz:'''
+
+    length = u.shape[0]
+    u_zz = np.zeros((length,length))
+
+    if string=='x':
+
+        #For periodicity on ends
+        u_zz[:,0] =  ( u[:,1] - 2*u[:,0]   + u[:,length-1] )   / (dz**2)
+        u_zz[:,-1] = ( u[:,0] - 2*u[:,length-1] + u[:,length-2] ) / (dz**2)
+
+        #Standard Upwind Scheme (Centered Difference)
+        for jj in range(1,length-1):
+            u_zz[:,jj] = ( u[:,jj+1] - 2*u[:,jj] + u[:,jj-1] ) / (dz**2)
+
+    elif string=='y':
+
+        #For periodicity on ends
+        u_zz[0,:] =  ( u[1,:] - 2*u[0,:]   + u[length-1,:] )   / (dz**2)
+        u_zz[-1,:]= ( u[0,:] - 2*u[length-1,:] + u[length-2,:] ) / (dz**2)
+
+        #Standard Upwind Scheme (Centered Difference)
+        for jj in range(1,length-1):
+            u_zz[jj,:] = ( u[jj+1,:] - 2*u[jj,:] + u[jj-1,:] ) / (dz**2)
+
+    else:
+        
+        print('\n\n\n ERROR IN FUNCTION DD FOR COMPUTING 2ND DERIVATIVE\n')
+        print('Need to specify which desired derivative, x or y.\n\n\n')
+        
+    return u_zz
 
