@@ -418,6 +418,17 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         # Update Massive Boundary Velocity for Time-step
         mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,\
         mVelocity,F_Mass_Bnd,gravity_Info)
+        
+    # Add artificial force from fluid boundary, if desired. 
+    if arb_ext_force_Yes == 1:
+        # This function is user defined along with main2d
+        # Some of these arguments are mutable. Make sure they are not 
+        #   getting assigned to!
+        Fx_Arb, Fy_Arb, firstExtForce, indsExtForce = \
+        please_Compute_External_Forcing(dt, current_time, x, y, grid_Info,\
+        U, V, firstExtForce, indsExtForce)
+        Fxh = Fxh + Fx_Arb
+        Fyh = Fyh + Fy_Arb
 
     
 ###########################################################################

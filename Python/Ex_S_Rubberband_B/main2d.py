@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''-------------------------------------------------------------------------
 
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
