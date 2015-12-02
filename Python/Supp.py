@@ -205,12 +205,15 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
 ################################################################################
 #
 # FUNCTION distance between Eulerian grid data, x, and Lagrangian grid data, y, 
-#          at specifed pts typically and makes sure the distance are [0,L] accordingly.
+#          at specifed pts typically and makes sure the distances are 
+#          correct for a periodic [0,L] domain.
 #
 ################################################################################
 
 def give_Eulerian_Lagrangian_Distance(x, y, L):
     ''' Find dist. between Eulerian grid data and Lagrangian grid data.
+    [0,L] has periodic boundary condition, so in actuality, the greatest
+    distance possible is L/2.
     
     Args:
         x,y: two matrices that you find the distance between
@@ -225,7 +228,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
     for ii in range(row):
         for jj in range(col):
             #Note: need to make sure that taking correct value
-            distance[ii,jj] = min(distance[ii,jj],L-distance[ii,jj]) 
+            distance[ii,jj] = min(distance[ii,jj],L-distance[ii,jj])
     
     return distance
 
