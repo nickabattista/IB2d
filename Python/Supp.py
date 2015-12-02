@@ -101,7 +101,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
 
 
     # Shift so that all values are in [0,Lx or Ly).
-    if porous_Yes == 0:
+    if not porous_Yes:
         xL_Next = xL_Next % Lx
         yL_Next = yL_Next % Ly
 
@@ -262,7 +262,7 @@ def give_Delta_Kernel(x,dx):
             
             if r<1:
                 delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
-            elif ( (r<2) and (r>=1) ):
+            elif (r<2) and (r>=1):
                 delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
 
     return delta

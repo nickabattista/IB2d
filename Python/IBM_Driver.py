@@ -152,7 +152,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
                             
                             
     # READ IN TRACERS (IF THERE ARE TRACERS) #
-    if (tracers_Yes == 1):
+    if tracers_Yes:
        nulvar,xT,yT = read_Tracer_Points(struct_name)
        tracers = np.zeros((xT.size,4))
        tracers[0,0] = 1
@@ -165,7 +165,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
        
        
     # READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) #
-    if ( concentration_Yes == 1 ):
+    if concentration_Yes:
         C,kDiffusion = read_In_Concentration_Info(struct_name)
             #C:           Initial background concentration
             #kDiffusion:  Diffusion constant for Advection-Diffusion
@@ -174,7 +174,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
         
     # READ IN SPRINGS (IF THERE ARE SPRINGS) #
-    if ( springs_Yes == 1 ):
+    if springs_Yes:
         springs_info = read_Spring_Points(struct_name)
             #springs_info: col 1: starting spring pt (by lag. discretization)
             #              col 2: ending spring pt. (by lag. discretization)
@@ -188,7 +188,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # READ IN MUSCLES (IF THERE ARE MUSCLES) #
-    if ( muscles_Yes == 1 ):
+    if muscles_Yes:
         muscles_info = read_Muscle_Points(struct_name)
             #         muscles: col 1: MASTER NODE (by lag. discretization)
             #         col 2: SLAVE NODE (by lag. discretization)
@@ -207,7 +207,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # READ IN MUSCLES (IF THERE ARE MUSCLES) #
-    if ( hill_3_muscles_Yes == 1 ):
+    if hill_3_muscles_Yes:
         muscles3_info = read_Hill_3Muscle_Points(struct_name)
             #         muscles: col 1: MASTER NODE (by lag. discretization)
             #         col 2: SLAVE NODE (by lag. discretization)
@@ -224,7 +224,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # READ IN MASS POINTS (IF THERE ARE MASS PTS) #
-    if ( mass_Yes == 1):
+    if mass_Yes:
         mass_aux = read_Mass_Points(struct_name)
         #target_aux: col 0: Lag Pt. ID w/ Associated Mass Pt.
         #            col 1: "Mass-spring" stiffness parameter
@@ -252,7 +252,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
 
     # READ IN TARGET POINTS (IF THERE ARE TARGET PTS) #
-    if ( target_pts_Yes == 1):
+    if target_pts_Yes:
         target_aux = read_Target_Points(struct_name)
         #target_aux: col 0: Lag Pt. ID w/ Associated Target Pt.
         #            col 1: target STIFFNESSES
@@ -276,7 +276,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) #
-    if ( porous_Yes == 1):
+    if porous_Yes:
         porous_aux = read_Porous_Points(struct_name)
         #porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
         #            col 2: Porosity coefficient
@@ -300,7 +300,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
 
     # READ IN BEAMS (IF THERE ARE BEAMS) #
-    if ( beams_Yes == 1):
+    if beams_Yes:
         beams_info = read_Beam_Points(struct_name)
         #beams:      col 1: 1ST PT.
         #            col 2: MIDDLE PT. (where force is exerted)
@@ -312,7 +312,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
     
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
-    if gravity_Yes == 1:
+    if gravity_Yes:
         #gravity_Vec[0] = model_Info[11]     # x-Component of Gravity Vector
         #gravity_Vec[1] = model_Info[12]     # y-Component of Gravity Vector
         xG = model_Info[12]
@@ -334,7 +334,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     V = U                                           # y-Eulerian grid velocity
     mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
 
-    if arb_ext_force_Yes == 1:
+    if arb_ext_force_Yes:
         firstExtForce = 1                           # initialize external forcing
         indsExtForce = 0                            # initialize for external forcing computation
     
@@ -382,19 +382,19 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
         xLag, yLag, x, y, dt/2, grid_Info, 0)
         
-    if mass_Yes == 1:
+    if mass_Yes:
         mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
         mass_info,mVelocity)
        
-    if ( ( update_Springs_Flag == 1 ) and ( springs_Yes == 1 ) ):
+    if update_Springs_Flag and springs_Yes:
         #This function is application specific, located with main2d
         springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
         
-    if ( ( update_Target_Pts == 1 ) and ( target_pts_Yes == 1) ):
+    if update_Target_Pts and target_pts_Yes:
         #This function is application specific, located with main2d
         target_info = update_Target_Point_Positions(dt,current_time,target_info)
         
-    if ( ( update_Beams_Flag == 1 ) and ( beams_Yes == 1) ):
+    if update_Beams_Flag and beams_Yes:
         #This function is application specific, located with main2d
         beams_info = update_Beams(dt,current_time,beams_info)
         
@@ -406,7 +406,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
     
     # Once force is calculated, can finish time-step for massive boundary
-    if mass_Yes == 1:   
+    if mass_Yes:   
         # Update Massive Boundary Velocity
         mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,\
         mVelocity,F_Mass_Bnd,gravity_Info)
@@ -420,7 +420,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         mVelocity,F_Mass_Bnd,gravity_Info)
         
     # Add artificial force from fluid boundary, if desired. 
-    if arb_ext_force_Yes == 1:
+    if arb_ext_force_Yes:
         # This function is user defined along with main2d
         # Some of these arguments are mutable. Make sure they are not 
         #   getting assigned to!
@@ -847,7 +847,7 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     savevtk_scalar(U, uXName, 'uX',dx,dy)
     savevtk_scalar(V, uYName, 'uY',dx,dy)
 
-    if concentration_Yes == 1:
+    if concentration_Yes:
         confName = 'concentration.'+strNUM+'.vtk'
         savevtk_scalar(C, confName, 'Concentration',dx,dy)
 
