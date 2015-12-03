@@ -34,6 +34,8 @@ from Supp import *
 from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
     please_Find_Lagrangian_Forces_On_Eulerian_grid
 from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
+from please_Compute_Porous_Slip_Velocity import\
+    please_Compute_Porous_Slip_Velocity
 
 ###############################################################################
 #
@@ -436,6 +438,26 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #
     Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
     grid_Info, dt)
+    
+    #
+    #**** STEP 4: Update Position of Boundary of membrane again for a half time-step ****
+    #
+    xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
+    yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
+    #Uh, Vh instead of U,V?
+    xLag, yLag = please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag,\
+        xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes)
+        
+    #NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
+    if porous_Yes:
+        Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
+            porous_info,F_Lag)
+        xLag[porous_info[:,0].astype('int')] = xLag[porous_info[:,0].astype('int')] \
+            - dt*Por_Mat[:,0]*nX
+        yLag[porous_info[:,0].astype('int')] = yLag[porous_info[:,0].astype('int')] \
+            - dt*Por_Mat[:,1]*nY
+        xLag = xLag % Lx # If structure goes outside domain
+        yLag = yLag % Ly # If structure goes outside domain
 
     
 ###########################################################################
