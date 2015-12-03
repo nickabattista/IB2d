@@ -1158,3 +1158,65 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             for c in range(nx):
                 fid.write('{0} '.format(array[c,b]))
             fid.write('\n')
+            
+
+            
+##############################################################################
+#
+# FUNCTION: Computes vorticity from two matrices, U and V, where each
+# matrix is the discretized field of velocity values either for x or y,
+# respectively.
+#
+##############################################################################
+
+def give_Me_Vorticity(U,V,dx,dy):
+    ''' Computes vorticity from two matrices, discretized field of velocity values
+    
+    Args:
+        U: x-directed vorticity
+        V: y-directed vorticity
+        dx:
+        dy:
+        
+    Returns:
+        vort:'''
+
+    # w = ( dv/dx - du/dy )\hat{z}
+
+    #Compute dv/dx using central differencing! (maintains periodicity)
+    dvdx = D(V,dx,'x')
+
+    #Compute du/dy using central differencing! (maintains periodicity)
+    dudy = D(U,dy,'y')
+
+    #Compute vorticity
+    vort = ( dvdx - dudy )
+
+    #Take transpose so all lines up
+    vort = vort.T
+
+    return vort
+
+
+##############################################################################
+#
+# FUNCTION: Computes velocity magnitude from two matrices, U and V, where each
+# matrix is the discretized field of velocity values either for x or y,
+# respectively.
+#
+##############################################################################
+
+def give_Me_Magnitude_Velocity(U,V):
+    ''' Computes velocity magnitude from two matrices of velocity values
+    
+    Args:
+        U: x-directed velocity
+        V: y-directed velocity
+        
+    Returns:
+        uMag: Magnitude of velocity'''
+
+    # Compute magnitude of velocity
+    uMag = np.sqrt( U**2 + V**2 )
+
+    return uMag
