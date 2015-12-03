@@ -458,6 +458,19 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             - dt*Por_Mat[:,1]*nY
         xLag = xLag % Lx # If structure goes outside domain
         yLag = yLag % Ly # If structure goes outside domain
+        
+    # If there are tracers, update tracer positions #
+    if tracers_Yes:
+        #Uh, Vh instead of U,V?
+        xT, yT = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT,\
+            x, y, dt, grid_Info,0) #0 for always no porous tracers
+        tracers[:,1] = xT
+        tracers[:,2] = yT
+        
+    # If there is a background concentration, update concentration-gradient #
+    # Note, C does not need to be assigned here - this function alters it internally
+    if concentration_Yes:
+       C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
 
     
 ###########################################################################
