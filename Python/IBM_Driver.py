@@ -471,6 +471,36 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # Note, C does not need to be assigned here - this function alters it internally
     if concentration_Yes:
        C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
+       
+    # Save/Plot Lagrangian/Eulerian Dynamics! #
+    if ( cter % pDump == 0 and cter >= pDump ):
+        
+        #Compute vorticity, uMagnitude
+        vort = give_Me_Vorticity(U,V,dx,dy)
+        uMag = give_Me_Magnitude_Velocity(U,V)
+        
+        #Plot in Matplotlib
+        # if pMatplotlib:
+            # loc, diffy = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,\
+                # lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,\
+                # loc,diffy,spacing)
+        
+        #Print .vtk files!
+        lagPts = vstack((xLag, yLag, np.zeros(xLag.size))).T
+        print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
+            lagPts,connectsMat,tracers,concentration_Yes,C)
+        
+        #Print Current Time
+        print('Current Time(s): {0:6.6f}\n'.format(current_time))
+        
+        #Update print counter for filename index
+        ctsave+=1
+        firstPrint = 0
+        
+    # Update current_time value & counter
+    current_time = current_time+dt
+    cter += 1
+    #wait = input('Press enter to continue...')
 
     
 ###########################################################################
