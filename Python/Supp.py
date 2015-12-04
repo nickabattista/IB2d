@@ -80,6 +80,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     #        values to find distances between corresponding Eulerian data and them
     xLH_aux = xL_H % Lx; xL_H_ReSize = []
     yLH_aux = yL_H % Ly; yL_H_ReSize = []
+
     for ii in range(supp**2):
        xL_H_ReSize.append(xLH_aux)
        yL_H_ReSize.append(yLH_aux)
@@ -183,8 +184,8 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     for ii in range(supp):
        xInds.append(xIndsAux) #Sets up x-INDEX matrix bc we consider BOTH dimensions
     #this is a list of matrices. concatenate in horiz direction
-    xInds = np.concatenate(xInds,1)
-
+    xInds = np.hstack(xInds)
+    
 
     #Give y-dimension Non-Zero Delta Indices
     yIndsAux = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp)
@@ -195,7 +196,7 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
         for jj in range(supp):
             yInds.append(yIndsAux[:,ii]) #Sets up y-INDEX matrix bc we consider
                                          #  BOTH dimensions
-    #this is a list of 1-D arrays. stack them along a new column axis
+    #this is a list of 1-D arrays. turn them into columns and stack horizontally
     yInds = np.stack(yInds,axis=-1)
     
     #these are indices, so return ints
@@ -286,7 +287,7 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     ''' Find the indices on Eulerian grid where 1D delta is non-zero in x dim.
     
     Args:
-        lagPts_j: matrix of lagrangian pts for specific coordinate, j= x or y.
+        lagPts_j: row of lagrangian pts for specific coordinate, j= x or y.
         N:        # spatial resolution of Eulerian grid in each dimension
         dx:       Spatial step-size on Eulerian (fluid) grid
         supp:     Size of support of the Dirac-delta kernel (should be even)
@@ -302,14 +303,14 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     indices = []
     for ii in range(supp):
         indices.append(ind_Aux)
-    #this is a list of 1-D arrays. stack them along a new column axis
+    #this is a list of 1-D arrays. stack them along a new axis
     indices = np.stack(indices,axis=-1)
     #
     for ii in range(supp):
         indices[:,ii] = indices[:,ii] + -supp/2+1+ii
 
     # Translate indices between {0,2,..,N-1}
-    indices = (indices-1 % N)
+    indices = (indices-1) % N
 
     return indices
     

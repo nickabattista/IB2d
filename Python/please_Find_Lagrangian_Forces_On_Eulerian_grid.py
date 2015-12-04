@@ -721,7 +721,7 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
         indices[ii,:] = indices[ii,:] + -supp/2+1+ii
 
     # Translate indices between {0,2,..,N-1}
-    indices = indices-1 % N
+    indices = (indices-1) % N
     
     # Transpose to work with current column-major code
     return indices.T

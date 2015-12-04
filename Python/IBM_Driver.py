@@ -36,6 +36,7 @@ from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
 from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 from please_Compute_Porous_Slip_Velocity import\
     please_Compute_Porous_Slip_Velocity
+from please_Plot_Results import please_Plot_Results
 
 ###############################################################################
 #
@@ -375,132 +376,132 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #
     #
     
-    #This line commented for debugging
-    #while current_time < T_FINAL:
+    while current_time < T_FINAL:
         
-    #
-    #******Step 1: Update Position of Boundary of membrane at half time-step ******
-    #                 (Variables end with h if it is a half-step)
-    #
-    xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
-        xLag, yLag, x, y, dt/2, grid_Info, 0)
+        #
+        #******Step 1: Update Position of Boundary of membrane at half time-step ******
+        #                 (Variables end with h if it is a half-step)
+        #
+        xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
+            xLag, yLag, x, y, dt/2, grid_Info, 0)
+            
+        if mass_Yes:
+            mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
+            mass_info,mVelocity)
+           
+        if update_Springs_Flag and springs_Yes:
+            #This function is application specific, located with main2d
+            springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
+            
+        if update_Target_Pts and target_pts_Yes:
+            #This function is application specific, located with main2d
+            target_info = update_Target_Point_Positions(dt,current_time,target_info)
+            
+        if update_Beams_Flag and beams_Yes:
+            #This function is application specific, located with main2d
+            beams_info = update_Beams(dt,current_time,beams_info)
+            
+        #
+        #*******STEP 2: Calculate Force coming from membrane at half time-step ********
+        #
+        Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
+        dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
+        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
         
-    if mass_Yes:
-        mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
-        mass_info,mVelocity)
-       
-    if update_Springs_Flag and springs_Yes:
-        #This function is application specific, located with main2d
-        springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
-        
-    if update_Target_Pts and target_pts_Yes:
-        #This function is application specific, located with main2d
-        target_info = update_Target_Point_Positions(dt,current_time,target_info)
-        
-    if update_Beams_Flag and beams_Yes:
-        #This function is application specific, located with main2d
-        beams_info = update_Beams(dt,current_time,beams_info)
-        
-    #
-    #*******STEP 2: Calculate Force coming from membrane at half time-step ********
-    #
-    Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
-    dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
-    springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
-    
-    # Once force is calculated, can finish time-step for massive boundary
-    if mass_Yes:   
-        # Update Massive Boundary Velocity
-        mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,\
-        mVelocity,F_Mass_Bnd,gravity_Info)
-        
-        # Update Massive Boundary Position for Time-step
-        mass_info[:,[1,2]] = massLagsOld
-        mass_info,unused = please_Move_Massive_Boundary(dt,mass_info,mVelocity_h)
+        # Once force is calculated, can finish time-step for massive boundary
+        if mass_Yes:   
+            # Update Massive Boundary Velocity
+            mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,\
+            mVelocity,F_Mass_Bnd,gravity_Info)
+            
+            # Update Massive Boundary Position for Time-step
+            mass_info[:,[1,2]] = massLagsOld
+            mass_info,unused = please_Move_Massive_Boundary(dt,mass_info,mVelocity_h)
 
-        # Update Massive Boundary Velocity for Time-step
-        mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,\
-        mVelocity,F_Mass_Bnd,gravity_Info)
+            # Update Massive Boundary Velocity for Time-step
+            mVelocity = please_Update_Massive_Boundary_Velocity(dt,mass_info,\
+            mVelocity,F_Mass_Bnd,gravity_Info)
+            
+        # Add artificial force from fluid boundary, if desired. 
+        if arb_ext_force_Yes:
+            # This function is user defined along with main2d
+            # Some of these arguments are mutable. Make sure they are not 
+            #   getting assigned to!
+            Fx_Arb, Fy_Arb, firstExtForce, indsExtForce = \
+            please_Compute_External_Forcing(dt, current_time, x, y, grid_Info,\
+            U, V, firstExtForce, indsExtForce)
+            Fxh = Fxh + Fx_Arb
+            Fyh = Fyh + Fy_Arb
+            
+        #
+        #******************* STEP 3: Solve for Fluid motion ************************
+        #
+        Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
+        grid_Info, dt)
         
-    # Add artificial force from fluid boundary, if desired. 
-    if arb_ext_force_Yes:
-        # This function is user defined along with main2d
-        # Some of these arguments are mutable. Make sure they are not 
-        #   getting assigned to!
-        Fx_Arb, Fy_Arb, firstExtForce, indsExtForce = \
-        please_Compute_External_Forcing(dt, current_time, x, y, grid_Info,\
-        U, V, firstExtForce, indsExtForce)
-        Fxh = Fxh + Fx_Arb
-        Fyh = Fyh + Fy_Arb
-        
-    #
-    #******************* STEP 3: Solve for Fluid motion ************************
-    #
-    Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
-    grid_Info, dt)
-    
-    #
-    #**** STEP 4: Update Position of Boundary of membrane again for a half time-step ****
-    #
-    xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
-    yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
-    #Uh, Vh instead of U,V?
-    xLag, yLag = please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag,\
-        xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes)
-        
-    #NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
-    if porous_Yes:
-        Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
-            porous_info,F_Lag)
-        xLag[porous_info[:,0].astype('int')] = xLag[porous_info[:,0].astype('int')] \
-            - dt*Por_Mat[:,0]*nX
-        yLag[porous_info[:,0].astype('int')] = yLag[porous_info[:,0].astype('int')] \
-            - dt*Por_Mat[:,1]*nY
-        xLag = xLag % Lx # If structure goes outside domain
-        yLag = yLag % Ly # If structure goes outside domain
-        
-    # If there are tracers, update tracer positions #
-    if tracers_Yes:
+        #
+        #**** STEP 4: Update Position of Boundary of membrane again for a half time-step ****
+        #
+        xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
+        yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
         #Uh, Vh instead of U,V?
-        xT, yT = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT,\
-            x, y, dt, grid_Info,0) #0 for always no porous tracers
-        tracers[:,1] = xT
-        tracers[:,2] = yT
-        
-    # If there is a background concentration, update concentration-gradient #
-    # Note, C does not need to be assigned here - this function alters it internally
-    if concentration_Yes:
-       C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
-       
-    # Save/Plot Lagrangian/Eulerian Dynamics! #
-    if ( cter % pDump == 0 and cter >= pDump ):
-        
-        #Compute vorticity, uMagnitude
-        vort = give_Me_Vorticity(U,V,dx,dy)
-        uMag = give_Me_Magnitude_Velocity(U,V)
-        
-        #Plot in Matplotlib
-        # if pMatplotlib:
-            # loc, diffy = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,\
-                # lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,\
-                # loc,diffy,spacing)
-        
-        #Print .vtk files!
-        lagPts = vstack((xLag, yLag, np.zeros(xLag.size))).T
-        print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
-            lagPts,connectsMat,tracers,concentration_Yes,C)
-        
-        #Print Current Time
-        print('Current Time(s): {0:6.6f}\n'.format(current_time))
-        
-        #Update print counter for filename index
-        ctsave+=1
-        firstPrint = 0
-        
-    # Update current_time value & counter
-    current_time = current_time+dt
-    cter += 1
-    #wait = input('Press enter to continue...')
+        xLag, yLag = please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag,\
+            xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes)
+            
+        #NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
+        if porous_Yes:
+            Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
+                porous_info,F_Lag)
+            xLag[porous_info[:,0].astype('int')] = xLag[porous_info[:,0].astype('int')] \
+                - dt*Por_Mat[:,0]*nX
+            yLag[porous_info[:,0].astype('int')] = yLag[porous_info[:,0].astype('int')] \
+                - dt*Por_Mat[:,1]*nY
+            xLag = xLag % Lx # If structure goes outside domain
+            yLag = yLag % Ly # If structure goes outside domain
+            
+        # If there are tracers, update tracer positions #
+        if tracers_Yes:
+            #Uh, Vh instead of U,V?
+            xT, yT = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT,\
+                x, y, dt, grid_Info,0) #0 for always no porous tracers
+            tracers[:,1] = xT
+            tracers[:,2] = yT
+            
+        # If there is a background concentration, update concentration-gradient #
+        # Note, C does not need to be assigned here - this function alters it internally
+        if concentration_Yes:
+           C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
+           
+        # Save/Plot Lagrangian/Eulerian Dynamics! #
+        if ( cter % pDump == 0 and cter >= pDump ):
+            
+            #Compute vorticity, uMagnitude
+            vort = give_Me_Vorticity(U,V,dx,dy)
+            uMag = give_Me_Magnitude_Velocity(U,V)
+            
+            #Plot in Matplotlib
+            if pMatplotlib:
+                loc, diffy = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,\
+                    lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,\
+                    loc,diffy,spacing)
+            
+            #Print .vtk files!
+            lagPts = np.vstack((xLag, yLag, np.zeros(xLag.size))).T
+            print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
+                lagPts,connectsMat,tracers,concentration_Yes,C)
+            
+            #Print Current Time
+            print('Current Time(s): {0:6.6f}\n'.format(current_time))
+            
+            #Update print counter for filename index
+            ctsave+=1
+            firstPrint = 0
+            
+            
+        # Update current_time value & counter
+        current_time = current_time+dt
+        cter += 1
+        #wait = input('Press enter to continue...')
 
     
 ###########################################################################
