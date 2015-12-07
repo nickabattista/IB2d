@@ -409,7 +409,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
         
         # Once force is calculated, can finish time-step for massive boundary
-        if mass_Yes:   
+        if mass_Yes: #need to test
             # Update Massive Boundary Velocity
             mVelocity_h = please_Update_Massive_Boundary_Velocity(dt/2,mass_info,\
             mVelocity,F_Mass_Bnd,gravity_Info)
@@ -423,7 +423,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             mVelocity,F_Mass_Bnd,gravity_Info)
             
         # Add artificial force from fluid boundary, if desired. 
-        if arb_ext_force_Yes:
+        if arb_ext_force_Yes: #need to test
             # This function is user defined along with main2d
             # Some of these arguments are mutable. Make sure they are not 
             #   getting assigned to!
@@ -449,7 +449,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes)
             
         #NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
-        if porous_Yes:
+        if porous_Yes: #need to test
             Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
                 porous_info,F_Lag)
             xLag[porous_info[:,0].astype('int')] = xLag[porous_info[:,0].astype('int')] \
@@ -468,8 +468,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             tracers[:,2] = yT
             
         # If there is a background concentration, update concentration-gradient #
-        # Note, C does not need to be assigned here - this function alters it internally
-        if concentration_Yes:
+        # Note, C is mutable
+        if concentration_Yes: #need to test
            C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
            
         # Save/Plot Lagrangian/Eulerian Dynamics! #

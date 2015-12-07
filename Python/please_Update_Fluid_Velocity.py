@@ -366,7 +366,7 @@ def give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat):
                      1j/dy*sin(2*PI*idY[ii,jj]/Ny)*rhs_v_hat[ii,jj] )
             den = ( dt/rho*( (sin(2*PI*idX[ii,jj]/Nx)/dx)**2 + \
                              (sin(2*PI*idY[ii,jj]/Ny)/dy)**2 ))
-            if ii != 0 and jj != 0: #this one is nan, and will be zeroed out anyway
+            if not (ii==0 and jj==0): #this one is nan, and will be zeroed out anyway
                 p_hat[ii,jj] = num/den
 
     # Zero out modes.
