@@ -215,23 +215,23 @@ def compute_ELLIPTIC_Branch(ds,rmin,rmax):
         
         while abs(err) > 1e-6:
            
-           if err > 0:
+            if err > 0:
               
-              tN = tGuess              # Update 'close' PT. [tN,tGuess,tF]
-              tGuess = (tN+tF)/2       # New Guess
-              xN1 = rmin*cos(tGuess)   # x-guess 
-              yN1 = rmax*sin(tGuess)   # y-guess          
+                tN = tGuess              # Update 'close' PT. [tN,tGuess,tF]
+                tGuess = (tN+tF)/2       # New Guess
+                xN1 = rmin*cos(tGuess)   # x-guess 
+                yN1 = rmax*sin(tGuess)   # y-guess          
               
-           elif err < 0:
+            elif err < 0:
                
-              tF = tGuess             # Update FAR PT. [tN,tGuess,tF] 
-              tGuess = (tF+tN)/2      # New Guess
-              xN1 = rmin*cos(tGuess)   # x-guess 
-              yN1 = rmax*sin(tGuess)   # y-guess  
+                tF = tGuess             # Update FAR PT. [tN,tGuess,tF] 
+                tGuess = (tF+tN)/2      # New Guess
+                xN1 = rmin*cos(tGuess)   # x-guess 
+                yN1 = rmax*sin(tGuess)   # y-guess  
               
             
-           #compute error
-           err = ( ds - sqrt( (xN1-xP)**2 + (yN1-yP)**2 ) )
+            #compute error
+            err = ( ds - sqrt( (xN1-xP)**2 + (yN1-yP)**2 ) )
 
 
         #save values
@@ -301,25 +301,27 @@ def compute_Curvatures(ds,angs,rmin,rmax,xLag,yLag):
     #      -THIS MAKES INITIAL BEAM CONFIGURATION THE DESIRED CURAVTURE!!
     for ii in range(N):
        
-       if ii==0:
+        if ii==0:
        
             # Pts Xp -> Xq -> Xr (same as beam force calc.)
             Xp = xLag[-1]; Xq = xLag[ii]; Xr = xLag[ii+1]
             Yp = yLag[-1]; Yq = yLag[ii]; Yr = yLag[ii+1]
        
-       elif ii<N-1:
+        elif ii<N-1:
        
             # Pts Xp -> Xq -> Xr (same as beam force calc.)
             Xp = xLag[ii-1]; Xq = xLag[ii]; Xr = xLag[ii+1]
             Yp = yLag[ii-1]; Yq = yLag[ii]; Yr = yLag[ii+1]
            
-       else:
+        else:
            
             # Pts Xp -> Xq -> Xr (same as beam force calc.)
             Xp = xLag[ii-1]; Xq = xLag[ii]; Xr = xLag[0]
             Yp = yLag[ii-1]; Yq = yLag[ii]; Yr = yLag[0]
-            
-       C[ii] = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) #Cross product btwn vectors
+        
+        # Small numbers here, roundoff error can make result slightly different
+        #   from what you get in MATLAB.
+        C[ii] = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) #Cross product btwn vectors
        
     return C
 
