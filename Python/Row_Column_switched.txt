@@ -1,4 +1,9 @@
 List of all functions which have been optimized for row-major language
 
-give_NonZero_Delta_Indices_XY (returns MATLAB matching arrays)
-    --give_1D_NonZero_Delta_Indices (return's transpose of MATLAB)
+please_Move_Lagrangian_Point_Positions (it's not clear this can be fixed any more)
+    give_NonZero_Delta_Indices_XY (returns MATLAB matching arrays)
+        --give_1D_NonZero_Delta_Indices (return's transpose of MATLAB)
+        
+    give_Eulerian_Lagrangian_Distance (nothing to be done. return is based on input)
+    give_Delta_Kernel (nothing to be done. return is based on input)
+    give_Me_Perturbed_Distance (nothing to be done. sums over rows of input!)

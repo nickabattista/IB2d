@@ -55,6 +55,17 @@ from math import sqrt
 def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     dt, grid_Info,porous_Yes):
     ''' Moves Lagrangian point positions
+        u: 2D array
+        v: 2D array
+        xL_P:
+        yL_P:
+        xL_H:
+        yL_H:
+        x:
+        y:
+        dt:
+        grid_Info:
+        porous_Yes:
     
     Returns:
         xL_Next: 
@@ -89,6 +100,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     yL_H_ReSize = np.stack(yL_H_ReSize,axis=-1)
 
     # Finds distance between specified Eulerian data and nearby Lagrangian data
+    # x is a 1D array. x[xInds] is a 2D array of values in x
     distX = give_Eulerian_Lagrangian_Distance(x[xInds], xL_H_ReSize, Lx)
     distY = give_Eulerian_Lagrangian_Distance(y[yInds], yL_H_ReSize, Ly)
 
@@ -181,8 +193,9 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
 
     #Repeat x-Indices for Non-Zero y-Indices!
     xInds = []
+    xIndsAux_T = xIndsAux.T
     for ii in range(supp):
-       xInds.append(xIndsAux.T) #Sets up x-INDEX matrix bc we consider BOTH dimensions
+       xInds.append(xIndsAux_T) #Sets up x-INDEX matrix bc we consider BOTH dimensions
     #this is a list of matrices. concatenate in horiz direction
     xInds = np.hstack(xInds)
     
@@ -200,7 +213,7 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     yInds = np.stack(yInds,axis=-1)
     
     #these are indices, so return ints
-    #This return is consistent with MATLAB code column-major
+    #This return is consistent with MATLAB code
     return (xInds.astype('int'),yInds.astype('int'))
 
 
