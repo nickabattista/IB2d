@@ -38,7 +38,7 @@ concentration = 0       % 0 (for no) or 1 (for yes)
 
 % PRINTING INFORMATION
 print_dump = 20          % How often to print (PLOT) to screen
-plot_Matplotlib = 1      % Plot in Matplotlib? (1=YES, 0=NO)
+plot_Matplotlib = 0      % Plot in Matplotlib? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab

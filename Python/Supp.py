@@ -182,7 +182,7 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     #Repeat x-Indices for Non-Zero y-Indices!
     xInds = []
     for ii in range(supp):
-       xInds.append(xIndsAux) #Sets up x-INDEX matrix bc we consider BOTH dimensions
+       xInds.append(xIndsAux.T) #Sets up x-INDEX matrix bc we consider BOTH dimensions
     #this is a list of matrices. concatenate in horiz direction
     xInds = np.hstack(xInds)
     
@@ -194,12 +194,13 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     yInds = []
     for ii in range(supp):
         for jj in range(supp):
-            yInds.append(yIndsAux[:,ii]) #Sets up y-INDEX matrix bc we consider
+            yInds.append(yIndsAux[ii,:]) #Sets up y-INDEX matrix bc we consider
                                          #  BOTH dimensions
     #this is a list of 1-D arrays. turn them into columns and stack horizontally
     yInds = np.stack(yInds,axis=-1)
     
     #these are indices, so return ints
+    #This return is consistent with MATLAB code column-major
     return (xInds.astype('int'),yInds.astype('int'))
 
 
@@ -304,14 +305,18 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     for ii in range(supp):
         indices.append(ind_Aux)
     #this is a list of 1-D arrays. stack them along a new axis
-    indices = np.stack(indices,axis=-1)
+    # slot in as columns
+    # indices = np.stack(indices,axis=-1)
+    #stack rows on top of each other
+    indices = np.vstack(indices)
     #
     for ii in range(supp):
-        indices[:,ii] = indices[:,ii] + -supp/2+1+ii
+        indices[ii,:] = indices[ii,:] + -supp/2+1+ii
 
     # Translate indices between {0,2,..,N-1}
     indices = (indices-1) % N
-
+    
+    # Returns the transpose of the MATLAB code
     return indices
     
 ################################################################################

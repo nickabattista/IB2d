@@ -1,0 +1,4 @@
+List of all functions which have been optimized for row-major language
+
+give_NonZero_Delta_Indices_XY (returns MATLAB matching arrays)
+    --give_1D_NonZero_Delta_Indices (return's transpose of MATLAB)
