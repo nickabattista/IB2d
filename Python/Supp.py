@@ -193,27 +193,19 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
 
     #Repeat x-Indices for Non-Zero y-Indices!
     xInds = []
-    xIndsAux_T = xIndsAux.T
-    for ii in range(supp):
-       xInds.append(xIndsAux_T) #Sets up x-INDEX matrix bc we consider BOTH dimensions
-    #this is a list of matrices. concatenate in horiz direction
-    xInds = np.hstack(xInds)
+    #Sets up x-INDEX matrix bc we consider BOTH dimensions
+    xInds = np.tile(xIndsAux,(1,supp)) #tiles matrix in horiz direction
     
 
     #Give y-dimension Non-Zero Delta Indices
     yIndsAux = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp)
 
     #Repeat y-Indices for Non-Zero x-Indices!
-    yInds = []
-    for ii in range(supp):
-        for jj in range(supp):
-            yInds.append(yIndsAux[ii,:]) #Sets up y-INDEX matrix bc we consider
-                                         #  BOTH dimensions
-    #this is a list of 1-D arrays. turn them into columns and stack horizontally
-    yInds = np.stack(yInds,axis=-1)
+    yInds = np.repeat(yIndsAux,supp,axis=1) #repeats each element horizontally
+                                            #   supp number of times
+    #Sets up y-INDEX matrix bc we consider BOTH dimensions
     
     #these are indices, so return ints
-    #This return is consistent with MATLAB code
     return (xInds.astype('int'),yInds.astype('int'))
 
 
@@ -314,22 +306,16 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     ind_Aux = np.floor(lagPts_j/dx + 1)
 
     # Get all the different x indices that must be considered.
-    indices = []
-    for ii in range(supp):
-        indices.append(ind_Aux)
-    #this is a list of 1-D arrays. stack them along a new axis
-    # slot in as columns
-    # indices = np.stack(indices,axis=-1)
-    #stack rows on top of each other
-    indices = np.vstack(indices)
+    # ind_Aux is 1D. Create 2D array with supp # of columns of ind_Aux
+    indices = np.tile(ind_Aux,(supp,1)).T #stack then transpose row vector
+
     #
-    for ii in range(supp):
-        indices[ii,:] = indices[ii,:] + -supp/2+1+ii
+    indices += -supp/2+1+np.arange(supp) #arange returns row array, which
+                                         # broadcasts down each column.
 
     # Translate indices between {0,2,..,N-1}
     indices = (indices-1) % N
     
-    # Returns the transpose of the MATLAB code
     return indices
     
 ################################################################################
