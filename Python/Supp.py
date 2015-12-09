@@ -219,7 +219,6 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
     Returns:
         distance: distance'''
 
-    row,col = x.shape
     distance = abs( x - y )
     distance = np.minimum(distance,L-distance) #element-wise minima
     
@@ -250,6 +249,7 @@ def give_Delta_Kernel(x,dx):
     RMAT = np.abs(x)/dx
 
     #Alias the data for cleaner writing of the following step
+    #   RMAT is altered, but it will not be reused.
     delta = RMAT
 
     #Loops over to find delta approximation

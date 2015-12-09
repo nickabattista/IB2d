@@ -27,6 +27,7 @@
 
 from math import sqrt
 import numpy as np
+from numba import jit
  
 ################################################################################
 #
@@ -247,8 +248,8 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
     #   They are not assigned to, so aliasing is faster.
     
     Nmuscles = muscles.shape[0]      # # of Muscles
-    m_1 = muscles[:,0]     # Initialize storage for MASTER NODE Muscle Connection
-    m_2 = muscles[:,1]     # Initialize storage for SLAVE NODE Muscle Connection
+    id_Master = muscles[:,0].astype('int')     # MASTER NODE Muscle Connections
+    id_Slave = muscles[:,1].astype('int')      # SLAVE NODE Muscle Connections
     LFO_Vec = muscles[:,2] # Stores length for max. muscle tension
     SK_Vec = muscles[:,3]  # Stores muscle constant
     a_Vec = muscles[:,4]   # Stores Hill Parameter, a
@@ -257,49 +258,43 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    
+    xPt = xLag[id_Master]        # x-Pt of interest at the moment to drive 
+                                 #  muscle contraction
+    
+    dx = xLag[id_Slave] - xLag[id_Master]  # x-Distance btwn slave and master node
+    dy = yLag[id_Slave] - yLag[id_Master]  # y-Distance btwn slave and master node
+    LF = np.sqrt( dx**2 + dy**2 )          # Euclidean DISTANCE between master and slave node
+    
+    
+    dx_P = xLag_P[id_Slave] - xLag_P[id_Master]  # x-Distance btwn slave and master node
+    dy_P = yLag_P[id_Slave] - yLag_P[id_Master]  # y-Distance btwn slave and master node
+    LF_P = np.sqrt( dx_P**2 + dy_P**2 )          # Euclidean DISTANCE between master and slave node
+    
+    v =  np.abs(LF-LF_P)/dt        # How fast the muscle is contracting/expanding
+    
+    # Find actual muscle activation magnitude
+    # This function is user defined and included with main2d.
+    #   In this Python code, it takes in vectors instead of scalars.
+    #   Universal numpy functions could probably deal with this if you don't 
+    #   want to port the vectorization.
+    #   BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.  
+    Fm = give_Muscle_Activation(v,LF,LFO_Vec,SK_Vec,a_Vec,b_Vec,FMAX_Vec,\
+                                current_time,xPt,np.array(xLag))
+    
+    mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
+    mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
 
     for ii in range(Nmuscles):
         
-        id_Master = int(m_1[ii])     # Master Node index for i-th muscle
-        id_Slave = int(m_2[ii])      # Slave Node index for i-th muscle
-        LFO = LFO_Vec[ii]            # Length for max. muscle tension for i-th muscle
-        sk = SK_Vec[ii]              # Muscle constant for i-th muscle
-        a = a_Vec[ii]                # Hill parameter, a, for i-th muscle
-        b = b_Vec[ii]                # Hill parameter, b, for i-th muscle
-        Fmax = FMAX_Vec[ii]          # Force-Maximum for i-th muscle
-        
-        xPt = xLag[id_Master]        # x-Pt of interest at the moment to drive 
-                                     #  muscle contraction
-        
-        dx = xLag[id_Slave] - xLag[id_Master]  # x-Distance btwn slave and master node
-        dy = yLag[id_Slave] - yLag[id_Master]  # y-Distance btwn slave and master node
-        LF = sqrt( dx**2 + dy**2 )             # Euclidean DISTANCE between master and slave node
-        
-        
-        dx_P = xLag_P[id_Slave] - xLag_P[id_Master]  # x-Distance btwn slave and master node
-        dy_P = yLag_P[id_Slave] - yLag_P[id_Master]  # y-Distance btwn slave and master node
-        LF_P = sqrt( dx_P**2 + dy_P**2 )             # Euclidean DISTANCE between master and slave node
-        
-        v =  abs(LF-LF_P)/dt        # How fast the muscle is contracting/expanding
-        
-        
-        # Find actual muscle activation magnitude
-        # This function is user defined and included with main2d
-        # BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
-        Fm = give_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,xPt,\
-                                    np.array(xLag))
-        
-        mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
-        mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
-        
-        fx[id_Master] = fx[id_Master] + mF_x  # Sum total forces for node,
+        fx[id_Master[ii]] += mF_x[ii]  # Sum total forces for node,
                         # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master] = fy[id_Master] + mF_y  # Sum total forces for node,
+        fy[id_Master[ii]] += mF_y[ii]  # Sum total forces for node,
                         # i in y-direction (this is MASTER node for this spring)
         
-        fx[id_Slave] = fx[id_Slave] - mF_x    # Sum total forces for node,
+        fx[id_Slave[ii]] -= mF_x[ii]    # Sum total forces for node,
                         # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave] = fy[id_Slave] - mF_y    # Sum total forces for node,
+        fy[id_Slave[ii]] -= mF_y[ii]    # Sum total forces for node,
                         # i in y-direction (this is SLAVE node for this spring)
                         
         return (fx,fy)
@@ -336,8 +331,8 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
     #   They are not assigned to, so aliasing is faster.
         
     Nmuscles = muscles3.shape[0]       # # of Muscles
-    m_1 = muscles3[:,0]      # Initialize storage for MASTER NODE Muscle Connection
-    m_2 = muscles3[:,1]      # Initialize storage for SLAVE NODE Muscle Connection
+    id_Master = muscles3[:,0].astype('int')      # MASTER NODE Muscle Connections
+    id_Slave = muscles3[:,1].astype('int')       # SLAVE NODE Muscle Connections
     LFO_Vec = muscles3[:,2]  # Stores length for max. muscle tension
     SK_Vec = muscles3[:,3]   # Stores muscle constant
     a_Vec = muscles3[:,4]    # Stores Hill Parameter, a
@@ -346,49 +341,42 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
-
+    
+    xPt = xLag[id_Master]     # x-Pt of interest at the moment to drive muscle contraction
+    
+    dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
+    dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
+    LF = np.sqrt( dx**2 + dy**2 )         # Euclidean DISTANCE between
+    
+    dx_P = xLag_P[id_Slave] - xLag_P[id_Master] # x-Distance btwn slave and master node
+    dy_P = yLag_P[id_Slave] - yLag_P[id_Master] # y-Distance btwn slave and master node
+    LF_P = np.sqrt( dx_P**2 + dy_P**2 )         # Euclidean DISTANCE between 
+                                                #   master and slave node
+                                                
+    v =  np.abs(LF-LF_P)/dt         # How fast the muscle is contracting/expanding
+    
+    # Find actual muscle activation magnitude
+    # This function is user defined and included with main2d.
+    #   In this Python code, it takes in vectors instead of scalars.
+    #   Universal numpy functions could probably deal with this if you don't 
+    #   want to port the vectorization.
+    #   BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
+    Fm = give_3_Element_Muscle_Activation(v,LF,LFO_Vec,SK_Vec,a_Vec,b_Vec,\
+                                    FMAX_Vec,current_time,xPt,np.array(xLag))
+        
+    mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
+    mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
+    
     for ii in range(Nmuscles):
         
-        id_Master = m_1[ii]          # Master Node index for i-th muscle
-        id_Slave = m_2[ii]           # Slave Node index for i-th muscle
-        LFO = LFO_Vec[ii]            # Length for max. muscle tension for i-th muscle
-        sk = SK_Vec[ii]              # Muscle constant for i-th muscle
-        a = a_Vec[ii]                # Hill parameter, a, for i-th muscle
-        b = b_Vec[ii]                # Hill parameter, b, for i-th muscle
-        Fmax = FMAX_Vec[ii]          # Force-Maximum for i-th muscle
-        
-        xPt = xLag[ id_Master ]     # x-Pt of interest at the moment to drive muscle contraction
-        
-        dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
-        dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
-        LF = sqrt( dx**2 + dy**2 )            # Euclidean DISTANCE between 
-                                              #   master and slave node
-        
-        
-        dx_P = xLag_P[id_Slave] - xLag_P[id_Master] # x-Distance btwn slave and master node
-        dy_P = yLag_P[id_Slave] - yLag_P[id_Master] # y-Distance btwn slave and master node
-        LF_P = sqrt( dx_P**2 + dy_P**2 )            # Euclidean DISTANCE between 
-                                                    #   master and slave node
-        
-        v =  abs(LF-LF_P)/dt         # How fast the muscle is contracting/expanding 
-
-        # Find actual muscle activation magnitude
-        # This function is user defined and included with main2d
-        # BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
-        Fm = give_3_Element_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,\
-            xPt,np.array(xLag))
-        
-        mF_x = Fm*(dx/LF)           # cos(theta) = dx / LF;
-        mF_y = Fm*(dy/LF)           # sin(theta) = dy / LF;
-        
-        fx[id_Master] = fx[id_Master] + mF_x  # Sum total forces for node,
+        fx[id_Master[ii]] += mF_x[ii]  # Sum total forces for node,
                         # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master] = fy[id_Master] + mF_y  # Sum total forces for node, 
+        fy[id_Master[ii]] += mF_y[ii]  # Sum total forces for node, 
                         # i in y-direction (this is MASTER node for this spring)
         
-        fx[id_Slave] = fx[id_Slave] - mF_x    # Sum total forces for node, 
+        fx[id_Slave[ii]] -= mF_x[ii]    # Sum total forces for node, 
                         # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave] = fy[id_Slave] - mF_y    # Sum total forces for node, 
+        fy[id_Slave[ii]] -= mF_y[ii]    # Sum total forces for node, 
                         # i in y-direction (this is SLAVE node for this spring)
         
     return (fx,fy)
@@ -418,35 +406,30 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     #leng = Tx.shape[0]               # # of Lagrangian Pts.
 
     Nsprings = springs.shape[0]  # # of Springs
-    sp_1 = springs[:,0]   # Initialize storage for MASTER NODE Spring Connection
-    sp_2 = springs[:,1]   # Initialize storage for SLAVE NODE Spring Connection
+    id_Master = springs[:,0]   # MASTER NODE Spring Connections
+    id_Slave = springs[:,1]   # SLAVE NODE Spring Connections
     K_Vec = springs[:,2]  # Stores spring stiffness associated with each spring
     RL_Vec = springs[:,3] # Stores spring resting length associated with each spring
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    
+    dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
+    dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
+    
+    sF_x = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dx/np.sqrt(dx**2+dy**2))
+    sF_y = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dy/np.sqrt(dx**2+dy**2))
 
     for ii in range(Nsprings):
         
-        id_Master = sp_1[ii]          # Master Node index
-        id_Slave = sp_2[ii]           # Slave Node index
-        k_Spring = K_Vec[ii]          # Spring stiffness of i-th spring
-        L_r = RL_Vec[ii]              # Resting length of i-th spring
-        
-        dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
-        dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
-        
-        sF_x = k_Spring * ( sqrt(dx**2 + dy**2) - L_r ) * ( dx / sqrt(dx**2+dy**2) )
-        sF_y = k_Spring * ( sqrt(dx**2 + dy**2) - L_r ) * ( dy / sqrt(dx**2+dy**2) )
-        
-        fx[id_Master] = fx[id_Master] + sF_x  # Sum total forces for node,
+        fx[id_Master[ii]] += sF_x[ii]  # Sum total forces for node,
                         # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master] = fy[id_Master] + sF_y  # Sum total forces for node, 
+        fy[id_Master[ii]] += sF_y[ii]  # Sum total forces for node, 
                         # i in y-direction (this is MASTER node for this spring)
         
-        fx[id_Slave] = fx[id_Slave] - sF_x    # Sum total forces for node, 
+        fx[id_Slave[ii]] -= sF_x[ii]    # Sum total forces for node, 
                         # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave] = fy[id_Slave] - sF_y    # Sum total forces for node, 
+        fy[id_Slave[ii]] -= sF_y[ii]    # Sum total forces for node, 
                         # i in y-direction (this is SLAVE node for this spring)
 
     # MIGHT NOT NEED THESE!
@@ -477,7 +460,7 @@ def give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses):
         fy_mass:
         F_mass:'''
 
-    IDs = masses[:,0]                 # Stores Lag-Pt IDs in col vector
+    IDs = masses[:,0].astype('int')   # Stores Lag-Pt IDs in col vector
     xPts= masses[:,1]                 # Original x-Values of x-Mass Pts.
     yPts= masses[:,2]                 # Original y-Values of y-Mass Pts.
     kStiffs = masses[:,3]             # Stores "spring" stiffness parameter
@@ -487,16 +470,15 @@ def give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses):
     fx = np.zeros(xLag.size) # Initialize storage for x-force density from TARGET PTS
     fy = np.zeros(xLag.size) # Initialize storage for y-force density from TARGET PTS
 
-    for ii in range(N_masses):
-        fx[int(IDs[ii])] = fx[int(IDs[ii])] + kStiffs[ii]*( xPts[ii] - xLag[int(IDs[ii])] )
-        fy[int(IDs[ii])] = fy[int(IDs[ii])] + kStiffs[ii]*( yPts[ii] - yLag[int(IDs[ii])] ) 
+    fx[IDs] = fx[IDs] + kStiffs*( xPts - xLag[IDs] )
+    fy[IDs] = fy[IDs] + kStiffs*( yPts - yLag[IDs] ) 
        
     fx_mass = fx # alias only
     fy_mass = fy # alias only
     
     F_Mass = np.empty((fx.shape[0],2))
-    F_Mass[:,1] = fx  # Store for updating massive boundary pts
-    F_Mass[:,2] = fy  # Store for updating massive boundary pts
+    F_Mass[:,0] = fx  # Store for updating massive boundary pts
+    F_Mass[:,1] = fy  # Store for updating massive boundary pts
     
     return (fx_mass, fy_mass, F_Mass)
     
@@ -521,7 +503,7 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
         fx_target:
         fy_target:'''
 
-    IDs = targets[:,0]                 # Stores Lag-Pt IDs in col vector
+    IDs = targets[:,0].astype('int')   # Stores Lag-Pt IDs in col vector
     xPts= targets[:,1]                 # Original x-Values of x-Target Pts.
     yPts= targets[:,2]                 # Original y-Values of y-Target Pts.
     kStiffs = targets[:,3]             # Stores Target Stiffnesses 
@@ -531,9 +513,8 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
     fx = np.zeros(xLag.size)  # Initialize storage for x-force density from TARGET PTS
     fy = np.zeros(xLag.size)  # Initialize storage for y-force density from TARGET PTS
 
-    for ii in range(N_targets):
-        fx[int(IDs[ii])] = fx[int(IDs[ii])] + kStiffs[ii]*( xPts[ii] - xLag[int(IDs[ii])] )
-        fy[int(IDs[ii])] = fy[int(IDs[ii])] + kStiffs[ii]*( yPts[ii] - yLag[int(IDs[ii])] ) 
+    fx[IDs] = fx[IDs] + kStiffs*( xPts - xLag[IDs] )
+    fy[IDs] = fy[IDs] + kStiffs*( yPts - yLag[IDs] )
 
 
     fx_target = fx  # alias only
@@ -569,43 +550,36 @@ def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
 
 
     Nbeams = beams.shape[0]     # # of Beams
-    pts_1 = beams[:,0]  # Initialize storage for 1ST NODE for BEAM
-    pts_2 = beams[:,1]  # Initialize storage for MIDDLE NODE (2ND Node) for BEAM
-    pts_3 = beams[:,2]  # Initialize storage for 3RD NODE for BEAM
+    pts_1 = beams[:,0].astype('int')  # 1ST NODES for BEAM
+    pts_2 = beams[:,1].astype('int')  # MIDDLE NODES (2ND Node) for BEAM
+    pts_3 = beams[:,2].astype('int')  # 3RD NODES for BEAM
     K_Vec = beams[:,3]  # Stores spring stiffness associated with each spring
     C_Vec = beams[:,4]  # Stores spring resting length associated with each spring
 
     fx = np.zeros(Nb)                # Initialize storage for x-forces
     fy = np.zeros(Nb)                # Initialize storage for y-forces
-
+    
+    Xp = xLag[pts_1]          # xPt of 1ST Node Pt. in beam
+    Xq = xLag[pts_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
+    Xr = xLag[pts_3]          # xPt of 3RD Node Pt. in beam
+    
+    Yp = yLag[pts_1]         # yPt of 1ST Node Pt. in beam
+    Yq = yLag[pts_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
+    Yr = yLag[pts_3]         # yPt of 3RD Node Pt. in beam
+    
+    bF_x =  K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Yq-Yp) + (Yr-Yq) )
+    bF_y = -K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Xr-Xq) + (Xq-Xp) )
+    
+    #bF_x = -K_Vec * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Yq-Yp) + (Yr-Yq) )
+    #bF_y = -K_Vec * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  -(Xr-Xq) - (Xq-Xp) )
+    
+    # Want to preserve the ability for the same id_2 to be assigned twice, so
+    #   need a loop here.
     for ii in range(Nbeams):
-        
-        id_1 = int(pts_1[ii])  # 1ST Node index
-        id_2 = int(pts_2[ii])  # (MIDDLE) 2nd Node index -> 
-                               #           index that gets force applied to it!
-        id_3 = int(pts_3[ii])  # 3RD Node index
-        k_Beam = K_Vec[ii]     # Beam stiffness of i-th spring
-        C = C_Vec[ii]          # Curvature of the beam between these three nodes 
-        
-        Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
-        Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
-        Xr = xLag[id_3]          # xPt of 3RD Node Pt. in beam
-        
-        Yp = yLag[id_1]         # yPt of 1ST Node Pt. in beam
-        Yq = yLag[id_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
-        Yr = yLag[id_3]         # yPt of 3RD Node Pt. in beam
-        
-        bF_x =  k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) )
-        bF_y = -k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) )
-        
-        #bF_x = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) )
-        #bF_y = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  -(Xr-Xq) - (Xq-Xp) )
-        
-        fx[id_2] = fx[id_2] + bF_x  # Sum total forces for middle node,
+        fx[pts_2[ii]] += bF_x[ii]  # Sum total forces for middle node,
                             # in x-direction (this is MIDDLE node for this beam)
-        fy[id_2] = fy[id_2] + bF_y  # Sum total forces for middle node, 
+        fy[pts_2[ii]] += bF_y[ii]  # Sum total forces for middle node, 
                             # in y-direction (this is MIDDLE node for this beam)
-
 
     # MIGHT NOT NEED THESE!
     #fx = fx/ds**2
@@ -654,15 +628,15 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     # Matrix of possible indices, augmented by "supp"-copies to perform subtractions later in LAGRANGIAN FRAME
     indLagAux = np.arange(Nb)
     # Create copies of indLagAux row vector, stacked vertically.
-    # Then transpose to agree with current column major code
-    ind_Lag = np.vstack(indLagAux for ii in range(int(supp))).T
+    # Then transpose to get column vectors
+    ind_Lag = np.tile(indLagAux,(supp,1)).T.astype('int')
 
 
     # Compute distance between Eulerian Pts. and Lagrangian Pts. by passing correct indices for each
     distX = give_Eulerian_Lagrangian_Distance(x[indX.astype('int')],\
-        xLag[ind_Lag.astype('int')],Lx)
+        xLag[ind_Lag],Lx)
     distY = give_Eulerian_Lagrangian_Distance(y[indY.astype('int')],\
-        yLag[ind_Lag.astype('int')],Ly) #Python: remove transpose - matches indY
+        yLag[ind_Lag],Ly) #Python: remove transpose - matches indY
                                         # Result is now tranpose of original code
 
 
@@ -674,19 +648,9 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     delta_1D_x = give_Delta_Kernel(distX, dx)
     delta_1D_y = give_Delta_Kernel(distY, dy)
 
-
+    delta_X[ind_Lag,indX.astype('int')] = delta_1D_x
+    delta_Y[indY.astype('int'),ind_Lag] = delta_1D_y
     row,col = ind_Lag.shape
-    for ii in range(row):
-        for jj in range(col):
-            
-            # Get Eulerian/Lagrangian indices to use for saving non-zero delta-function values
-            xID = indX[ii,jj]
-            indy= ind_Lag[ii,jj]
-            yID = indY[ii,jj] #Python: now indicies don't need to be switched
-            
-            # Store non-zero delta-function values into delta_X / delta_Y matrices at correct indices!
-            delta_X[indy,xID] = delta_1D_x[ii,jj]
-            delta_Y[yID,indy] = delta_1D_y[ii,jj] #now return transpose
 
     return (delta_X, delta_Y)
     
@@ -715,16 +679,15 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     ind_Aux = np.floor(lagPts_j/dx + 1)
 
     # Get all the different x indices that must be considered.
-    indices = np.vstack(ind_Aux for ii in range(int(supp))) #ind_Aux is each row
+    indices = np.tile(ind_Aux,(supp,1)).T #ind_Aux is each row
     #
-    for ii in range(int(supp)):
-        indices[ii,:] = indices[ii,:] + -supp/2+1+ii
+    indices += -supp/2+1+np.arange(supp) #arange returns row array, which
+                                         # broadcasts down each column.
 
     # Translate indices between {0,2,..,N-1}
     indices = (indices-1) % N
     
-    # Transpose to work with current column-major code
-    return indices.T
+    return indices
     
 
     
@@ -736,7 +699,9 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
 ################################################################################
 
 def give_Eulerian_Lagrangian_Distance(x, y, L):
-    ''' Distance between Eulerian grid data x and Lagrangian grid data y within [0,L]
+    ''' Find dist. between Eulerian grid data and Lagrangian grid data.
+    [0,L] has periodic boundary condition, so in actuality, the greatest
+    distance possible is L/2.
     
     Args:
         x: 2D ndarray (Eulerian data)
@@ -744,15 +709,10 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
         L: Length of domain, [0,L]
         
     Returns:
-        distance:'''
+        distance: distance'''
 
-    row,col = x.shape
     distance = np.abs( x - y )
-    for ii in range(row):
-        for jj in range(col):
-            distance[ii,jj] = min( distance[ii,jj], L-distance[ii,jj] ) 
-            #Note: need to make sure that taking correct value
-            #CHRISTOPHER'S NOTE: This looks like an error to me!
+    distance = np.minimum(distance,L-distance) #element-wise minima
 
     return distance
 
@@ -767,6 +727,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
+@jit
 def give_Delta_Kernel(x,dx):
     ''' Compute discrete approx. to 1D delta function over x, dx.
     Support is in [x-2dx, x+2dx].
@@ -781,8 +742,9 @@ def give_Delta_Kernel(x,dx):
     # Computes Dirac-delta Approximation.
     RMAT = np.abs(x)/dx
 
-    #Initialize delta
-    delta = np.array(RMAT)
+    #Alias the data for cleaner writing of the following step
+    #   RMAT is altered, but it will not be reused.
+    delta = RMAT
 
     #Loops over to find delta approximation
     row,col = x.shape
