@@ -89,15 +89,11 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
 
     # ReSize the xL_H and yL_H matrices for use in the Dirac-delta function
     #        values to find distances between corresponding Eulerian data and them
-    xLH_aux = xL_H % Lx; xL_H_ReSize = []
-    yLH_aux = yL_H % Ly; yL_H_ReSize = []
-
-    for ii in range(supp**2):
-       xL_H_ReSize.append(xLH_aux)
-       yL_H_ReSize.append(yLH_aux)
-    #xL_H and yL_H are vectors. stack them along a new column axis 
-    xL_H_ReSize = np.stack(xL_H_ReSize,axis=-1)
-    yL_H_ReSize = np.stack(yL_H_ReSize,axis=-1)
+    xLH_aux = xL_H % Lx
+    yLH_aux = yL_H % Ly
+    # Stack copies of the row vector and then transpose
+    xL_H_ReSize = np.tile(xLH_aux,(supp**2,1)).T
+    yL_H_ReSize = np.tile(yLH_aux,(supp**2,1)).T
 
     # Finds distance between specified Eulerian data and nearby Lagrangian data
     # x is a 1D array. x[xInds] is a 2D array of values in x
@@ -133,26 +129,17 @@ def give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds):
     ''' Computes the integral to move each Lagrangian Pt.
     
     Args:
-        u:        x-component of velocity
-        v:        y-component of velocity
-        delta_X:  values of Dirac-delta function in x-direction
-        delta_Y:  values of Dirac-delta function in y-direction
-        xInds:    x-Indices on fluid grid
-        yInds:    y-Indices on fluid grid'''
+        u:        x-component of velocity (2D array)
+        v:        y-component of velocity (2D array)
+        delta_X:  values of Dirac-delta function in x-direction (2D array)
+        delta_Y:  values of Dirac-delta function in y-direction (2D array)
+        xInds:    x-Indices on fluid grid (2D array)
+        yInds:    y-Indices on fluid grid (2D array)'''
 
-    row,col = xInds.shape
-    mat_X = np.zeros((row,col))  # Initialize matrix for storage
-    mat_Y = np.zeros((row,col))  # Initialize matrix for storage
-    for ii in range(row):
-        for jj in range(col):
-            
-            # Get Eulerian indices to use for velocity grids, u and 
-            xID = xInds[ii,jj]
-            yID = yInds[ii,jj]
-            
-            # Compute integrand 'stencil' of velocity x delta for each Lagrangian Pt!
-            mat_X[ii,jj] = u[yID,xID]*delta_X[ii,jj]*delta_Y[ii,jj]
-            mat_Y[ii,jj] = v[yID,xID]*delta_X[ii,jj]*delta_Y[ii,jj]
+    # Compute integrand 'stencil' of velocity x delta for each Lagrangian Pt!
+    # Fancy indexing allows us to do this directly
+    mat_X = u[yInds,xInds]*delta_X*delta_Y
+    mat_Y = v[yInds,xInds]*delta_X*delta_Y
 
             
     # Approximate Integral of Velocity x Delta for each Lagrangian Pt!
@@ -233,10 +220,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 
     row,col = x.shape
     distance = abs( x - y )
-    for ii in range(row):
-        for jj in range(col):
-            #Note: need to make sure that taking correct value
-            distance[ii,jj] = min(distance[ii,jj],L-distance[ii,jj])
+    distance = np.minimum(distance,L-distance) #element-wise minima
     
     return distance
 
@@ -261,9 +245,9 @@ def give_Delta_Kernel(x,dx):
         delta: delta function with support [x-2dx,x+2dx]'''
 
     # Computes Dirac-delta Approximation.
-    RMAT = abs(x)/dx
+    RMAT = np.abs(x)/dx
 
-    #Initialize delta
+    #Alias the data for cleaner writing of the following step
     delta = RMAT
 
     #Loops over to find delta approximation
@@ -307,7 +291,7 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
 
     # Get all the different x indices that must be considered.
     # ind_Aux is 1D. Create 2D array with supp # of columns of ind_Aux
-    indices = np.tile(ind_Aux,(supp,1)).T #stack then transpose row vector
+    indices = np.tile(ind_Aux,(supp,1)).T #stack row vectors then transpose
 
     #
     indices += -supp/2+1+np.arange(supp) #arange returns row array, which
