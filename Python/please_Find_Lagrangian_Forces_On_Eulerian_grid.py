@@ -28,6 +28,8 @@
 from math import sqrt
 import numpy as np
 from numba import jit
+from Supp import give_1D_NonZero_Delta_Indices
+from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
  
 ################################################################################
 #
@@ -653,111 +655,3 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     row,col = ind_Lag.shape
 
     return (delta_X, delta_Y)
-    
-    
-    
-###########################################################################
-#
-# FUNCTION finds the indices on the Eulerian grid where the 1D Dirac-delta
-# kernel is possibly non-zero is x-dimension.
-#
-###########################################################################
-
-def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
-    '''Find the indices on Eulerian grid where 1D delta kernel is poss. non-zero
-    
-    Args:
-        lagPts_j: 2D array of lagrangian pts for specific coordinate, j= x or y.
-        N: # spatial resolution of Eulerian grid in each dimension
-        dx: Spatial step-size on Eulerian (fluid) grid
-        supp: Size of support of the Dirac-delta kernel (should be even)
-        
-    Returns:
-        indices:''' 
-
-    # Finds the index of the lower left Eulerian pt. to Lagrangian pt..
-    ind_Aux = np.floor(lagPts_j/dx + 1)
-
-    # Get all the different x indices that must be considered.
-    indices = np.tile(ind_Aux,(supp,1)).T #ind_Aux is each row
-    #
-    indices += -supp/2+1+np.arange(supp) #arange returns row array, which
-                                         # broadcasts down each column.
-
-    # Translate indices between {0,2,..,N-1}
-    indices = (indices-1) % N
-    
-    return indices
-    
-
-    
-################################################################################
-#
-# FUNCTION distance between Eulerian grid data, x, and Lagrangian grid data, y, 
-#          at specifed pts typically and makes sure the distance are [0,L] accordingly.
-#
-################################################################################
-
-def give_Eulerian_Lagrangian_Distance(x, y, L):
-    ''' Find dist. between Eulerian grid data and Lagrangian grid data.
-    [0,L] has periodic boundary condition, so in actuality, the greatest
-    distance possible is L/2.
-    
-    Args:
-        x: 2D ndarray (Eulerian data)
-        y: 2D ndarray (Lagrangian data)
-        L: Length of domain, [0,L]
-        
-    Returns:
-        distance: distance'''
-
-    distance = np.abs( x - y )
-    distance = np.minimum(distance,L-distance) #element-wise minima
-
-    return distance
-
-    
-
-    
-###########################################################################
-#
-# FUNCTION: computes a discrete approx. to a 1D Dirac-delta function over a
-# specified matrix, x, and spatial step-size, dx. It will have support in
-# [x-2dx, x+2dx]
-#
-###########################################################################
-
-@jit
-def give_Delta_Kernel(x,dx):
-    ''' Compute discrete approx. to 1D delta function over x, dx.
-    Support is in [x-2dx, x+2dx].
-    
-    Args:
-        x:  Values in which the delta function will be evaulated
-        dx: Spatial step-size of grid
-        
-    Returns:
-        delta:'''
-
-    # Computes Dirac-delta Approximation.
-    RMAT = np.abs(x)/dx
-
-    #Alias the data for cleaner writing of the following step
-    #   RMAT is altered, but it will not be reused.
-    delta = RMAT
-
-    #Loops over to find delta approximation
-    row,col = x.shape
-    for ii in range(row):
-        for jj in range(col):
-            
-            r = RMAT[ii,jj]
-            
-            if r<1:
-                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
-            elif ( (r<2) and (r>=1) ):
-                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
-
-    return delta
-
-
