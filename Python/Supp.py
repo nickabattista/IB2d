@@ -43,7 +43,8 @@
 
 import numpy as np
 from math import sqrt
-
+from numba import jit
+    
 ################################################################################
 #
 # FUNCTION: Moves Lagrangian Point Positions by doing the integral,
@@ -234,6 +235,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
+@jit
 def give_Delta_Kernel(x,dx):
     ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
     
