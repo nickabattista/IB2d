@@ -419,9 +419,8 @@ def D(u,dz,string):
         u_z[:,0] = ( u[:,1] - u[:,length-1] ) / (2*dz)
         u_z[:,-1]= ( u[:,0] - u[:,length-2] ) / (2*dz)
 
-        #Standard Centered Difference 
-        for jj in range(1,length-1):
-            u_z[:,jj] = ( u[:,jj+1] - u[:,jj-1] ) / (2*dz)
+        #Standard Centered Difference
+        u_z[:,1:length-1] = ( u[:,2:length] - u[:,:length-2] ) / (2*dz)
 
     elif string=='y':
         
@@ -429,9 +428,8 @@ def D(u,dz,string):
         u_z[0,:] = ( u[1,:] - u[length-1,:] ) / (2*dz)
         u_z[length-1,:] = ( u[0,:] - u[length-2,:] ) / (2*dz)
 
-        #Standard Centered Difference 
-        for jj in range(1,length-1):
-            u_z[jj,:] = ( u[jj+1,:] - u[jj-1,:] ) / (2*dz)
+        #Standard Centered Difference
+        u_z[1:length-1,:] = ( u[2:length,:] - u[:length-2,:] ) / (2*dz)
         
     else:
         
@@ -470,8 +468,8 @@ def DD(u,dz,string):
         u_zz[:,-1] = ( u[:,0] - 2*u[:,length-1] + u[:,length-2] ) / (dz**2)
 
         #Standard Upwind Scheme (Centered Difference)
-        for jj in range(1,length-1):
-            u_zz[:,jj] = ( u[:,jj+1] - 2*u[:,jj] + u[:,jj-1] ) / (dz**2)
+        u_zz[:,1:length-1] = (u[:,2:length]-2*u[:,1:length-1]+u[:,:length-2])\
+                                / (dz**2)
 
     elif string=='y':
 
@@ -480,8 +478,8 @@ def DD(u,dz,string):
         u_zz[-1,:]= ( u[0,:] - 2*u[length-1,:] + u[length-2,:] ) / (dz**2)
 
         #Standard Upwind Scheme (Centered Difference)
-        for jj in range(1,length-1):
-            u_zz[jj,:] = ( u[jj+1,:] - 2*u[jj,:] + u[jj-1,:] ) / (dz**2)
+        u_zz[1:length-1,:] = (u[2:length,:]-2*u[1:length-1,:]+u[:length-2,:])\
+                                / (dz**2)
 
     else:
         
