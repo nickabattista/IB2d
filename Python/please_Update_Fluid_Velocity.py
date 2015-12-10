@@ -78,8 +78,8 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
 
 
     # Construct EULERIAN Index Matrices
-    idX = np.vstack(range(Nx) for ii in range(Nx))
-    idY = np.vstack(range(Ny) for ii in range(Ny)).T
+    idX = np.tile(np.arange(Nx),(Nx,1))
+    idY = np.tile(np.arange(Ny),(Ny,1)).T
 
 
     # Create FFT Operator (used for both half time-step and full time-step computations)
@@ -219,16 +219,10 @@ def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string)
 
 
     if string=='x':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                vel_hat[ii,jj] = ( rhs_VEL_hat[ii,jj] - \
-                1j*dt/(rho*dj)*sin(2*PI*idMat[ii,jj]/Nx)*p_hat[ii,jj] )/ A_hat[ii,jj]
+        vel_hat = ( rhs_VEL_hat - 1j*dt/(rho*dj)*sin(2*PI*idMat/Nx)*p_hat )/A_hat
 
     elif string=='y':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                vel_hat[ii,jj] = ( rhs_VEL_hat[ii,jj] - \
-                1j*dt/(rho*dj)*sin(2*PI*idMat[ii,jj]/Ny)*p_hat[ii,jj] )/ A_hat[ii,jj]
+        vel_hat = ( rhs_VEL_hat - 1j*dt/(rho*dj)*sin(2*PI*idMat/Ny)*p_hat )/A_hat
         
     return vel_hat
 
@@ -267,20 +261,12 @@ def give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,\
     rhs = np.zeros((Ny,Nx)) #initialize rhs
 
     if string=='x':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                rhs[ii,jj] = A[ii,jj] + dt/rho*( Fj[ii,jj] + \
-                mu/2*(Axx[ii,jj]+Ayy[ii,jj]) - \
-                0.5*rho*(A[ii,jj]*Ax[ii,jj] + B[ii,jj]*Ay[ii,jj]) - \
-                .5*rho*(A_sq_j[ii,jj] + AB_j[ii,jj] ) ) #RHS: u-component
+        rhs = A + dt/rho*( Fj + mu/2*(Axx+Ayy) - 0.5*rho*(A*Ax+B*Ay) -\
+                .5*rho*(A_sq_j+AB_j) ) #RHS: u-component
         
     elif string=='y':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                rhs[ii,jj] = A[ii,jj] + dt/rho*( Fj[ii,jj] + \
-                mu/2*(Axx[ii,jj]+Ayy[ii,jj]) - \
-                0.5*rho*(B[ii,jj]*Ax[ii,jj] + A[ii,jj]*Ay[ii,jj]) - \
-                .5*rho*(AB_j[ii,jj] + A_sq_j[ii,jj] ) ) #RHS: v-compoent
+        rhs = A + dt/rho*( Fj + mu/2*(Axx+Ayy) - 0.5*rho*(B*Ax+A*Ay) -\
+                .5*rho*(AB_j+A_sq_j) ) #RHS: v-compoent
        
     return rhs
 
@@ -318,18 +304,12 @@ def give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,string):
     rhs = np.zeros((Ny,Nx)) #initialize rhs
 
     if string=='x':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                rhs[ii,jj] = A[ii,jj] + .5*dt/rho*( Fj[ii,jj] - \
-                .5*rho*(A[ii,jj]*Ax[ii,jj] + B[ii,jj]*Ay[ii,jj]) - \
-                .5*rho*(A_sq_j[ii,jj] + AB_j[ii,jj] ) ) #RHS: u-component
+        #RHS: u-component
+        rhs = A + .5*dt/rho*( Fj - .5*rho*(A*Ax+B*Ay) - .5*rho*(A_sq_j+AB_j) )
         
     elif string=='y':
-        for ii in range(Ny):
-            for jj in range(Nx):
-                rhs[ii,jj] = A[ii,jj] + .5*dt/rho*( Fj[ii,jj] - \
-                .5*rho*(B[ii,jj]*Ax[ii,jj] + A[ii,jj]*Ay[ii,jj]) - \
-                .5*rho*(AB_j[ii,jj] + A_sq_j[ii,jj] ) ) #RHS: v-compoent
+        #RHS: v-compoent
+        rhs = A + .5*dt/rho*( Fj - .5*rho*(B*Ax+A*Ay) - .5*rho*(AB_j+A_sq_j) )
        
     return rhs
 
@@ -359,15 +339,14 @@ def give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat):
         p_hat:'''
 
     p_hat = np.zeros((Ny,Nx),dtype='complex') #initialize fluid pressure
-
-    for ii in range(Ny):
-        for jj in range(Nx):
-            num = -( 1j/dx*sin(2*PI*idX[ii,jj]/Nx)*rhs_u_hat[ii,jj] + \
-                     1j/dy*sin(2*PI*idY[ii,jj]/Ny)*rhs_v_hat[ii,jj] )
-            den = ( dt/rho*( (sin(2*PI*idX[ii,jj]/Nx)/dx)**2 + \
-                             (sin(2*PI*idY[ii,jj]/Ny)/dy)**2 ))
-            if not (ii==0 and jj==0): #this one is nan, and will be zeroed out anyway
-                p_hat[ii,jj] = num/den
+    
+    num = -( 1j/dx*sin(2*PI*idX/Nx)*rhs_u_hat + 1j/dy*sin(2*PI*idY/Ny)*rhs_v_hat )
+    den = ( dt/rho*( (sin(2*PI*idX/Nx)/dx)**2 + (sin(2*PI*idY/Ny)/dy)**2 ) )
+    
+    # Deal with nan in [0,0] entry
+    num[0,0] = 0; den[0,0] = 1
+    
+    p_hat = num/den
 
     # Zero out modes.
     p_hat[0,0] = 0

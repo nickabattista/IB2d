@@ -1,5 +1,3 @@
-it turns out row vs. column major doesn't matter much for ndarrays. What DOES
-    matter is that looping over arrays is about 10x-100x slower than using 
-    numPy array manipulation!! So, go through and kill all loops.
-    
 When reading in data, especially from input2d, use a dict for human readable code
+
+Kill loops in give_Me_Lag_Pt_Connects (not essential - this is a setup function)

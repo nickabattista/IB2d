@@ -106,16 +106,14 @@ def give_Me_Lagrangian_Derivatives(ds,Np,porous_info):
     xL_s = np.zeros(Np)
     yL_s = np.zeros(Np)
 
-    for ii in range(Np):
-        if ii==0:
-           xL_s[0] = ( xL[1] - xL[-1] ) / (2*ds)
-           yL_s[0] = ( yL[1] - yL[-1] ) / (2*ds)
-        elif ii<Np-1:
-           xL_s[ii] = ( xL[ii+1] - xL[ii-1] ) / (2*ds) 
-           yL_s[ii] = ( yL[ii+1] - yL[ii-1] ) / (2*ds)
-        else:
-           xL_s[ii] = ( xL[0] - xL[-2] ) / (2*ds)
-           yL_s[ii] = ( yL[0] - yL[-2] ) / (2*ds)
+    xL_s[0] = ( xL[1] - xL[-1] ) / (2*ds)
+    yL_s[0] = ( yL[1] - yL[-1] ) / (2*ds)
+
+    xL_s[1:-1] = ( xL[2:] - xL[:-2] ) / (2*ds) 
+    yL_s[1:-1] = ( yL[2:] - yL[:-2] ) / (2*ds)
+   
+    xL_s[-1] = ( xL[0] - xL[-2] ) / (2*ds)
+    yL_s[-1] = ( yL[0] - yL[-2] ) / (2*ds)
     
     return (xL_s,yL_s)
 
