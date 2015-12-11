@@ -834,27 +834,15 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
     else:
         space = 40*ds
         
-
-    #need to instantiate connectsMat or something...
-    connectsMat0 = []; connectsMat1 = []
-    for ii in range(N): #for i=1:N
-        if ii<N-1:
-            x1=xLag[ii]; x2=xLag[ii+1]
-            y1=yLag[ii]; y2=yLag[ii+1]
-            dist = sqrt( (x1-x2)**2 + (y1-y2)**2 )
-            if dist < space:
-                #The note here refers to Cpp notation (and .vtk counting)...
-                #   I'm guessing that means counting starts at 0 as in Python
-                connectsMat0.append(ii)   #For Cpp notation (and .vtk counting)
-                connectsMat1.append(ii+1) #For Cpp notation (and .vtk counting)
-        elif ii==N-1:
-            x1=xLag[ii]; x2=xLag[0]
-            y1=yLag[ii]; y2=yLag[0]
-            dist = sqrt( (x1-x2)**2 + (y1-y2)**2 )
-            if dist < space:
-                connectsMat0.append(N-1) #For Cpp notation (and .vtk counting)
-                connectsMat1.append(0)   #For Cpp notation (and .vtk counting)
-    connectsMat = np.array([connectsMat0,connectsMat1]).T
+    dist = np.zeros(N)
+    dist[:-1] = np.sqrt( (xLag[:-1]-xLag[1:])**2 + (yLag[:-1]-yLag[1:])**2 )
+    dist[-1] = sqrt( (xLag[-1]-xLag[0])**2 + (yLag[-1]-yLag[0])**2 )
+    #collect the indices where dist < space, for Cpp notation (and .vtk counting)
+    connectsMat0 = np.where(dist<space)[0] #always returns tuple of arrays of
+                                           # indices, so need first array in tuple
+    if connectsMat0.size > 0:
+        connectsMat1 = (connectsMat0 + 1) % N # N index should wrap back to 0
+    connectsMat = np.vstack((connectsMat0,connectsMat1)).T
     
     return (connectsMat,space)
 
