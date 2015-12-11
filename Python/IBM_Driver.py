@@ -53,10 +53,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         struct_name: structure name
         mu: dynamic viscosity
         rho: density
-        grid_Info: list of grid properties
+        grid_Info: dict of grid properties
         dt: time-step
         T_FINAL: final simulation time
-        model_Info: list of model structure properties
+        model_Info: dict of model structure properties
         
     Returns:
         X: here
@@ -87,23 +87,23 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     current_time = 0.0
     
     # GRID INFO #
-    Nx = grid_Info[0]   # num of Eulerian pts. in x-direction (int)
-    Ny = grid_Info[1]   # num of Eulerian pts. in y-direction (int)
-    Lx = grid_Info[2]   # Length of Eulerian grid in x-coordinate
-    Ly = grid_Info[3]   # Length of Eulerian grid in y-coordinate
-    dx = grid_Info[4]   # Spatial-size in x
-    dy = grid_Info[5]   # Spatial-size in y
-    supp = grid_Info[6] # Delta-function support
+    Nx = grid_Info['Nx']   # num of Eulerian pts. in x-direction (int)
+    Ny = grid_Info['Ny']   # num of Eulerian pts. in y-direction (int)
+    Lx = grid_Info['Lx']   # Length of Eulerian grid in x-coordinate
+    Ly = grid_Info['Ly']   # Length of Eulerian grid in y-coordinate
+    dx = grid_Info['dx']   # Spatial-size in x
+    dy = grid_Info['dy']   # Spatial-size in y
+    supp = grid_Info['supp'] # Delta-function support
     
     # PRINTING/PLOTTING INFO #
-    pDump = grid_Info[7]        # Print (Plot) Dump interval
-    pMatplotlib = grid_Info[8]  # Plot in matplotlib? (1=YES,0=NO)
-    lagPlot = grid_Info[9]      # Plot LAGRANGIAN PTs ONLY in matplotlib
-    velPlot = grid_Info[10]     # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
-    vortPlot = grid_Info[11]    # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
-    uMagPlot = grid_Info[12]    # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
-                                #   colormap in matplotlib
-    pressPlot = grid_Info[13]   # Plot LAGRANTIAN PTs + PRESSURE colormap in matplotlib
+    pDump = grid_Info['pDump']              # Print (Plot) Dump interval
+    pMatplotlib = grid_Info['pMatplotlib']  # Plot in matplotlib? (1=YES,0=NO)
+    lagPlot = grid_Info['lagPlot'] # Plot LAGRANGIAN PTs ONLY in matplotlib
+    velPlot = grid_Info['velPlot']   # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
+    vortPlot = grid_Info['vortPlot'] # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
+    uMagPlot = grid_Info['uMagPlot'] # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
+                                     #   colormap in matplotlib
+    pressPlot = grid_Info['pressPlot'] # Plot LAGRANTIAN PTs + PRESSURE colormap in matplotlib
     
     
     # MODEL STRUCTURE DATA STORED #
@@ -129,7 +129,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     #Lagrangian Structure Data
     ds = Lx/(2.*Nx)             #Lagrangian Spacing
-    grid_Info[8] = ds
+    grid_Info['ds'] = ds
     
     
     # Create EULERIAN Mesh (these assume periodicity in x and y)
@@ -148,7 +148,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
     # READ IN LAGRANGIAN POINTS #
     Nb,xLag,yLag = read_Vertex_Points(struct_name)
-    grid_Info[7] = Nb          # num Total Number of Lagrangian Pts.
+    grid_Info['Nb'] = Nb          # num Total Number of Lagrangian Pts.
     xLag_P = xLag              # Initialize previous Lagrangian x-Values 
                                #   (for use in muscle-model)
     yLag_P = yLag              # Initialize previous Lagrangian y-Values 

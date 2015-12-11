@@ -66,15 +66,15 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
         p:'''
 
     # Initialize #
-    Nx =   grid_Info[0]
-    Ny =   grid_Info[1]
-    Lx =   grid_Info[2]
-    Ly =   grid_Info[3]
-    dx =   grid_Info[4]
-    dy =   grid_Info[5]
-    supp = grid_Info[6]
-    Nb =   grid_Info[7]
-    ds =   grid_Info[8]
+    Nx =   grid_Info['Nx']
+    Ny =   grid_Info['Ny']
+    Lx =   grid_Info['Lx']
+    Ly =   grid_Info['Ly']
+    dx =   grid_Info['dx']
+    dy =   grid_Info['dy']
+    supp = grid_Info['supp']
+    Nb =   grid_Info['Nb']
+    ds =   grid_Info['ds']
 
 
     # Construct EULERIAN Index Matrices

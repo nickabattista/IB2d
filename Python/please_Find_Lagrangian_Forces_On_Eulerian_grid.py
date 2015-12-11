@@ -82,15 +82,15 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
                    f = ( \LagPts_s * ( 1 - L / abs(\LagPts_s) )  )/ds^2'''
 
     # Grid Info - list#
-    Nx =    grid_Info[0] # # of Eulerian pts. in x-direction
-    Ny =    grid_Info[1] # # of Eulerian pts. in y-direction
-    Lx =    grid_Info[2] # Length of Eulerian grid in x-coordinate
-    Ly =    grid_Info[3] # Length of Eulerian grid in y-coordinate
-    dx =    grid_Info[4] # Spatial-size in x
-    dy =    grid_Info[5] # Spatial-size in y
-    supp =  grid_Info[6] # Delta-function support
-    Nb =    grid_Info[7] # # of Lagrangian pts. 
-    ds =    grid_Info[8] # Lagrangian spacing
+    Nx =    grid_Info['Nx'] # # of Eulerian pts. in x-direction
+    Ny =    grid_Info['Ny'] # # of Eulerian pts. in y-direction
+    Lx =    grid_Info['Lx'] # Length of Eulerian grid in x-coordinate
+    Ly =    grid_Info['Ly'] # Length of Eulerian grid in y-coordinate
+    dx =    grid_Info['dx'] # Spatial-size in x
+    dy =    grid_Info['dy'] # Spatial-size in y
+    supp =  grid_Info['supp'] # Delta-function support
+    Nb =    grid_Info['Nb'] # # of Lagrangian pts. 
+    ds =    grid_Info['ds'] # Lagrangian spacing
 
 
     # Model Potential Forces #
@@ -611,14 +611,14 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
         delta_Y:'''
 
     # Grid Info
-    Nx =   grid_Info[0]
-    Ny =   grid_Info[1]
-    Lx =   grid_Info[2]
-    Ly =   grid_Info[3]
-    dx =   grid_Info[4]
-    dy =   grid_Info[5]
-    supp = grid_Info[6]
-    Nb =   grid_Info[7]
+    Nx =   grid_Info['Nx']
+    Ny =   grid_Info['Ny']
+    Lx =   grid_Info['Lx']
+    Ly =   grid_Info['Ly']
+    dx =   grid_Info['dx']
+    dy =   grid_Info['dy']
+    supp = grid_Info['supp']
+    Nb =   grid_Info['Nb']
 
     # Find the indices of the points (xi, yj) where the 1D delta functions are 
     # non-zero in EULERIAN FRAME

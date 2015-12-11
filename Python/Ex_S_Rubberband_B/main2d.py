@@ -100,35 +100,37 @@ def main2d():
     dt = params[3]      # Time-step
 
     # GRID INFO STORED #
-    grid_Info = list(range(14))
-    grid_Info[0] = int(params[4])      # num of Eulerian Pts in x-Direction
-    grid_Info[1] = int(params[5])      # num of Eulerian Pts in y-Direction 
-    grid_Info[2] = params[6]           # Length of Eulerian domain in x-Direction
-    grid_Info[3] = params[7]           # Length of Eulerian domain in y-Direction
-    grid_Info[4] = params[6]/params[4] # Spatial step-size in x
-    grid_Info[5] = params[7]/params[5] # Spatial step-size in y
-    grid_Info[6] = params[8]           # num of pts used in delta-function support 
+    grid_Info = {}
+    grid_Info['Nx'] = int(params[4])      # num of Eulerian Pts in x-Direction
+    grid_Info['Ny'] = int(params[5])      # num of Eulerian Pts in y-Direction 
+    grid_Info['Lx'] = params[6]           # Length of Eulerian domain in x-Direction
+    grid_Info['Ly'] = params[7]           # Length of Eulerian domain in y-Direction
+    grid_Info['dx'] = params[6]/params[4] # Spatial step-size in x
+    grid_Info['dy'] = params[7]/params[5] # Spatial step-size in y
+    grid_Info['supp'] = params[8] # num of pts used in delta-function support 
                                        #    (supp/2 in each direction)
-    grid_Info[7] = params[25]          # Print Dump (How often to plot)
-    grid_Info[8] = int(params[26])     # Plot in matplotlib? (1=YES,0=NO) 
-    grid_Info[9] = int(params[27])     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info[10] = int(params[28])    # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
-    grid_Info[11] = int(params[29])    # Plot LAGRANGIAN PTs + VORTICITY colormap 
-                                       #   in matplotlib
-    grid_Info[12] = int(params[30])    # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY 
-                                       #     colormap in matplotlib
-    grid_Info[13] = int(params[31])    # Plot LAGRANGIAN PTs + PRESSURE colormap 
-                                       #    in matplotlib
+    grid_Info['pDump'] = params[25]            # Print Dump (How often to plot)
+    grid_Info['pMatplotlib'] = int(params[26]) # Plot in matplotlib? (1=YES,0=NO) 
+    grid_Info['lagPlot'] = int(params[27])     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info['velPlot'] = int(params[28])     # Plot LAGRANGIAN PTs + 
+                                               #  VELOCITY FIELD in matplotlib
+    grid_Info['vortPlot'] = int(params[29])    # Plot LAGRANGIAN PTs + 
+                                               #  VORTICITY colormap in matplotlib
+    grid_Info['uMagPlot'] = int(params[30])    # Plot LAGRANGIAN PTs + 
+                                               #  MAGNITUDE OF VELOCITY 
+                                               #     colormap in matplotlib
+    grid_Info['pressPlot'] = int(params[31])   # Plot LAGRANGIAN PTs + 
+    #                                          # PRESSURE colormap in matplotlib
 
 
     # MODEL STRUCTURE DATA STORED #
-    model_Info = list(range(16))
-    model_Info[0] = int(params[9])     # Springs: 0 (for no) or 1 (for yes) 
-    model_Info[1] = int(params[10])    # Update_Springs: 0 (for no) or 1 (for yes)
-    model_Info[2] = int(params[11])    # Target_Pts: 0 (for no) or 1 (for yes)
-    model_Info[3] = int(params[12])    # Update_Target_Pts: 0 (for no) or 1 (for yes)
-    model_Info[4] = int(params[13])    # Beams: 0 (for no) or 1 (for yes)
-    model_Info[5] = int(params[14])    # Update_Beams: 0 (for no) or 1 (for yes)
+    model_Info = {}
+    model_Info[0] = int(params[9])     # Springs: (0=no, 1=yes)
+    model_Info[1] = int(params[10])    # Update_Springs: (0=no, 1=yes)
+    model_Info[2] = int(params[11])    # Target_Pts: (0=no, 1=yes)
+    model_Info[3] = int(params[12])    # Update_Target_Pts: (0=no, 1=yes)
+    model_Info[4] = int(params[13])    # Beams: (0=no, 1=yes)
+    model_Info[5] = int(params[14])    # Update_Beams: (0=no, 1=yes)
     model_Info[6] = int(params[15])    # Muscle Activation (Length/Tension-Hill Model): 
                                        #     0 (for no) or 1 (for yes)
     model_Info[7] = int(params[16])    # Muscle Activation 3-ELEMENT HILL MODEL w/
@@ -136,12 +138,12 @@ def main2d():
                                        #     0 (for no) or 1 (for yes)
     model_Info[8] = int(params[17])    # Arbirtary External Force Onto Fluid Grid: 
                                        #     0 (for no) or 1 (for yes)
-    model_Info[9] = int(params[18])    # Tracer Particles: 0 (for no) or 1 (for yes)
-    model_Info[10]= int(params[19])    # Mass Points: 0 (for no) or 1 (for yes)
-    model_Info[11]= int(params[20])    # Gravity: 0 (for no) or 1 (for yes)
+    model_Info[9] = int(params[18])    # Tracer Particles: (0=no, 1=yes)
+    model_Info[10]= int(params[19])    # Mass Points: (0=no, 1=yes)
+    model_Info[11]= int(params[20])    # Gravity: (0=no, 1=yes)
     model_Info[12]= params[21]         # x-Component of Gravity vector
     model_Info[13]= params[22]         # y-Component of Gravity Vector
-    model_Info[14]= int(params[23])    # Porous Media: 0 (for no) or 1 (for yes)
+    model_Info[14]= int(params[23])    # Porous Media: (0=no, 1=yes)
     model_Info[15]= int(params[24])    # Background Concentration Gradient: 
                                        #     0 (for no) or 1 (for yes)
 
