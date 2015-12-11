@@ -107,22 +107,22 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     
     # MODEL STRUCTURE DATA STORED #
-    springs_Yes = model_Info[0]         # Springs: 0 (for no) or 1 (for yes) 
-    update_Springs_Flag = model_Info[1] # Update_Springs: 0 (for no) or 1 (for yes)
-    target_pts_Yes = model_Info[2]      # Target_Pts: 0 (for no) or 1 (for yes)
-    update_Target_Pts = model_Info[3]   # Update_Target_Pts: 0 (for no) or 1 (for yes)
-    beams_Yes = model_Info[4]           # Beams: 0 (for no) or 1 (for yes)
-    update_Beams_Flag = model_Info[5]   # Update_Beams: 0 (for no) or 1 (for yes)
-    muscles_Yes = model_Info[6]         # FV-LT Muscles: 0 (for no) or 1 (for yes)
-    hill_3_muscles_Yes = model_Info[7]  # Hill 3-Element Muscle: 0 (for no) or 1 (for yes)
-    arb_ext_force_Yes = model_Info[8]   # Arbitrary External Force: 0 (for no) or 1 (for yes)
-    tracers_Yes = model_Info[9]         # Tracers: 0 (for no) or 1 (for yes)
-    mass_Yes = model_Info[10]           # Mass Points: 0 (for no) or 1 (for yes)
-    gravity_Yes = model_Info[11]        # Gravity: 0 (for no) or 1 (for yes)
-    #NOTE: model_Info[12]/[13] - components of gravity vector
-    porous_Yes = model_Info[14]         # Porous Media: 0 (for no) or 1 (for yes)
-    concentration_Yes = model_Info[15]  # Background Concentration Gradient: 
-                                        #   0 (for no) or 1 (for yes)
+    springs_Yes = model_Info['springs']                # Springs: 0 (0=no, 1=yes)
+    update_Springs_Flag = model_Info['update_springs'] # Update_Springs: (0=no, 1=yes)
+    target_pts_Yes = model_Info['target_pts']          # Target_Pts: (0=no, 1=yes)
+    update_Target_Pts = model_Info['update_target_pts']# Update_Target_Pts: (0=no, 1=yes)
+    beams_Yes = model_Info['beams']                    # Beams: (0=no, 1=yes)
+    update_Beams_Flag = model_Info['update_beams']     # Update_Beams: (0=no, 1=yes)
+    muscles_Yes = model_Info['muscles']                # FV-LT Muscles: (0=no, 1=yes)
+    hill_3_muscles_Yes = model_Info['hill_3_muscles']  # Hill 3-Element Muscle: (0=no, 1=yes)
+    arb_ext_force_Yes = model_Info['arb_ext_force']    # Arbitrary External Force: (0=no, 1=yes)
+    tracers_Yes = model_Info['tracers']                # Tracers: (0=no, 1=yes)
+    mass_Yes = model_Info['mass']                      # Mass Points: (0=no, 1=yes)
+    gravity_Yes = model_Info['gravity']                # Gravity: (0=no, 1=yes)
+    #NOTE: model_Info['xG']/['yG'] - components of gravity vector
+    porous_Yes = model_Info['porous']                  # Porous Media: (0=no, 1=yes)
+    concentration_Yes = model_Info['concentration']    # Background Concentration Gradient: 
+                                                       #  0 (for no) or 1 (for yes)
     
     
     
@@ -316,11 +316,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
     
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
-    if gravity_Yes:
-        #gravity_Vec[0] = model_Info[11]     # x-Component of Gravity Vector
-        #gravity_Vec[1] = model_Info[12]     # y-Component of Gravity Vector
-        xG = model_Info[12]
-        yG = model_Info[13]
+    if gravity_Yes:    
+        xG = model_Info['xG']       # x-Component of Gravity Vector
+        yG = model_Info['yG']       # y-Component of Gravity Vector
         normG = sqrt( xG**2 + yG**2 )
         gravity_Info = [gravity_Yes, xG/normG, yG/normG]
         #   col 1: flag if considering gravity

@@ -1,3 +1,3 @@
-When reading in data, especially from input2d, use a dict for human readable code
+Consider outputting these dicts with the result for parameter persistance.
 
 Kill loops in give_Me_Lag_Pt_Connects (not essential - this is a setup function)

@@ -125,27 +125,27 @@ def main2d():
 
     # MODEL STRUCTURE DATA STORED #
     model_Info = {}
-    model_Info[0] = int(params[9])     # Springs: (0=no, 1=yes)
-    model_Info[1] = int(params[10])    # Update_Springs: (0=no, 1=yes)
-    model_Info[2] = int(params[11])    # Target_Pts: (0=no, 1=yes)
-    model_Info[3] = int(params[12])    # Update_Target_Pts: (0=no, 1=yes)
-    model_Info[4] = int(params[13])    # Beams: (0=no, 1=yes)
-    model_Info[5] = int(params[14])    # Update_Beams: (0=no, 1=yes)
-    model_Info[6] = int(params[15])    # Muscle Activation (Length/Tension-Hill Model): 
-                                       #     0 (for no) or 1 (for yes)
-    model_Info[7] = int(params[16])    # Muscle Activation 3-ELEMENT HILL MODEL w/
-                                       #     Length-Tension/Force-Velocity: 
-                                       #     0 (for no) or 1 (for yes)
-    model_Info[8] = int(params[17])    # Arbirtary External Force Onto Fluid Grid: 
-                                       #     0 (for no) or 1 (for yes)
-    model_Info[9] = int(params[18])    # Tracer Particles: (0=no, 1=yes)
-    model_Info[10]= int(params[19])    # Mass Points: (0=no, 1=yes)
-    model_Info[11]= int(params[20])    # Gravity: (0=no, 1=yes)
-    model_Info[12]= params[21]         # x-Component of Gravity vector
-    model_Info[13]= params[22]         # y-Component of Gravity Vector
-    model_Info[14]= int(params[23])    # Porous Media: (0=no, 1=yes)
-    model_Info[15]= int(params[24])    # Background Concentration Gradient: 
-                                       #     0 (for no) or 1 (for yes)
+    model_Info['springs'] = int(params[9])           # Springs: (0=no, 1=yes)
+    model_Info['update_springs'] = int(params[10])   # Update_Springs: (0=no, 1=yes)
+    model_Info['target_pts'] = int(params[11])       # Target_Pts: (0=no, 1=yes)
+    model_Info['update_target_pts'] = int(params[12])# Update_Target_Pts: (0=no, 1=yes)
+    model_Info['beams'] = int(params[13])            # Beams: (0=no, 1=yes)
+    model_Info['update_beams'] = int(params[14])     # Update_Beams: (0=no, 1=yes)
+    # Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
+    model_Info['muscles'] = int(params[15])
+    # Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 
+    #   0 (for no) or 1 (for yes)
+    model_Info['hill_3_muscles'] = int(params[16])
+    # Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
+    model_Info['arb_ext_force'] = int(params[17]) 
+    model_Info['tracers'] = int(params[18])       # Tracer Particles: (0=no, 1=yes)
+    model_Info['mass']= int(params[19])           # Mass Points: (0=no, 1=yes)
+    model_Info['gravity']= int(params[20])        # Gravity: (0=no, 1=yes)
+    model_Info['xG']= params[21]                  # x-Component of Gravity vector
+    model_Info['yG']= params[22]                  # y-Component of Gravity Vector
+    model_Info['porous']= int(params[23])         # Porous Media: (0=no, 1=yes)
+    model_Info['concentration']= int(params[24])  # Background Concentration Gradient: 
+                                                  # 0 (for no) or 1 (for yes)
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#

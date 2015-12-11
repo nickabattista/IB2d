@@ -94,12 +94,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # Model Potential Forces #
-    springs_Yes = model_Info[0]        # Springs: 0 (for no) or 1 (for yes) 
-    target_pts_Yes = model_Info[2]     # Target_Pts: 0 (for no) or 1 (for yes)
-    beams_Yes = model_Info[4]          # Beams: 0 (for no) or 1 (for yes)
-    muscle_LT_FV_Yes = model_Info[6]   # Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
-    muscle_3_Hill_Yes = model_Info[7]  # 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
-    mass_Yes = model_Info[10]          # Mass Pts: 0 (for no) or 1 (for yes)
+    springs_Yes = model_Info['springs']        # Springs: 0 (for no) or 1 (for yes) 
+    target_pts_Yes = model_Info['target_pts']  # Target_Pts: 0 (for no) or 1 (for yes)
+    beams_Yes = model_Info['beams']            # Beams: 0 (for no) or 1 (for yes)
+    muscle_LT_FV_Yes = model_Info['muscles']   # Length-Tension/Force-Velocity Muscle: 
+        # 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+    muscle_3_Hill_Yes = model_Info['hill_3_muscles']  # 3-Element Hill Model: 
+        # 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
+    mass_Yes = model_Info['mass']          # Mass Pts: 0 (for no) or 1 (for yes)
 
 
     #
