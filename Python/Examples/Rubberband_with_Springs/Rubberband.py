@@ -70,7 +70,7 @@ def Rubberband():
 
 
     # Prints .spring file!
-    k_Spring = 1e7
+    k_Spring = 2.5e4
     print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
 

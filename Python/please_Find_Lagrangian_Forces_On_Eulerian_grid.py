@@ -409,8 +409,8 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     #leng = Tx.shape[0]               # # of Lagrangian Pts.
 
     Nsprings = springs.shape[0]  # # of Springs
-    id_Master = springs[:,0]   # MASTER NODE Spring Connections
-    id_Slave = springs[:,1]   # SLAVE NODE Spring Connections
+    id_Master = springs[:,0].astype('int')   # MASTER NODE Spring Connections
+    id_Slave = springs[:,1].astype('int')    # SLAVE NODE Spring Connections
     K_Vec = springs[:,2]  # Stores spring stiffness associated with each spring
     RL_Vec = springs[:,3] # Stores spring resting length associated with each spring
 
@@ -422,7 +422,7 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     
     sF_x = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dx/np.sqrt(dx**2+dy**2))
     sF_y = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dy/np.sqrt(dx**2+dy**2))
-
+    #import pdb; pdb.set_trace()
     for ii in range(Nsprings):
         
         fx[id_Master[ii]] += sF_x[ii]  # Sum total forces for node,

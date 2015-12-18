@@ -593,7 +593,7 @@ def read_In_Concentration_Info(struct_name): #untested
 #
 ###########################################################################
 
-def read_Spring_Points(struct_name): #untested
+def read_Spring_Points(struct_name):
     ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths
     
     Args:
