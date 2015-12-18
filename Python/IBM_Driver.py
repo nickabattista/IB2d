@@ -238,13 +238,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         mass_info = np.empty((mass_aux.shape[0],5))
         
         mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
+        #Stores Original x-Lags and y-Lags as x/y-Mass Pt. Identities
+        mass_info[:,1] = xLag[mass_info[:,0].astype('int')
+        mass_info[:,2] = yLag[mass_info[:,1].astype('int')
         
-        for ii in range(mass_info.shape[0]):
-            id = int(mass_info[ii,0])
-            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            mass_info[ii,1] = xLag[id-1]  #Stores Original x-Lags as x-Mass Pt. Identities
-            mass_info[ii,2] = yLag[id-1]  #Stores Original y-Lags as y-Mass Pt. Identities
-       
         mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
         mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
         
@@ -264,11 +261,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         # initialize target_info
         target_info = np.empty((target_aux.shape[0],4))
         
-        #Stores Lag-Pt IDs in col vector
-        target_info[:,0] = target_aux[:,0]
-        
+        target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
+        # Stores Original x-Lags and y-Lags as x/y-Target Pt. Identities
         target_info[:,1] = xLag[target_info[:,0].astype('int')]
         target_info[:,2] = yLag[target_info[:,0].astype('int')]
+        
         target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
     else:
         target_info = np.zeros((1,1))
@@ -282,16 +279,12 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 2: Porosity coefficient
         
         # initizlize porous_info
-        porous_info = np.empty((porous_aux.size,4))
+        porous_info = np.empty((porous_aux.shape[0],4))
         
         porous_info[:,0] = porous_aux[:,0] #Stores Lag-Pt IDs in col vector
-        for ii in range(porous_info.shape[0]):
-            id = int(porous_info[ii,0])
-            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            porous_info[ii,1] = xLag[id-1] #Stores Original x-Lags as 
-                                                #    x-Porous Pt. Identities
-            porous_info[ii,2] = yLag[id-1] #Stores Original y-Lags as 
-                                                #    y-Porous Pt. Identities
+        # Stores Original x-Lags and y-Lags as x/y-Porous Pt. Identities
+        porous_info[:,1] = xLag[porous_info[:,0].astype('int')]
+        porous_info[:,2] = yLag[porous_info[:,0].astype('int')]
         
         porous_info[:,3] = porous_aux[:,1] #Stores Porosity Coefficient 
     else:
