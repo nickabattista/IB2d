@@ -55,8 +55,8 @@ Np = length( porous_info(:,1) );
 
 
 % Compute Porous Slip Velocity
-Up_X = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,1).*nX / sqrtNorm;
-Up_Y = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,2).*nY / sqrtNorm;
+Up_X = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,1).*nX ./ sqrtNorm;
+Up_Y = - ( porous_info(:,4) ) .* F_Lag( porous_info(:,1) ,2).*nY ./ sqrtNorm;
 Por_Mat = [Up_X Up_Y];
 
 % Store porous slip velocities in appropriate vector for adding to current Lagrangian Velocity Computation
