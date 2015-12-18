@@ -88,7 +88,9 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         locX = np.argwhere(diffX > spacing).flatten()
         # assuming y value can't change more than Ly/2 (without crossing boundary)
         locY = np.argwhere(diffY > spacing).flatten()
-        loc = np.unique(np.hstack((locX,locY))) #automatically sorts the output
+        loc = np.unique(np.hstack((locX,locY)))+1 #automatically sorts the output
+        #adds one so that index points to after the jump. This works better for
+        #   Python 0-base indexing, with endpt not included
 
         diffy = sqrt( (chiX[-1]-chiX[0] )**2 + ( chiY[-1]-chiY[0] )**2 )
 
@@ -111,9 +113,9 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.xlabel('x'); plt.ylabel('y')
         plt.hold(True)
 
-        loc = np.hstack((0,loc,chiX.size))
+        loc = np.hstack((0,loc,chiX.size-1))
         for ii in range(1,loc.size):     #=2:length(loc)
-            plt.plot(chiX[loc[ii-1]:loc[ii]+1],chiY[loc[ii-1]:loc[ii]+1],'m',linewidth=3)
+            plt.plot(chiX[loc[ii-1]:loc[ii]],chiY[loc[ii-1]:loc[ii]],'m',linewidth=3)
         if diffy < 5*ds:
             xTemp = [chiX[0], chiX[-1]]
             yTemp = [chiY[0], chiY[-1]]
@@ -141,7 +143,7 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
 
         loc = np.hstack((0,loc,chiX.size))
         for ii in range(1,loc.size):
-            plt.plot(chiX[loc[ii-1]:loc[ii]+1],chiY[loc[ii-1]:loc[ii]+1],'m',linewidth=3)
+            plt.plot(chiX[loc[ii-1]:loc[ii]],chiY[loc[ii-1]:loc[ii]],'m',linewidth=3)
         if diffy < 5*ds:
             xTemp = [chiX[0], chiX[-1]]
             yTemp = [chiY[0], chiY[-1]]
@@ -168,7 +170,7 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
 
         loc = np.hstack((0,loc,chiX.size))
         for ii in range(1,loc.size):
-            plt.plot(chiX[loc[ii-1]:loc[ii]+1],chiY[loc[ii-1]:loc[ii]+1],'m',linewidth=3)
+            plt.plot(chiX[loc[ii-1]:loc[ii]],chiY[loc[ii-1]:loc[ii]],'m',linewidth=3)
         if diffy < 5*ds:
             xTemp = [chiX[0], chiX[-1]]
             yTemp = [chiY[0], chiY[-1]]
@@ -195,7 +197,7 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
 
         loc = np.hstack((0,loc,chiX.size))
         for ii in range(1,loc.size):
-            plt.plot(chiX[loc[ii-1]:loc[ii]+1],chiY[loc[ii-1]:loc[ii]+1],'m',linewidth=3)
+            plt.plot(chiX[loc[ii-1]:loc[ii]],chiY[loc[ii-1]:loc[ii]],'m',linewidth=3)
         if diffy < 5*ds:
             xTemp = [chiX[0], chiX[-1]]
             yTemp = [chiY[0], chiY[-1]]
@@ -220,7 +222,7 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
 
         loc = np.hstack((0,loc,chiX.size))
         for ii in range(1,loc.size):
-            plt.plot(chiX[loc[ii-1]:loc[ii]+1],chiY[loc[ii-1]:loc[ii]+1],'m',linewidth=3)
+            plt.plot(chiX[loc[ii-1]:loc[ii]],chiY[loc[ii-1]:loc[ii]],'m',linewidth=3)
         if diffy < 5*ds:
             xTemp = [chiX[0], chiX[-1]]
             yTemp = [chiY[0], chiY[-1]]
