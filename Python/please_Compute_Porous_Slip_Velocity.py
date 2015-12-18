@@ -70,9 +70,9 @@ def please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag):
 
 
     # Compute Porous Slip Velocity
-    Up_X = - porous_info[:,3]*F_Lag[porous_info[:,0],0]*nX / sqrtNorm
-    Up_Y = - porous_info[:,3]*F_Lag[porous_info[:,0],1]*nY / sqrtNorm
-    Por_Mat = np.array([Up_X, Up_Y])
+    Up_X = - porous_info[:,3]*F_Lag[porous_info[:,0].astype('int'),0]*nX / sqrtNorm
+    Up_Y = - porous_info[:,3]*F_Lag[porous_info[:,0].astype('int'),1]*nY / sqrtNorm
+    Por_Mat = np.array([Up_X, Up_Y]).T
 
     # Store porous slip velocities in appropriate vector for adding to 
     #   current Lagrangian Velocity Computation
