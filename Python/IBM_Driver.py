@@ -239,8 +239,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
         mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
         #Stores Original x-Lags and y-Lags as x/y-Mass Pt. Identities
-        mass_info[:,1] = xLag[mass_info[:,0].astype('int')
-        mass_info[:,2] = yLag[mass_info[:,1].astype('int')
+        mass_info[:,1] = xLag[mass_info[:,0].astype('int')]
+        mass_info[:,2] = yLag[mass_info[:,1].astype('int')]
         
         mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
         mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
