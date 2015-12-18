@@ -342,6 +342,13 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #I'm going to expect that vizID is a file object with write permission...?
     vizID = 1 #JUST INITIALIZE BC dumps.visit isn't working correctly...yet
     os.chdir('viz_IB2d')
+    #Save grid_Info and model_Info in human readable format
+    with open('_grid_Info.txt','w') as fobj:
+        for key in sorted(grid_Info):
+            fobj.write('{0} = {1}\n'.format(key,grid_Info[key]))
+    with open('_model_Info.txt','w') as fobj:
+        for key in sorted(model_Info):
+            fobj.write('{0} = {1}\n'.format(key,model_Info[key]))
     #vizID = open('dumps.visit','w')
     #vizID.write('!NBLOCKS 6\n')
     #os.chdir('..')
