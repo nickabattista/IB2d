@@ -389,13 +389,16 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
            
         if update_Springs_Flag and springs_Yes:
             #This function is application specific, located with main2d
+            from update_Springs import update_Springs
             springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
             
         if update_Target_Pts and target_pts_Yes:
             #This function is application specific, located with main2d
+            from update_Target_Point_Positions import update_Target_Point_Positions
             target_info = update_Target_Point_Positions(dt,current_time,target_info)
             
         if update_Beams_Flag and beams_Yes:
+            from update_Beams import update_Beams
             #This function is application specific, located with main2d
             beams_info = update_Beams(dt,current_time,beams_info)
             
@@ -423,6 +426,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         # Add artificial force from fluid boundary, if desired. 
         if arb_ext_force_Yes: #need to test
             # This function is user defined along with main2d
+            from please_Compute_External_Forcing import \
+            please_Compute_External_Forcing
             # Some of these arguments are mutable. Make sure they are not 
             #   getting assigned to!
             Fx_Arb, Fy_Arb, firstExtForce, indsExtForce = \
@@ -723,7 +728,7 @@ def read_Mass_Points(struct_name): #untested
 #
 ###########################################################################
 
-def read_Target_Points(struct_name): #untested
+def read_Target_Points(struct_name):
     ''' Reads in the num of target pts, target-pt-nodes, and target-stiffness
     
     Args:
@@ -733,7 +738,7 @@ def read_Target_Points(struct_name): #untested
         targets: array of target info'''
     filename = struct_name+'.target'  #Name of file to read in
     with open(filename) as f:
-        targets = np.txtload(f,skiprows=1,usecols=(0,1))
+        targets = np.loadtxt(f,skiprows=1,usecols=(0,1))
 
     #targets: col 1: Lag Pt. ID w/ Associated Target Pt.
     #         col 2: target STIFFNESSES
