@@ -264,15 +264,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         # initialize target_info
         target_info = np.empty((target_aux.shape[0],4))
         
-        target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
-        for ii in range(target_info.shape[0]):
-            id = int(target_info[ii,0])
-            #here, i'm going to guess that mass pt. IDs start at 1 given prev. code
-            target_info[ii,1] = xLag[id-1] #Stores Original x-Lags as 
-                                                #  x-Target Pt. Identities
-            target_info[ii,2] = yLag[id-1] #Stores Original y-Lags as 
-                                                #  y-Target Pt. Identities
-       
+        #Stores Lag-Pt IDs in col vector
+        target_info[:,0] = target_aux[:,0]
+        
+        target_info[:,1] = xLag[target_info[:,0].astype('int')]
+        target_info[:,2] = yLag[target_info[:,0].astype('int')]
         target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
     else:
         target_info = np.zeros((1,1))
