@@ -234,7 +234,7 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
-@jit
+@jit(nopython=True)
 def give_Delta_Kernel(x,dx):
     ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
     
