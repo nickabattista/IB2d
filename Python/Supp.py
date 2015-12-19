@@ -367,7 +367,8 @@ def please_Update_Massive_Boundary_Velocity(dt_step,mass_info,mVelocity,\
     Returns:
         mVelocity_h:'''
 
-    ids = mass_info[:,0]
+    ids = mass_info[:,0].astype('int')
+    mVelocity_h = np.empty(mVelocity.shape)
 
     if gravity_Info[0] == 1:
          
