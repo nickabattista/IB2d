@@ -453,7 +453,7 @@ while current_time < T_FINAL
 
     
     % Update current_time value & counter
-    current_time = current_time+dt
+    current_time = current_time+dt;
     cter = cter + 1;
     %pause();
     
