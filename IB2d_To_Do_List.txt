@@ -22,7 +22,8 @@
 3. Stoke's Fluid Solver
 4. Non-Newtonian Fluid Solver
 5. Parallelization
-6. Port code to Python
+6. Port code to Python (thank you Christopher Strickland!)
+7. Port code to Julia 
 
 %
 % EXAMPLES
