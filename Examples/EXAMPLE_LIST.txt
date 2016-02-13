@@ -34,6 +34,9 @@ GitHub: http://www.github.com/nickabattista
                    combined with a length-tension/force-velocity
             ex5: - heart that pumps w/ an electrophysiology model, e.g., 
                    the FitzHugh-Nagumo reduced order model of Hodgkin-Huxley
+	    ex6: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley with 
+	           underlying calcium dynamics	
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
