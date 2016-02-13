@@ -18,7 +18,7 @@
 % FLUID SOLVER / BLACK-BOX
 % 
 1. Optimize muscle model force computations
-2. Add neuro-mechanical coupling via FitzHugh-Nagumo
+2. Add muscle model and calcium dynamics to electrophysiology model
 3. Stoke's Fluid Solver
 4. Non-Newtonian Fluid Solver
 5. Parallelization
