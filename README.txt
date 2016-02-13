@@ -23,6 +23,7 @@ This code is capable of creating Lagrangian Structures using:
                         Force-Velocity/Length-Tension Model)
         6. Mass Points (with or without influence of gravity)
         7. Porous Structures 
+        8. Electrophysiology (FitzHugh-Nagumo coupling)
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -58,6 +59,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                    by changing resting lengths of springs
             ex4: - heart tube that pumps via muscle activation by 3-element 
                    Hill Model combined w/ length-tension/force-velocity model
+            ex5: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
