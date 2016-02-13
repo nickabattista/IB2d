@@ -32,6 +32,8 @@ GitHub: http://www.github.com/nickabattista
                    by changing resting lengths of springs
             ex4: - heart that pumps via muscle activation by 3-element Hill Model
                    combined with a length-tension/force-velocity
+            ex5: - heart that pumps w/ an electrophysiology model, e.g., 
+                   the FitzHugh-Nagumo reduced order model of Hodgkin-Huxley
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
