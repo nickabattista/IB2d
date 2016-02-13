@@ -13,7 +13,10 @@
 % 	1. Springs
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
-%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%   4. Mass Points
+%   5. Porous Points
+%	6. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%   7. 3-Element Hill Muscle Model
 %
 % One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
 % 
