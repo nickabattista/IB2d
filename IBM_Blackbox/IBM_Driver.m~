@@ -45,8 +45,6 @@ function [X, Y, U, V, xLag, yLag] = IBM_Driver(struct_name, mu, rho, grid_Info, 
 %    F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
 %
 
-fprintf('\n\n--> Reading input data for simulation...\n\n');
-
 
 % Temporal Information
 NTime = floor(T_FINAL/dt)+1; % # of total time-steps (floor'd so exact number of time-steps)
@@ -157,6 +155,7 @@ if ( springs_Yes == 1 )
 else
     springs_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 end
+
 
 
 
@@ -307,10 +306,9 @@ end
 
 % SOLVE ELECTROPHYSIOLOGY MODEL FOR PUMPING %
 if electro_phys_Yes == 1
-    fprintf('\n--> Solving Electrophysiology Model...\n');
+    
     [electro_potential, ePhys_Start, ePhys_End] = FitzHugh_Nagumo_1d(dt,T_FINAL);
     ePhys_Ct = 1;
-    fprintf('--> Finished Computing Electrophysiology...time for IBM!\n\n');
 end
 
 
@@ -343,18 +341,13 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C);
-fprintf('\n ****** Begin IMMERSED BOUNDARY SIMULATION! ****** \n\n');
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
 
 
 %
 %
-%
-% **************************************************************
 % * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
-% **************************************************************
-%
 %
 %
 while current_time < T_FINAL
@@ -370,7 +363,7 @@ while current_time < T_FINAL
     end
     
     if ( electro_phys_Yes == 1)
-        springs_info(ePhys_Start:ePhys_End,3) = ( 1e1*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
+        springs(ePhys_Start:ePhys_End,3) = ( 2*electro_potential(ePhys_Ct,:)' ).^4;
         ePhys_Ct = ePhys_Ct + 1;
     end
     
@@ -469,11 +462,6 @@ while current_time < T_FINAL
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
-        %pause();
-         %electro_potential(ePhys_Ct,:)'
-         %springs_info(ePhys_Start:ePhys_End,3)
-         %springs_info(:,3)
-         %pause();
         
     end
 
@@ -481,7 +469,7 @@ while current_time < T_FINAL
     % Update current_time value & counter
     current_time = current_time+dt;
     cter = cter + 1;
-    %pause(0.);
+    %pause();
     
     
 end %ENDS TIME-STEPPING LOOP
