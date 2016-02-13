@@ -1,9 +1,5 @@
-function [v,v_INTERP] = FitzHugh_Nagumo_1d(dt_IBM,T_final)
+function [v_INTERP,ind_Start,ind_End] = FitzHugh_Nagumo_1d(dt_IBM,T_final)
 %function FitzHugh_Nagumo_1d(dt_IBM,T_final)
-
-%INPUT:
-numPtsAlongTube = 78; % # of Lag. Muscle Pts Along Tube 
-
 
 %
 % This script solves the FitzHugh-Nagumo Equations in 1d, which are 
@@ -11,6 +7,7 @@ numPtsAlongTube = 78; % # of Lag. Muscle Pts Along Tube
 %
 % Author:  Nick Battista
 % Created: 09/11/2015
+% University: UNC-CH
 %
 % Equations:
 % dv/dt = D*Laplacian(v) + v*(v-a)*(v-1) - w - I(t)
@@ -18,6 +15,7 @@ numPtsAlongTube = 78; % # of Lag. Muscle Pts Along Tube
 %
 % Inputs:
 % dt_IBM: time-step from immersed boundary code
+% T_final: final time for immersed boundary simulation
 %
 % Variables & Parameters:
 % v(x,t): membrane potential
@@ -27,6 +25,17 @@ numPtsAlongTube = 78; % # of Lag. Muscle Pts Along Tube
 % gamma:  resetting rate
 % eps:    strength of blocking
 % I(t):   initial condition for applied activation
+%
+
+
+%USER-INPUT FROM MODEL:
+numPtsAlongTube = 78;    % # of Lag. Muscle Pts Along Tube 
+ind_Start = 155;         % first index for muscle between tube in spring count
+ind_End = 232;           % last index for muscle between tube in spring count
+dt_IBM = dt_IBM*2500;    % scale time-info
+T_final_Ca = T_final;    % Stays on time-scale of IBM
+T_final = T_final * 2500;% scale time-info
+
 
 % Save Movie? 
 PLAY_MOVIE = 0; % (1 for YES, 0 for NO)
@@ -46,17 +55,14 @@ dx = L/N;       % Spatial Step
 x = 0:dx:L;     % Computational Domain
 
 % Temporal  Parameters %
-%T_final = 10000;     % Sets the final time (now input from IBM)
 Np = 10;              % Set the number of pulses
 pulse = T_final/Np;   % determines the length of time between pulses.
 numFHN = 10;          % # that relates # of time-steps of FHN to IBM
 dt = dt_IBM / numFHN; % Time-step for FitzHugh-Nagumo (fraction of IBM time-step)
 NT = T_final / dt;    % Total # of time-steps to be taken for FHN
 NT_IBM = T_final / dt_IBM; % Total # of time-steps for IBM
-%NT = 400000;         % Number of total time-steps to be taken
-%dt = T_final/NT;     % Time-step taken
-i1 = 0.25%0.475;           % fraction of total length where current starts
-i2 = 0.3%0.525;           % fraction of total length where current ends
+i1 = 0.25;%0.475;     % fraction of total length where current starts
+i2 = 0.3;%0.525;      % fraction of total length where current ends
 dp = pulse/50;        % Set the duration of the current pulse
 pulse_time = 0;       % pulse time is used to store the time that the next pulse of current will happen
 IIapp=zeros(1,N+1);   % this vector holds the values of the applied current along the length of the neuron
@@ -72,7 +78,17 @@ tVec = 0:dt:T_final;
 Nsteps = length(tVec);
 vStore = zeros(NT_IBM,N+1); vStore(store,:) = v;
 wStore = zeros(NT_IBM,N+1); wStore(store,:) = w;
+IIappStore=vStore;
 store = store+1; % update storage counter
+
+
+% Compute Calcium-Dynamics a-priori for activation wave!
+% (returns Ca: free calcium ions, Caf: bound to filaments Ca-ions)
+fprintf('     --> Solving Calcium Dynamics Model\n');
+[Ca,Caf] = Calcium_Dynamics(Nsteps,T_final_Ca);
+fprintf('     --> Finished calculating Calcium Dynamics\n');
+
+
 
 %
 % **** % **** BEGIN SIMULATION! **** % **** %
@@ -85,8 +101,9 @@ for i=2:Nsteps;
     % Give Laplacian
     DD_v_p = give_Me_Laplacian(v,dx);  
     
-    % Gives activation wave
-    [IIapp,pulse_time] = Iapp(pulse_time,i1,i2,I_mag,N,pulse,dp,t,IIapp);
+    % Gives activation wave (either from prescribed or Calcium-Dynamics model)
+    %[IIapp,pulse_time] = Iapp(pulse_time,i1,i2,I_mag,N,pulse,dp,t,IIapp);
+    IIapp = Iapp_from_Calcium_Dynamics(i,i1,i2,N,Caf);
     
     % Update potential and blocking mechanism, using Forward Euler
     vN = v + dt * ( D*DD_v_p - v.*(v-a).*(v-1) - w + IIapp );
@@ -100,6 +117,7 @@ for i=2:Nsteps;
     if mod(i-1,numFHN) == 0
         vStore(store,:) = v;
         wStore(store,:) = w;
+        IIappStore(store,:) = IIapp;
         store = store + 1;
     end
     
@@ -122,15 +140,18 @@ end %END TIME-STEPPING LOOP
 
 % Compute electro-potential at associated Lagrangian Pts.
 v_INTERP = compute_IBM_Potential_At_IBM_Lag_Pts(factor,numPtsAlongTube,vStore);
+%IIapp_INTERP = compute_IBM_Potential_At_IBM_Lag_Pts(factor,numPtsAlongTube,IIappStore);
+
 
 % TEST SOLUTION
-% pause();
-% x=1:1:78;
-% for i=1:10:40001
-%    plot(x,v_INTERP(i,:),'-'); 
-%    axis([0 79 -0.5 1.5]);
-%    pause(0.01);
-% end
+%  pause();
+%  x=1:1:78;
+%  for i=1:10:length(v_INTERP(:,1))
+%     plot(x,v_INTERP(i,:),'-'); 
+%     %plot(x,IIapp_INTERP(i,:),'-');
+%     axis([0 79 -0.5 1.5]);
+%     pause(0.01);
+%  end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -155,6 +176,25 @@ for j=1:length(vStore(1,:))
    end
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: the CALCIUM inspired injection function, Iapp = activation wave 
+% for system, and returns the activation signal between i1 and i2 in
+% geometry along tube
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function IIapp = Iapp_from_Calcium_Dynamics(ith_step,i1,i2,N,Caf)
+
+    % Resets activation to zero
+    IIapp = zeros(1,N+1);
+    
+    % Activates the proper region based on Calcium-Dynamics
+    for j=(floor(i1*N):floor(i2*N))
+        coeff = 0.5;                 % Coefficient to scale activation wave accordingly
+        IIapp(j) = coeff*Caf(ith_step); % Activation of bound Calcium to filaments
+    end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
