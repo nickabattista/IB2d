@@ -18,11 +18,11 @@
 %	6. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %   7. 3-Element Hill Muscle Model
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting-lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
