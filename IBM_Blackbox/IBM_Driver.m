@@ -44,7 +44,7 @@ function [X, Y, U, V, xLag, yLag] = IBM_Driver(struct_name, mu, rho, grid_Info, 
 %    F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
 %    F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
 %
-
+fprintf('\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
 fprintf('\n\n--> Reading input data for simulation...\n\n');
 
 
@@ -116,39 +116,27 @@ end
 % % % % % HOPEFULLY WHERE I CAN READ IN INFO!!! % % % % %
 
 
+
+
+
 % READ IN LAGRANGIAN POINTS %
 [Nb,xLag,yLag] = read_Vertex_Points(struct_name);
 grid_Info(8) = Nb;          % # Total Number of Lagrangian Pts.
 xLag_P = xLag;              % Initialize previous Lagrangian x-Values (for use in muscle-model)
 yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use in muscle-model)
 
+fprintf('\n--> FIBER MODEL INCLUDES: \n');
 
-% READ IN TRACERS (IF THERE ARE TRACERS) %
-if (tracers_Yes == 1)
-   [~,xT,yT] = read_Tracer_Points(struct_name);
-   tracers = zeros(length(xT),4);
-   tracers(1,1) = 1;
-   tracers(:,2) = xT;
-   tracers(:,3) = yT;
-        %tracers_info: col 1: xPt of Tracers
-        %              col 2: yPt of Tracers
-else
-   tracers = 0; 
-end
-
-
-% READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
-if ( concentration_Yes == 1 )
-    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
-        %C:           Initial background concentration
-        %kDiffusion:  Diffusion constant for Advection-Diffusion
-else
-    C = 0; % placeholder for plotting 
-end
 
 
 % READ IN SPRINGS (IF THERE ARE SPRINGS) %
 if ( springs_Yes == 1 )
+    fprintf('  -Springs and ');
+    if update_Springs_Flag == 0
+        fprintf('NOT dynamically updating spring properties\n');
+    else
+        fprintf('dynamically updating spring properties\n');
+    end
     springs_info = read_Spring_Points(struct_name);
         %springs_info: col 1: starting spring pt (by lag. discretization)
         %              col 2: ending spring pt. (by lag. discretization)
@@ -160,82 +148,39 @@ end
 
 
 
-% READ IN MUSCLES (IF THERE ARE MUSCLES) %
-if ( muscles_Yes == 1 )
-    muscles_info = read_Muscle_Points(struct_name);
-        %         muscles: col 1: MASTER NODE (by lag. discretization)
-        %         col 2: SLAVE NODE (by lag. discretization)
-        %         col 3: length for max. muscle tension
-        %         col 4: muscle constant
-        %         col 5: hill parameter, a
-        %         col 6: hill parameters, b
-        %         col 7: force maximum!
-else
-    muscles_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
-end
 
 
 
-
-
-
-
-
-
-
-
-% READ IN MUSCLES (IF THERE ARE MUSCLES) %
-if ( hill_3_muscles_Yes == 1 )
-    muscles3_info = read_Hill_3Muscle_Points(struct_name);
-        %         muscles: col 1: MASTER NODE (by lag. discretization)
-        %         col 2: SLAVE NODE (by lag. discretization)
-        %         col 3: length for max. muscle tension
-        %         col 4: muscle constant
-        %         col 5: hill parameter, a
-        %         col 6: hill parameters, b
-        %         col 7: force maximum!
-else
-    muscles3_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% READ IN MASS POINTS (IF THERE ARE MASS PTS) %
-if ( mass_Yes == 1)
-    mass_aux = read_Mass_Points(struct_name);
-    %target_aux: col 1: Lag Pt. ID w/ Associated Mass Pt.
-    %            col 2: "Mass-spring" stiffness parameter
-    %            col 3: "MASS" value parameter
-    mass_info(:,1) = mass_aux(:,1); %Stores Lag-Pt IDs in col vector
-    for i=1:length(mass_info(:,1))
-        id = mass_info(i,1);
-        mass_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Mass Pt. Identities
-        mass_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Mass Pt. Identities
+% READ IN BEAMS (IF THERE ARE BEAMS) %
+if ( beams_Yes == 1)
+    fprintf('  -Beams ("Torsional Springs") and ');
+    if update_Beams_Flag == 0
+        fprintf('NOT dynamically updating beam properties\n');
+    else
+        fprintf('dynamically updating beam properties\n');
     end
-   
-    mass_info(:,4) = mass_aux(:,2);   %Stores "mass-spring" parameter 
-    mass_info(:,5) = mass_aux(:,3);   %Stores "MASS" value parameter
+    
+    beams_info = read_Beam_Points(struct_name);
+    %beams:      col 1: 1ST PT.
+    %            col 2: MIDDLE PT. (where force is exerted)
+    %            col 3: 3RD PT.
+    %            col 4: beam stiffness
+    %            col 5: curavture
 else
-    mass_info = 0;
+    beams_info = 0;
 end
-
-
 
 
 
 % READ IN TARGET POINTS (IF THERE ARE TARGET PTS) %
 if ( target_pts_Yes == 1)
+    fprintf('  -Target Pts. and ');
+    if update_Target_Pts == 0
+        fprintf('NOT dynamically updating target point properties\n');
+    else
+        fprintf('dynamically updating target point properties\n');
+    end
+    
     target_aux = read_Target_Points(struct_name);
     %target_aux: col 1: Lag Pt. ID w/ Associated Target Pt.
     %            col 2: target STIFFNESSES
@@ -254,35 +199,29 @@ end
 
 
 
-% READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
-if ( porous_Yes == 1)
-    porous_aux = read_Porous_Points(struct_name);
-    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
-    %            col 2: Porosity coefficient
-    porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
-    for i=1:length(porous_info(:,1))
-        id = porous_info(i,1);
-        porous_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
-        porous_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
+% READ IN MASS POINTS (IF THERE ARE MASS PTS) %
+if ( mass_Yes == 1)
+    fprintf('  -Mass Pts. with ');
+    if gravity_Yes == 0
+        fprintf('NO artificial gravity\n');
+    else
+        fprintf('artificial gravity\n');
+    end
+    mass_aux = read_Mass_Points(struct_name);
+    %target_aux: col 1: Lag Pt. ID w/ Associated Mass Pt.
+    %            col 2: "Mass-spring" stiffness parameter
+    %            col 3: "MASS" value parameter
+    mass_info(:,1) = mass_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(mass_info(:,1))
+        id = mass_info(i,1);
+        mass_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Mass Pt. Identities
+        mass_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Mass Pt. Identities
     end
    
-    porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+    mass_info(:,4) = mass_aux(:,2);   %Stores "mass-spring" parameter 
+    mass_info(:,5) = mass_aux(:,3);   %Stores "MASS" value parameter
 else
-    porous_info = 0;
-end
-
-
-
-% READ IN BEAMS (IF THERE ARE BEAMS) %
-if ( beams_Yes == 1)
-    beams_info = read_Beam_Points(struct_name);
-    %beams:      col 1: 1ST PT.
-    %            col 2: MIDDLE PT. (where force is exerted)
-    %            col 3: 3RD PT.
-    %            col 4: beam stiffness
-    %            col 5: curavture
-else
-    beams_info = 0;
+    mass_info = 0;
 end
 
 
@@ -305,13 +244,110 @@ else
 end
 
 
+% READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
+if ( porous_Yes == 1)
+    fprintf('  -Porous Points\n');
+    porous_aux = read_Porous_Points(struct_name);
+    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+    %            col 2: Porosity coefficient
+    porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(porous_info(:,1))
+        id = porous_info(i,1);
+        porous_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
+        porous_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
+    end
+   
+    porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+else
+    porous_info = 0;
+end
+
+
+% READ IN MUSCLES (IF THERE ARE MUSCLES) %
+if ( muscles_Yes == 1 )
+    fprintf('  -Force-Velocity / Length-Tension Muscle Model\n');
+    muscles_info = read_Muscle_Points(struct_name);
+        %         muscles: col 1: MASTER NODE (by lag. discretization)
+        %         col 2: SLAVE NODE (by lag. discretization)
+        %         col 3: length for max. muscle tension
+        %         col 4: muscle constant
+        %         col 5: hill parameter, a
+        %         col 6: hill parameters, b
+        %         col 7: force maximum!
+else
+    muscles_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+end
+
+
+
+
+
+
+
+
+
+
+
+
+% READ IN MUSCLES (IF THERE ARE MUSCLES) %
+if ( hill_3_muscles_Yes == 1 )
+    fprintf('  -3 Element Hill Muscle Model\n');
+    muscles3_info = read_Hill_3Muscle_Points(struct_name);
+        %         muscles: col 1: MASTER NODE (by lag. discretization)
+        %         col 2: SLAVE NODE (by lag. discretization)
+        %         col 3: length for max. muscle tension
+        %         col 4: muscle constant
+        %         col 5: hill parameter, a
+        %         col 6: hill parameters, b
+        %         col 7: force maximum!
+else
+    muscles3_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+end
+
+
+
+
 % SOLVE ELECTROPHYSIOLOGY MODEL FOR PUMPING %
 if electro_phys_Yes == 1
-    fprintf('\n--> Solving Electrophysiology Model...\n');
+    fprintf('  -Electrophysiology model via FitzHugh-Nagumo\n');
+    fprintf('\n\n--> Solving Electrophysiology Model...\n');
     [electro_potential, ePhys_Start, ePhys_End] = FitzHugh_Nagumo_1d(dt,T_FINAL);
     ePhys_Ct = 1;
-    fprintf('--> Finished Computing Electrophysiology...time for IBM!\n\n');
+    fprintf('--> Finished Computing Electrophysiology...time for IBM!\n');
 end
+
+
+
+fprintf('\n\n--> Background Flow Items\n');
+if ( tracers_Yes == 0 ) && (concentration_Yes == 0)
+    fprintf('  -No tracers nor other passive scalars immersed in fluid\n\n');
+end
+
+% READ IN TRACERS (IF THERE ARE TRACERS) %
+if (tracers_Yes == 1)
+   fprintf('  -Tracer Particles included\n');
+   [~,xT,yT] = read_Tracer_Points(struct_name);
+   tracers = zeros(length(xT),4);
+   tracers(1,1) = 1;
+   tracers(:,2) = xT;
+   tracers(:,3) = yT;
+        %tracers_info: col 1: xPt of Tracers
+        %              col 2: yPt of Tracers
+else
+   tracers = 0; 
+end
+
+
+% READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
+if ( concentration_Yes == 1 )
+    fprintf('  -Background concentration included\n');
+    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
+        %C:           Initial background concentration
+        %kDiffusion:  Diffusion constant for Advection-Diffusion
+else
+    C = 0; % placeholder for plotting 
+end
+
 
 
 
@@ -343,7 +379,7 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C);
-fprintf('\n ****** Begin IMMERSED BOUNDARY SIMULATION! ****** \n\n');
+fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
 
