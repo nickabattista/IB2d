@@ -268,7 +268,7 @@ end
 
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
 if ( muscles_Yes == 1 )
-    fprintf('  -Force-Velocity / Length-Tension Muscle Model\n');
+    fprintf('  -MUSCLE MODEL (Force-Velocity / Length-Tension Model)\n');
     muscles_info = read_Muscle_Points(struct_name);
         %         muscles: col 1: MASTER NODE (by lag. discretization)
         %         col 2: SLAVE NODE (by lag. discretization)
@@ -294,7 +294,7 @@ end
 
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
 if ( hill_3_muscles_Yes == 1 )
-    fprintf('  -3 Element Hill Muscle Model\n');
+    fprintf('  -MUSCLE MODEL (3 Element Hill Model)\n');
     muscles3_info = read_Hill_3Muscle_Points(struct_name);
         %         muscles: col 1: MASTER NODE (by lag. discretization)
         %         col 2: SLAVE NODE (by lag. discretization)
@@ -317,13 +317,15 @@ if electro_phys_Yes == 1
     [electro_potential, ePhys_Start, ePhys_End] = FitzHugh_Nagumo_1d(dt,T_FINAL);
     ePhys_Ct = 1;
     fprintf('--> Finished Computing Electrophysiology...time for IBM!\n');
+else
+    electro_potential = 0;
 end
 
 
 
 fprintf('\n\n--> Background Flow Items\n');
 if ( tracers_Yes == 0 ) && (concentration_Yes == 0)
-    fprintf('  -No tracers nor other passive scalars immersed in fluid\n\n');
+    fprintf('      (No tracers nor other passive scalars immersed in fluid)\n\n');
 end
 
 % READ IN TRACERS (IF THERE ARE TRACERS) %
@@ -408,7 +410,7 @@ while current_time < T_FINAL
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
     end
     
-    if ( electro_phys_Yes == 1)
+    if ( ( electro_phys_Yes == 1) && (muscles_Yes == 0) )
         springs_info(ePhys_Start:ePhys_End,3) = ( 1e1*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
         ePhys_Ct = ePhys_Ct + 1;
     end
@@ -428,7 +430,7 @@ while current_time < T_FINAL
     %
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
