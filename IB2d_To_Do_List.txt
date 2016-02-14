@@ -18,12 +18,11 @@
 % FLUID SOLVER / BLACK-BOX
 % 
 1. Optimize muscle model force computations
-2. Add muscle model to electrophysiology/calcium-dynamics model
-3. Stoke's Fluid Solver
-4. Non-Newtonian Fluid Solver
-5. Parallelization
-6. Port electrophysiology code to Python (thank you Christopher Strickland for all else!)
-7. Port code to Julia 
+2. Stoke's Fluid Solver
+3. Non-Newtonian Fluid Solver
+4. Parallelization
+5. Port electrophysiology code to Python (thank you Christopher Strickland for all else!)
+6. Port code to Julia 
 
 %
 % EXAMPLES
