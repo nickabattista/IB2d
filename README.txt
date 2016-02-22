@@ -78,6 +78,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex4: - Flow produced in the middle of the channel
             ex5: - Flow produced in an empty channel
             ex6: - Flow in a channel, mocking an aneurysm
+            ex7: - Flow past cylinder with attached flag (Turek-Hron)
     7. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
     8. "Tracers" - examples of inserting tracer particles into simulations
