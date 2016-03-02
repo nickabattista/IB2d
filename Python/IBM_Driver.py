@@ -569,7 +569,7 @@ def read_Tracer_Points(struct_name):
 #
 ###########################################################################
 
-def read_In_Concentration_Info(struct_name): #untested
+def read_In_Concentration_Info(struct_name):
     ''' Reads in the diffusion coefficient and initial concentration, C
     
     Args:
