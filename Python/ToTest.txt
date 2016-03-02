@@ -2,11 +2,7 @@ List of subfunctions of IBM_Driver.py that need to be tested
     using appropriate example with data:
     
 .concentration
-.spring
 .muscle (muscle and Hill_3Muscle)
-.mass
-.target
-.porous
 
 Notes:
 len(myarray[:,0]) is an order of magnitude slower than myarray.shape[0]

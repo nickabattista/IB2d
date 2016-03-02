@@ -206,10 +206,10 @@ def print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name):
                 s-1, s, 0, k_Beam, C))
         
         for s in range(N,2*N):
-            if s==0:
+            if s==N:
                 beam_fid.write('{0:d} {1:d} {2:d} {3:1.16e} {4:1.16e}\n'.format(\
                 2*N-1, s, s+1, k_Beam, C))
-            elif s <= N-2:
+            elif s <= 2*N-2:
                 beam_fid.write('{0:d} {1:d} {2:d} {3:1.16e} {4:1.16e}\n'.format(\
                 s-1, s, s+1, k_Beam, C))
             else:
@@ -217,10 +217,10 @@ def print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name):
                 s-1, s, N, k_Beam, C))
                 
         for s in range(2*N,3*N):
-            if s==0:
+            if s==2*N:
                 beam_fid.write('{0:d} {1:d} {2:d} {3:1.16e} {4:1.16e}\n'.format(\
                 3*N-1, s, s+1, k_Beam, C))
-            elif s <= N-2:
+            elif s <= 3*N-2:
                 beam_fid.write('{0:d} {1:d} {2:d} {3:1.16e} {4:1.16e}\n'.format(\
                 s-1, s, s+1, k_Beam, C))
             else:
@@ -262,7 +262,7 @@ def print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,struct_name):
             elif s >= 2*N and s <3*N-1:
                 spring_fid.write('{0:d} {1:d} {2:1.16e} {3:1.16e}\n'.format(\
                 s, s+1, k_Spring, ds_Rest))
-            elif s==3*N:
+            elif s==3*N-1:
                 spring_fid.write('{0:d} {1:d} {2:1.16e} {3:1.16e}\n'.format(\
                 s, 2*N, k_Spring, ds_Rest))
                 
