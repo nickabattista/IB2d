@@ -75,7 +75,7 @@ def Rubberband():
     
     
     # Prints .porous file!
-    alpha = 1e-1
+    alpha = 1e-4
     print_Lagrangian_Porosity(xLag,alpha,struct_name)
     
 
