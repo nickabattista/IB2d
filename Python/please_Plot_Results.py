@@ -28,6 +28,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+plt.rcParams['image.cmap'] = 'viridis'
 from math import sqrt
 
 ###########################################################################
