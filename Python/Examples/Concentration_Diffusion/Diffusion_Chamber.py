@@ -219,11 +219,11 @@ def print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name):
 def give_Me_Immsersed_Boundary_Geometry(ds,Lx,Ly):
     
     # The immsersed structure is a channel #
-    xH = list(np.arange(2*ds,Lx-2*ds+ds,ds))  #xPts on horizontal part
+    xH = list(np.arange(2*ds,Lx-2*ds+ds/100,ds))  #xPts on horizontal part
     yHB = 2*ds*np.ones(len(xH))               #yPts on BOTTOM horizontal part
     yHT = Ly - yHB                            #yPts on TOP horizontal part
     
-    yV = list(np.arange(3*ds,Ly-3*ds+ds,ds))  #xPts on horizontal part
+    yV = list(np.arange(3*ds,Ly-3*ds+ds/100,ds))  #xPts on horizontal part
     xVL = 2*ds*np.ones(len(yV))               #xPts on LEFT vertical part
     xVR = Lx - xVL                            #xPts on RIGHT vertical part
     
@@ -247,8 +247,8 @@ def give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy):
     xMax = 0.525
     yMin = 0.475
     yMax = 0.525
-    x = list(np.arange(0,Lx+dx,dx))
-    y = list(np.arange(0,Ly+dy,dy))
+    x = list(np.arange(0,Lx+dx/100,dx))
+    y = list(np.arange(0,Ly+dy/100,dy))
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax)
     
     C = np.zeros((Ny,Nx))

@@ -626,7 +626,7 @@ def read_Spring_Points(struct_name):
 #
 ###########################################################################
 
-def read_Muscle_Points(struct_name): #untested
+def read_Muscle_Points(struct_name):
     ''' Reads in the # of muscles and other information
     
     Args:

@@ -281,7 +281,8 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
     #   In this Python code, it takes in vectors instead of scalars.
     #   Universal numpy functions could probably deal with this if you don't 
     #   want to port the vectorization.
-    #   BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.  
+    #   BE CAREFUL!! xLag is MUTABLE. Pass it by value instead of reference.
+    from give_Muscle_Activation import give_Muscle_Activation
     Fm = give_Muscle_Activation(v,LF,LFO_Vec,SK_Vec,a_Vec,b_Vec,FMAX_Vec,\
                                 current_time,xPt,np.array(xLag))
     
@@ -300,7 +301,7 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
         fy[id_Slave[ii]] -= mF_y[ii]    # Sum total forces for node,
                         # i in y-direction (this is SLAVE node for this spring)
                         
-        return (fx,fy)
+    return (fx,fy)
         
         
 
