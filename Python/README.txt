@@ -33,6 +33,7 @@ This code is capable of creating Lagrangian Structures using:
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
 There are a number of ported Examples, mostly used for testing purposes.
+
 Many more are available in the Matlab code - if you port another example, please send us a pull request!
 
 If you would like us to add a specific muscle model, please contact Nick (nick.battista@unc.edu) 
