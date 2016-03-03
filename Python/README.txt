@@ -24,11 +24,11 @@ This code is capable of creating Lagrangian Structures using:
  	2. Beams (*torsional springs)
  	3. Target Points
 	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
-                        Hill (i.e.,Length-Tension) Model )
-        5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
-                        Force-Velocity/Length-Tension Model) -- UNTESTED!!
-        6. Mass Points (with or without influence of gravity)
-        7. Porous Structures
+            Hill (i.e.,Length-Tension) Model )
+    5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
+            Force-Velocity/Length-Tension Model) -- UNTESTED!! THIS IS LIKELY BROKEN.
+    6. Mass Points (with or without influence of gravity)
+    7. Porous Structures
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
