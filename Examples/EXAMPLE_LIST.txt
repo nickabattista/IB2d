@@ -32,6 +32,14 @@ GitHub: http://www.github.com/nickabattista
                    by changing resting lengths of springs
             ex4: - heart that pumps via muscle activation by 3-element Hill Model
                    combined with a length-tension/force-velocity
+            ex5: - heart that pumps w/ an electrophysiology model, e.g., 
+                   the FitzHugh-Nagumo reduced order model of Hodgkin-Huxley
+            ex6: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley with 
+                   underlying calcium dynamics	
+            ex7: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley WITH 
+                   underlying calcium dynamics WITH muscle-models
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
@@ -42,6 +50,7 @@ GitHub: http://www.github.com/nickabattista
             ex4: - Flow produced in the middle of the channel
             ex5: - Flow produced in an empty channel
             ex6: - Flow in a channel, mocking an aneurysm
+            ex7: - Flow past cylinder with attached flag (Turek-Hron)
     7. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
     8. "Tracers" - examples of inserting tracer particles into simulations
@@ -76,7 +85,7 @@ GitHub: http://www.github.com/nickabattista
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
     Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media (.porous), 
-    and initial concentration (.concentration)!  
+    initial concentration (.concentration), and electrophysiology!  
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Example in Moving_Rubberband & 

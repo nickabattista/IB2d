@@ -8,11 +8,11 @@ rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
 Tfinal = 1.25           % Final time of simulation (s)
-dt = 5.0e-5               % Time-step (s)
+dt = 5.0e-5             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
-Nx =  128                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -34,6 +34,7 @@ x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
 concentration = 0       % 0 (for no) or 1 (for yes)
+electro_phys = 0        % 0 (for no) or 1 (for yes)
 
 
 

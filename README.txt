@@ -23,6 +23,8 @@ This code is capable of creating Lagrangian Structures using:
                         Force-Velocity/Length-Tension Model)
         6. Mass Points (with or without influence of gravity)
         7. Porous Structures 
+        8. Electrophysiology (FitzHugh-Nagumo coupling w/ or w/o calcium
+			dynamics and w/ or w/o muscle models)
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -58,6 +60,14 @@ If you use this code for the purposes of teaching, research, or recreation pleas
                    by changing resting lengths of springs
             ex4: - heart tube that pumps via muscle activation by 3-element 
                    Hill Model combined w/ length-tension/force-velocity model
+            ex5: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley
+            ex6: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley with 
+                   underlying calcium dynamics
+            ex7: - heart that pumps using an electrophysiology model, e.g. the
+                   FitzHugh-Nagumo reduced order model of Hodgkin-Huxley WITH 
+                   underlying calcium dynamics WITH muscle-models	
     5. "Lymphangion" - tube that pumps via muscle activation using combined a
                    hybrid length/tension and Hill model
     6. "Channel_Flow" - various channel flow examples with parabolic flow being 
@@ -68,6 +78,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex4: - Flow produced in the middle of the channel
             ex5: - Flow produced in an empty channel
             ex6: - Flow in a channel, mocking an aneurysm
+            ex7: - Flow past cylinder with attached flag (Turek-Hron)
     7. "Pulsing_Heart" - cartoon heart that "pumps" via moving target points 
                          (interpolates between two phases)
     8. "Tracers" - examples of inserting tracer particles into simulations

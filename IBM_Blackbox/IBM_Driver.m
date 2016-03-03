@@ -13,13 +13,16 @@
 % 	1. Springs
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
-%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%   4. Mass Points
+%   5. Porous Points
+%	6. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%   7. 3-Element Hill Muscle Model
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting-lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -44,6 +47,8 @@ function [X, Y, U, V, xLag, yLag] = IBM_Driver(struct_name, mu, rho, grid_Info, 
 %    F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
 %    F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
 %
+fprintf('\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
+fprintf('\n\n--> Reading input data for simulation...\n\n');
 
 
 % Temporal Information
@@ -87,7 +92,7 @@ gravity_Yes = model_Info(12);        % Gravity: 0 (for no) or 1 (for yes)
 %NOTE: model_Info(13)/(14) - components of gravity vector
 porous_Yes = model_Info(15);         % Porous Media: 0 (for no) or 1 (for yes)
 concentration_Yes = model_Info(16);  % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-
+electro_phys_Yes = model_Info(17);   % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 
 
 
@@ -114,39 +119,27 @@ end
 % % % % % HOPEFULLY WHERE I CAN READ IN INFO!!! % % % % %
 
 
+
+
+
 % READ IN LAGRANGIAN POINTS %
 [Nb,xLag,yLag] = read_Vertex_Points(struct_name);
 grid_Info(8) = Nb;          % # Total Number of Lagrangian Pts.
 xLag_P = xLag;              % Initialize previous Lagrangian x-Values (for use in muscle-model)
 yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use in muscle-model)
 
+fprintf('\n--> FIBER MODEL INCLUDES: \n');
 
-% READ IN TRACERS (IF THERE ARE TRACERS) %
-if (tracers_Yes == 1)
-   [~,xT,yT] = read_Tracer_Points(struct_name);
-   tracers = zeros(length(xT),4);
-   tracers(1,1) = 1;
-   tracers(:,2) = xT;
-   tracers(:,3) = yT;
-        %tracers_info: col 1: xPt of Tracers
-        %              col 2: yPt of Tracers
-else
-   tracers = 0; 
-end
-
-
-% READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
-if ( concentration_Yes == 1 )
-    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
-        %C:           Initial background concentration
-        %kDiffusion:  Diffusion constant for Advection-Diffusion
-else
-    C = 0; % placeholder for plotting 
-end
 
 
 % READ IN SPRINGS (IF THERE ARE SPRINGS) %
 if ( springs_Yes == 1 )
+    fprintf('  -Springs and ');
+    if update_Springs_Flag == 0
+        fprintf('NOT dynamically updating spring properties\n');
+    else
+        fprintf('dynamically updating spring properties\n');
+    end
     springs_info = read_Spring_Points(struct_name);
         %springs_info: col 1: starting spring pt (by lag. discretization)
         %              col 2: ending spring pt. (by lag. discretization)
@@ -159,8 +152,123 @@ end
 
 
 
+
+
+% READ IN BEAMS (IF THERE ARE BEAMS) %
+if ( beams_Yes == 1)
+    fprintf('  -Beams ("Torsional Springs") and ');
+    if update_Beams_Flag == 0
+        fprintf('NOT dynamically updating beam properties\n');
+    else
+        fprintf('dynamically updating beam properties\n');
+    end
+    
+    beams_info = read_Beam_Points(struct_name);
+    %beams:      col 1: 1ST PT.
+    %            col 2: MIDDLE PT. (where force is exerted)
+    %            col 3: 3RD PT.
+    %            col 4: beam stiffness
+    %            col 5: curavture
+else
+    beams_info = 0;
+end
+
+
+
+% READ IN TARGET POINTS (IF THERE ARE TARGET PTS) %
+if ( target_pts_Yes == 1)
+    fprintf('  -Target Pts. and ');
+    if update_Target_Pts == 0
+        fprintf('NOT dynamically updating target point properties\n');
+    else
+        fprintf('dynamically updating target point properties\n');
+    end
+    
+    target_aux = read_Target_Points(struct_name);
+    %target_aux: col 1: Lag Pt. ID w/ Associated Target Pt.
+    %            col 2: target STIFFNESSES
+    target_info(:,1) = target_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(target_info(:,1))
+        id = target_info(i,1);
+        target_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Target Pt. Identities
+        target_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Target Pt. Identities
+    end
+   
+    target_info(:,4) = target_aux(:,2); %Stores Target Stiffnesses 
+else
+    target_info = 0;
+end
+
+
+
+
+% READ IN MASS POINTS (IF THERE ARE MASS PTS) %
+if ( mass_Yes == 1)
+    fprintf('  -Mass Pts. with ');
+    if gravity_Yes == 0
+        fprintf('NO artificial gravity\n');
+    else
+        fprintf('artificial gravity\n');
+    end
+    mass_aux = read_Mass_Points(struct_name);
+    %target_aux: col 1: Lag Pt. ID w/ Associated Mass Pt.
+    %            col 2: "Mass-spring" stiffness parameter
+    %            col 3: "MASS" value parameter
+    mass_info(:,1) = mass_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(mass_info(:,1))
+        id = mass_info(i,1);
+        mass_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Mass Pt. Identities
+        mass_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Mass Pt. Identities
+    end
+   
+    mass_info(:,4) = mass_aux(:,2);   %Stores "mass-spring" parameter 
+    mass_info(:,5) = mass_aux(:,3);   %Stores "MASS" value parameter
+else
+    mass_info = 0;
+end
+
+
+% CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) %
+if gravity_Yes == 1
+    %gravity_Vec(1) = model_Info(12);     % x-Component of Gravity Vector
+    %gravity_Vec(2) = model_Info(13);     % y-Component of Gravity Vector
+    xG = model_Info(13);
+    yG = model_Info(14);
+    normG = sqrt( xG^2 + yG^2 );
+    gravity_Info = [gravity_Yes xG/normG yG/normG];
+    %   col 1: flag if considering gravity
+    %   col 2: x-component of gravity vector (normalized)
+    %   col 3: y-component of gravity vector (normalized)
+    
+    clear xG yG normG;
+    
+else
+    gravity_Info = 0;
+end
+
+
+% READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
+if ( porous_Yes == 1)
+    fprintf('  -Porous Points\n');
+    porous_aux = read_Porous_Points(struct_name);
+    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+    %            col 2: Porosity coefficient
+    porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(porous_info(:,1))
+        id = porous_info(i,1);
+        porous_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
+        porous_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
+    end
+   
+    porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+else
+    porous_info = 0;
+end
+
+
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
 if ( muscles_Yes == 1 )
+    fprintf('  -MUSCLE MODEL (Force-Velocity / Length-Tension Model)\n');
     muscles_info = read_Muscle_Points(struct_name);
         %         muscles: col 1: MASTER NODE (by lag. discretization)
         %         col 2: SLAVE NODE (by lag. discretization)
@@ -183,8 +291,10 @@ end
 
 
 
+
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
 if ( hill_3_muscles_Yes == 1 )
+    fprintf('  -MUSCLE MODEL (3 Element Hill Model)\n');
     muscles3_info = read_Hill_3Muscle_Points(struct_name);
         %         muscles: col 1: MASTER NODE (by lag. discretization)
         %         col 2: SLAVE NODE (by lag. discretization)
@@ -200,108 +310,50 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-% READ IN MASS POINTS (IF THERE ARE MASS PTS) %
-if ( mass_Yes == 1)
-    mass_aux = read_Mass_Points(struct_name);
-    %target_aux: col 1: Lag Pt. ID w/ Associated Mass Pt.
-    %            col 2: "Mass-spring" stiffness parameter
-    %            col 3: "MASS" value parameter
-    mass_info(:,1) = mass_aux(:,1); %Stores Lag-Pt IDs in col vector
-    for i=1:length(mass_info(:,1))
-        id = mass_info(i,1);
-        mass_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Mass Pt. Identities
-        mass_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Mass Pt. Identities
-    end
-   
-    mass_info(:,4) = mass_aux(:,2);   %Stores "mass-spring" parameter 
-    mass_info(:,5) = mass_aux(:,3);   %Stores "MASS" value parameter
+% SOLVE ELECTROPHYSIOLOGY MODEL FOR PUMPING %
+if electro_phys_Yes == 1
+    fprintf('  -Electrophysiology model via FitzHugh-Nagumo\n');
+    fprintf('\n\n--> Solving Electrophysiology Model...\n');
+    [electro_potential, ePhys_Start, ePhys_End] = FitzHugh_Nagumo_1d(dt,T_FINAL);
+    ePhys_Ct = 1;
+    fprintf('--> Finished Computing Electrophysiology...time for IBM!\n');
 else
-    mass_info = 0;
+    electro_potential = 0;
 end
 
 
 
+fprintf('\n\n--> Background Flow Items\n');
+if ( tracers_Yes == 0 ) && (concentration_Yes == 0)
+    fprintf('      (No tracers nor other passive scalars immersed in fluid)\n\n');
+end
 
-
-% READ IN TARGET POINTS (IF THERE ARE TARGET PTS) %
-if ( target_pts_Yes == 1)
-    target_aux = read_Target_Points(struct_name);
-    %target_aux: col 1: Lag Pt. ID w/ Associated Target Pt.
-    %            col 2: target STIFFNESSES
-    target_info(:,1) = target_aux(:,1); %Stores Lag-Pt IDs in col vector
-    for i=1:length(target_info(:,1))
-        id = target_info(i,1);
-        target_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Target Pt. Identities
-        target_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Target Pt. Identities
-    end
-   
-    target_info(:,4) = target_aux(:,2); %Stores Target Stiffnesses 
+% READ IN TRACERS (IF THERE ARE TRACERS) %
+if (tracers_Yes == 1)
+   fprintf('  -Tracer Particles included\n');
+   [~,xT,yT] = read_Tracer_Points(struct_name);
+   tracers = zeros(length(xT),4);
+   tracers(1,1) = 1;
+   tracers(:,2) = xT;
+   tracers(:,3) = yT;
+        %tracers_info: col 1: xPt of Tracers
+        %              col 2: yPt of Tracers
 else
-    target_info = 0;
+   tracers = 0; 
 end
 
 
-
-
-% READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
-if ( porous_Yes == 1)
-    porous_aux = read_Porous_Points(struct_name);
-    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
-    %            col 2: Porosity coefficient
-    porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
-    for i=1:length(porous_info(:,1))
-        id = porous_info(i,1);
-        porous_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
-        porous_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
-    end
-   
-    porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+% READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
+if ( concentration_Yes == 1 )
+    fprintf('  -Background concentration included\n');
+    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
+        %C:           Initial background concentration
+        %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
-    porous_info = 0;
+    C = 0; % placeholder for plotting 
 end
 
 
-
-% READ IN BEAMS (IF THERE ARE BEAMS) %
-if ( beams_Yes == 1)
-    beams_info = read_Beam_Points(struct_name);
-    %beams:      col 1: 1ST PT.
-    %            col 2: MIDDLE PT. (where force is exerted)
-    %            col 3: 3RD PT.
-    %            col 4: beam stiffness
-    %            col 5: curavture
-else
-    beams_info = 0;
-end
-
-
-% CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) %
-if gravity_Yes == 1
-    %gravity_Vec(1) = model_Info(12);     % x-Component of Gravity Vector
-    %gravity_Vec(2) = model_Info(13);     % y-Component of Gravity Vector
-    xG = model_Info(13);
-    yG = model_Info(14);
-    normG = sqrt( xG^2 + yG^2 );
-    gravity_Info = [gravity_Yes xG/normG yG/normG];
-    %   col 1: flag if considering gravity
-    %   col 2: x-component of gravity vector (normalized)
-    %   col 3: y-component of gravity vector (normalized)
-    
-    clear xG yG normG;
-    
-else
-    gravity_Info = 0;
-end
 
 
 % Initialize the initial velocities to zero.
@@ -332,13 +384,18 @@ vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)];
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
 print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C);
+fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
 
 
 %
 %
+%
+% **************************************************************
 % * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
+% **************************************************************
+%
 %
 %
 while current_time < T_FINAL
@@ -351,6 +408,11 @@ while current_time < T_FINAL
     
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
+    end
+    
+    if ( ( electro_phys_Yes == 1) && (muscles_Yes == 0) )
+        springs_info(ePhys_Start:ePhys_End,3) = ( 1e1*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
+        ePhys_Ct = ePhys_Ct + 1;
     end
     
     if ( ( update_Springs_Flag == 1 ) && ( springs_Yes == 1 ) )
@@ -368,7 +430,7 @@ while current_time < T_FINAL
     %
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -404,11 +466,12 @@ while current_time < T_FINAL
     %Uh, Vh instead of U,V?
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
+    
     %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
-       xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*Por_Mat(:,1).*nX;
-       yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) - dt*Por_Mat(:,2).*nY;
+       xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nX;
+       yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nY;
        xLag = mod(xLag, Lx); % If structure goes outside domain
        yLag = mod(yLag, Ly); % If structure goes outside domain
     end
@@ -447,6 +510,11 @@ while current_time < T_FINAL
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
+        %pause();
+         %electro_potential(ePhys_Ct,:)'
+         %springs_info(ePhys_Start:ePhys_End,3)
+         %springs_info(:,3)
+         %pause();
         
     end
 
@@ -454,7 +522,7 @@ while current_time < T_FINAL
     % Update current_time value & counter
     current_time = current_time+dt;
     cter = cter + 1;
-    %pause();
+    %pause(0.);
     
     
 end %ENDS TIME-STEPPING LOOP

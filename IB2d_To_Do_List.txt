@@ -9,7 +9,7 @@
 % LAGRANGIAN STRUCTURE 
 %
 1. Finish force calculation for 3-Element Hill Model
-2. Update porous connections
+2. Update porous connections (currently works for closed boundary)
 3. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
 4. Add non-invariant beams (now just have torsional springs)
 5. Allow for one than one boundary to be read in
@@ -18,11 +18,11 @@
 % FLUID SOLVER / BLACK-BOX
 % 
 1. Optimize muscle model force computations
-2. Add neuro-mechanical coupling via FitzHugh-Nagumo
-3. Stoke's Fluid Solver
-4. Non-Newtonian Fluid Solver
-5. Parallelization
-6. Port code to Python
+2. Stoke's Fluid Solver
+3. Non-Newtonian Fluid Solver
+4. Parallelization
+5. Port electrophysiology code to Python (thank you Christopher Strickland for all else!)
+6. Port code to Julia 
 
 %
 % EXAMPLES

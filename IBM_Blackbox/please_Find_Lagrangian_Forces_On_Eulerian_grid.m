@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential)
 
 %
 % The components of the force are given by
@@ -76,13 +76,16 @@ beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
 muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
 muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
 mass_Yes = model_Info(11);          % Mass Pts: 0 (for no) or 1 (for yes)
+electro_phys_Yes = model_Info(17);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 
 
 %
 % Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY (if using combined length/tension-Hill model) %
 %
-if ( muscle_LT_FV_Yes == 1)
+if ( ( muscle_LT_FV_Yes == 1 ) && ( electro_phys_Yes == 0 ) )
     [fx_muscles, fy_muscles] = give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt);
+elseif ( ( muscle_LT_FV_Yes == 1 ) && ( electro_phys_Yes == 1 ) )
+    [fx_muscles, fy_muscles] = give_ElectroPhys_Ca_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt,electro_potential);
 else
     fx_muscles = zeros(length(xLag),1);
     fy_muscles = fx_muscles;
@@ -254,6 +257,77 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+function [fx,fy] = give_ElectroPhys_Ca_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt,electro_potential)
+
+
+Nmuscles = length(muscles(:,1));  % # of Muscles
+m_1 = muscles(:,1);               % Initialize storage for MASTER NODE Muscle Connection
+m_2 = muscles(:,2);               % Initialize storage for SLAVE NODE Muscle Connection
+LFO_Vec = muscles(:,3);           % Stores length for max. muscle tension
+SK_Vec = muscles(:,4);            % Stores muscle constant
+a_Vec = muscles(:,5);             % Stores Hill Parameter, a
+b_Vec = muscles(:,6);             % Stores Hill Parameter, b
+FMAX_Vec = muscles(:,7);          % Stores Force-Maximum for Muscle
+
+fx = zeros(Nb,1);                 % Initialize storage for x-forces
+fy = fx;                          % Initialize storage for y-forces
+
+ct = current_time/dt;             % gives count of time-steps for simulation
+
+for i=1:Nmuscles
+    
+    id_Master = m_1(i);          % Master Node index for i-th muscle
+    id_Slave = m_2(i);           % Slave Node index for i-th muscle
+    LFO = LFO_Vec(i);            % Length for max. muscle tension for i-th muscle
+    sk = SK_Vec(i);              % Muscle constant for i-th muscle
+    a = a_Vec(i);                % Hill parameter, a, for i-th muscle
+    b = b_Vec(i);                % Hill parameter, b, for i-th muscle
+    Fmax = FMAX_Vec(i);          % Force-Maximum for i-th muscle
+    
+    %xPt = xLag( id_Master );     % x-Pt of interest at the moment to drive muscle contraction
+    
+    dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
+    dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
+    LF = sqrt( dx^2 + dy^2 );              % Euclidean DISTANCE between master and slave node
+    
+    
+    dx_P = xLag_P(id_Slave) - xLag_P(id_Master); % x-Distance btwn slave and master node
+    dy_P = yLag_P(id_Slave) - yLag_P(id_Master); % y-Distance btwn slave and master node
+    LF_P = sqrt( dx_P^2 + dy_P^2 );              % Euclidean DISTANCE between master and slave node
+    
+    v =  abs(LF-LF_P)/dt;        % How fast the muscle is contracting/expanding 
+
+    % Find actual muscle activation magnitude
+    Fm = give_Ca_ElectroPhys_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,ct,id_Master,electro_potential);
+    
+    mF_x = Fm*(dx/LF);           % cos(theta) = dx / LF;
+    mF_y = Fm*(dy/LF);           % sin(theta) = dy / LF;
+    
+    fx(id_Master,1) = fx(id_Master,1) + mF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
+    fy(id_Master,1) = fy(id_Master,1) + mF_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
+    
+    fx(id_Slave,1) = fx(id_Slave,1) - mF_x;    % Sum total forces for node, i in x-direction (this is SLAVE node for this spring)
+    fy(id_Slave,1) = fy(id_Slave,1) - mF_y;    % Sum total forces for node, i in y-direction (this is SLAVE node for this spring)
+
+    
+end
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION computes the Lagrangian MUSCLE Force Densities for LENGTH-TENSION/FORCE-VELOCITY MUSCLE MODEL.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function [fx,fy] = give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt)
 
 
@@ -306,6 +380,13 @@ for i=1:Nmuscles
 
     
 end
+
+
+
+
+
+
+
 
 
 

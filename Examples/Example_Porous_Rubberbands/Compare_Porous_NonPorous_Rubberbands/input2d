@@ -34,10 +34,11 @@ x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 1        % 0 (for no) or 1 (for yes)
 concentration = 0       % 0 (for no) or 1 (for yes)
+electro_phys = 0        % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 20          % How often to print (PLOT) to screen
+print_dump = 50          % How often to print (PLOT) to screen
 plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 0          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
