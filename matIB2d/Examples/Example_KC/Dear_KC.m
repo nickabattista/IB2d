@@ -49,33 +49,30 @@ struct_name = 'heart'; % Name for .vertex, .spring, etc files.
 
 % Call function to construct geometry
 [x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,ds);
-Nb1 = length(x1);
+Nb1 = length(x1)
 
 % Call function to construct geometry
-frac2 = 0.015;
 [x2,y2] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,ds);
-Nb2 = length(x2);
+Nb2 = length(x2)
+
+% Call function to construct geometry
+[x3,y3] = give_Me_Immsersed_Boundary_Geometry_3(Lx,Nx,ds);
+Nb3 = length(x3)
 
 % Plot Geometry to test BEFORE taking out pts.
 figure(1)
-plot(x1,y1,'r-'); hold on;
-plot(x1,y1,'*'); hold on;
-plot(x2,y2,'m-'); hold on;
-plot(x2,y2,'g*'); hold on;
-xlabel('x'); ylabel('y');
-axis square;
+plot(x1,y1,'r*'); hold on;
+axis([0 Lx 0 Ly]);
 
-[x1,y1,x2,y2] = please_Take_Out_Points(x1,y1,x2,y2);
-
-
-% Plot Geometry to test AFTER taking out pts.
 figure(2)
-plot(x1,y1,'r-'); hold on;
-plot(x1,y1,'*'); hold on;
-plot(x2,y2,'m-'); hold on;
-plot(x2,y2,'g*'); hold on;
-xlabel('x'); ylabel('y');
-axis square;
+plot(x2,y2,'b*'); hold on;
+axis([0 Lx 0 Ly]);
+
+figure(3)
+plot(x3,y3,'k*'); hold on;
+axis([0 Lx 0 Ly]);
+
+pause();
 
 % Print files to .txt files
 please_Print_Vertices_To_File(x1,y1,x2,y2)
@@ -224,8 +221,21 @@ yC = -Lx/2;
 [xEx1,yEx1] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.54,yC);
 [xEx2,yEx2] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.58,yC);
 
-xLag = [xH xi xK xCap xEx1 xEx2];
-yLag = [yH yi yK yCap yEx1 yEx2];
+xBL2 =  0:ds:Lx/4+3*ds;  xBL2 = xBL2 + 3/8*Lx - 2*ds;
+yTL2 =  0.75*ones(1,length(xBL2));
+yBL2 =  0.25*ones(1,length(xBL2));
+
+xBL = 0:ds:Lx/2+2*ds; xBL = xBL + Lx/4 - ds;
+yTL = 0.82*ones(1,length(xBL));
+yBL = 0.18*ones(1,length(xBL));
+
+xBL3 = 0:ds:Lx/8+ds; xBL3 = xBL3 + 7/16*Lx -ds;
+yBL3 = 0.9*ones(1,length(xBL3));
+yTL3 = 0.1*ones(1,length(xBL3));
+
+
+xLag = [xH xi xK xCap xEx1 xEx2 xBL xBL2 xBL3 xBL(1:end-1) xBL2 xBL3];
+yLag = [yH yi yK yCap yEx1 yEx2 yBL yBL2 yBL3 yTL(1:end-1) yTL2 yTL3];
 
 %plot(xH,yH,'r*'); hold on;
 %plot(xi,yi,'r*'); hold on;
@@ -274,33 +284,118 @@ yC = -1*Lx/5 - Lx/6;
 [xo5,yo5] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.48,yC);
 [xo6,yo6] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.52,yC);
 
+xBL = 0:ds:Lx/2.5; xBL = xBL + 3/10*Lx;
+yTL = 0.84*ones(1,length(xBL));
+yBL = 0.18*ones(1,length(xBL));
 
-plot(xW,yW,'r*'); hold on;
-plot(xo,yo,'r*'); hold on;
-plot(xu,yu,'r*'); hold on;
-plot(xl,yl,'r*'); hold on;
-plot(xd,yd,'r*'); hold on;
 
-plot(xy,yy,'r*'); hold on;
-plot(xo2,yo2,'r*'); hold on;
-plot(xu2,yu2,'r*'); hold on;
+xLag = [xW xo xu xl xd xy xo2 xu2 xl2 xi xk xe xt xo3 xo4 xo5 xo6 xBL xBL];
+yLag = [yW yo yu yl yd yy yo2 yu2 yl2 yi yk ye yt yo3 yo4 yo5 yo6 yTL yBL];
 
-plot(xl2,yl2,'r*'); hold on;
-plot(xi,yi,'r*'); hold on;
-plot(xk,yk,'r*'); hold on;
-plot(xe,ye,'r*'); hold on;
+% plot(xW,yW,'r*'); hold on;
+% plot(xo,yo,'r*'); hold on;
+% plot(xu,yu,'r*'); hold on;
+% plot(xl,yl,'r*'); hold on;
+% plot(xd,yd,'r*'); hold on;
+% 
+% plot(xy,yy,'r*'); hold on;
+% plot(xo2,yo2,'r*'); hold on;
+% plot(xu2,yu2,'r*'); hold on;
+% 
+% plot(xl2,yl2,'r*'); hold on;
+% plot(xi,yi,'r*'); hold on;
+% plot(xk,yk,'r*'); hold on;
+% plot(xe,ye,'r*'); hold on;
+% 
+% plot(xt,yt,'r*'); hold on;
+% plot(xo3,yo3,'r*'); hold on;
+% 
+% plot(xo4,yo4,'r*'); hold on;
+% plot(xo5,yo5,'r*'); hold on;
+% plot(xo6,yo6,'r*'); hold on;
+% axis([0 Lx 0 Lx]);
 
-plot(xt,yt,'r*'); hold on;
-plot(xo3,yo3,'r*'); hold on;
 
-plot(xo4,yo4,'r*'); hold on;
-plot(xo5,yo5,'r*'); hold on;
-plot(xo6,yo6,'r*'); hold on;
-axis([0 Lx 0 Lx]);
-pause();
 
-%xLag = [xH xi xK xCap xEx1 xEx2];
-%yLag = [yH yi yK yCap yEx1 yEx2];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry for PHASE 2
+%           msg: "Would you like to ..."
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_3(Lx,Nx,ds)
+
+% The immsersed structure message #1: Hi KC!! %
+len = Lx/9;
+
+xC = -Lx/8;
+yC = -3*Lx/4;
+shift = 0.2;
+
+[xo4,yo4] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC,yC+0.09);
+[xo5,yo5] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.04,yC+0.09);
+[xo6,yo6] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.08,yC+0.09);
+
+[xg,yg] = give_Me_The_Letter_Please(ds,len,'g',xC-shift,yC);
+[xo,yo] = give_Me_The_Letter_Please(ds,len,'o',xC-0.1-shift,yC);
+
+[xo2,yo2] = give_Me_The_Letter_Please(ds,1.2*len,'o',xC-0.25-shift,yC);
+[xn,yn] = give_Me_The_Letter_Please(ds,1.2*len,'n',xC-0.34-shift,yC);
+
+[xa,ya] = give_Me_The_Letter_Please(ds,len,'a',xC-0.48-shift,yC);
+
+
+xC = -Lx/5;
+yC = -Lx/2;
+[xd,yd] = give_Me_The_Letter_Please(ds,len,'d',xC,yC);
+[xa2,ya2] = give_Me_The_Letter_Please(ds,len,'a',xC-0.08,yC);
+[xt,yt] = give_Me_The_Letter_Please(ds,len,'t',xC-0.16,yC);
+[xe,ye] = give_Me_The_Letter_Please(ds,len,'e',xC-0.22,yC);
+
+[xw,yw] = give_Me_The_Letter_Please(ds,1.1*len,'w',xC-0.37,yC);
+[xi,yi] = give_Me_The_Letter_Please(ds,len,'i',xC-0.45,yC);
+[xt2,yt2] = give_Me_The_Letter_Please(ds,len,'t',xC-0.505,yC);
+[xh,yh] = give_Me_The_Letter_Please(ds,len,'h',xC-0.58,yC);
+
+xC = -Lx/2.5;
+yC = -Lx/4;
+[xm,ym] = give_Me_The_Letter_Please(ds,1.1*len,'m',xC,yC);
+[xe2,ye2] = give_Me_The_Letter_Please(ds,len,'e',xC-0.12,yC);
+[xQU,yQU] = give_Me_The_Letter_Please(ds,1.2*len,'?',xC-0.22,yC);
+
+xLag = [xo4 xo5 xo6 xg xo xo2 xn xa xd xa2 xt xe xw xi xt2 xh xm xe2 xQU];
+yLag = [yo4 yo5 yo6 yg yo yo2 yn ya yd ya2 yt ye yw yi yt2 yh ym ye2 yQU];
+
+
+% plot(xo4,yo4,'r*'); hold on;
+% plot(xo5,yo5,'r*'); hold on;
+% plot(xo6,yo6,'r*'); hold on;
+% 
+% plot(xg,yg,'r*'); hold on;
+% plot(xo,yo,'r*'); hold on;
+% 
+% plot(xo2,yo2,'r*'); hold on;
+% plot(xn,yn,'r*'); hold on;
+% 
+% plot(xa,ya,'r*'); hold on;
+% 
+% plot(xd,yd,'r*'); hold on;
+% plot(xa2,ya2,'r*'); hold on;
+% plot(xt,yt,'r*'); hold on;
+% plot(xe,ye,'r*'); hold on;
+% 
+% plot(xw,yw,'r*'); hold on;
+% plot(xi,yi,'r*'); hold on;
+% plot(xt2,yt2,'r*'); hold on;
+% plot(xh,yh,'r*'); hold on;
+% 
+% plot(xm,ym,'r*'); hold on;
+% plot(xe2,ye2,'r*'); hold on;
+% plot(xQU,yQU,'r*'); hold on;
+% 
+% axis([0 Lx 0 Lx]);
+
 
 
 
@@ -332,7 +427,7 @@ yLag = frac*yLag + 0.5;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_3(Lx,Nx,frac,Nb)
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_4(Lx,Nx,frac,Nb)
 
 % The immsersed structure is a heart %
 ds = 2*pi/(Nb-1);
@@ -728,8 +823,8 @@ elseif strcmp(letter,'w')
    xDL = xDL - xC - len/4;
    yDL = yDL - yC - len/2;
  
-   x = [xDL xDr(2:end-1) xDL+len/2 xDr(2:end)+len/2];
-   y = [yDL yDr(2:end-1) yDL yDr(2:end)];   
+   x = [xDL xDr(2:end) xDL+len/2 xDr(2:end)+len/2];
+   y = [yDL yDr(2:end) yDL yDr(2:end)];   
    
 elseif strcmp(letter,'W')
     
