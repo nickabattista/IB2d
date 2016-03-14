@@ -38,7 +38,7 @@ Nx =  32;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny =  32;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
-
+ds = Lx/(2*Nx);  % Spatial step!
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
@@ -48,13 +48,12 @@ struct_name = 'heart'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-frac1 = 0.022;
-[x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,frac1);
+[x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,ds);
 Nb1 = length(x1);
 
 % Call function to construct geometry
 frac2 = 0.015;
-[x2,y2] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,frac2,Nb1);
+[x2,y2] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,ds);
 Nb2 = length(x2);
 
 % Plot Geometry to test BEFORE taking out pts.
@@ -207,23 +206,105 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: creates the Lagrangian structure geometry for PHASE 1
+%           msg: "Hi KC!!"
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,frac)
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,ds)
 
-% The immsersed structure is a heart %
-tVec = 0:Lx/(2*Nx):2*pi;
-for i=1:length(tVec)
-    t = tVec(i);
-    xLag(i)	=	16*sin(t)^3;
-    yLag(i)	=	13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t);
-end
+% The immsersed structure message #1: Hi KC!! %
+len = Lx/5;
 
-xLag = frac*xLag + 0.5;
-yLag = frac*yLag + 0.5;
+xC = -Lx/4;
+yC = -Lx/2;
+[xH,yH] = give_Me_The_Letter_Please(ds,len,'H',xC,yC);
+[xi,yi] = give_Me_The_Letter_Please(ds,len,'i',xC-0.1,yC);
+[xK,yK] = give_Me_The_Letter_Please(ds,len,'K',xC-0.3,yC);
+[xCap,yCap] = give_Me_The_Letter_Please(ds,len,'C',xC-0.46,yC);
+[xEx1,yEx1] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.54,yC);
+[xEx2,yEx2] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.58,yC);
+
+xLag = [xH xi xK xCap xEx1 xEx2];
+yLag = [yH yi yK yCap yEx1 yEx2];
+
+%plot(xH,yH,'r*'); hold on;
+%plot(xi,yi,'r*'); hold on;
+%plot(xK,yK,'r*'); hold on;
+%plot(xCap,yCap,'r*'); hold on;
+%plot(xEx1,yEx1,'r*'); hold on;
+%plot(xEx2,yEx2,'r*'); hold on;
+%axis([0 Lx 0 Lx]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry for PHASE 2
+%           msg: "Would you like to ..."
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,ds)
+
+% The immsersed structure message #1: Hi KC!! %
+len = Lx/8;
+
+xC = -Lx/6;
+yC = -2*Lx/3;
+[xW,yW] = give_Me_The_Letter_Please(ds,len,'W',xC,yC);
+[xo,yo] = give_Me_The_Letter_Please(ds,len,'o',xC-0.1,yC);
+[xu,yu] = give_Me_The_Letter_Please(ds,len,'u',xC-0.18,yC);
+[xl,yl] = give_Me_The_Letter_Please(ds,len,'l',xC-0.27,yC);
+[xd,yd] = give_Me_The_Letter_Please(ds,1.2*len,'d',xC-0.29,yC);
+
+[xy,yy] = give_Me_The_Letter_Please(ds,1.2*len,'y',xC-0.47,yC);
+[xo2,yo2] = give_Me_The_Letter_Please(ds,len,'o',xC-0.55,yC);
+[xu2,yu2] = give_Me_The_Letter_Please(ds,len,'u',xC-0.63,yC);
+
+xC = -Lx/4;
+yC = -1*Lx/4 - Lx/6;
+[xl2,yl2] = give_Me_The_Letter_Please(ds,len,'l',xC,yC);
+[xi,yi] = give_Me_The_Letter_Please(ds,len,'i',xC-0.01,yC);
+[xk,yk] = give_Me_The_Letter_Please(ds,len,'k',xC-0.07,yC);
+[xe,ye] = give_Me_The_Letter_Please(ds,len,'e',xC-0.13,yC);
+
+[xt,yt] = give_Me_The_Letter_Please(ds,len,'t',xC-0.27,yC);
+[xo3,yo3] = give_Me_The_Letter_Please(ds,len,'o',xC-0.32,yC);
+
+yC = -1*Lx/5 - Lx/6;
+[xo4,yo4] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.44,yC);
+[xo5,yo5] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.48,yC);
+[xo6,yo6] = give_Me_The_Letter_Please(ds/3,len/6,'o',xC-0.52,yC);
+
+
+plot(xW,yW,'r*'); hold on;
+plot(xo,yo,'r*'); hold on;
+plot(xu,yu,'r*'); hold on;
+plot(xl,yl,'r*'); hold on;
+plot(xd,yd,'r*'); hold on;
+
+plot(xy,yy,'r*'); hold on;
+plot(xo2,yo2,'r*'); hold on;
+plot(xu2,yu2,'r*'); hold on;
+
+plot(xl2,yl2,'r*'); hold on;
+plot(xi,yi,'r*'); hold on;
+plot(xk,yk,'r*'); hold on;
+plot(xe,ye,'r*'); hold on;
+
+plot(xt,yt,'r*'); hold on;
+plot(xo3,yo3,'r*'); hold on;
+
+plot(xo4,yo4,'r*'); hold on;
+plot(xo5,yo5,'r*'); hold on;
+plot(xo6,yo6,'r*'); hold on;
+axis([0 Lx 0 Lx]);
+pause();
+
+%xLag = [xH xi xK xCap xEx1 xEx2];
+%yLag = [yH yi yK yCap yEx1 yEx2];
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%s%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: creates the Lagrangian structure geometry for the Heart
 %
@@ -304,31 +385,450 @@ fclose(fileID);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: give me the letter!
+% FUNCTION: give me the letter!!!!!
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [x,y] = give_Me_The_Letter_Please(ds,le,letter,xC,yC)
+function [x,y] = give_Me_The_Letter_Please(ds,len,letter,xC,yC)
 
 if strcmp(letter,'a')
-    r = len/2.2;
-    theta = 0:2*pi/ds:2*pi;
+    r = len/4.1;
+    dt = ds/r;
+    theta = 0:dt:2*pi;
     for i=1:length(theta)
        xA(i) = r*cos(theta(i)) - xC;
-       yA(i) = r*sin(theta(i)) - yC;
+       yA(i) = r*sin(theta(i)) - yC - len/4;
     end
     
-    yLine = -r:ds:r; yLine = yLine - yC;
-    xLine = r*ones(1,length(yLine)) - xC;
+    yLine = [-r:ds:r r]; yLine = yLine - yC - len/4;
+    xLine = r*ones(1,length(yLine)) - (xC-ds/6);
+    
+    x = [xA xLine];
+    y = [yA yLine];
+
+elseif strcmp(letter,'C')
+    
+    r = len/2;
+        dt = ds/r;
+    theta = pi/2:dt:pi-0.25*dt;
+    theta = [theta pi -theta];
+    for i=1:length(theta)
+       x(i) = 3*r/4*cos(theta(i)) - xC;
+       y(i) = r*sin(theta(i)) - yC;
+    end
+    
+    xTB = 0:3*ds/4:len/6;
+    xTB = xTB - xC;
+    yT = r*ones(1,length(xTB))-yC;
+    yB = -r*ones(1,length(xTB))-yC;
+    x = [xTB x xTB];
+    y = [yT y yB];
+    
+elseif strcmp(letter,'d')
+    
+    r = len/4.1;
+    dt = ds/r;
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xA(i) = r*cos(theta(i)) - xC;
+       yA(i) = r*sin(theta(i)) - yC - len/4;
+    end
+    
+    yLine = [-len/2:ds:len/2.25 r]; yLine = yLine - yC;
+    xLine = r*ones(1,length(yLine)) - (xC-ds/6);
     
     x = [xA xLine];
     y = [yA yLine];
     
-elseif strcmp(letter,'H')
-   x=1;
-   y=1;
-end
+ elseif strcmp(letter,'e')
+        
+    r = len/4.1;
+    yV = [-r:ds:r r]; 
+    xH = yV - xC;
+    yH = zeros(1,length(xH)) - yC;
+    yH2 = yH - len/4;
+    yH3 = yH - len/2;
+    
+    yV = yV - yC - len/4;
+    xV = r*ones(1,length(yV));
+    
+    yV3 = 0:-ds:-len/4;
+    yV3 = yV3 - yC;
+    xV3 = r*ones(1,length(yV3));
+        
+    x = [-xV-(xC-ds/6) xH xV3-(xC-ds/6) xH xH];
+    y = [yV yH yV3 yH2 yH3];
+           
+    
+elseif strcmp(letter,'g')
+    
+    r = len/4.1;
+    dt = ds/r;
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xA(i) = r*cos(theta(i)) - xC;
+       yA(i) = r*sin(theta(i)) - yC - len/4;
+    end
+    
+    yLine = [-len/2:ds:len/2.25 r]; yLine = yLine - yC - len/3;
+    xLine = r*ones(1,length(yLine)) - (xC-ds/6);
+    
+    yV = [-r:ds:r r]; 
+    xH = yV - xC;
+    yH = zeros(1,length(xH)) - yC - 0.85*len;
+    
+    x = [xA xLine xH];
+    y = [yA yLine yH];
+    
+elseif strcmp(letter,'h')
 
+   yLine = -len/2:ds:0-ds/4;
+   yLine = [yLine 0 -yLine];
+   yLine1 = yLine - yC;
+   xLine1 = 1/2*len/2*ones(1,length(yLine1));
+   
+   yLine2 = -len/2:ds:0-ds/4;
+   yLine2 = [yLine2 0];
+   yLine2 = yLine2 - yC;
+   xLine2 = 1/2*len/2*ones(1,length(yLine2));
+   
+   xH = (-1/2*len/2+ds/2:ds:1/2*len/2-ds/4);
+   xH = xH - xC;
+   yH = zeros(1,length(xH)) - yC;
+   
+   x = [-xLine1-xC xH xLine2-xC];
+   y = [yLine1 yH yLine2];    
+   
+elseif strcmp(letter,'H')
+   yLine = -len/2:ds:0-ds/4;
+   yLine = [yLine 0 -yLine];
+   yLine = yLine - yC;
+   xLine = 1/2*len/2*ones(1,length(yLine));
+   xH = (-1/2*len/2+ds/2:ds:1/2*len/2-ds/4);
+   xH = xH - xC;
+   yH = zeros(1,length(xH)) - yC;
+   
+   x = [-xLine-xC xH xLine-xC];
+   y = [yLine yH yLine];
+   
+elseif strcmp(letter,'i')
+    
+   yLine = -len/2:ds:0-ds/4;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) - xC; 
+   
+    r = len/21;
+    dt = ds/(2*r);
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xDot(i) = r*cos(theta(i)) - xC;
+       yDot(i) = r*sin(theta(i)) - yC + len/7;
+    end
+    
+    x = [xLine xDot];
+    y = [yLine yDot];
+    
+
+elseif strcmp(letter,'k')
+    
+   yLine = -len/2:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) -xC-len/3.9;
+
+   XD = 0:ds:len/sqrt(2);
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   for i=1:length(XD)
+      xDt(i) = XD(i)*cos(pi/4)-YD(i)*sin(pi/4);
+      yDt(i) = XD(i)*sin(pi/4)+YD(i)*cos(pi/4);
+      
+      xDb(i) = XD(i)*cos(pi/4)-YD(i)*sin(-pi/4);
+      yDb(i) = XD(i)*sin(-pi/4)+YD(i)*cos(pi/4);
+   end
+   xDt = xDt - xC - len/4;
+   yDt = yDt - yC;
+   
+   xDb = xDb - xC - len/4;
+   yDb = yDb - yC;
+   
+   x = [xLine(1:ceil(0.75*end)) xDt(1:ceil(2*end/3)) xDb(1:ceil(2*end/3))];
+   y = [yLine(1:ceil(0.75*end)) yDt(1:ceil(2*end/3))-len/8 yDb(1:ceil(2*end/3))-len/5.5];
+    
+elseif strcmp(letter,'K')
+    
+   yLine = -len/2:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) -xC-len/3.9;
+
+   XD = 0:ds:len/sqrt(2);
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   for i=1:length(XD)
+      xDt(i) = XD(i)*cos(pi/4)-YD(i)*sin(pi/4);
+      yDt(i) = XD(i)*sin(pi/4)+YD(i)*cos(pi/4);
+      
+      xDb(i) = XD(i)*cos(pi/4)-YD(i)*sin(-pi/4);
+      yDb(i) = XD(i)*sin(-pi/4)+YD(i)*cos(pi/4);
+   end
+   xDt = xDt - xC - len/4;
+   yDt = yDt - yC;
+   
+   xDb = xDb - xC - len/4;
+   yDb = yDb - yC;
+   
+   x = [xLine xDt xDb];
+   y = [yLine yDt yDb];
+
+ 
+elseif strcmp(letter,'l')
+    
+   yLine = -len/2:ds:len/2.25;
+   yLine = yLine - yC;
+   xLine = 1/2*len/2*ones(1,length(yLine));
+
+   x = -xLine-xC;
+   y = yLine;
+
+elseif strcmp(letter,'m')
+        
+    r = len/2;
+    xH = -r:ds:r;  xH = xH - xC;
+    yH = zeros(1,length(xH)) - yC;
+    yV = 0:-ds:-len/2; yV = yV - yC;
+    xV = -r*ones(1,length(yV)) - xC;
+    xV2 = zeros(1,length(yV)) - xC;
+    xV3 = r*ones(1,length(yV)) - xC;
+    
+    yVS = 0:ds:len/12;
+    yVS = yVS - yC;
+    xVS = -r*ones(1,length(yVS)) - xC;
+        
+    x = [xVS xH xV xV2 xV3];
+    y = [yVS yH yV yV yV];
+    
+elseif strcmp(letter,'n')
+        
+    r = len/4.1;
+    yV = [-r:ds:r r]; 
+    xH = yV - xC;
+    yH = zeros(1,length(xH)) - yC;
+    
+    yV = yV - yC - len/4;
+    xV = r*ones(1,length(yV));
+    
+    yV2 = 0:ds:len/12;
+    yV2 = yV2 - yC;
+    xV2 = r*ones(1,length(yV2));
+        
+    x = [-xV-(xC-ds/6) -xV2-(xC-ds/6) xH xV-(xC-ds/6)];
+    y = [yV yV2 yH yV];
+    
+   
+elseif strcmp(letter,'o')
+       
+    r = len/4.1;
+    dt = ds/r;
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       x(i) = r*cos(theta(i)) - xC;
+       y(i) = r*sin(theta(i)) - yC - len/4;
+    end
+    
+ elseif strcmp(letter,'r')
+        
+    r = len/4.1;
+    yV = [-r:ds:r r]; 
+    xH = yV - xC;
+    yH = zeros(1,length(xH)) - yC;
+    
+    yV = yV - yC - len/4;
+    xV = r*ones(1,length(yV));
+    
+    yV2 = 0:ds:len/12;
+    yV2 = yV2 - yC;
+    xV2 = r*ones(1,length(yV2));
+    
+    yV3 = 0:-ds:-len/10;
+    yV3 = yV3 - yC;
+    xV3 = r*ones(1,length(yV3));
+        
+    x = [-xV-(xC-ds/6) -xV2-(xC-ds/6) xH xV3-(xC-ds/6)];
+    y = [yV yV2 yH yV3];
+       
+    
+elseif strcmp(letter,'t')
+    
+   yLine = -len/2:ds:len/2.25;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine));
+
+   xH = -len/4:ds:len/4;
+   xH = xH-xC;
+   yH = zeros(1,length(xH)) - yC + len/9;
+   
+   x = [xLine-xC xH];
+   y = [yLine yH];
+   
+    
+elseif strcmp(letter,'u')
+        
+    r = len/4.1;
+    yV = [-r:ds:r r]; 
+    xH = yV - xC;
+    yH = zeros(1,length(xH)) - yC - len/2;
+    
+    yV = yV - yC - len/4;
+    xV = r*ones(1,length(yV));
+    
+    x = [-xV-(xC-ds/6) xH xV-(xC-ds/6)];
+    y = [yV yH yV];
+
+elseif strcmp(letter,'v')
+    
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:end)];
+   y = [yDL yDr(2:end)];
+   
+elseif strcmp(letter,'w')
+    
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC - len/4;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC - len/4;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:end-1) xDL+len/2 xDr(2:end)+len/2];
+   y = [yDL yDr(2:end-1) yDL yDr(2:end)];   
+   
+elseif strcmp(letter,'W')
+    
+   XD = 0:ds:sqrt(5)*len/2;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC - len/4;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC - len/4;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:floor(end/2)) xDL(1:floor(end/2))+len/2 xDr(2:end)+len/2];
+   y = [yDL yDr(2:floor(end/2)) yDL(1:floor(end/2))       yDr(2:end)];     
+   
+elseif strcmp(letter,'y')
+    
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+      
+      xB(i) = XD(i)*cos(pi+ang)-YD(i)*sin(pi+ang);
+      yB(i) = XD(i)*sin(pi+ang)+YD(i)*cos(pi+ang);
+   end
+   xDr = xDr - xC;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC;
+   yDL = yDL - yC - len/2;
+   
+   xB = xB - xC;
+   yB = yB - yC - len/2;
+ 
+   x = [xDL xDr(2:end) xB(2:end)];
+   y = [yDL yDr(2:end) yB(2:end)];
+      
+   
+elseif strcmp(letter,'!')
+    
+   yLine = -len/4:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) - xC; 
+   
+    r = len/21;
+    dt = ds/(2*r);
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xDot(i) = r*cos(theta(i)) - xC;
+       yDot(i) = r*sin(theta(i)) - yC - len/2.1;
+    end
+    
+    x = [xLine xDot];
+    y = [yLine yDot];  
+    
+elseif strcmp(letter,'?')
+    
+    %xT = 0:ds:len/8-ds; xT = xT - xC - len/4;
+    %yT = zeros(1,length(xT)) - yC + len/2;
+
+    r = len/4;
+    dt = ds/r;
+    theta = 1.25*pi/2:-dt:-pi/2;
+    for i=1:length(theta)
+       xL(i) = 1.5*r*cos(theta(i)) - xC - len/8;
+       yL(i) = r*sin(theta(i)) - yC + len/4;
+    end
+    
+    yV = -ds:-ds:-len/3.25;
+    xV = zeros(1,length(yV)) - xC - len/8;
+    
+    r = len/21;
+    dt = ds/(2*r);
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xDot(i) = r*cos(theta(i)) - xC -len/8;
+       yDot(i) = r*sin(theta(i)) - yC - len/2.1;
+    end
+    
+    x = [xL xV xDot];
+    y = [yL yV yDot];  
+ 
+end
 
 
 
