@@ -1,7 +1,7 @@
 function test_Letters()
 
-xCenter=1;
-yCenter=0.5;
+xCenter=-1.5;
+yCenter=0;
 len=0.25;
 ds=0.0125;
 
@@ -13,13 +13,13 @@ ds=0.0125;
 [xl,yl] = give_Me_The_Letter_Please(ds,len,'l',xCenter-0.7,yCenter);
 [xd,yd] = give_Me_The_Letter_Please(ds,len,'d',xCenter-0.75,yCenter);
 [xu,yu] = give_Me_The_Letter_Please(ds,len,'u',xCenter-0.925,yCenter);
-[xt,yt] = give_Me_The_Letter_Please(ds,len,'t',xCenter-1.15,yCenter);
-[xh,yh] = give_Me_The_Letter_Please(ds,len,'h',xCenter-1.3,yCenter);
-[xn,yn] = give_Me_The_Letter_Please(ds,len,'n',xCenter-1.475,yCenter);
-[xr,yr] = give_Me_The_Letter_Please(ds,len,'r',xCenter-1.675,yCenter);
-[xg,yg] = give_Me_The_Letter_Please(ds,len,'g',xCenter-1.875,yCenter);
-[xe,ye] = give_Me_The_Letter_Please(ds,len,'e',xCenter-2.085,yCenter);
-[xm,ym] = give_Me_The_Letter_Please(ds,len,'m',xCenter-2.35,yCenter);
+[xt,yt] = give_Me_The_Letter_Please(ds,len,'t',xCenter-1.05,yCenter);
+[xh,yh] = give_Me_The_Letter_Please(ds,len,'h',xCenter-1.2,yCenter);
+[xn,yn] = give_Me_The_Letter_Please(ds,len,'n',xCenter-1.375,yCenter);
+[xr,yr] = give_Me_The_Letter_Please(ds,len,'r',xCenter-1.575,yCenter);
+[xg,yg] = give_Me_The_Letter_Please(ds,len,'g',xCenter-1.775,yCenter);
+[xe,ye] = give_Me_The_Letter_Please(ds,len,'e',xCenter-1.985,yCenter);
+[xm,ym] = give_Me_The_Letter_Please(ds,len,'m',xCenter-2.25,yCenter);
 
 
 
@@ -39,8 +39,7 @@ plot(xg,yg,'r*'); hold on;
 plot(xe,ye,'b*'); hold on;
 plot(xm,ym,'k*'); hold on;
 
-axis square;
-
+axis([-3 3 -3 3]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: give me the letter!
@@ -266,12 +265,13 @@ elseif strcmp(letter,'t')
     
    yLine = -len/2:ds:len/2.25;
    yLine = yLine - yC;
-   xLine = 1/2*len/2*ones(1,length(yLine));
+   xLine = zeros(1,length(yLine));
 
-   xH = -len/6.5:ds:len/6.5 - xC;
+   xH = -len/4:ds:len/4;
+   xH = xH-xC;
    yH = zeros(1,length(xH)) - yC + len/9;
    
-   x = [-xLine-xC xH];
+   x = [xLine-xC xH];
    y = [yLine yH];
    
     
