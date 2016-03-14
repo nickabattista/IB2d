@@ -1,6 +1,6 @@
 function test_Letters()
 
-xCenter=-1.5;
+xCenter=0.5;
 yCenter=0;
 len=0.25;
 ds=0.0125;
@@ -20,6 +20,14 @@ ds=0.0125;
 [xg,yg] = give_Me_The_Letter_Please(ds,len,'g',xCenter-1.775,yCenter);
 [xe,ye] = give_Me_The_Letter_Please(ds,len,'e',xCenter-1.985,yCenter);
 [xm,ym] = give_Me_The_Letter_Please(ds,len,'m',xCenter-2.25,yCenter);
+[xK,yK] = give_Me_The_Letter_Please(ds,len,'K',xCenter-2.55,yCenter);
+[xk,yk] = give_Me_The_Letter_Please(ds,len,'k',xCenter-2.75,yCenter);
+[xEX,yEX] = give_Me_The_Letter_Please(ds,len,'!',xCenter-2.9,yCenter);
+[xQU,yQU] = give_Me_The_Letter_Please(ds,len,'?',xCenter-3.05,yCenter);
+[xv,yv] = give_Me_The_Letter_Please(ds,len,'v',xCenter-3.25,yCenter);
+[xw,yw] = give_Me_The_Letter_Please(ds,len,'w',xCenter-3.5,yCenter);
+[xW,yW] = give_Me_The_Letter_Please(ds,len,'W',xCenter-3.85,yCenter);
+[xy,yy] = give_Me_The_Letter_Please(ds,len,'y',xCenter-4.15,yCenter);
 
 
 
@@ -38,8 +46,18 @@ plot(xr,yr,'k*'); hold on;
 plot(xg,yg,'r*'); hold on;
 plot(xe,ye,'b*'); hold on;
 plot(xm,ym,'k*'); hold on;
+plot(xK,yK,'r*'); hold on;
+plot(xk,yk,'b*'); hold on;
+plot(xEX,yEX,'k*'); hold on;
+plot(xQU,yQU,'r*'); hold on;
+plot(xv,yv,'b*'); hold on;
+plot(xw,yw,'k*'); hold on;
+plot(xW,yW,'r*'); hold on;
+plot(xy,yy,'b*'); hold on;
 
-axis([-3 3 -3 3]);
+
+
+axis([-1 4 -1 4]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: give me the letter!
@@ -184,6 +202,60 @@ elseif strcmp(letter,'i')
     
     x = [xLine xDot];
     y = [yLine yDot];
+    
+
+elseif strcmp(letter,'k')
+    
+   yLine = -len/2:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) -xC-len/3.9;
+
+   XD = 0:ds:len/sqrt(2);
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   for i=1:length(XD)
+      xDt(i) = XD(i)*cos(pi/4)-YD(i)*sin(pi/4);
+      yDt(i) = XD(i)*sin(pi/4)+YD(i)*cos(pi/4);
+      
+      xDb(i) = XD(i)*cos(pi/4)-YD(i)*sin(-pi/4);
+      yDb(i) = XD(i)*sin(-pi/4)+YD(i)*cos(pi/4);
+   end
+   xDt = xDt - xC - len/4;
+   yDt = yDt - yC;
+   
+   xDb = xDb - xC - len/4;
+   yDb = yDb - yC;
+   
+   x = [xLine(1:ceil(0.75*end)) xDt(1:ceil(2*end/3)) xDb(1:ceil(2*end/3))];
+   y = [yLine(1:ceil(0.75*end)) yDt(1:ceil(2*end/3))-len/8 yDb(1:ceil(2*end/3))-len/5.5];
+    
+elseif strcmp(letter,'K')
+    
+   yLine = -len/2:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) -xC-len/3.9;
+
+   XD = 0:ds:len/sqrt(2);
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   for i=1:length(XD)
+      xDt(i) = XD(i)*cos(pi/4)-YD(i)*sin(pi/4);
+      yDt(i) = XD(i)*sin(pi/4)+YD(i)*cos(pi/4);
+      
+      xDb(i) = XD(i)*cos(pi/4)-YD(i)*sin(-pi/4);
+      yDb(i) = XD(i)*sin(-pi/4)+YD(i)*cos(pi/4);
+   end
+   xDt = xDt - xC - len/4;
+   yDt = yDt - yC;
+   
+   xDb = xDb - xC - len/4;
+   yDb = yDb - yC;
+   
+   x = [xLine xDt xDb];
+   y = [yLine yDt yDb];
+
  
 elseif strcmp(letter,'l')
     
@@ -287,5 +359,148 @@ elseif strcmp(letter,'u')
     
     x = [-xV-(xC-ds/6) xH xV-(xC-ds/6)];
     y = [yV yH yV];
+
+elseif strcmp(letter,'v')
     
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:end)];
+   y = [yDL yDr(2:end)];
+   
+elseif strcmp(letter,'w')
+    
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC - len/4;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC - len/4;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:end-1) xDL+len/2 xDr(2:end)+len/2];
+   y = [yDL yDr(2:end-1) yDL yDr(2:end)];   
+   
+elseif strcmp(letter,'W')
+    
+   XD = 0:ds:sqrt(5)*len/2;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+   end
+   xDr = xDr - xC - len/4;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC - len/4;
+   yDL = yDL - yC - len/2;
+ 
+   x = [xDL xDr(2:floor(end/2)-1) xDL(1:floor(end/2))+len/2 xDr(2:end)+len/2];
+   y = [yDL yDr(2:floor(end/2)-1) yDL(1:floor(end/2))       yDr(2:end)];     
+   
+elseif strcmp(letter,'y')
+    
+   XD = 0:ds:sqrt(5)*len/4;
+   YD = zeros(1,length(XD));
+   
+   %rotate!
+   ang = atan(2);
+   for i=1:length(XD)
+      xDr(i) = XD(i)*cos(ang)-YD(i)*sin(ang);
+      yDr(i) = XD(i)*sin(ang)+YD(i)*cos(ang);
+      
+      xDL(i) = XD(i)*cos(pi-ang)-YD(i)*sin(pi-ang);
+      yDL(i) = XD(i)*sin(pi-ang)+YD(i)*cos(pi-ang);
+      
+      xB(i) = XD(i)*cos(pi+ang)-YD(i)*sin(pi+ang);
+      yB(i) = XD(i)*sin(pi+ang)+YD(i)*cos(pi+ang);
+   end
+   xDr = xDr - xC;
+   yDr = yDr - yC - len/2;
+ 
+   xDL = xDL - xC;
+   yDL = yDL - yC - len/2;
+   
+   xB = xB - xC;
+   yB = yB - yC - len/2;
+ 
+   x = [xDL xDr(2:end) xB(2:end)];
+   y = [yDL yDr(2:end) yB(2:end)];
+      
+   
+elseif strcmp(letter,'!')
+    
+   yLine = -len/4:ds:len/2;
+   yLine = yLine - yC;
+   xLine = zeros(1,length(yLine)) - xC; 
+   
+    r = len/21;
+    dt = ds/(2*r);
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xDot(i) = r*cos(theta(i)) - xC;
+       yDot(i) = r*sin(theta(i)) - yC - len/2.1;
+    end
+    
+    x = [xLine xDot];
+    y = [yLine yDot];  
+    
+elseif strcmp(letter,'?')
+    
+    %xT = 0:ds:len/8-ds; xT = xT - xC - len/4;
+    %yT = zeros(1,length(xT)) - yC + len/2;
+
+    r = len/4;
+    dt = ds/r;
+    theta = 1.25*pi/2:-dt:-pi/2;
+    for i=1:length(theta)
+       xL(i) = 1.5*r*cos(theta(i)) - xC - len/8;
+       yL(i) = r*sin(theta(i)) - yC + len/4;
+    end
+    
+    yV = -ds:-ds:-len/3.25;
+    xV = zeros(1,length(yV)) - xC - len/8;
+    
+    r = len/21;
+    dt = ds/(2*r);
+    theta = 0:dt:2*pi;
+    for i=1:length(theta)
+       xDot(i) = r*cos(theta(i)) - xC -len/8;
+       yDot(i) = r*sin(theta(i)) - yC - len/2.1;
+    end
+    
+    x = [xL xV xDot];
+    y = [yL yV yDot];  
+ 
 end
