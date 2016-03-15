@@ -44,20 +44,17 @@ ds = Lx/(2*Nx);  % Spatial step!
 % Immersed Structure Geometric / Dynamic Parameters %
 N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
 ds_Rest = 0;     % Resting length of springs
-struct_name = 'heart'; % Name for .vertex, .spring, etc files.
+struct_name = 'dear_KC'; % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
 [x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,ds);
-Nb1 = length(x1)
 
 % Call function to construct geometry
 [x2,y2] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,ds);
-Nb2 = length(x2)
 
 % Call function to construct geometry
 [x3,y3] = give_Me_Immsersed_Boundary_Geometry_3(Lx,Nx,ds);
-Nb3 = length(x3)
 
 % Plot Geometry to test BEFORE taking out pts.
 figure(1)
@@ -72,10 +69,9 @@ figure(3)
 plot(x3,y3,'k*'); hold on;
 axis([0 Lx 0 Ly]);
 
-pause();
 
 % Print files to .txt files
-please_Print_Vertices_To_File(x1,y1,x2,y2)
+please_Print_Vertices_To_File(x1,y1,x2,y2,x3,y3)
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(x1,y1,struct_name);
@@ -470,11 +466,11 @@ y2 = [y2(1:n1) y2(n2:end)];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function please_Print_Vertices_To_File(X1,Y1,X2,Y2)
+function please_Print_Vertices_To_File(X1,Y1,X2,Y2,X3,Y3)
 
 fileID = fopen('All_Positions.txt','w');
 for j=1:length(X1)
-    fprintf(fileID,'%1.16e %1.16e %1.16e %1.16e\n', X1(j),Y1(j),X2(j),Y2(j) );
+    fprintf(fileID,'%1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n', X1(j),Y1(j),X2(j),Y2(j),X3(j),Y3(j),X3(j),Y3(j) );
 end
 fclose(fileID);
 
