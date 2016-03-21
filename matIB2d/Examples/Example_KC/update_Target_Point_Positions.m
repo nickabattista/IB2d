@@ -50,13 +50,16 @@ g = -0.015220700152207;
 h = 0.000253678335870;
 
 % Period Info
-tP1 = 0.05;                        % Contraction time
-tP2 = 0.05;                       % Expansion time
-tP3 = 0.05;
-tP4 = 0.05;
+tP1 = 0.05;  %Interpolation to 2nd Phase 
+tP2 = 0.025;  %More accurate interpolation to 2nd phase
+tP3 = 0.025;  %Ends interpolating to 2nd phase
+tP4 = 0.01;
 tP5 = 0.05;
-period = tP1+tP2+tP3+tP4;           % Period
-t = rem(current_time,period);       % Current time in simulation ( 'modular arithmetic to get time in period')
+tP6 = 0.025;
+tP7 = 0.025;
+tP8 = 0.01;
+period = tP1+tP2+tP3+tP4+tP5+tP6+tP7+tP8;  % Period
+t = rem(current_time,period);              % Current time in simulation ( 'modular arithmetic to get time in period')
 
 
 % Read In Pts!
@@ -64,7 +67,9 @@ t = rem(current_time,period);       % Current time in simulation ( 'modular arit
 
 
 
-for i=1:N_target                    % Loops over all target points!
+%for i=1:N_target                    % Loops over all target points!
+for i=1:284                    % Loops over all target points!
+
     
     
     if (t <= tP1) 
@@ -109,7 +114,8 @@ for i=1:N_target                    % Loops over all target points!
 			xPts(IDs(i)) = xM(i) + g2*( xP2(i) - xM(i) );
 			yPts(IDs(i)) = yM(i) + g2*( yP2(i) - yM(i) );            
             
-            if (( t > tP1+tP2-dt/2) && ( t < tP1+tP2+dt/2) )
+            if (( t > tP1+tP2-dt) && ( t < tP1+tP2+dt) )
+                phase1_to_phase2 = 1
                 xM1 = xPts(IDs);
                 yM1 = yPts(IDs);
                 please_Print_Vertices_To_File(xP1,yP1,xP2,yP2,xP3,yP3,xM1,yM1);
@@ -134,14 +140,46 @@ for i=1:N_target                    % Loops over all target points!
             
 			xPts(IDs(i)) = xM(i) + g2*( xP2(i) - xM(i) );
 			yPts(IDs(i)) = yM(i) + g2*( yP2(i) - yM(i) );
+            
+            if (( t > tP1+tP2+tP3-dt) && ( t < tP1+tP2+tP3+dt) )
+                phase1_to_phase2 = 10
+                xM1 = xPts(IDs);
+                yM1 = yPts(IDs);
+                please_Print_Vertices_To_File(xP1,yP1,xP2,yP2,xP3,yP3,xM1,yM1);
+            end
+    
+    elseif ((t>tP1+tP2+tP3)&&(t<=(tP1+tP2+tP3+tP4)))
+			
+			%PHASE 2 --> PHASE 2-Even Better!
+            
+			tprev = tP1+tP2+tP3;
+			t1 = 0.1*tP4 + tprev;
+			t2 = 0.9*tP4 + tprev;
+			if (t<t1) 							%//For Polynomial Phase Interp.
+				g2 = a*power( ( (t-tprev)/tP4) ,2);
+            elseif ((t>=t1)&&(t<t2)) 
+				g2 = c*power( ( (t-tprev)/tP4) ,3) + d*power( ((t-tprev)/tP4) ,2) + g*( (t-tprev)/tP4) + h;
+            elseif (t>=t2) 
+				g2 = -b*power( (( (t-tprev)/tP4) - 1) ,2) + 1;
+            end			
+            
+			xPts(IDs(i)) = xM(i) + g2*( xP2(i) - xM(i) );
+			yPts(IDs(i)) = yM(i) + g2*( yP2(i) - yM(i) );
+            
+            if (( t > tP1+tP2+tP3+tP4-dt) && ( t < tP1+tP2+tP3+tP4+dt) )
+                phase1_to_phase2 = 100
+                xM1 = xPts(IDs);
+                yM1 = yPts(IDs);
+                please_Print_Vertices_To_File(xP1,yP1,xP2,yP2,xP3,yP3,xM1,yM1);
+            end
    
     elseif ((t>tP1+tP2+tP3+tP4)&&(t<=(tP1+tP2+tP3+tP4+tP5)))
 			
-			%PHASE 2 --> PHASE 3!
+			%PHASE 2ish --> PHASE 3!
             
 			tprev = tP1+tP2+tP3+tP4;
-			t1 = 0.1*tP3 + tprev;
-			t2 = 0.9*tP3 + tprev;
+			t1 = 0.1*tP5 + tprev;
+			t2 = 0.9*tP5 + tprev;
 			if (t<t1) 							%//For Polynomial Phase Interp.
 				g2 = a*power( ( (t-tprev)/tP5) ,2);
             elseif ((t>=t1)&&(t<t2)) 
@@ -150,28 +188,61 @@ for i=1:N_target                    % Loops over all target points!
 				g2 = -b*power( (( (t-tprev)/tP5) - 1) ,2) + 1;
             end			
             
-			xPts(IDs(i)) = xP2(i) + g2*( xP3(i) - xP2(i) );
-			yPts(IDs(i)) = yP2(i) + g2*( yP3(i) - yP2(i) );
-            
-%     elseif ((t>tP2)&&(t<=(tP1+tP2+tP3)))
-% 			
-% 			%PHASE 2 --> PHASE 3
-%             
-% 			tprev = tP1+tP2;
-% 			t1 = 0.1*tP3 + tprev;
-% 			t2 = 0.9*tP3 + tprev;
-% 			if (t<t1) 							%//For Polynomial Phase Interp.
-% 				g2 = a*power( ( (t-tprev)/tP3) ,2);
-%             elseif ((t>=t1)&&(t<t2)) 
-% 				g2 = c*power( ( (t-tprev)/tP3) ,3) + d*power( ((t-tprev)/tP3) ,2) + g*( (t-tprev)/tP3) + h;
-%             elseif (t>=t2) 
-% 				g2 = -b*power( (( (t-tprev)/tP3) - 1) ,2) + 1;
-%             end			
-%             
-% 			xPts(IDs(i)) = xP2(i) + g2*( xP3(i) - xP2(i) );
-% 			yPts(IDs(i)) = yP2(i) + g2*( yP3(i) - yP2(i) );
-%             
+			xPts(IDs(i)) = xM(i) + g2*( xP3(i) - xM(i) );
+			yPts(IDs(i)) = yM(i) + g2*( yP3(i) - yM(i) );
     
+            if (( t > tP1+tP2+tP3+tP4+tP5-dt) && ( t < tP1+tP2+tP3+tP4+tP5+dt) )
+                test_phase3_1=11245
+                xM1 = xPts(IDs);
+                yM1 = yPts(IDs);
+                please_Print_Vertices_To_File(xP1,yP1,xP2,yP2,xP3,yP3,xM1,yM1);
+            end
+            
+    elseif ((t>tP1+tP2+tP3+tP4+tP5)&&(t<=(tP1+tP2+tP3+tP4+tP5+tP6)))
+			
+			%PHASE 2ish --> PHASE 3-Better!
+            
+			tprev = tP1+tP2+tP3+tP4+tP5;
+			t1 = 0.1*tP6 + tprev;
+			t2 = 0.9*tP6 + tprev;
+			if (t<t1) 							%//For Polynomial Phase Interp.
+				g2 = a*power( ( (t-tprev)/tP6) ,2);
+            elseif ((t>=t1)&&(t<t2)) 
+				g2 = c*power( ( (t-tprev)/tP6) ,3) + d*power( ((t-tprev)/tP6) ,2) + g*( (t-tprev)/tP6) + h;
+            elseif (t>=t2) 
+				g2 = -b*power( (( (t-tprev)/tP6) - 1) ,2) + 1;
+            end			
+            
+			xPts(IDs(i)) = xM(i) + g2*( xP3(i) - xM(i) );
+			yPts(IDs(i)) = yM(i) + g2*( yP3(i) - yM(i) );         
+    
+            
+            if (( t > tP1+tP2+tP3+tP4+tP5+tP6-dt) && ( t < tP1+tP2+tP3+tP4+tP5+tP6+dt) )
+                test_phase3_2=1
+                xM1 = xPts(IDs);
+                yM1 = yPts(IDs);
+                please_Print_Vertices_To_File(xP1,yP1,xP2,yP2,xP3,yP3,xM1,yM1);
+            end
+
+   elseif ((t>tP1+tP2+tP3+tP4+tP5+tP6)&&(t<=(tP1+tP2+tP3+tP4+tP5+tP6+tP7)))
+			
+			%PHASE 2ish --> PHASE 3-Even Better!
+            
+			tprev = tP1+tP2+tP3+tP4+tP5+tP6;
+			t1 = 0.1*tP7 + tprev;
+			t2 = 0.9*tP7 + tprev;
+			if (t<t1) 							%//For Polynomial Phase Interp.
+				g2 = a*power( ( (t-tprev)/tP7) ,2);
+            elseif ((t>=t1)&&(t<t2)) 
+				g2 = c*power( ( (t-tprev)/tP7) ,3) + d*power( ((t-tprev)/tP7) ,2) + g*( (t-tprev)/tP7) + h;
+            elseif (t>=t2) 
+				g2 = -b*power( (( (t-tprev)/tP7) - 1) ,2) + 1;
+            end			
+            
+			xPts(IDs(i)) = xM(i) + g2*( xP3(i) - xM(i) );
+			yPts(IDs(i)) = yM(i) + g2*( yP3(i) - yM(i) );         
+     
+            
     end
     
     targets(IDs(i),2) = xPts(IDs(i)); % Store new xVals
@@ -189,9 +260,6 @@ end
 function please_Print_Vertices_To_File(X1,Y1,X2,Y2,X3,Y3,xM,yM)
 
 delete('All_Positions.txt');
-
-size(X1)
-size(xM)
 
 fileID = fopen('All_Positions.txt','w');
 for j=1:length(X1)

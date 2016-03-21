@@ -46,15 +46,29 @@ N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
 ds_Rest = 0;     % Resting length of springs
 struct_name = 'dear_KC'; % Name for .vertex, .spring, etc files.
 
+% Line on top and bottom of geometry
+ds2 = 0.5*ds;
+xLine = Lx/20:ds2:0.95*Lx;
+yLineB = 0.025*Lx*ones(1,length(xLine));
+yLineT= 0.975*Lx*ones(1,length(xLine));
+
+xSq = [xLine xLine yLineB yLineT];
+ySq = [yLineB yLineT xLine xLine];
 
 % Call function to construct geometry
 [x1,y1] = give_Me_Immsersed_Boundary_Geometry_1(Lx,Nx,ds);
+x1 = [x1 xSq];
+y1 = [y1 ySq];
 
 % Call function to construct geometry
 [x2,y2] = give_Me_Immsersed_Boundary_Geometry_2(Lx,Nx,ds);
+x2 = [x2 xSq];
+y2 = [y2 ySq];
 
 % Call function to construct geometry
 [x3,y3] = give_Me_Immsersed_Boundary_Geometry_3(Lx,Nx,ds);
+x3 = [x3 xSq];
+y3 = [y3 ySq];
 
 % Plot Geometry to test BEFORE taking out pts.
 figure(1)
@@ -88,7 +102,7 @@ print_Lagrangian_Vertices(x1,y1,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e8;
+k_Target = 5e6;
 print_Lagrangian_Target_Pts(x1,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,6 +144,9 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
     %Loops over all Lagrangian Pts.
     for s = 1:N
+        if s > 284
+            k_Target = 2e9;
+        end
         fprintf(target_fid, '%d %1.16e\n', s, k_Target);
     end
 
