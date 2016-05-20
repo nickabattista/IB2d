@@ -10,7 +10,8 @@
 #include <stdio.h>
 using namespace std;
 /* Rewritten of savevtk_scalar(array, filename, colorMap,dx,dy) with int arrayRow,int arrayCol as additional inputs */
-void savevtk_scalar(int arrayRow,int arrayCol,double** array, char* filename, char* colorMap,int dx, int dy){
+
+void savevtk_scalar(int arrayRow,int arrayCol,double** array, char* filename, char* colorMap,double dx, double dy){
     int i,j;
     FILE *fptr = fopen(filename, "w");
     fprintf(fptr, "# vtk DataFile Version 2.0\n");
@@ -21,7 +22,7 @@ void savevtk_scalar(int arrayRow,int arrayCol,double** array, char* filename, ch
     fprintf(fptr, "DIMENSIONS    %d   %d   %d\n",arrayRow ,arrayCol,1);
     fprintf(fptr,"\n");
     fprintf(fptr, "ORIGIN    0.000   0.000   0.000\n");
-    fprintf(fptr,"SPACING   %d%d   1.000\n",arrayRow, arrayCol);
+    fprintf(fptr,"SPACING   %f%f   1.000\n",dx, dy);
     fprintf(fptr,"\n");
     fprintf(fptr,"POINT_DATA   %d\n",arrayCol*arrayCol*1);
     fprintf(fptr,"SCALARS %s double\n",colorMap);
@@ -40,7 +41,7 @@ void savevtk_scalar(int arrayRow,int arrayCol,double** array, char* filename, ch
 
 
 /* Rewritten of savevtk_vector(X, Y, filename, vectorName,dx,dy), int Xrow, int Xcol, int Yrow, int Ycol are added as additional inputs*/
-void savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double** X, double** Y,char* filename,char* vectorName,int dx,int dy){
+void savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double** X, double** Y,char* filename,char* vectorName,double dx,double dy){
     int i,j;
     FILE *fptr = fopen(filename, "w");
     assert(Xrow == Yrow && Xcol == Ycol && "Error: velocity arrays of unequal size");
@@ -53,7 +54,7 @@ void savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double** X, double**
     fprintf(fptr,"\n");
     fprintf(fptr,"ORIGIN    0.000   0.000   0.000\n");
     /*fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly] */
-    fprintf(fptr, "SPACING   %d%d   1.000\n",dx,dy);
+    fprintf(fptr, "SPACING   %f%f   1.000\n",dx,dy);
     fprintf(fptr,"\n");
     fprintf(fptr,"POINT_DATA   %d\n",Xrow*Xcol);
     fprintf(fptr,"Vectors %s double\n",vectorName);
@@ -61,7 +62,7 @@ void savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double** X, double**
     for (int i = 0; i< Xcol;i++){
         for (int j = 0; j<Ycol;j++){
             fprintf(fptr,"%f ",X[i][j]);
-            fprintf(fptr,"%f ",Y[i][j]); /*The length of the number is not specified here !!!!!!!!! */
+            fprintf(fptr,"%f ",Y[i][j]); /*The length of the number should e-15 !!!!!!!!! */
             fprintf(fptr,"1");
         }
         fprintf(fptr,"\n");
