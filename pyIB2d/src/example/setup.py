@@ -1,4 +1,4 @@
-'''To compile: python setup.py build_ext --inplace
+'''To compile: python setup.py build_ext --inplace'''
 
 from distutils.core import setup
 from distutils.extension import Extension
