@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 
-void add(double* array1, double* array2, int row1, int col1, int row2, int col2){
+void add(double* array1, double* array2, int row1, int col1){
     int index =0;
     for (int i=0;i<row1;i++){
         for (int j = 0; j<col1;j++){
@@ -30,7 +30,7 @@ int main(){
         }
     }
     
-    add(x1,x2,10,3,10,3);
+    add(x1,x2,10,3);
     for (int i=0; i< 10;i++){
         for (int j=0;j<3;j++){
             printf("%f", x1[i*3+j]);
