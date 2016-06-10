@@ -16,12 +16,11 @@ function C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k)
 % Compute Necessary Derivatives (Note: these calculations could be parallalized)
 Cx = give_Necessary_Derivative(C,dx,uX,'x');
 Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
-% Cx = D(C,dx,'x'); % Cy = D(C,dy,'y');
 Cxx = DD(C,dx,'x');
 Cyy = DD(C,dy,'y');
     
 % Update Concentration 
-% C = C + dt * ( k*(Cxx+Cyy) - uX'.*Cx - uY'.*Cy );
+%C = C + dt * ( k*(Cxx+Cyy) - uX'.*Cx - uY'.*Cy );
 
 C = C + dt * ( k*(Cxx+Cyy) - uX.*Cx - uY.*Cy );
 
@@ -84,7 +83,7 @@ elseif strcmp(string,'y')
             C_z(1,i) =  ( C(1,i) - C(len,i) ) / (dz);
         end
 
-        %top side of grid
+        %top of grid
         if signs(len,1) <= 0 
             C_z(len,i) =  ( C(1,i) - C(len,i) ) / (dz);
         else
