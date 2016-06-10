@@ -34,8 +34,8 @@ function HeartTube()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  64;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 5.0;        % Length of Eulerian Grid in x-Direction
 Ly = 5.0;        % Length of Eulerian Grid in y-Direction
 
@@ -71,7 +71,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e7;
+k_Spring = 2.5e6;
 print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 % Prints .muscle file!
@@ -80,7 +80,7 @@ print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 7.5e7; C = 0.0;
+k_Beam = 1e0; C = 0.0;
 print_Lagrangian_Beams(xLag,k_Beam,C,struct_name);
 
 
