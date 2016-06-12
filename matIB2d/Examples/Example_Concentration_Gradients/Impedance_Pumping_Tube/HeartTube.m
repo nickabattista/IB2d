@@ -71,7 +71,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 2.5e6;
+k_Spring = 1e6;
 print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 % Prints .muscle file!
@@ -80,7 +80,7 @@ print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e0; C = 0.0;
+k_Beam = 1e2; C = 0.0;
 print_Lagrangian_Beams(xLag,k_Beam,C,struct_name);
 
 

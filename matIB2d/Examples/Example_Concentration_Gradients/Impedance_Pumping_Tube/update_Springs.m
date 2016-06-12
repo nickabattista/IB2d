@@ -50,7 +50,7 @@ N_springs = length( springs(:,1) ); % Gives total number of springs!
 freq = 10;  % Frequency for pumping
 d = 1.0;    % Diameter of Heart Tube
 
-for i=(N-2)+40:(N-2)+60            % Loops over desired springs!
+for i=(N-2)+60:(N-2)+75            % Loops over desired springs!
     
     RL_Vec(i) = d - abs( 0.9*d*sin( 2*pi*freq*current_time ) );
 
