@@ -6,8 +6,9 @@ simple cython test of accessing a numpy array's data
 the C function: c_multiply multiplies all the values in a 2-d array by a scalar, in place.
 
 """
-
+import line_profiler
 import cython
+import time
 
 # import both numpy and the Cython declarations for numpy
 import numpy as np
