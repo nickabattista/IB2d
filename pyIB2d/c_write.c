@@ -9,19 +9,16 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 /* Rewritten of savevtk_scalar(array, filename, colorMap,dx,dy) with int arrayRow,int arrayCol as additional inputs */
 
 void c_savevtk_scalar(int arrayRow,int arrayCol,double* array, char* filename, char* colorMap,double dx, double dy){
     int i,j;
-    clock_t start_t, end_t, total_t;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
     }
     else{
-    start_t = clock();
     fprintf(fptr, "# vtk DataFile Version 2.0\n");
     fprintf(fptr, "Comment goes here\n");
     fprintf(fptr, "ASCII\n");
@@ -42,9 +39,6 @@ void c_savevtk_scalar(int arrayRow,int arrayCol,double* array, char* filename, c
         }
         fprintf(fptr,"\n");
     }
-    end_t =clock();
-    total_t = (end_t - start_t);
-    printf("The TOTAL TIME IS: %ld \n",total_t);
     fclose(fptr);
 }
 }
@@ -55,13 +49,11 @@ void c_savevtk_scalar(int arrayRow,int arrayCol,double* array, char* filename, c
 /* Rewritten of savevtk_vector(X, Y, filename, vectorName,dx,dy), int Xrow, int Xcol, int Yrow, int Ycol are added as additional inputs*/
 void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double* Y,char* filename,char* vectorName,double dx,double dy){
     int i,j;
-    clock_t start_t, end_t, total_t;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
     }
     else{
-    start_t = clock();
     assert(Xrow == Yrow && Xcol == Ycol && "Error: velocity arrays of unequal size");
     fprintf(fptr,"# vtk DataFile Version 2.0\n");
     fprintf(fptr,"Comment goes here\n");
@@ -75,7 +67,7 @@ void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double*
     fprintf(fptr, "SPACING   %f%f   1.000\n",dx,dy);
     fprintf(fptr,"\n");
     fprintf(fptr,"POINT_DATA   %d\n",Xrow*Xcol);
-    fprintf(fptr,"Vectors %s double\n",vectorName);
+    fprintf(fptr,"VECTORS %s double\n",vectorName);
     fprintf(fptr, "\n");
     for (int i = 0; i< Xrow;i++){
         for (int j = 0; j<Xcol;j++){
@@ -85,9 +77,6 @@ void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double*
         }
         fprintf(fptr,"\n");
     }
-    end_t = clock();
-    total_t = (end_t - start_t);
-    printf("The TOTAL TIME IS: %ld \n",total_t);
     fclose(fptr);
 }
 }
@@ -97,13 +86,11 @@ void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double*
 /*Rewritten of Savevtk_points, add int N as additional input */
 void c_savevtk_points_write(int N, double *x, char* filename, char* vectorName){
     int i,j;
-    clock_t start_t, end_t, total_t;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
     }
     else{
-        start_t = clock();
         fprintf(fptr, "# vtk DataFile Version 2.0\n");
         fprintf(fptr, "%s\n",vectorName);
         fprintf(fptr, "ASCII\n");
@@ -123,9 +110,6 @@ void c_savevtk_points_write(int N, double *x, char* filename, char* vectorName){
             fprintf(fptr, "%d ",1);
         }
         fprintf(fptr,"\n");
-        end_t = clock();
-        total_t = (end_t - start_t);
-        printf( "The TOTAL TIME IS: %ld \n",total_t);
         fclose(fptr);
     }
 }
@@ -137,26 +121,23 @@ void c_savevtk_points_write(int N, double *x, char* filename, char* vectorName){
 
 /*Rewritten of Savevtk_points_connects, add int N, int Nc as additional input */
 void c_savevtk_points_connects_write(int N, int Nc, double* x,char* filename, char* vectorname, double* connectsMat){
-    clock_t start_t, end_t, total_t;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
     }
     else{
-        start_t = clock();
-        fprintf(fptr,"This is the header for the Test!\n"); /*Declare this is a test */
         fprintf(fptr,"# vtk DataFile Version 2.0 \n");
         fprintf(fptr,"%s",vectorname);
         fprintf(fptr,"\n");
         fprintf(fptr,"ASCII\n");
-        fprintf(fptr,"DATASET UNSTRUCTED_GRID\n \n");
+        fprintf(fptr,"DATASET UNSTRUCTURED_GRID\n\n");
         fprintf(fptr, "POINTS %d float\n",N);
         for (int i = 0; i < N; i++){
             fprintf(fptr, "%.15e %.15e %.15e \n", x[i*3+0],x[i*3+1],x[i*3+2]);
         }
         fprintf(fptr, "\n");
         
-        fprintf(fptr,"CELL %d %d\n", Nc, Nc*3);
+        fprintf(fptr,"CELLS %d %d\n", Nc, Nc*3);
         
         for(int i = 0; i < Nc; i++){
             fprintf(fptr, "%d %f %f\n",2,connectsMat[i*2+0],connectsMat[i*2+1]);
@@ -168,9 +149,6 @@ void c_savevtk_points_connects_write(int N, int Nc, double* x,char* filename, ch
             fprintf(fptr, "3 ");
         }
         fprintf(fptr,"\n");
-        end_t = clock();
-        total_t = (end_t - start_t);
-        printf("The TOTAL TIME IS: %ld \n",total_t);
         fclose(fptr);
     }
 };
