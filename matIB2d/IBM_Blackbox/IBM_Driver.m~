@@ -145,7 +145,7 @@ if ( springs_Yes == 1 )
         %              col 2: ending spring pt. (by lag. discretization)
         %              col 3: spring stiffness
         %              col 4: spring resting lengths
-        %              col 5: spring linearity (1=linear, >1 non-linear)
+        %              col 5: spring linearity (1=k
 else
     springs_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 end
@@ -1081,7 +1081,7 @@ clear springs2 inds NPspr spring_info;
 %         col 2: ending spring pt. (by lag. discretization)
 %         col 3: spring stiffness
 %         col 4: spring resting lengths
-%         col 5: linearity of spring (1=linear, > 1 non-linear spring)
+%         col 5: linearity of spring (1=linear, > 2 non-linear spring)
 
 
 
