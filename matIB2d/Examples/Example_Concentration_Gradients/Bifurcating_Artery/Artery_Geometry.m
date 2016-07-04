@@ -160,7 +160,7 @@ C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy);
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .concentration file!
-kDiffusion = 5e-4;
+kDiffusion = 5e-5;
 print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name);
 
 % Prints .tracer file!
@@ -561,7 +561,7 @@ for i=1:length( inds(:,1) )
     xPt = x(xInd);
     yPt = y(yInd);
     %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
-    C(xInd,yInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+    C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
 
 end
 

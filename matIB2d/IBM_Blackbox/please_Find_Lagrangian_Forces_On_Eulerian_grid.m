@@ -218,6 +218,7 @@ sp_1 = springs(:,1);              % Initialize storage for MASTER NODE Spring Co
 sp_2 = springs(:,2);              % Initialize storage for SLAVE NODE Spring Connection
 K_Vec = springs(:,3);             % Stores spring stiffness associated with each spring
 RL_Vec = springs(:,4);            % Stores spring resting length associated with each spring
+alpha_pow = springs(:,5);         % Degree of linearity (1=linear, >1 = non-linear)
 
 fx = zeros(Nb,1);                 % Initialize storage for x-forces
 fy = fx;                          % Initialize storage for y-forces
@@ -228,12 +229,13 @@ for i=1:Nsprings
     id_Slave = sp_2(i);           % Slave Node index
     k_Spring = K_Vec(i);          % Spring stiffness of i-th spring
     L_r = RL_Vec(i);              % Resting length of i-th spring
+    alpha = alpha_pow(i);         % Degree of linearity of i-th spring
     
     dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
     
-    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) );
-    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) );
+    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
+    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
     
     fx(id_Master,1) = fx(id_Master,1) + sF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
     fy(id_Master,1) = fy(id_Master,1) + sF_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
