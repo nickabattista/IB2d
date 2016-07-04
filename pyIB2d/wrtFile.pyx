@@ -5,6 +5,7 @@ simple cython test of accessing a numpy array's data
 
 the C function: c_multiply multiplies all the values in a 2-d array by a scalar, in place.
 
+Created by Ao Zeng on 5/17/16.
 """
 import cython
 
