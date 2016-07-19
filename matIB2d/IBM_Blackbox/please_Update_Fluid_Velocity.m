@@ -49,7 +49,6 @@ function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, m
 % dt:        Time-step
 
 
-
 % Initialize %
 Nx =   grid_Info(1);
 Ny =   grid_Info(2);

@@ -67,7 +67,7 @@ delta_X = give_Delta_Kernel( distX, dx);
 delta_Y = give_Delta_Kernel( distY, dy);
 
 % Perform Integral
-[move_X move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds);
+[move_X, move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds);
 
 % Update the Lagrangian Point Position.
 xL_Next = xL_P + (dt) * move_X;
@@ -88,7 +88,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [move_X move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds)
+function [move_X, move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds)
 
 % u:        x-component of velocity
 % v:        y-component of velocity

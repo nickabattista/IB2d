@@ -234,8 +234,8 @@ for i=1:Nsprings
     dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
     
-    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
-    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
+    sF_x = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
+    sF_y = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
     
     fx(id_Master,1) = fx(id_Master,1) + sF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
     fy(id_Master,1) = fy(id_Master,1) + sF_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)

@@ -597,7 +597,7 @@ savevtk_scalar(V, uYName, 'uY',dx,dy);
 
 if concentration_Yes == 1
     confName = ['concentration.' strNUM '.vtk'];
-    savevtk_scalar(C, confName, 'Concentration',dx,dy);
+    savevtk_scalar(C', confName, 'Concentration',dx,dy);
 end
 
 %Print VECTOR DATA (i.e., velocity data) to .vtk file
