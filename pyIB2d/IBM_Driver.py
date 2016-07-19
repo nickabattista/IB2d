@@ -25,6 +25,7 @@
  please let Nick (nick.battista@unc.edu) know.
 
 ----------------------------------------------------------------------------'''
+
 import pdb
 import numpy as np
 from math import sqrt
@@ -36,13 +37,6 @@ from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 from please_Compute_Porous_Slip_Velocity import\
     please_Compute_Porous_Slip_Velocity
 from please_Plot_Results import please_Plot_Results
-
-#Here is the try import C part
-try:
-    import write
-    C_flag = True
-except:
-    C_flag = False
 
 ###############################################################################
 #
@@ -957,6 +951,7 @@ def give_String_Number_For_VTK(num):
 # FUNCTION: prints matrix vector data to vtk formated file
 #
 ##############################################################################
+
 def savevtk_points_connects( X, filename, vectorName,connectsMat):
     '''Prints matrix vector data to vtk formated file
     
@@ -969,35 +964,29 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
     N = X.shape[0]
     Nc = connectsMat.shape[0]
 
-    if C_flag==True:
-        #Just add the measure of time for transforming the 
-        nX = np.ascontiguousarray(X, dtype=np.float64)
-        nconnectsMat = np.ascontiguousarray(connectsMat, dtype=np.float64)
-        write.savevtk_points_connects_write(N,Nc,nX,filename,vectorName,nconnectsMat)
+    #TRY PRINTING THEM AS UNSTRUCTURED_GRID
+    with open(filename,'w') as file:
+        file.write('# vtk DataFile Version 2.0\n')
+        file.write(vectorName+'\n')
+        file.write('ASCII\n')
+        file.write('DATASET UNSTRUCTURED_GRID\n\n')
+        #
+        file.write('POINTS {0} float\n'.format(N))
+        for ii in range(N):
+            file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        file.write('\n')
+        #
+        #First: # of "Cells", Second: Total # of info inputed following
+        file.write('CELLS {0} {1}\n'.format(Nc,3*Nc))
+        for s in range(Nc):
+            file.write('{0} {1:d} {2:d}\n'.format(2,connectsMat[s,0],connectsMat[s,1]))
+        file.write('\n')
+        #
+        file.write('CELL_TYPES {0}\n'.format(Nc)) # N = # of "Cells"
+        for ii in range(Nc):
+           file.write('3 ')
+        file.write('\n')
 
-    else:
-        with open(filename,'w') as file:
-            file.write('# vtk DataFile Version 2.0\n')
-            file.write(vectorName+'\n')
-            file.write('ASCII\n')
-            file.write('DATASET UNSTRUCTURED_GRID\n\n')
-            #
-            file.write('POINTS {0} float\n'.format(N))
-            for ii in range(N):
-                file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
-            file.write('\n')
-            #
-            #First: # of "Cells", Second: Total # of info inputed following
-            file.write('CELLS {0} {1}\n'.format(Nc,3*Nc))
-            for s in range(Nc):
-                file.write('{0} {1:d} {2:d}\n'.format(2,connectsMat[s,0],connectsMat[s,1]))
-            file.write('\n')
-            #
-            file.write('CELL_TYPES {0}\n'.format(Nc)) # N = # of "Cells"
-            for ii in range(Nc):
-               file.write('3 ')
-            file.write('\n')
-    
 
 
 
@@ -1006,6 +995,7 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
 # FUNCTION: prints matrix vector data to vtk formated file
 #
 ##############################################################################
+
 def savevtk_points( X, filename, vectorName):
     ''' Prints matrix vector data to vtk formated file
     
@@ -1016,31 +1006,29 @@ def savevtk_points( X, filename, vectorName):
 
     N = X.shape[0]
 
-    if C_flag == True:
-        nX = np.ascontiguousarray(X, dtype=np.float64)
-        write.savevtk_points_write(N,nX,filename,vectorName)
-    else:
-        with open(filename,'w') as file:
-            file.write('# vtk DataFile Version 2.0\n')
-            file.write(vectorName+'\n')
-            file.write('ASCII\n')
-            file.write('DATASET UNSTRUCTURED_GRID\n\n')
-            file.write('POINTS {0} float\n'.format(N))
-            for ii in range(N):
-                file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
-            file.write('\n')
-            #
-            #First: # of "Cells", Second: Total # of info inputed following
-            file.write('CELLS {0} {1}\n'.format(N,2*N))
-            for s in range(N):
-                file.write('{0} {1}\n'.format(1,s))
-            file.write('\n')
-            #
-            file.write('CELL_TYPES {0}\n'.format(N)) # N = # of "Cells"
-            for ii in range(N):
-               file.write('1 ')
-            file.write('\n')
 
+    #TRY PRINTING THEM AS UNSTRUCTURED_GRID
+    with open(filename,'w') as file:
+        file.write('# vtk DataFile Version 2.0\n')
+        file.write(vectorName+'\n')
+        file.write('ASCII\n')
+        file.write('DATASET UNSTRUCTURED_GRID\n\n')
+        #
+        file.write('POINTS {0} float\n'.format(N))
+        for ii in range(N):
+            file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+        file.write('\n')
+        #
+        #First: # of "Cells", Second: Total # of info inputed following
+        file.write('CELLS {0} {1}\n'.format(N,2*N))
+        for s in range(N):
+            file.write('{0} {1}\n'.format(1,s))
+        file.write('\n')
+        #
+        file.write('CELL_TYPES {0}\n'.format(N)) # N = # of "Cells"
+        for ii in range(N):
+           file.write('1 ')
+        file.write('\n')
 
 
 
@@ -1085,6 +1073,7 @@ def savevtk_points( X, filename, vectorName):
 # FUNCTION: prints matrix vector data to vtk formated file
 #
 ##############################################################################
+
 def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     ''' Prints matrix vector data to vtk formated file.
     
@@ -1112,41 +1101,29 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     #   catch it in the following function.
     assert (X.shape == Y.shape), 'Error: velocity arrays of unequal size'
     nx, ny = X.shape
-    
-    XRow = X.shape[0]
-    XCol = X.shape[1]
-    YRow = Y.shape[0]
-    YCol = Y.shape[1]
-
-
-    if C_flag == True:
-        nX = np.ascontiguousarray(X, dtype=np.float64)
-        nY = np.ascontiguousarray(Y, dtype=np.float64)
-        write.savevtk_vector(XRow,XCol,YRow,YCol,nX,nY,filename,vectorName,dx,dy)
-    else:
-        with open(filename,'w') as fid:
-            fid.write('# vtk DataFile Version 2.0\n')
-            fid.write('Comment goes here\n')
-            fid.write('ASCII\n')
-            fid.write('\n')
-            fid.write('DATASET STRUCTURED_POINTS\n')
-            # 1 below was nz
-            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
-            fid.write('\n')
-            fid.write('ORIGIN    0.000   0.000   0.000\n')
-            #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-            fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
-            fid.write('\n')
-            fid.write('POINT_DATA   {0}\n'.format(nx*ny))
-            fid.write('VECTORS '+vectorName+' double\n')
-            fid.write('\n')
-            for b in range(ny):
-                for c in range(nx):
-                    fid.write('{0} '.format(X[c,b]))
-                    fid.write('{0} '.format(Y[c,b]))
-                    fid.write('1 ')
-                fid.write('\n')
     #Python 3.5 automatically opens in text mode unless otherwise specified
+    with open(filename,'w') as fid:
+        fid.write('# vtk DataFile Version 2.0\n')
+        fid.write('Comment goes here\n')
+        fid.write('ASCII\n')
+        fid.write('\n')
+        fid.write('DATASET STRUCTURED_POINTS\n')
+        # 1 below was nz
+        fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+        fid.write('\n')
+        fid.write('ORIGIN    0.000   0.000   0.000\n')
+        #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+        fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+        fid.write('\n')
+        fid.write('POINT_DATA   {0}\n'.format(nx*ny))
+        fid.write('VECTORS '+vectorName+' double\n')
+        fid.write('\n')
+        for b in range(ny):
+            for c in range(nx):
+                fid.write('{0} '.format(X[c,b]))
+                fid.write('{0} '.format(Y[c,b]))
+                fid.write('1 ')
+            fid.write('\n')
 
 
 ##############################################################################
@@ -1154,6 +1131,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
 # FUNCTION: prints scalar matrix to vtk formated file
 #
 ##############################################################################
+
 def savevtk_scalar(array, filename, colorMap,dx,dy):
     ''' Prints scalar matrix to vtk formatted file.
     
@@ -1175,33 +1153,29 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
     #   So, specifically, nz is now gone. I will keep the output the same,
     #   however, for compatibility. So 1 will be pritned in the Z column.
     nx,ny = array.shape
-    if C_flag == True:
-        narray = np.ascontiguousarray(array, dtype=np.float64)
-        write.savevtk_scalar(nx,ny,narray,filename,colorMap,dx,dy)
-    else:
-        with open(filename,'w') as fid:
-            fid.write('# vtk DataFile Version 2.0\n')
-            fid.write('Comment goes here\n')
-            fid.write('ASCII\n')
+    #Python 3.5 automatically opens in text mode unless otherwise specified
+    with open(filename,'w') as fid:
+        fid.write('# vtk DataFile Version 2.0\n')
+        fid.write('Comment goes here\n')
+        fid.write('ASCII\n')
+        fid.write('\n')
+        fid.write('DATASET STRUCTURED_POINTS\n')
+        # 1 below was nz
+        fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+        fid.write('\n')
+        fid.write('ORIGIN    0.000   0.000   0.000\n')
+        #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
+        fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+        fid.write('\n')
+        # The 1 below was nz
+        fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
+        fid.write('SCALARS '+colorMap+' double\n')
+        fid.write('LOOKUP_TABLE default\n')
+        fid.write('\n')
+        for b in range(ny):
+            for c in range(nx):
+                fid.write('{0} '.format(array[c,b]))
             fid.write('\n')
-            fid.write('DATASET STRUCTURED_POINTS\n')
-            # 1 below was nz
-            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
-            fid.write('\n')
-            fid.write('ORIGIN    0.000   0.000   0.000\n')
-            #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-            fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
-            fid.write('\n')
-            # The 1 below was nz
-            fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
-            fid.write('SCALARS '+colorMap+' double\n')
-            fid.write('LOOKUP_TABLE default\n')
-            fid.write('\n')
-            for b in range(ny):
-                for c in range(nx):
-                    fid.write('{0} '.format(array[c,b]))
-                fid.write('\n')
-        #Python 3.5 automatically opens in text mode unless otherwise specified
             
 
             

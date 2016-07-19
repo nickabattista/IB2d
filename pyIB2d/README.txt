@@ -19,8 +19,6 @@ Institution: University of North Carolina at Chapel Hill
 Website: http://www.christopherstrickland.info
 GitHub: http://www.github.com/mountaindust
 
-For info on compiling the included Cython code, please see Cython_README.md
-
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
