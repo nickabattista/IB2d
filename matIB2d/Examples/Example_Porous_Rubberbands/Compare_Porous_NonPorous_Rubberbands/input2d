@@ -39,7 +39,7 @@ electro_phys = 0        % 0 (for no) or 1 (for yes)
 
 % PRINTING INFORMATION
 print_dump = 50          % How often to print (PLOT) to screen
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 0          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab

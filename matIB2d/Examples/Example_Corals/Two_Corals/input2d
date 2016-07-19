@@ -2,30 +2,31 @@
 %****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
 
+
 % FLUID PARAMETER VALUES %
-mu = 0.01                % Dynamic Viscosity (N*s/m^2) 
+mu = 0.0025             % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 1.5            % Final time of simulation (s)
-dt = 1.0e-3             % Time-step (s)
+Tfinal = 6.0           % Final time of simulation (s)
+dt = 1.0e-5            % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
-Nx =  32                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  32                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
+Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 0.6                % Length of Eulerian Grid in x-Direction (m)
+Ly = 0.6                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
-springs = 1             % 0 (for no) or 1 (for yes)
+springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
-target_pts = 0          % 0 (for no) or 1 (for yes)
-update_target = 0       % 0 (for no) or 1 (for yes)
+target_pts = 1          % 0 (for no) or 1 (for yes)
+update_target = 1       % 0 (for no) or 1 (for yes)
 beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
-3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ FV-LT Model
+3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
 tracers = 0             % 0 (for no) or 1 (for yes)
 mass_pts = 0            % 0 (for no) or 1 (for yes)
@@ -36,14 +37,15 @@ porous_media = 0        % 0 (for no) or 1 (for yes)
 concentration = 0       % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 
+
 % PRINTING INFORMATION
-print_dump = 20          % How often to print (PLOT) to screen
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+print_Dump = 2000        % How often to print (PLOT) to screen
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
-plot_MagVelocity = 0     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
-plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
+plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = rubberband % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = coral  % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)

@@ -67,10 +67,6 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 k_Spring = 1e7;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
-% Prints .porous file!
-alpha = 1e-4; 
-print_Lagrangian_Porosity(xLag,alpha,struct_name)
-
 
 % Prints .beam file!
 %k_Beam = 0.5; C = 0.0;
@@ -104,31 +100,9 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints POROSITY points to a file called rubberband.porous
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function print_Lagrangian_Porosity(xLag,alpha,struct_name)
-
-    N = length(xLag);
-
-    porous_fid = fopen([struct_name '.porous'], 'w');
-
-    fprintf(porous_fid, '%d\n', N );
-
-    %Loops over all Lagrangian Pts.
-    for s = 1:N
-        fprintf(porous_fid, '%d %1.16e\n', s, alpha);
-    end
-
-    fclose(porous_fid); 
-        
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints TARGET points to a file called rubberband.target
+% FUNCTION: prints Vertex points to a file called rubberband.vertex
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -194,16 +168,16 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
     fprintf(spring_fid, '%d\n', N );
 
     %spring_force = kappa_spring*ds/(ds^2);
-    
-    alpha = 4;
 
+    alpha = 1.0;
+    
     %SPRINGS BETWEEN VERTICES
     for s = 1:N
             if s < N         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest, alpha);  
+                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest,alpha);  
             else
                 %Case s=N
-                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest, alpha);  
+                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest,alpha);  
             end
     end
     fclose(spring_fid); 
