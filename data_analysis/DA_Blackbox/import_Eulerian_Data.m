@@ -30,8 +30,6 @@ strChoice = 'uY'; first = 0;
 
 % read in Velocity Field %
 [U,V] = read_Eulerian_Velocity__Field_vtk(path,numSim);
-size(U)
-size(V)
 
 clear strChoice first;
 
