@@ -1,8 +1,52 @@
+%-------------------------------------------------------------------------------------------------------------------%
+%
+% IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
+% 	fluid-structure interaction models. This version of the code is based off of
+%	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
+%
+% Author: Nicholas A. Battista
+% Email:  nick.battista@unc.edu
+% Date Created: May 27th, 2015
+% Institution: UNC-CH
+%
+% This code is capable of creating Lagrangian Structures using:
+% 	1. Springs
+% 	2. Beams (*torsional springs)
+% 	3. Target Points
+%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% 
+% There are a number of built in Examples, mostly used for teaching purposes. 
+% 
+% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+%
+%--------------------------------------------------------------------------------------------------------------------%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: EXAMPLE DATA ANALYSIS CODE TO LOOK AT FLOW IN EMPTY CHANNEL
+%
+%     Note: 
+%           (1) This code analyzes viz_IB2d code for channel flow in
+%               /data_analysis/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d
+%           (2) Produces a plot of cross-sectional mag. of velocity for
+%               different points along the channel at three times.
+%           (3) USER-DEFINED functions are functions that users should make to
+%               analyze their specific data sets
+%           (4) MUST make sure to 'addpath' to where DA_Blackbox is, i.e.,
+%               line 61
+%           (5) MUST make sure to set path to desired dataset, i.e., in line
+%               56
+%          
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function Example_Channel_Flow_Analysis()
 
 % TEMPORAL INFO FROM input2d %
 dt = 1e-4;      % Time-step
-Tfinal = 0.015;   % Final time in simulation
+Tfinal = 0.015; % Final time in simulation
 pDump=50;       % Note: 'print_dump' should match from input2d
 
 % DATA ANALYSIS INFO %
