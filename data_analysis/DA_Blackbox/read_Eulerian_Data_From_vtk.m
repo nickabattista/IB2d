@@ -70,7 +70,7 @@ if count ~= Nx*Nx
 end
 
 % reshape the matrix into desired data type %
-e_Data = reshape(e_Data, 64, count/64); % Reshape vector -> matrix (every 3 entries in vector make into matrix row)
+e_Data = reshape(e_Data, Nx, count/Nx); % Reshape vector -> matrix (every 3 entries in vector make into matrix row)
 e_Data = e_Data';                       % Store vertices in new matrix
 
 fclose(fileID);                         % Closes the data file.

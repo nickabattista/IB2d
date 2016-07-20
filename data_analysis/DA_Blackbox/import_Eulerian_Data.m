@@ -18,6 +18,8 @@ strChoice = 'P'; first = 0;
 strChoice = 'uMag'; first = 0;
 [uMag,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
+size(uMag)
+
 % read in x-directed Velocity Magnitude %
 strChoice = 'uX'; first = 0;
 [uX,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
