@@ -14,7 +14,6 @@ filename = ['lagsPts.' num2str(simNums) '.vtk'];  % desired lagPts.xxxx.vtk file
 fileID = fopen(filename);
 if ( fileID== -1 )
     error('\nCANNOT OPEN THE FILE!');
-    return
 end
 
 str = fgets(fileID); %-1 if eof
@@ -47,3 +46,5 @@ xLag = vertices(:,1);         % x-Lagrangian Pts.
 yLag = vertices(:,2);         % y-Lagrangian Pts.
 
 cd ..;                        % Change directory back to ../viz_IB2d/ directory
+
+clear mat str filename fileID count;

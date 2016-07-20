@@ -78,3 +78,5 @@ fclose(fileID);                         % Closes the data file.
 cd ..;                                  % Change directory back to ../viz_IB2d/ directory
 
 cd(analysis_path);                      % Change directory back to Data Analysis Folder
+
+clear filename fileID str strVec count analysis_path;
