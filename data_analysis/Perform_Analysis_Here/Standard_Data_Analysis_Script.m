@@ -39,6 +39,9 @@ for i=start:1:finish
     %    uMag: mag. of velocity  
     %    uX: mag. of x-Velocity   uY: mag. of y-Velocity  
     %    U: x-directed velocity   V: y-directed velocity
+    % 
+    %  Note: U(j,i): j-corresponds to y-index, i to the x-index
+    %
     [x,y,Omega,P,uMag,uX,uY,U,V] = import_Eulerian_Data(path,numSim);
 
 end
