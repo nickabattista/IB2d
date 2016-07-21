@@ -35,7 +35,7 @@ function [x,y,Omega,P,uMag,uX,uY,U,V] = import_Eulerian_Data(path,numSim)
 strChoice = 'Omega'; first = 1;
 [Omega,x,y] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
-% read in Momentum %
+% read in Pressure %
 strChoice = 'P'; first = 0;
 [P,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 

@@ -78,7 +78,7 @@ for i=start:1:finish
     % Imports (x,y) grid values and ALL Eulerian Data %
     %                      DEFINITIONS 
     %          x: x-grid                y: y-grid
-    %       Omega: vorticity           P: momentum
+    %       Omega: vorticity           P: pressure
     %    uMag: mag. of velocity  
     %    uX: mag. of x-Velocity   uY: mag. of y-Velocity  
     %    U: x-directed velocity   V: y-directed velocity
