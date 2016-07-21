@@ -1144,7 +1144,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
                 for c in range(nx):
                     fid.write('{0} '.format(X[c,b]))
                     fid.write('{0} '.format(Y[c,b]))
-                    fid.write('1 ')
+                    fid.write('0 ')
                 fid.write('\n')
     #Python 3.5 automatically opens in text mode unless otherwise specified
 
