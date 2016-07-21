@@ -915,7 +915,7 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
 
     if concentration_Yes:
         confName = 'concentration.'+strNUM+'.vtk'
-        savevtk_scalar(C, confName, 'Concentration',dx,dy)
+        savevtk_scalar(C.T, confName, 'Concentration',dx,dy)
 
     #Print VECTOR DATA (i.e., velocity data) to .vtk file
     savevtk_vector(U, V, velocityName, 'u',dx,dy)
