@@ -54,7 +54,8 @@ finish=40;                           % LAST interval # included in data analysis
 dump_Times = (start:1:finish)*pDump; % Time vector when data was printed in analysis
 
 % SET PATH TO DESIRED viz_IB2d DATA %
-path = '/Users/nick_battista/Desktop/IB2d/matIB2d/Examples/Example_Porous_Rubberbands/Compare_Porous_NonPorous_Rubberbands/viz_IB2d';
+path = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d';
+
 
 % SET PATH TO DA_BLACKBOX %
 addpath('../DA_Blackbox');
