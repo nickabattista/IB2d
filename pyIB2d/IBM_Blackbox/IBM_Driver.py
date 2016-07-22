@@ -1135,7 +1135,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
             fid.write('\n')
             fid.write('ORIGIN    0.000   0.000   0.000\n')
             #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-            fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+            fid.write('SPACING   '+str(dx)+str(' ')+str(dy)+'   1.000\n')
             fid.write('\n')
             fid.write('POINT_DATA   {0}\n'.format(nx*ny))
             fid.write('VECTORS '+vectorName+' double\n')
@@ -1190,7 +1190,7 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             fid.write('\n')
             fid.write('ORIGIN    0.000   0.000   0.000\n')
             #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-            fid.write('SPACING   '+str(dx)+str(dy)+'   1.000\n')
+            fid.write('SPACING   '+str(dx)+str(' ')+str(dy)+'   1.000\n')
             fid.write('\n')
             # The 1 below was nz
             fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
