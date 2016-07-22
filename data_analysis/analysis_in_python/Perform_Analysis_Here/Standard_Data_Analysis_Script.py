@@ -78,7 +78,7 @@ def Standard_Data_Analysis_Script():
         
     
     # Imports immersed boundary positions %
-    #xLag,yLag = give_Lag_Positions(path,numSim);
+    xLag,yLag = give_Lag_Positions(path,numSim);
 
     # Imports (x,y) grid values and ALL Eulerian Data %
     #                      DEFINITIONS 
@@ -90,7 +90,7 @@ def Standard_Data_Analysis_Script():
     # 
     #  Note: U(j,i): j-corresponds to y-index, i to the x-index
     #
-    #x,y,Omega,P,uMag,uX,uY,U,V = import_Eulerian_Data(path,numSim);    
+    x,y,Omega,P,uMag,uX,uY,U,V = import_Eulerian_Data(path,numSim);
     
     
 if __name__ == "__main__":
