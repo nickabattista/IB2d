@@ -25,8 +25,8 @@
 
 import numpy as np
 import sys
-from math import cos, sin, pi, sqrt
-import matplotlib.pyplot as plt
+from give_Lag_Positions import give_Lag_Positions
+from import_Eulerian_Data import import_Eulerian_Data
 
 #################################################################################
 #
