@@ -52,7 +52,7 @@ strChoice = 'uY'; first = 0;
 [uY,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
 % read in Velocity Field %
-[U,V] = read_Eulerian_Velocity__Field_vtk(path,numSim);
+[U,V] = read_Eulerian_Velocity_Field_vtk(path,numSim);
 
 clear strChoice first;
 
