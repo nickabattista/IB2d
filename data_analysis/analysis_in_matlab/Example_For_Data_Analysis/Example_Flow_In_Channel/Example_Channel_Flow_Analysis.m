@@ -68,7 +68,7 @@ for i=start:1:finish
     elseif i<100
        numSim = ['00', num2str(i)];
     elseif i<1000
-       numSim = ['0', num2str(i) '.vtk'];
+       numSim = ['0', num2str(i)];
     else
        numSim = num2str(i);
     end
