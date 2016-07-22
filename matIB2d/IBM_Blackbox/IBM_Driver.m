@@ -871,7 +871,7 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
     %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
+    fprintf(fid, ['SPACING   ' num2str(dx) ' '  num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny);
     fprintf(fid, ['VECTORS ' vectorName ' double\n']);
@@ -911,7 +911,7 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
     %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
-    fprintf(fid, ['SPACING   ' num2str(dx)   num2str(dy) '   1.000\n']);
+    fprintf(fid, ['SPACING   ' num2str(dx) ' '   num2str(dy) '   1.000\n']);
     fprintf(fid, '\n');
     fprintf(fid, 'POINT_DATA   %d\n', nx*ny*nz);
     fprintf(fid, ['SCALARS ' colorMap ' double\n']);
