@@ -31,7 +31,7 @@
 import numpy as np
 import sys
 # Path Reference to where Driving code is found #
-sys.path.append('../../')
+sys.path.append('../../IBM_Blackbox')
 import IBM_Driver as Driver
 
 ###############################################################################
