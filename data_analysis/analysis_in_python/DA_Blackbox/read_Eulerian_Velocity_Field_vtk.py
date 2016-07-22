@@ -49,7 +49,4 @@ def read_Eulerian_Velocity_Field_vtk(path,simNums):
 
     os.chdir(analysis_path);     # Path to working directory
 
-    print(e_data_Y[:,0])
-    print(e_data_Y[4,:])
-
     return e_data_X, e_data_Y
