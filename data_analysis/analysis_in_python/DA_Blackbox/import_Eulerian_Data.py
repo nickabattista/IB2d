@@ -37,9 +37,6 @@ from read_Eulerian_Velocity_Field_vtk import read_Eulerian_Velocity_Field_vtk
 
 def import_Eulerian_Data(path,numSim):
  
-
-    path = '/Users/Lab/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d/'
-
     # read in Vorticity #
     strChoice = 'Omega'; first = 1;
     Omega,x,y = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);

@@ -51,6 +51,4 @@ def give_Lag_Positions(path,numSim):
 
     os.chdir(analysis_path);        
 
-    del analysis_path;    
-
     return xLag,yLag;
