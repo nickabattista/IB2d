@@ -108,7 +108,7 @@ end % END OF LOOP OVER ANALYZED TIME-PTS
 
 
 %                                                                    %
-% ***** USER DEFINED FUNCTION TO PRINT DESIRED VELOCITY DATA *****   %
+% ***** USER DEFINED FUNCTION TO PLOT DESIRED VELOCITY DATA *****   %
 %                                                                    %
 yVals = y(yInds);
 plot_Desired_Data(yVals,vel_data);
