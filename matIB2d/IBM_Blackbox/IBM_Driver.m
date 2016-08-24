@@ -620,16 +620,18 @@ cd ..
 %
 % Print Lagrangian Force Data to hier_IB2d_data folder
 %
+[F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
+%
 cd('hier_IB2d_data'); %change directory to hier-data folder
     fMagName = ['fMag.' strNUM '.vtk'];
     fNormalName = ['fNorm.' strNUM '.vtk'];
     fTangentName = ['fTan.' strNUM '.vtk'];
 
-    fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 );
+    fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
     savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fNormalName, 'fNorm');
-    savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fTangentName, 'fTan');
+    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
 cd .. % Get out of hier_IB2d_data folder
 

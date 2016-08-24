@@ -374,17 +374,19 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
 mkdir('viz_IB2d');
-vizID = 1; %JUST INITIALIZE BC dumps.visit isn't working correctly...yet
+mkdir('hier_IB2d_data'); 
 %cd('viz_IB2d');
 %vizID = fopen('dumps.visit','w'); 
 %fprintf(vizID,'!NBLOCKS 6\n');
 %cd ..
 
+
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
-vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)]; fMag = zeros( length(xLag), 1);
+vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx);
-print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,forces_Yes,fMag);
+Fxh = vort; Fyh = vort; F_Lag = zeros( length(xLag), 2); 
+print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
@@ -503,13 +505,8 @@ while current_time < T_FINAL
         end
         
         %Print .vtk files!
-  
-        size(Fxh)
-        size(Fyh)
-        pause();
-        
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_viz_IB2d_vtk_files(ctsave,vizID,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,Cforces_Yes,Fxh,F);
+        print_vtk_files(ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -550,88 +547,96 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_viz_IB2d_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,forces_Yes,fGridX,fGridY)
+function print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
 
 %Give spacing for grid
 dx = Lx/Nx; 
 dy = Ly/Ny;
 
+%
+% Print all Eulerian Data and Lagrangian Position Data to viz_IB2d folder
+%
+cd('viz_IB2d'); %Go into viz_IB2d directory
 
-%Go into viz_IB2d directory
-cd('viz_IB2d');
+    %Find string number for storing files
+    strNUM = give_String_Number_For_VTK(ctsave);
+    vortfName = ['Omega.' strNUM '.vtk'];
+    uMagfName = ['uMag.' strNUM '.vtk'];
+    pfName = ['P.' strNUM '.vtk'];
+    uXName = ['uX.' strNUM '.vtk'];
+    uYName = ['uY.' strNUM '.vtk'];
+    fXName = ['fX.' strNUM '.vtk'];
+    fYName = ['fY.' strNUM '.vtk'];
+    fMagName = ['fMag.' strNUM '.vtk'];
+    velocityName = ['u.' strNUM '.vtk'];
+    lagPtsName = ['lagsPts.' strNUM '.vtk'];
+    lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
 
-%Find string number for storing files
-strNUM = give_String_Number_For_VTK(ctsave);
-vortfName = ['Omega.' strNUM '.vtk'];
-uMagfName = ['uMag.' strNUM '.vtk'];
-pfName = ['P.' strNUM '.vtk'];
-uXName = ['uX.' strNUM '.vtk'];
-uYName = ['uY.' strNUM '.vtk'];
-fXName = ['fX.' strNUM '.vtk'];
-fYName = ['fY.' strNUM '.vtk'];
-fMagName = ['fMag.' strNUM '.vtk'];
-velocityName = ['u.' strNUM '.vtk'];
-lagPtsName = ['lagsPts.' strNUM '.vtk'];
-lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
+    %Print Lagrangian Pts to .vtk format
+    savevtk_points(lagPts, lagPtsName, 'lagPts');
 
-%Print Lagrangian Pts to .vtk format
-savevtk_points(lagPts, lagPtsName, 'lagPts');
+    %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+    savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
 
-%Print Lagrangian Pts w/ CONNECTIONS to .vtk format
-savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
+    %Print Tracer Pts (*if tracers*)
+    if tracers(1,1) == 1
+        tracersPtsName = ['tracer.' strNUM '.vtk'];
+        %tMatrix = tracers(:,2:4);
+        savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
+    end
 
-%Print Tracer Pts (*if tracers*)
-if tracers(1,1) == 1
-    tracersPtsName = ['tracer.' strNUM '.vtk'];
-    %tMatrix = tracers(:,2:4);
-    savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
-end
-        
-%Print another cycle to .visit file
-%fprintf(vizID,[vortfName '\n']);
-%fprintf(vizID,[uMagfName '\n']);
-%fprintf(vizID,[pfName '\n']);
-%fprintf(vizID,[uXName '\n']);
-%fprintf(vizID,[uYName '\n']);
-%fprintf(vizID,[velocityName '\n']);
-
-
-%Print SCALAR DATA (i.e., colormap data) to .vtk file
-savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
-savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
-savevtk_scalar(p, pfName, 'P',dx,dy);
-savevtk_scalar(U, uXName, 'uX',dx,dy);
-savevtk_scalar(V, uYName, 'uY',dx,dy);
-savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
-savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
-savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
+    %Print another cycle to .visit file
+    %fprintf(vizID,[vortfName '\n']);
+    %fprintf(vizID,[uMagfName '\n']);
+    %fprintf(vizID,[pfName '\n']);
+    %fprintf(vizID,[uXName '\n']);
+    %fprintf(vizID,[uYName '\n']);
+    %fprintf(vizID,[velocityName '\n']);
 
 
-if concentration_Yes == 1
-    confName = ['concentration.' strNUM '.vtk'];
-    savevtk_scalar(C', confName, 'Concentration',dx,dy);
-end
+    %Print SCALAR DATA (i.e., colormap data) to .vtk file
+    savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
+    savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
+    savevtk_scalar(p, pfName, 'P',dx,dy);
+    savevtk_scalar(U, uXName, 'uX',dx,dy);
+    savevtk_scalar(V, uYName, 'uY',dx,dy);
+    savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
+    savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
+    savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
 
 
-%Print VECTOR DATA (i.e., velocity data) to .vtk file
-savevtk_vector(U, V, velocityName, 'u',dx,dy)
+    if concentration_Yes == 1
+        confName = ['concentration.' strNUM '.vtk'];
+        savevtk_scalar(C', confName, 'Concentration',dx,dy);
+    end
+
+
+    %Print VECTOR DATA (i.e., velocity data) to .vtk file
+    savevtk_vector(U, V, velocityName, 'u',dx,dy)
 
 %Get out of viz_IB2d folder
 cd ..
 
-% Print Force Data
-if forces_Yes == 1
-    cd('hier_IB2d_data'); %change directory to hier-data folder
+%
+% Print Lagrangian Force Data to hier_IB2d_data folder
+%
+[F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
+%
+ftest1 = sqrt( F_Tan
+
+cd('hier_IB2d_data'); %change directory to hier-data folder
     fMagName = ['fMag.' strNUM '.vtk'];
     fNormalName = ['fNorm.' strNUM '.vtk'];
     fTangentName = ['fTan.' strNUM '.vtk'];
 
-    savevtk_points_with_scalar_data( lagPts, F, fMagName, 'fMag');
-    savevtk_points_with_scalar_data( lagPts, F, fNormalName, 'fNorm');
-    savevtk_points_with_scalar_data( lagPts, F, fTangentName, 'fTan');
+    fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+    
+    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
-    cd .. % Get out of hier_IB2d_data folder
-end
+cd .. % Get out of hier_IB2d_data folder
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -984,16 +989,16 @@ for i=1:N
 end
 fprintf(file,'\n');
 %
-fprintf(fid, 'POINT_DATA   %d\n', N);
-fprintf(fid, ['SCALARS ' colorMap ' double\n']);
-fprintf(fid, 'LOOKUP_TABLE default\n');
-fprintf(fid, '\n');
+fprintf(file, 'POINT_DATA   %d\n', N);
+fprintf(file, ['SCALARS ' vectorName ' double\n']);
+fprintf(file, 'LOOKUP_TABLE default\n');
+fprintf(file, '\n');
     for i=1:N
-        fprintf(fid, '%d ', scalarArray(i,1));
-        fprintf(fid, '\n');
+        fprintf(file, '%d ', scalarArray(i,1));
+        fprintf(file, '\n');
     end
 
-fclose(fid);
+fclose(file);
     
     
 %     for a=1:nz
