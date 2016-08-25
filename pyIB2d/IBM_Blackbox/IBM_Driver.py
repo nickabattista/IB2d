@@ -6,7 +6,7 @@
 
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
- Date Created: May 27th, 2015\
+ Date Created: May 27th, 2015
  Python 3.5 port by: Christopher Strickland
  Institution: UNC-CH
 
@@ -339,15 +339,21 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #(flags for storing structure connects for printing and printing to .vtk)
     cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1
     
-    # CREATE VIZ_IB2D FOLDER and VISIT FILES
+    # CREATE VIZ_IB2D FOLDER, HIER_IB2D_DATA FOLDER and VISIT FILES
     try:
         os.mkdir('viz_IB2d')
+    except FileExistsError:
+        #File already exists
+        pass
+    try:
+        os.mkdir('hier_IB2d_data')
     except FileExistsError:
         #File already exists
         pass
     #I'm going to expect that vizID is a file object with write permission...?
     vizID = 1 #JUST INITIALIZE BC dumps.visit isn't working correctly...yet
     os.chdir('viz_IB2d')
+
     #Save grid_Info and model_Info in human readable format
     with open('_grid_Info.txt','w') as fobj:
         for key in sorted(grid_Info):
@@ -365,8 +371,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     lagPts = np.zeros((xLag.size,3))
     lagPts[:,0] = xLag; lagPts[:,1] = yLag
     connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
+    Fxh = np.array(vort); Fyh =np.array(vort); F_Lag = np.zeros((xLag.size,2)) 
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
-    connectsMat,tracers,concentration_Yes,C)
+    connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
     
@@ -493,7 +500,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #Print .vtk files!
             lagPts = np.vstack((xLag, yLag, np.zeros(xLag.size))).T
             print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
-                lagPts,connectsMat,tracers,concentration_Yes,C)
+                lagPts,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
             
             #Print Current Time
             print('Current Time(s): {0:6.6f}\n'.format(current_time))
@@ -862,7 +869,7 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
 ##############################################################################
 
 def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
-    connectsMat,tracers,concentration_Yes,C):
+    connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag):
     ''' Gives appropriate string number for filename in printing the .vtk files'''
 
     #Give spacing for grid
@@ -881,6 +888,9 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     pfName = 'P.'+strNUM+'.vtk'
     uXName = 'uX.'+strNUM+'.vtk'
     uYName = 'uY.'+strNUM+'.vtk'
+    fXName = 'fX.'+strNUM+'.vtk'
+    fYName = 'fY.'+strNUM+'.vtk'
+    fMagName = 'fMag.'+strNUM+'.vtk'
     velocityName = 'u.'+strNUM+'.vtk'
     lagPtsName = 'lagsPts.'+strNUM+'.vtk'
     lagPtsConName = 'lagPtsConnect.'+strNUM+'.vtk'
@@ -912,6 +922,9 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     savevtk_scalar(p, pfName, 'P',dx,dy)
     savevtk_scalar(U, uXName, 'uX',dx,dy)
     savevtk_scalar(V, uYName, 'uY',dx,dy)
+    savevtk_scalar(fXGrid, fXName, 'fX',dx,dy)
+    savevtk_scalar(fYGrid, fYName, 'fY',dx,dy)
+    savevtk_scalar(np.sqrt( fXGrid*fXGrid + fYGrid*fYGrid ), fMagName, 'fMag',dx,dy)
 
     if concentration_Yes:
         confName = 'concentration.'+strNUM+'.vtk'
@@ -922,6 +935,25 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
 
     #Get out of viz_IB2d folder
     os.chdir('..')
+
+    #
+    # Print Lagrangian Force Data to hier_IB2d_data folder
+    #
+    #    F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
+    #
+    #    os.chdir('hier_IB2d_data') #change directory to hier-data folder
+    #    fMagName = 'fMag.'+strNUM+'.vtk'
+    #    fNormalName = 'fNorm.'+strNUM+'.vtk'
+    #    fTangentName = 'fTan.'+strNUM+'.vtk'
+
+    #    fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); % Compute magnitude of forces on boundary
+
+    #    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+    #    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+    #    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+
+    # Get out of hier_IB2d_data folder
+    #os.chdir('..') 
     
     
     
@@ -1203,6 +1235,56 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
                 fid.write('\n')
         #Python 3.5 automatically opens in text mode unless otherwise specified
             
+
+##############################################################################
+#
+# FUNCTION: prints unstructured point data w/ associated scalar value to vtk 
+#           formated file
+#
+##############################################################################
+
+def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
+    ''' Prints matrix vector data to vtk formated file
+    
+    Args:
+        X: Matrix of size Nx3
+        scalarArray:
+        filename:
+        colorMap:'''
+
+    # X is matrix of size Nx3 
+    #              Col 1: x-data
+    #              Col 2: y-data
+    #              Col 3: z-data
+    # scalarArray: Scalar array you are assigning to each point
+    # filename:    What you are saving the VTK file as (string)
+    # colorMap:  What you are naming the data you're printing (string)
+
+    N = X.shape[0]
+
+    if C_flag == True:
+        nX = np.ascontiguousarray(X, dtype=np.float64)
+        write.savevtk_points_write(N,nX,filename,vectorName)
+    else:
+        with open(filename,'w') as file:
+            file.write('# vtk DataFile Version 2.0\n')
+            file.write(vectorName+'\n')
+            file.write('ASCII\n')
+            file.write('DATASET UNSTRUCTURED_GRID\n\n')
+            file.write('POINTS {0} float\n'.format(N))
+            for ii in range(N):
+                file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
+            file.write('\n')
+            #
+            fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
+            fid.write('SCALARS '+colorMap+' double\n')
+            fid.write('LOOKUP_TABLE default\n')
+            fid.write('\n')
+            for c in range(nx):
+                fid.write('{0} '.format(scalarArray[c,0]))
+                fid.write('\n')
+            #Python 3.5 automatically opens in text mode unless otherwise specified
+
 
             
 ##############################################################################
