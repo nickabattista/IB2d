@@ -91,10 +91,11 @@ def Example_Channel_Flow_Analysis():
         #    uMag: mag. of velocity
         #    uX: mag. of x-Velocity   uY: mag. of y-Velocity
         #    U: x-directed velocity   V: y-directed velocity
+        #    Fx: x-directed Force     Fy: y-directed Force
         #
         #  Note: U(j,i): j-corresponds to y-index, i to the x-index
         #
-        x,y,Omega,P,uMag,uX,uY,U,V = import_Eulerian_Data(path,numSim);
+        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(path,numSim);
 
         #                                                                    #
         # *** USER DEFINED FUNCTIONS TO GET DESIRED ANALYSIS PT. INDICES *** #

@@ -41,30 +41,32 @@ def import_Eulerian_Data(path,numSim):
     strChoice = 'Omega'; first = 1;
     Omega,x,y = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
-
     # read in Pressure #
     strChoice = 'P'; first = 0;
     P = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
-
     # read in Velocity Magnitude #
     strChoice = 'uMag'; first = 0;
     uMag = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
-
  
     # read in x-directed Velocity Magnitude #
     strChoice = 'uX'; first = 0;
     uX = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
-
  
     # read in y-directed Velocity Magnitude #
     strChoice = 'uY'; first = 0;
     uY = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
+    # read in y-directed Velocity Magnitude #
+    strChoice = 'Fx'; first = 0;
+    Fx = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+
+    # read in y-directed Velocity Magnitude #
+    strChoice = 'Fy'; first = 0;
+    Fy = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);    
  
     # read in Velocity Field #
     U,V = read_Eulerian_Velocity_Field_vtk(path,numSim);
 
     return x,y,Omega,P,uMag,uX,uY,U,V
-    #return x,y,Omega,P,uMag,uX,uY,U,V
 
