@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [x,y,Omega,P,uMag,uX,uY,U,V] = import_Eulerian_Data(path,numSim)
+function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim)
 
 % read in Vorticity %
 strChoice = 'Omega'; first = 1;
@@ -50,6 +50,14 @@ strChoice = 'uX'; first = 0;
 % read in y-directed Velocity Magnitude %
 strChoice = 'uY'; first = 0;
 [uY,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+
+% read in x-directed Forces %
+strChoice = 'Fx'; first = 0;
+[Fx,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+
+% read in y-directed Forces %
+strChoice = 'Fy'; first = 0;
+[Fy,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
 
 % read in Velocity Field %
 [U,V] = read_Eulerian_Velocity_Field_vtk(path,numSim);
