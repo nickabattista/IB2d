@@ -63,8 +63,11 @@ def Standard_Data_Analysis_Script():
     # SET PATH TO DA_BLACKBOX %
     sys.path.append('../DA_Blackbox')
 
+    from give_Lag_Positions import give_Lag_Positions
+    from import_Eulerian_Data import import_Eulerian_Data
+    from import_Lagrangian_Force_Data import import_Lagrangian_Force_Data
+
     for i in range(start,finish+1):
-    
 
         # Points to desired data viz_IB2d data file
         if i<10:
@@ -77,22 +80,31 @@ def Standard_Data_Analysis_Script():
             numSim = str(i);
         
     
-    # Imports immersed boundary positions %
-    xLag,yLag = give_Lag_Positions(path,numSim);
+        # Imports immersed boundary positions %
+        xLag,yLag = give_Lag_Positions(path,numSim);
 
-    # Imports (x,y) grid values and ALL Eulerian Data %
-    #                      DEFINITIONS 
-    #          x: x-grid                y: y-grid
-    #       Omega: vorticity           P: pressure
-    #    uMag: mag. of velocity  
-    #    uX: mag. of x-Velocity   uY: mag. of y-Velocity  
-    #    U: x-directed velocity   V: y-directed velocity
-    #    Fx: x-directed Force     Fy: y-directed Force
-    #
-    #  Note: U(j,i): j-corresponds to y-index, i to the x-index
-    #
-    x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(path,numSim);
-    
+        # Imports (x,y) grid values and ALL Eulerian Data %
+        #                      DEFINITIONS 
+        #          x: x-grid                y: y-grid
+        #       Omega: vorticity           P: pressure
+        #    uMag: mag. of velocity  
+        #    uX: mag. of x-Velocity   uY: mag. of y-Velocity  
+        #    U: x-directed velocity   V: y-directed velocity
+        #    Fx: x-directed Force     Fy: y-directed Force
+        #
+        #  Note: U(j,i): j-corresponds to y-index, i to the x-index
+        #
+        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(path,numSim);
+
+        # Imports Lagrangian Pt. FORCE (magnitude) DATA %
+        #                      DEFINITIONS 
+        #
+        #       fLagMag: magnitude of force at boundary
+        #   fLagNorm: magnitude of NORMAL force at boundary
+        #   fLagTan: magnitude of TANGENT force at boundary
+        #
+        fLagMag,fLagNorm,fLagTan = import_Lagrangian_Force_Data(pathForce,numSim);
+
     
 if __name__ == "__main__":
     Standard_Data_Analysis_Script()

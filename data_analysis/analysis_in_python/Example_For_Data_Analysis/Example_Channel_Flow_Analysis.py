@@ -60,13 +60,15 @@ def Example_Channel_Flow_Analysis():
     dump_Times = np.array(range(start,finish+1))*pDump; # Time vector when data was printed in analysis
         
     # SET PATH TO DESIRED viz_IB2d DATA %
-    path = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d/';
+    pathViz = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d/';
+    pathForce = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/hier_IB2d_data';
 
     # SET PATH TO DA_BLACKBOX %
     sys.path.append('../DA_Blackbox/')
 
     from give_Lag_Positions import give_Lag_Positions
     from import_Eulerian_Data import import_Eulerian_Data
+    from import_Lagrangian_Force_Data import import_Lagrangian_Force_Data
 
     for i in range(start,finish+1):
 
@@ -82,7 +84,7 @@ def Example_Channel_Flow_Analysis():
         
     
         # Imports immersed boundary positions %
-        xLag,yLag = give_Lag_Positions(path,numSim);
+        xLag,yLag = give_Lag_Positions(pathViz,numSim);
 
         # Imports (x,y) grid values and ALL Eulerian Data %
         #                      DEFINITIONS
@@ -95,7 +97,18 @@ def Example_Channel_Flow_Analysis():
         #
         #  Note: U(j,i): j-corresponds to y-index, i to the x-index
         #
-        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(path,numSim);
+        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(pathViz,numSim);
+
+
+        # Imports Lagrangian Pt. FORCE (magnitude) DATA %
+        #                      DEFINITIONS 
+        #
+        #       fLagMag: magnitude of force at boundary
+        #   fLagNorm: magnitude of NORMAL force at boundary
+        #   fLagTan: magnitude of TANGENT force at boundary
+        #
+        fLagMag,fLagNorm,fLagTan = import_Lagrangian_Force_Data(pathForce,numSim);
+
 
         #                                                                    #
         # *** USER DEFINED FUNCTIONS TO GET DESIRED ANALYSIS PT. INDICES *** #
