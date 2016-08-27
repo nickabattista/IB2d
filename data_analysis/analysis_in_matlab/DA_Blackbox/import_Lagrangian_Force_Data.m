@@ -31,15 +31,15 @@
 
 function [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(path,numSim)
 
-% read in Vorticity %
+% read in Mag. of Force %
 strChoice = 'fMag'; 
 fLagMag =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in Pressure %
+% read in Mag. of Tangential Force %
 strChoice = 'fTan'; 
 fLagNorm = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in Velocity Magnitude %
+% read in Mag. of Normal Force %
 strChoice = 'fNorm';
 fLagTan =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
  

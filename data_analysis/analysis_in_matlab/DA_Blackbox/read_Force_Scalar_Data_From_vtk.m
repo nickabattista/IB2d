@@ -71,7 +71,7 @@ forces = mat';              % Store vertices in new matrix
 
 fclose(fileID);               % Closes the data file.
 
-Fdata = forces(:,1);        % magnitude of the force
+Fdata = forces(:,1);         % magnitude of the force
 
 cd ..;                        % Change directory back to ../viz_IB2d/ directory
 
