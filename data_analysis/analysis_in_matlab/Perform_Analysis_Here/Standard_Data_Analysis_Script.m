@@ -89,5 +89,14 @@ for i=start:1:finish
     %
     [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim);
     
+    % Imports Lagrangian Pt. FORCE (magnitude) DATA %
+    %                      DEFINITIONS 
+    %
+    %       fLagMag: magnitude of force at boundary
+    %   fLagNorm: magnitude of NORMAL force at boundary
+    %   fLagTan: magnitude of TANGENT force at boundary
+    %
+    [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
+    
 
 end

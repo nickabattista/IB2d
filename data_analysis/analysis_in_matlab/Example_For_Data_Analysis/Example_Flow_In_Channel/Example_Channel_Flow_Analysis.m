@@ -54,8 +54,9 @@ start=1;                             % 1ST interval # included in data analysis
 finish=3;                            % LAST interval # included in data analysis 
 dump_Times = (start:1:finish)*pDump; % Time vector when data was printed in analysis
 
-% SET PATH TO DESIRED viz_IB2d DATA %
-path = 'viz_IB2d';
+% SET PATH TO DESIRED viz_IB2d DATA and hier_IB2d DATA %
+pathViz = 'viz_IB2d';
+pathForce='hier_IB2d_data';
 
 % SET PATH TO DA_BLACKBOX %
 addpath('../../DA_Blackbox');
@@ -74,9 +75,9 @@ for i=start:1:finish
     end
     
     % Imports immersed boundary positions %
-    [xLag,yLag] = give_Lag_Positions(path,numSim);
+    [xLag,yLag] = give_Lag_Positions(pathViz,numSim);
 
-    % Imports (x,y) grid values and ALL Eulerian Data %
+    % Imports (x,y) grid values and ALL EULERIAN DATA %
     %                      DEFINITIONS 
     %          x: x-grid                y: y-grid
     %       Omega: vorticity           P: pressure
@@ -87,9 +88,20 @@ for i=start:1:finish
     %
     %  Note: U(j,i): j-corresponds to y-index, i to the x-index
     %
-    [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim);
+    [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(pathViz,numSim);
+    
+    
+    % Imports Lagrangian Pt. FORCE (magnitude) DATA %
+    %                      DEFINITIONS 
+    %
+    %       fLagMag: magnitude of force at boundary
+    %   fLagNorm: magnitude of NORMAL force at boundary
+    %   fLagTan: magnitude of TANGENT force at boundary
+    %
+    [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
 
-    %                                                                    %
+    %                 
+    %
     % *** USER DEFINED FUNCTIONS TO GET DESIRED ANALYSIS PT. INDICES *** %
     %                                                                    %
     if i==start
