@@ -68,5 +68,5 @@ def import_Eulerian_Data(path,numSim):
     # read in Velocity Field #
     U,V = read_Eulerian_Velocity_Field_vtk(path,numSim);
 
-    return x,y,Omega,P,uMag,uX,uY,U,V
+    return x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy
 
