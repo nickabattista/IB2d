@@ -36,6 +36,8 @@ from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 from please_Compute_Porous_Slip_Velocity import\
     please_Compute_Porous_Slip_Velocity
 from please_Plot_Results import please_Plot_Results
+from please_Compute_Normal_Tangential_Forces_On_Lag_Pts import\
+    please_Compute_Normal_Tangential_Forces_On_Lag_Pts
 
 #Here is the try import C part
 try:
@@ -500,7 +502,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #Print .vtk files!
             lagPts = np.vstack((xLag, yLag, np.zeros(xLag.size))).T
             print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
-                lagPts,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
+                lagPts,connectsMat,tracers,concentration_Yes,C,Fxh.T,Fyh.T,F_Lag)
             
             #Print Current Time
             print('Current Time(s): {0:6.6f}\n'.format(current_time))
@@ -939,21 +941,23 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     #
     # Print Lagrangian Force Data to hier_IB2d_data folder
     #
-    #    F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
-    #
-    #    os.chdir('hier_IB2d_data') #change directory to hier-data folder
-    #    fMagName = 'fMag.'+strNUM+'.vtk'
-    #    fNormalName = 'fNorm.'+strNUM+'.vtk'
-    #    fTangentName = 'fTan.'+strNUM+'.vtk'
+    F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
 
-    #    fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); % Compute magnitude of forces on boundary
+    os.chdir('hier_IB2d_data') #change directory to hier-data folder
+    fMagName = 'fMag.'+strNUM+'.vtk'
+    fNormalName = 'fNorm.'+strNUM+'.vtk'
+    fTangentName = 'fTan.'+strNUM+'.vtk'
 
-    #    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    #    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-    #    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+    # Compute magnitude of forces on Lagrangian boundary
+    fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); 
+
+    # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
+    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
     # Get out of hier_IB2d_data folder
-    #os.chdir('..') 
+    os.chdir('..') 
     
     
     
@@ -1261,14 +1265,16 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
     # colorMap:  What you are naming the data you're printing (string)
 
     N = X.shape[0]
+    nx = scalarArray.shape[0]
+
 
     if C_flag == True:
         nX = np.ascontiguousarray(X, dtype=np.float64)
-        write.savevtk_points_write(N,nX,filename,vectorName)
+        write.savevtk_points_write(N,nX,filename,colorMap)
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
-            file.write(vectorName+'\n')
+            file.write(colorMap+'\n')
             file.write('ASCII\n')
             file.write('DATASET UNSTRUCTURED_GRID\n\n')
             file.write('POINTS {0} float\n'.format(N))
@@ -1276,13 +1282,13 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
                 file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
             file.write('\n')
             #
-            fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
-            fid.write('SCALARS '+colorMap+' double\n')
-            fid.write('LOOKUP_TABLE default\n')
-            fid.write('\n')
+            file.write('POINT_DATA   {0}\n'.format(nx*1*1))
+            file.write('SCALARS '+colorMap+' double\n')
+            file.write('LOOKUP_TABLE default\n')
+            file.write('\n')
             for c in range(nx):
-                fid.write('{0} '.format(scalarArray[c,0]))
-                fid.write('\n')
+                file.write('{0} '.format(scalarArray[c]))
+                file.write('\n')
             #Python 3.5 automatically opens in text mode unless otherwise specified
 
 
