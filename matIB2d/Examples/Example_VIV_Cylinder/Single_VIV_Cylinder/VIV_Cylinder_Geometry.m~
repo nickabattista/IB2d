@@ -85,15 +85,15 @@ print_Lagrangian_Vertices([xLag xLag_Cy],[yLag yLag_Cy],struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1.75e7; resting_length_tether = 2*r;
+k_Spring = 1e7; resting_length_tether = 2*r;
 offset = length(xLag);
 print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e12;  
+%k_Beam = 0.5; C = 0.0;
 C = compute_Curvatures(xLag_Cy,yLag_Cy);
-print_Lagrangian_Beams(xLag_Cy,yLag_Cy,k_Beam,C,struct_name,offset);
+print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,offset);
 
 
 % Prints .target file!
@@ -151,7 +151,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,offset)
+function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     % k_Beam: beam stiffness
     % C: beam curvature
@@ -166,13 +166,11 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,offset)
 
     %BEAMS BETWEEN VERTICES
     for s = 1:N
-            if ( (s>1) && (s <= N-1) )        
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1+offset, s+offset, s+1+offset, k_Beam, C(s) );  
-            elseif (s==1)
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N+offset,   s+offset, s+1+offset, k_Beam, C(s) );  
-            elseif (s==N)
+            if  (s>1) (s <= N-1)         
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C(s) );  
+            else
                 %Case s=N
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N-1+offset, N+offset, 1+offset,   k_Beam, C(s) );  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C(s) );  
             end
     end
     fclose(beam_fid); 
@@ -213,8 +211,8 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     s=1; % Reset
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), 0.0025*k_Spring, resting_length_tether);
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), 0.0025*k_Spring, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), 0.1*k_Spring, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), 0.1*k_Spring, resting_length_tether);
     
     fclose(spring_fid); 
     
@@ -299,7 +297,7 @@ for i=1:N
    
    % Pts Xp -> Xq -> Xr (same as beam force calc.)
    
-   if ( (i > 1) && (i < N) )
+   if (i > 2 && i < N)
    
         Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
         Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
