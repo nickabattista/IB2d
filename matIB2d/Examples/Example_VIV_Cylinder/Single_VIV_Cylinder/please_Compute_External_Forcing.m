@@ -211,7 +211,27 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+% CONSTANT VELOCITY
+%uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+
+% PULSATILE VELOCITY PROFILE
+% freq = 10;
+%uX_Tar = -Umax * (5*sin(freq*2*pi*t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+
+% PULSATILE VELOCITY PROFILE w/ PAUSES BETWEEN SUCCESSIVE PULSES
+freq_P = 10;                     % frequency of pulse
+period = 1/freq_P;               % pulsation period
+rest_time = 2*period;            % rest time (no pulsation)
+tot_period = period + rest_time; % total period (pulsation + rest time)
+t_mod = mod(t,tot_period);
+if t_mod <= tot_period
+    if t_mod <= period
+        uX_Tar = -Umax * (5*sin(freq_P*2*pi*t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+    else
+        uX_Tar = 0;  % during rest
+    end
+end
+
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 

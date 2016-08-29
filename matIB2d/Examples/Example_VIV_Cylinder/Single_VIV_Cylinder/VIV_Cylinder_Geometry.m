@@ -74,7 +74,7 @@ print_Lagrangian_Vertices([xLag xLag_Cy],[yLag yLag_Cy],struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e8; resting_length_tether = r;
+k_Spring = 1e7; resting_length_tether = 2*r;
 offset = length(xLag);
 print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,struct_name);
 
@@ -85,7 +85,7 @@ print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 2.5e7;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,7 +174,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
 
     % offset = # of lag pts in channel (ordering lag pts, channel -> cylinder)
 
-    N = length(xLag);
+    N = length(xLag); % Number of pts on cylinder
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
@@ -193,12 +193,12 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     for s=1:N/2
-        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset, s+N/2+offset, 2*k_Spring, 2*r);
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset, s+N/2+offset, k_Spring, 2*r);
     end
     
     s=1; % Reset
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(1), 5*k_Spring, resting_length_tether);
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+offset, indsTether(2), 5*k_Spring, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(1), 0.1*k_Spring, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+offset, indsTether(2), 0.1*k_Spring, resting_length_tether);
     
     fclose(spring_fid); 
     
