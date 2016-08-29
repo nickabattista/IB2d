@@ -386,7 +386,7 @@ mkdir('hier_IB2d_data');
 vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
 Fxh = vort; Fyh = vort; F_Lag = zeros( length(xLag), 2); 
-print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
+print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n',current_time);
 ctsave = ctsave+1;
@@ -508,7 +508,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
+        print_vtk_files(ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -549,7 +549,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
+function print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
 
 %Give spacing for grid
 dx = Lx/Nx; 
@@ -572,17 +572,14 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     fMagName = ['fMag.' strNUM '.vtk'];
     velocityName = ['u.' strNUM '.vtk'];
     lagPtsName = ['lagsPts.' strNUM '.vtk'];
+    lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
 
     %Print Lagrangian Pts to .vtk format
     savevtk_points(lagPts, lagPtsName, 'lagPts');
 
-    % Print Spring Connections (* if springs *)
-    if springs_Yes == 1
-         %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
-        lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
-        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
-    end
-    
+    %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+    savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
+
     %Print Tracer Pts (*if tracers*)
     if tracers(1,1) == 1
         tracersPtsName = ['tracer.' strNUM '.vtk'];
@@ -657,18 +654,9 @@ function [connectsMat,space] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Y
         %              col 5: spring linearity (1=linear, >1 non-linear)
 
 
+N = length(xLag);
 
 space = 20*ds;
-
-if springs_Yes == 1
-    connectsMat(:,1) = springs_info(:,1)-1; % -1 For Cpp notation (and .vtk counting)
-    connectsMat(:,2) = springs_info(:,2)-1; % -1 For Cpp notation (and .vtk counting)
-else
-    
-    connectsMat = 0;
-end
-
-%N = length(xLag);
 
 % if Nx <= 32
 %     space = 5*ds;
@@ -685,28 +673,28 @@ end
 % end
     
 
-% ct = 1;
-% for i=1:N
-%     if i<N
-%         x1=xLag(i); x2=xLag(i+1);
-%         y1=yLag(i); y2=yLag(i+1);
-%         dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-%         if dist < space
-%             connectsMat(ct,1) = i-1; %For Cpp notation (and .vtk counting)
-%             connectsMat(ct,2) = i;   %For Cpp notation (and .vtk counting)
-%         ct=ct+1;
-%         end
-%     elseif i==N
-%         x1=xLag(N); x2=xLag(1);
-%         y1=yLag(N); y2=yLag(1);
-%         dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-%         if dist < space
-%             connectsMat(ct,1) = N-1; %For Cpp notation (and .vtk counting)
-%             connectsMat(ct,2) = 0;   %For Cpp notation (and .vtk counting)
-%         ct=ct+1;
-%         end
-%     end
-% end
+ct = 1;
+for i=1:N
+    if i<N
+        x1=xLag(i); x2=xLag(i+1);
+        y1=yLag(i); y2=yLag(i+1);
+        dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+        if dist < space
+            connectsMat(ct,1) = i-1; %For Cpp notation (and .vtk counting)
+            connectsMat(ct,2) = i;   %For Cpp notation (and .vtk counting)
+        ct=ct+1;
+        end
+    elseif i==N
+        x1=xLag(N); x2=xLag(1);
+        y1=yLag(N); y2=yLag(1);
+        dist = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+        if dist < space
+            connectsMat(ct,1) = N-1; %For Cpp notation (and .vtk counting)
+            connectsMat(ct,2) = 0;   %For Cpp notation (and .vtk counting)
+        ct=ct+1;
+        end
+    end
+end
 
 
 
