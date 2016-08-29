@@ -34,14 +34,14 @@ function VIV_Cylinder_Geometry()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  256;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-ds= min(Lx/(2*Nx),Ly/(2*Ny));  % Lagrangian spacing
+ds= min(Lx/(2.1*Nx),Ly/(2.1*Ny));  % Lagrangian spacing
 L = 0.9*Lx;                    % Length of Channel
 w = 0.2*Ly;                    % Width of Channel
 x0 = 0.3;                      % x-Center for Cylinder
@@ -254,6 +254,7 @@ while theta < 3*pi/2
    theta = theta + dtheta;
    i=i+1;
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
