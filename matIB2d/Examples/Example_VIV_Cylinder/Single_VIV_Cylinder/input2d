@@ -7,8 +7,8 @@ mu = 0.01               % Dynamic Viscosity (N*s/m^2)
 rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 1.25           % Final time of simulation (s)
-dt = 5.0e-5             % Time-step (s)
+Tfinal = 0.9           % Final time of simulation (s)
+dt = 2.5e-5             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -22,7 +22,7 @@ springs = 1             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 0               % 0 (for no) or 1 (for yes)
+beams = 1               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
@@ -39,7 +39,7 @@ electro_phys = 0        % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 200          % How often to print (PLOT) to screen
+print_dump = 400          % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

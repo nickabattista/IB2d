@@ -85,13 +85,13 @@ print_Lagrangian_Vertices([xLag xLag_Cy],[yLag yLag_Cy],struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1.75e7; resting_length_tether = 2*r;
+k_Spring = 2.0e7; resting_length_tether = 2*r;
 offset = length(xLag);
 print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e12;  
+k_Beam = 5.0e9;  
 C = compute_Curvatures(xLag_Cy,yLag_Cy);
 print_Lagrangian_Beams(xLag_Cy,yLag_Cy,k_Beam,C,struct_name,offset);
 
@@ -213,8 +213,8 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     s=1; % Reset
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), 0.0025*k_Spring, resting_length_tether);
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), 0.0025*k_Spring, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), 1e4, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), 1e4, resting_length_tether);
     
     fclose(spring_fid); 
     
