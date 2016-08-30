@@ -372,9 +372,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     vort = np.zeros((Ny,Nx)); uMag = np.array(vort); p = np.array(vort)
     lagPts = np.zeros((xLag.size,3))
     lagPts[:,0] = xLag; lagPts[:,1] = yLag
-    connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx)
+    connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info)
     Fxh = np.array(vort); Fyh =np.array(vort); F_Lag = np.zeros((xLag.size,2)) 
-    print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
+    print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
@@ -502,7 +502,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #Print .vtk files!
             lagPts = np.vstack((xLag, yLag, np.zeros(xLag.size))).T
             print_vtk_files(ctsave,vizID,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,\
-                lagPts,connectsMat,tracers,concentration_Yes,C,Fxh.T,Fyh.T,F_Lag)
+                lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh.T,Fyh.T,F_Lag)
             
             #Print Current Time
             print('Current Time(s): {0:6.6f}\n'.format(current_time))
@@ -822,7 +822,7 @@ def read_Beam_Points(struct_name):
 #
 ##############################################################################
 
-def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
+def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info):
     ''' Give me Connects Vector for printing Lagrangian .vtk info!
 
     Args:
@@ -835,30 +835,46 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
         connectsMat:
         space:'''
 
-    N = xLag.size
+    #springs_info: col 1: starting spring pt (by lag. discretization)
+    #              col 2: ending spring pt. (by lag. discretization)
+    #              col 3: spring stiffness
+    #              col 4: spring resting lengths
 
-    if Nx <= 32:
-        space = 5*ds
-    elif Nx <= 64:
-       space = 5*ds
-    elif Nx <=128:
-       space = 5*ds
-    elif Nx <=256:
-        space = 10*ds
-    elif Nx <= 512:
-        space = 20*ds
+    space = 20*ds
+
+    nSprings = springs_info.shape;
+    connectsMat = np.zeros([nSprings[0],2])
+
+    if springs_Yes:
+        connectsMat[:,0] = springs_info[:,0]; # (for .vtk counting)
+        connectsMat[:,1] = springs_info[:,1]; # (for .vtk counting)
     else:
-        space = 40*ds
+        connectsMat = 0;
+
+    #N = xLag.size
+
+    #if Nx <= 32:
+    #    space = 5*ds
+    #elif Nx <= 64:
+    #   space = 5*ds
+    #elif Nx <=128:
+    #   space = 5*ds
+    #elif Nx <=256:
+    #    space = 10*ds
+    #elif Nx <= 512:
+    #    space = 20*ds
+    #else:
+    #    space = 40*ds
         
-    dist = np.zeros(N)
-    dist[:-1] = np.sqrt( (xLag[:-1]-xLag[1:])**2 + (yLag[:-1]-yLag[1:])**2 )
-    dist[-1] = sqrt( (xLag[-1]-xLag[0])**2 + (yLag[-1]-yLag[0])**2 )
+    #dist = np.zeros(N)
+    #dist[:-1] = np.sqrt( (xLag[:-1]-xLag[1:])**2 + (yLag[:-1]-yLag[1:])**2 )
+    #dist[-1] = sqrt( (xLag[-1]-xLag[0])**2 + (yLag[-1]-yLag[0])**2 )
     #collect the indices where dist < space, for Cpp notation (and .vtk counting)
-    connectsMat0 = np.where(dist<space)[0] #always returns tuple of arrays of
+    #connectsMat0 = np.where(dist<space)[0] #always returns tuple of arrays of
                                            # indices, so need first array in tuple
-    if connectsMat0.size > 0:
-        connectsMat1 = (connectsMat0 + 1) % N # N index should wrap back to 0
-    connectsMat = np.vstack((connectsMat0,connectsMat1)).T
+    #if connectsMat0.size > 0:
+    #    connectsMat1 = (connectsMat0 + 1) % N # N index should wrap back to 0
+    #connectsMat = np.vstack((connectsMat0,connectsMat1)).T
     
     return (connectsMat,space)
 
@@ -870,7 +886,7 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx):
 #
 ##############################################################################
 
-def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
+def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag):
     ''' Gives appropriate string number for filename in printing the .vtk files'''
 
@@ -895,13 +911,15 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,\
     fMagName = 'fMag.'+strNUM+'.vtk'
     velocityName = 'u.'+strNUM+'.vtk'
     lagPtsName = 'lagsPts.'+strNUM+'.vtk'
-    lagPtsConName = 'lagPtsConnect.'+strNUM+'.vtk'
 
     #Print Lagrangian Pts to .vtk format
     savevtk_points(lagPts, lagPtsName, 'lagPts')
 
-    #Print Lagrangian Pts w/ CONNECTIONS to .vtk format
-    savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat)
+    # Print Spring Connections (* if springs *)
+    if springs_Yes:
+        #Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+        lagPtsConName = 'lagPtsConnect.'+strNUM+'.vtk'
+        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat )
 
     #Print Tracer Pts (*if tracers*)
     if tracers[0,0] == 1:
@@ -1026,7 +1044,7 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
             #First: # of "Cells", Second: Total # of info inputed following
             file.write('CELLS {0} {1}\n'.format(Nc,3*Nc))
             for s in range(Nc):
-                file.write('{0} {1:d} {2:d}\n'.format(2,connectsMat[s,0],connectsMat[s,1]))
+                file.write('{0} {1:d} {2:d}\n'.format(2,int(connectsMat[s,0]),int(connectsMat[s,1]) ) ) 
             file.write('\n')
             #
             file.write('CELL_TYPES {0}\n'.format(Nc)) # N = # of "Cells"
