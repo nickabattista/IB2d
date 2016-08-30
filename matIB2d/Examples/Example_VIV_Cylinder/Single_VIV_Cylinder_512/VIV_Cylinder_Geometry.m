@@ -85,7 +85,7 @@ print_Lagrangian_Vertices([xLag xLag_Cy],[yLag yLag_Cy],struct_name);
 
 
 % Prints .spring file!
-k_Spring = 2.0e7; resting_length_tether = 2*r;
+k_Spring = 1.0e7; resting_length_tether = 2*r;
 offset = length(xLag);
 print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,struct_name);
 
