@@ -45,7 +45,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS VERSION HAS 11 DIFFERENT FLAVORS OF EXAMPLES:
+-THIS VERSION HAS VARIOUS DIFFERENT FLAVORS OF EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
@@ -103,7 +103,12 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex2: - Bell composed of beams and springs
             ex3: - Bell motion driven by interpolating between resting lengths
                    for two phases.
-            NOTE: not entirely debugged, yet. 
+            NOTE: not entirely debugged, yet. 	
+    13. "Vortex Induced Vibration" (VIV)
+    	    ex1: - Tethered cylinder in channel with pulsatile flow, which vibrates
+    	    	   due to the underlying flow. 
+    14. "KC" - simulation using moving target points to spell out words and phrases.
+    	    ex1: - spells out a phrase to ask a girl on a date.
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
