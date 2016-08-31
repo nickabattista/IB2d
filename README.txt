@@ -120,7 +120,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     a. updating target point positions -> Examples in Moving_Rubberband & 
        Pulsing_Heart
     b. updating_springs() -> Examples in HeartTube
-    c. update_beams()    [can be made analogously] 
+    c. update_beams()     -> Examples in Jellyfish 
     d. update_muscles()  [can be made analogously]
     e. update_porosity() [can be made analogously]
 
