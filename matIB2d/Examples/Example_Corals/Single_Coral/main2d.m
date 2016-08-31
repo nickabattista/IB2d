@@ -92,7 +92,7 @@ model_Info(16)= params(25);         % Background Concentration Gradient: 0 (for 
 model_Info(17)= params(26);         % Electrophysiology Model (FitzHugh-Nagumo)
 
 % Path Reference to where Driving code is found %
-addpath('../../../../IBM_Blackbox/');
+addpath('../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
