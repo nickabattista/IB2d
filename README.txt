@@ -155,18 +155,31 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -Every example prints the following:
 
-        LAGRANGIAN PTS:     a. Lag. Pts. themselves
-                            b. Lag. Pts. w/ connections!
+	viz_IB2d: 
+	
+        	LAGRANGIAN PTS:     a. Lag. Pts. themselves
+                	            b. Lag. Pts. w/ spring connections!
 
-        SCALARS (colormap): a. Vorticity
-                            b. Magnitude of Velocity
-                            c. uX (x-directed velocity)
-                            d. uY (y-directed velocity)
-                            e. Pressure
+        	SCALARS (colormap): a. Vorticity
+                	            b. Magnitude of Velocity
+                        	    c. uX (x-directed velocity)
+                           	    d. uY (y-directed velocity)
+                            	    e. Pressure
+                            	    f. fMag (magnitude of force)
+                            	    g. fX (magnitude of x-directed force)
+                            	    h. fY (magnitude of y-directed force)
 
-        VECTORS: a. velocity data
-
-        TRACERS: a. tracer particle locations
+        	VECTORS:            a. velocity data
+	
+	hier_IB2d_data:
+		
+		FORCE MAGNITUDES:   a. fLagMag: Mag. Force on each Lag. Pt. 
+				    b. fLagNorm: Mag. Normal Force on each
+				       Lagrangian Pt. 
+				    c. fLagTan: Tangential Force on each 
+				       Lagrangian Pt. 
+				       
+        TRACERS: a. tracer particle locations (*if in simulation)
 
 -There are flags in input2d for the printing interval between saving data
         -> print_Dump
