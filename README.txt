@@ -45,7 +45,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS VERSION HAS 11 DIFFERENT FLAVORS OF EXAMPLES:
+-THIS VERSION HAS VARIOUS DIFFERENT FLAVORS OF EXAMPLES:
     1. "Standard Rubberband" - only uses springs between Lagrangian pts.
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
@@ -103,7 +103,12 @@ If you use this code for the purposes of teaching, research, or recreation pleas
             ex2: - Bell composed of beams and springs
             ex3: - Bell motion driven by interpolating between resting lengths
                    for two phases.
-            NOTE: not entirely debugged, yet. 
+            NOTE: not entirely debugged, yet. 	
+    13. "Vortex Induced Vibration" (VIV)
+    	    ex1: - Tethered cylinder in channel with pulsatile flow, which vibrates
+    	    	   due to the underlying flow. 
+    14. "KC" - simulation using moving target points to spell out words and phrases.
+    	    ex1: - spells out a phrase to ask a girl on a date.
 
 -It has the ability to read in Lagrangian Point Data (.vertex), Springs 
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
@@ -115,7 +120,7 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     a. updating target point positions -> Examples in Moving_Rubberband & 
        Pulsing_Heart
     b. updating_springs() -> Examples in HeartTube
-    c. update_beams()    [can be made analogously] 
+    c. update_beams()     -> Examples in Jellyfish 
     d. update_muscles()  [can be made analogously]
     e. update_porosity() [can be made analogously]
 
@@ -150,18 +155,31 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -Every example prints the following:
 
-        LAGRANGIAN PTS:     a. Lag. Pts. themselves
-                            b. Lag. Pts. w/ connections!
+	viz_IB2d: 
+	
+        	LAGRANGIAN PTS:     a. Lag. Pts. themselves
+                	            b. Lag. Pts. w/ spring connections!
 
-        SCALARS (colormap): a. Vorticity
-                            b. Magnitude of Velocity
-                            c. uX (x-directed velocity)
-                            d. uY (y-directed velocity)
-                            e. Pressure
+        	SCALARS (colormap): a. Vorticity
+                	            b. Magnitude of Velocity
+                        	    c. uX (x-directed velocity)
+                           	    d. uY (y-directed velocity)
+                            	    e. Pressure
+                            	    f. fMag (magnitude of force)
+                            	    g. fX (magnitude of x-directed force)
+                            	    h. fY (magnitude of y-directed force)
 
-        VECTORS: a. velocity data
-
-        TRACERS: a. tracer particle locations
+        	VECTORS:            a. velocity data
+	
+	hier_IB2d_data:
+		
+		FORCE MAGNITUDES:   a. fLagMag: Mag. Force on each Lag. Pt. 
+				    b. fLagNorm: Mag. Normal Force on each
+				       Lagrangian Pt. 
+				    c. fLagTan: Tangential Force on each 
+				       Lagrangian Pt. 
+				       
+        TRACERS: a. tracer particle locations (*if in simulation)
 
 -There are flags in input2d for the printing interval between saving data
         -> print_Dump
