@@ -94,7 +94,7 @@ porous_Yes = model_Info(15);           % Porous Media: 0 (for no) or 1 (for yes)
 concentration_Yes = model_Info(16);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
 electro_phys_Yes = model_Info(17);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 d_Springs_Yes = model_Info(18);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = model_Info(19);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = model_info(19);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
 
 
 %Lagrangian Structure Data
@@ -459,16 +459,15 @@ while current_time < T_FINAL
        beams_info = update_Beams(dt,current_time,beams_info); 
     end
     
-    if ( ( update_D_Springs_Flag == 1 ) && ( d_Springs_Yes == 1) )
-       beams_info = update_Damped_Springs(dt,current_time,d_springs_info); 
+    if ( ( update_D_Springs_Flag == 1 ) && ( d_Sbeams_Yes == 1) )
+       beams_info = update_Beams(dt,current_time,beams_info); 
     end
-    
     
     
     %
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -1380,9 +1379,9 @@ beams = beam_info(2:end,1:5);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function dSprings = read_Damped_Spring_Points(struct_name)
+function dSprings = read_Damped_Springs_Points(struct_name)
 
-filename = [struct_name '.d_spring'];  %Name of file to read in
+filename = [struct_name '.d_springs'];  %Name of file to read in
 
 fileID = fopen(filename);
 

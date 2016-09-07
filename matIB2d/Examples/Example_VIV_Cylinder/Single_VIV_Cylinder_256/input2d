@@ -7,7 +7,7 @@ mu = 0.001               % Dynamic Viscosity (N*s/m^2)
 rho = 1                  % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 0.9            % Final time of simulation (s)
+Tfinal = 1.0            % Final time of simulation (s)
 dt = 2.5e-5             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %

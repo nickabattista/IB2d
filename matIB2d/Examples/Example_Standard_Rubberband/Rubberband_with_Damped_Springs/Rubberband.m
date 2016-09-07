@@ -64,8 +64,13 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
+%k_Spring = 1e7;
+%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+
+% Prints .spring file!
 k_Spring = 2.5e4;
-print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+b_damp = 5.0; 
+print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name);
 
 
 % Prints .beam file!
@@ -100,9 +105,9 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints Vertex points to a file called rubberband.vertex
+% FUNCTION: prints TARGET points to a file called rubberband.vertex
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -179,6 +184,34 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
             end
     end
     fclose(spring_fid); 
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints DAMPED SPRING points to a file called rubberband.d_spring
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name)
+
+    N = length(xLag);
+
+    spring_fid = fopen([struct_name '.d_spring'], 'w');
+
+    fprintf(spring_fid, '%d\n', N );
+
+    %spring_force = kappa_spring*ds/(ds^2);
+
+    %SPRINGS BETWEEN VERTICES
+    for s = 1:N
+            if s < N         
+                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest, b_damp);  
+            else
+                %Case s=N
+                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest, b_damp);  
+            end
+    end
+    fclose(spring_fid);     
     
     
 

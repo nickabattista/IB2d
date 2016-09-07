@@ -221,7 +221,7 @@ y = yGrid(j);  % y-Value considered
 % PULSATILE VELOCITY PROFILE w/ PAUSES BETWEEN SUCCESSIVE PULSES
 freq_P = 10;                     % frequency of pulse
 period = 1/freq_P;               % pulsation period
-rest_time = 5*period;            % rest time (no pulsation)
+rest_time = 10*period;            % rest time (no pulsation)
 tot_period = period + rest_time; % total period (pulsation + rest time)
 t_mod = mod(t,tot_period);
 if t_mod <= tot_period

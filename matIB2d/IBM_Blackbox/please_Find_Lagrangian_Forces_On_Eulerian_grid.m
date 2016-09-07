@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential, d_Springs)
 
 %
 % The components of the force are given by
@@ -77,6 +77,7 @@ muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (f
 muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
 mass_Yes = model_Info(11);          % Mass Pts: 0 (for no) or 1 (for yes)
 electro_phys_Yes = model_Info(17);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = model_Info(18);     % Damped Springs: 0 (for no) or 1 (for yes)
 
 
 %
@@ -168,9 +169,25 @@ end
 
 
 
+
+% Compute DAMPED SPRING FORCE DENSITIES (if there are damped springs!)
+if ( d_Springs_Yes == 1 )
+
+    % Compute the Lagrangian SPRING force densities!
+    [fx_dSprings, fy_dSprings] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt);
+    
+else
+    fx_dSprings = zeros(Nb,1);    %No x-forces coming from damped springs
+    fy_dSprings = fx_dSprings;    %No y-forces coming from damped springs
+end
+
+
+
+
+
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass;
-fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass;
+fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings;
+fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings;
 
 
 % SAVE LAGRANGIAN FORCES
@@ -249,6 +266,53 @@ end
 % MIGHT NOT NEED THESE!
 %fx = fx/ds^2;
 %fy = dy/ds^2;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION computes the Lagrangian **DAMPED** SPRING Force Densities .
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [fx, fy] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt)
+
+
+Ndsprings = length(d_Springs(:,1));  % # of DAMPED Springs
+sp_1 = d_Springs(:,1);               % Initialize storage for MASTER NODE Spring Connection
+sp_2 = d_Springs(:,2);               % Initialize storage for SLAVE NODE Spring Connection
+K_Vec = d_Springs(:,3);              % Stores spring stiffness associated with each spring
+RL_Vec = d_Springs(:,4);             % Stores spring resting length associated with each spring
+b_coeff = d_Springs(:,5);            % Damping coefficient
+
+fx = zeros(Nb,1);                    % Initialize storage for x-forces
+fy = fx;                             % Initialize storage for y-forces
+
+for i=1:Ndsprings
+    
+    id_Master = sp_1(i);          % Master Node index
+    id_Slave = sp_2(i);           % Slave Node index
+    k_Spring = K_Vec(i);          % Spring stiffness of i-th spring
+    L_r = RL_Vec(i);              % Resting length of i-th spring
+    b = b_coeff(i);               % Damping Coefficient
+    
+    dx = xLag(id_Slave) - xLag(id_Master);      % x-Distance btwn slave and master node
+    dy = yLag(id_Slave) - yLag(id_Master);      % y-Distance btwn slave and master node
+    
+    dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Distance between current and prev. steps
+    dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Distance between current and prev. steps
+    
+    sF_x = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
+    sF_y = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
+    
+    fx(id_Master,1) = fx(id_Master,1) + sF_x ;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
+    fy(id_Master,1) = fy(id_Master,1) + sF_y ;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
+    
+    fx(id_Slave,1) = fx(id_Slave,1) - sF_x ;    % Sum total forces for node, i in x-direction (this is SLAVE node for this spring)
+    fy(id_Slave,1) = fy(id_Slave,1) - sF_y ;    % Sum total forces for node, i in y-direction (this is SLAVE node for this spring)
+
+    
+end
 
 
 
