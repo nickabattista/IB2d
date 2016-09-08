@@ -34,7 +34,9 @@ x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
 concentration = 0       % 0 (for no) or 1 (for yes)
-
+electro_phys = 0        % 0 (for no) or 1 (for yes)
+damped_springs = 0      % 0 (for no) or 1 (for yes)
+update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 
 % PRINTING INFORMATION
 print_dump = 5           % How often to print (PLOT) to screen

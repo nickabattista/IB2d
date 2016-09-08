@@ -109,17 +109,17 @@ def main2d():
     grid_Info['dy'] = params[7]/params[5] # Spatial step-size in y
     grid_Info['supp'] = params[8] # num of pts used in delta-function support 
                                        #    (supp/2 in each direction)
-    grid_Info['pDump'] = params[25]            # Print Dump (How often to plot)
-    grid_Info['pMatplotlib'] = int(params[26]) # Plot in matplotlib? (1=YES,0=NO) 
-    grid_Info['lagPlot'] = int(params[27])     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info['velPlot'] = int(params[28])     # Plot LAGRANGIAN PTs + 
+    grid_Info['pDump'] = params[28]            # Print Dump (How often to plot)
+    grid_Info['pMatplotlib'] = int(params[29]) # Plot in matplotlib? (1=YES,0=NO) 
+    grid_Info['lagPlot'] = int(params[30])     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info['velPlot'] = int(params[31])     # Plot LAGRANGIAN PTs + 
                                                #  VELOCITY FIELD in matplotlib
-    grid_Info['vortPlot'] = int(params[29])    # Plot LAGRANGIAN PTs + 
+    grid_Info['vortPlot'] = int(params[32])    # Plot LAGRANGIAN PTs + 
                                                #  VORTICITY colormap in matplotlib
-    grid_Info['uMagPlot'] = int(params[30])    # Plot LAGRANGIAN PTs + 
+    grid_Info['uMagPlot'] = int(params[33])    # Plot LAGRANGIAN PTs + 
                                                #  MAGNITUDE OF VELOCITY 
                                                #     colormap in matplotlib
-    grid_Info['pressPlot'] = int(params[31])   # Plot LAGRANGIAN PTs + 
+    grid_Info['pressPlot'] = int(params[34])   # Plot LAGRANGIAN PTs + 
     #                                          # PRESSURE colormap in matplotlib
 
 
@@ -138,14 +138,17 @@ def main2d():
     model_Info['hill_3_muscles'] = int(params[16])
     # Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
     model_Info['arb_ext_force'] = int(params[17]) 
-    model_Info['tracers'] = int(params[18])       # Tracer Particles: (0=no, 1=yes)
-    model_Info['mass']= int(params[19])           # Mass Points: (0=no, 1=yes)
-    model_Info['gravity']= int(params[20])        # Gravity: (0=no, 1=yes)
-    model_Info['xG']= params[21]                  # x-Component of Gravity vector
-    model_Info['yG']= params[22]                  # y-Component of Gravity Vector
-    model_Info['porous']= int(params[23])         # Porous Media: (0=no, 1=yes)
-    model_Info['concentration']= int(params[24])  # Background Concentration Gradient: 
-                                                  # 0 (for no) or 1 (for yes)
+    model_Info['tracers'] = int(params[18])          # Tracer Particles: (0=no, 1=yes)
+    model_Info['mass']= int(params[19])              # Mass Points: (0=no, 1=yes)
+    model_Info['gravity']= int(params[20])           # Gravity: (0=no, 1=yes)
+    model_Info['xG']= params[21]                     # x-Component of Gravity vector
+    model_Info['yG']= params[22]                     # y-Component of Gravity Vector
+    model_Info['porous']= int(params[23])            # Porous Media: (0=no, 1=yes)
+    model_Info['concentration']= int(params[24])     # Background Concentration Gradient: 
+                                                     # 0 (for no) or 1 (for yes)
+    model_Info['electrophysiology'] = int(params[25])# Electrophysiology (FitzHugh-Nagumo)
+    model_Info['damped_springs'] = int(params[26])   # Damped Springs (0=no, 1=yes)
+    model_Info['update_D_Springs'] = int(params[27]) # Update Damped Springs
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
