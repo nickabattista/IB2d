@@ -426,6 +426,7 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     id_Slave = springs[:,1].astype('int')    # SLAVE NODE Spring Connections
     K_Vec = springs[:,2]  # Stores spring stiffness associated with each spring
     RL_Vec = springs[:,3] # Stores spring resting length associated with each spring
+    alpha = springs[:,4]  # Stores deg. of non-linearity of spring
 
     fx = np.zeros(Nb)                 # Initialize storage for x-forces
     fy = np.zeros(Nb)                 # Initialize storage for y-forces
@@ -433,8 +434,11 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
     dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
     
-    sF_x = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dx/np.sqrt(dx**2+dy**2))
-    sF_y = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dy/np.sqrt(dx**2+dy**2))
+    #sF_x = 0.5 * (alpha+1.0) * K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dx/np.sqrt(dx**2+dy**2))
+    #sF_y = 0.5 * (alpha+1.0) * K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dy/np.sqrt(dx**2+dy**2))
+
+    sF_x = 0.5 * (alpha+1.0) * K_Vec * np.power( (np.sqrt(dx**2 + dy**2)-RL_Vec), alpha ) * (dx/np.sqrt(dx**2+dy**2))
+    sF_y = 0.5 * (alpha+1.0) * K_Vec * np.power( (np.sqrt(dx**2 + dy**2)-RL_Vec), alpha ) * (dy/np.sqrt(dx**2+dy**2))
     #import pdb; pdb.set_trace()
     for ii in range(Nsprings):
         

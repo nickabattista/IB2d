@@ -27,6 +27,7 @@
 ----------------------------------------------------------------------------'''
 import pdb
 import numpy as np
+import pandas as pd
 from math import sqrt
 import os
 from Supp import *
@@ -194,6 +195,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #              col 2: ending spring pt. (by lag. discretization)
             #              col 3: spring stiffness
             #              col 4: spring resting lengths
+            #              col 5: degree of non-linearity (1=linear)
     else:
         springs_info = np.zeros((1,1))  #just to pass placeholder into 
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
@@ -628,7 +630,7 @@ def read_In_Concentration_Info(struct_name):
 ###########################################################################
 
 def read_Spring_Points(struct_name):
-    ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths
+    ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths, deg. of non-linearity
     
     Args:
         struct_name: structure name
@@ -639,12 +641,27 @@ def read_Spring_Points(struct_name):
     filename = struct_name+'.spring'  #Name of file to read in
     with open(filename) as f:
     #Store elements on .spring file into a matrix starting w/ 2nd row of read in data.
-        springs = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3))
+        #springs = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3))  # <-- this works w/o non-linearity
+
+        df = pd.read_table(f, sep='\s+',skiprows=0) # Read in table
+        df = df.reset_index()                       # Resets the header
+        df.fillna(1, inplace=True)                  # Fills in missing values with "1" (linear spring case)
+
+    # Convert pandas DataFrame to NUMPY Array
+    springs = df.values
+
+    # If no specified degreee on non-linearity in .spring file
+    n,m = springs.shape
+    if (m<5):
+        springs2 = np.ones([n,1])                           # DEFAULT DEG. NL if nothing inputted
+
+    springs = np.concatenate( (springs,springs2), axis=1 )  # Combine springs w/ DEG. NONLINEARITY if not there before
 
     #springs: col 1: starting spring pt (by lag. discretization)
     #         col 2: ending spring pt. (by lag. discretization)
     #         col 3: spring stiffness
     #         col 4: spring resting lengths
+    #         col 5: degree of non-linearity
     
     return springs
 
