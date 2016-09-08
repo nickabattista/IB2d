@@ -299,8 +299,8 @@ for i=1:Ndsprings
     dx = xLag(id_Slave) - xLag(id_Master);      % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master);      % y-Distance btwn slave and master node
     
-    dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Distance between current and prev. steps
-    dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Distance between current and prev. steps
+    dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Velocity between current and prev. steps
+    dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Velocity between current and prev. steps
     
     sF_x = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
     sF_y = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
