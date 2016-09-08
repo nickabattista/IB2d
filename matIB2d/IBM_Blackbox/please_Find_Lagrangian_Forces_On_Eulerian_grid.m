@@ -283,7 +283,7 @@ sp_1 = d_Springs(:,1);               % Initialize storage for MASTER NODE Spring
 sp_2 = d_Springs(:,2);               % Initialize storage for SLAVE NODE Spring Connection
 K_Vec = d_Springs(:,3);              % Stores spring stiffness associated with each spring
 RL_Vec = d_Springs(:,4);             % Stores spring resting length associated with each spring
-b_coeff = d_Springs(:,5);            % Damping coefficient
+b_Vec = d_Springs(:,5);              % Damping coefficient
 
 fx = zeros(Nb,1);                    % Initialize storage for x-forces
 fy = fx;                             % Initialize storage for y-forces
@@ -294,7 +294,7 @@ for i=1:Ndsprings
     id_Slave = sp_2(i);           % Slave Node index
     k_Spring = K_Vec(i);          % Spring stiffness of i-th spring
     L_r = RL_Vec(i);              % Resting length of i-th spring
-    b = b_coeff(i);               % Damping Coefficient
+    b = b_Vec(i);                 % Damping Coefficient
     
     dx = xLag(id_Slave) - xLag(id_Master);      % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master);      % y-Distance btwn slave and master node
@@ -302,8 +302,8 @@ for i=1:Ndsprings
     dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Velocity between current and prev. steps
     dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Velocity between current and prev. steps
     
-    sF_x = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
-    sF_y = 0.5*k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
+    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
+    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
     
     fx(id_Master,1) = fx(id_Master,1) + sF_x ;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
     fy(id_Master,1) = fy(id_Master,1) + sF_y ;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
