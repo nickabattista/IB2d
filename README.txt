@@ -25,6 +25,7 @@ This code is capable of creating Lagrangian Structures using:
         7. Porous Structures 
         8. Electrophysiology (FitzHugh-Nagumo coupling w/ or w/o calcium
 			dynamics and w/ or w/o muscle models)
+	9. Damped Springs
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
@@ -46,7 +47,10 @@ If you use this code for the purposes of teaching, research, or recreation pleas
        geometry in the specified geometry file
 
 -THIS VERSION HAS VARIOUS DIFFERENT FLAVORS OF EXAMPLES:
-    1. "Standard Rubberband" - only uses springs between Lagrangian pts.
+    1. "Standard Rubberband" 
+    	    ex1: - uses only linear (un-damped) springs
+    	    ex2: - uses only beams (torsional springs)
+    	    ex3: - uses only damped linear springs
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
     3. "Moving Rubberband" - rubberband moving along a zig-zag pattern, via 
@@ -114,15 +118,17 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 	(.spring), Torsional Springs (.beam),  Target Pts (.target), and 
 	Muscle Pts (.muscle), 3-Hill-Muscle-Pts (.muscle_Hill), 
         Tracer Particles (.tracer), Mass Points (.mass), and  Porous Media 
-        (.porous), and initial concentration (.concentration)! 
+        (.porous), and initial concentration (.concentration), and damped 
+        springs (.d_spring)! 
 
 -It has the capabilitiy for updating model data:
     a. updating target point positions -> Examples in Moving_Rubberband & 
        Pulsing_Heart
-    b. updating_springs() -> Examples in HeartTube
-    c. update_beams()     -> Examples in Jellyfish 
-    d. update_muscles()  [can be made analogously]
-    e. update_porosity() [can be made analogously]
+    b. update_Springs()        -> Examples in HeartTube
+    c. update_Beams()          -> Examples in Jellyfish 
+    d. update_Muscles()        [can be made analogously]
+    e. update_Porosity()       [can be made analogously]
+    f. update_Damped_Springs() [can be made analogously]
 
 -It can have pseudo-inflow conditions by inducing an arbitrary force onto the 
     Eulerian grid (e.g., Channel Flow Examples)
