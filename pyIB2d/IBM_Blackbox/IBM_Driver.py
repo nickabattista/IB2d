@@ -106,31 +106,33 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # PRINTING/PLOTTING INFO #
     pDump = grid_Info['pDump']              # Print (Plot) Dump interval
     pMatplotlib = grid_Info['pMatplotlib']  # Plot in matplotlib? (1=YES,0=NO)
-    lagPlot = grid_Info['lagPlot'] # Plot LAGRANGIAN PTs ONLY in matplotlib
-    velPlot = grid_Info['velPlot']   # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
-    vortPlot = grid_Info['vortPlot'] # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
-    uMagPlot = grid_Info['uMagPlot'] # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
-                                     #   colormap in matplotlib
+    lagPlot = grid_Info['lagPlot']     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    velPlot = grid_Info['velPlot']     # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
+    vortPlot = grid_Info['vortPlot']   # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
+    uMagPlot = grid_Info['uMagPlot']   # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
+                                       #   colormap in matplotlib
     pressPlot = grid_Info['pressPlot'] # Plot LAGRANTIAN PTs + PRESSURE colormap in matplotlib
     
     
     # MODEL STRUCTURE DATA STORED #
-    springs_Yes = model_Info['springs']                # Springs: 0 (0=no, 1=yes)
-    update_Springs_Flag = model_Info['update_springs'] # Update_Springs: (0=no, 1=yes)
-    target_pts_Yes = model_Info['target_pts']          # Target_Pts: (0=no, 1=yes)
-    update_Target_Pts = model_Info['update_target_pts']# Update_Target_Pts: (0=no, 1=yes)
-    beams_Yes = model_Info['beams']                    # Beams: (0=no, 1=yes)
-    update_Beams_Flag = model_Info['update_beams']     # Update_Beams: (0=no, 1=yes)
-    muscles_Yes = model_Info['muscles']                # FV-LT Muscles: (0=no, 1=yes)
-    hill_3_muscles_Yes = model_Info['hill_3_muscles']  # Hill 3-Element Muscle: (0=no, 1=yes)
-    arb_ext_force_Yes = model_Info['arb_ext_force']    # Arbitrary External Force: (0=no, 1=yes)
-    tracers_Yes = model_Info['tracers']                # Tracers: (0=no, 1=yes)
-    mass_Yes = model_Info['mass']                      # Mass Points: (0=no, 1=yes)
-    gravity_Yes = model_Info['gravity']                # Gravity: (0=no, 1=yes)
+    springs_Yes = model_Info['springs']                    # Springs: 0 (0=no, 1=yes)
+    update_Springs_Flag = model_Info['update_springs']     # Update_Springs: (0=no, 1=yes)
+    target_pts_Yes = model_Info['target_pts']              # Target_Pts: (0=no, 1=yes)
+    update_Target_Pts = model_Info['update_target_pts']    # Update_Target_Pts: (0=no, 1=yes)
+    beams_Yes = model_Info['beams']                        # Beams: (0=no, 1=yes)
+    update_Beams_Flag = model_Info['update_beams']         # Update_Beams: (0=no, 1=yes)
+    muscles_Yes = model_Info['muscles']                    # FV-LT Muscles: (0=no, 1=yes)
+    hill_3_muscles_Yes = model_Info['hill_3_muscles']      # Hill 3-Element Muscle: (0=no, 1=yes)
+    arb_ext_force_Yes = model_Info['arb_ext_force']        # Arbitrary External Force: (0=no, 1=yes)
+    tracers_Yes = model_Info['tracers']                    # Tracers: (0=no, 1=yes)
+    mass_Yes = model_Info['mass']                          # Mass Points: (0=no, 1=yes)
+    gravity_Yes = model_Info['gravity']                    # Gravity: (0=no, 1=yes)
     #NOTE: model_Info['xG']/['yG'] - components of gravity vector
-    porous_Yes = model_Info['porous']                  # Porous Media: (0=no, 1=yes)
-    concentration_Yes = model_Info['concentration']    # Background Concentration Gradient: 
-                                                       #  0 (for no) or 1 (for yes)
+    porous_Yes = model_Info['porous']                      # Porous Media: (0=no, 1=yes)
+    concentration_Yes = model_Info['concentration']        # Background Concentration Gradient: 
+                                                           #  0 (for no) or 1 (for yes)
+    d_Springs_Yes = model_Info['damped_springs']           #Damped Springs: 0 (for no) or 1 (for yes)
+    update_D_Springs_Flag = model_Info['update_D_Springs'] # Update_Damped_Springs (0=no, 1=yes)
     
     
     
@@ -196,7 +198,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         springs_info = np.zeros((1,1))  #just to pass placeholder into 
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
-    
+
+    # READ IN DAMPED SPRINGS (IF THERE ARE DAMPED SPRINGS) #
+    if d_Springs_Yes:
+        d_springs_info = read_Damped_Spring_Points(struct_name) 
+            #springs_info: col 1: starting spring pt (by lag. discretization)
+            #              col 2: ending spring pt. (by lag. discretization)
+            #              col 3: spring stiffness
+            #              col 4: spring resting lengths
+            #              col 5: damping coefficient
+    else:
+        d_springs_info = np.zeros((1,1))  #just to pass placeholder into 
+            # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
     
     # READ IN MUSCLES (IF THERE ARE MUSCLES) #
@@ -412,13 +425,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             from update_Beams import update_Beams
             #This function is application specific, located with main2d
             beams_info = update_Beams(dt,current_time,beams_info)
+
+        if update_D_Springs_Flag and d_Springs_Yes:
+            from update_Damped_Springs import update_Damped_Springs
+            #This function is application specific, located with main2d
+            d_springs_info = update_Damped_Springs(dt,current_time,d_springs_info)    
             
         #
         #*******STEP 2: Calculate Force coming from membrane at half time-step ********
         #
         Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
-        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info)
+        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, d_springs_info)
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test
@@ -631,6 +649,35 @@ def read_Spring_Points(struct_name):
     return springs
 
 
+
+################################################################################
+#
+# FUNCTION: Reads in the # of DAMPED springs and all MASTER NODEs, SLAVE NODEs,
+#           spring STIFFNESSES, spring RESTING LENGTHS, spring DAMPING coeffs.
+#
+################################################################################
+
+def read_Damped_Spring_Points(struct_name):
+    ''' Reads in the num of springs, master/slave nodes, spring stiffness/resting lengths
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        springs: above info stored in columns'''
+
+    filename = struct_name+'.d_spring'  #Name of file to read in
+    with open(filename) as f:
+    #Store elements on .spring file into a matrix starting w/ 2nd row of read in data.
+        dSprings = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4))
+
+    #springs: col 1: starting spring pt (by lag. discretization)
+    #         col 2: ending spring pt. (by lag. discretization)
+    #         col 3: spring stiffness
+    #         col 4: spring resting lengths
+    #         col 5: damping coefficient
+    
+    return dSprings
 
     
 ###########################################################################

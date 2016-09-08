@@ -40,7 +40,7 @@ from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
 
 def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,\
     xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams,\
-    muscles, muscles3, masses):
+    muscles, muscles3, masses, d_Springs):
     ''' Compute components of force term in Navier-Stokes from boundary deformations
 
         Args:
@@ -94,15 +94,15 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # Model Potential Forces #
-    springs_Yes = model_Info['springs']        # Springs: 0 (for no) or 1 (for yes) 
-    target_pts_Yes = model_Info['target_pts']  # Target_Pts: 0 (for no) or 1 (for yes)
-    beams_Yes = model_Info['beams']            # Beams: 0 (for no) or 1 (for yes)
-    muscle_LT_FV_Yes = model_Info['muscles']   # Length-Tension/Force-Velocity Muscle: 
+    springs_Yes = model_Info['springs']               # Springs: 0 (for no) or 1 (for yes) 
+    target_pts_Yes = model_Info['target_pts']         # Target_Pts: 0 (for no) or 1 (for yes)
+    beams_Yes = model_Info['beams']                   # Beams: 0 (for no) or 1 (for yes)
+    muscle_LT_FV_Yes = model_Info['muscles']          # Length-Tension/Force-Velocity Muscle: 
         # 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
     muscle_3_Hill_Yes = model_Info['hill_3_muscles']  # 3-Element Hill Model: 
         # 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
-    mass_Yes = model_Info['mass']          # Mass Pts: 0 (for no) or 1 (for yes)
-
+    mass_Yes = model_Info['mass']                     # Mass Pts: 0 (for no) or 1 (for yes)
+    d_Springs_Yes = model_Info['damped_springs']      # Damped Springs: 0 (for no) or 1 (for yes)
 
     #
     # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY #
@@ -192,10 +192,22 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_beams = np.zeros(Nb) #No y-forces coming from beams
 
 
+    # Compute SPRING FORCE DENSITIES (if there are springs!)
+    if ( d_Springs_Yes == 1 ):
+     
+        fx_dSprings, fy_dSprings = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
+            xLag,yLag,d_Springs,xLag_P,yLag_P,dt)
+        
+    else:
+        fx_dSprings = np.zeros(Nb) #No x-forces coming from damped springs
+        fy_dSprings = np.zeros(Nb) #No y-forces coming from damped springs
+
+
+
 
     # SUM TOTAL FORCE DENSITY! #
-    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass
-    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass
+    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings
+    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings
 
 
     # SAVE LAGRANGIAN FORCES
@@ -441,6 +453,84 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs):
     #fy = dy/ds**2
     
     return (fx, fy)
+
+
+
+
+
+
+
+
+###########################################################################
+#
+# FUNCTION computes the Lagrangian DAMPED SPRING Force Densities .
+#
+###########################################################################
+
+def give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
+            xLag,yLag,d_Springs,xLag_P,yLag_P,dt):
+    ''' Computes the Lagrangian spring force densities
+    
+    Args:
+        ds:         Lagrangian spacing
+        Nb:         Number of lagrangian points
+        xLag:       current xLag positions
+        yLag:       current yLag positions
+        d_Springs:  holds all information about damped springs
+        xLag_P:     previous time-step's xLag positions
+        yLag_P:     previous time-step's yLag positions
+        dt:         time-step
+        
+    Returns:
+        fx:
+        fy:'''
+
+    #leng = Tx.shape[0]               # # of Lagrangian Pts.
+
+    Nsprings = d_Springs.shape[0]              # # of Damped Springs
+    id_Master = d_Springs[:,0].astype('int')   # MASTER NODE DAMPED Spring Connections
+    id_Slave = d_Springs[:,1].astype('int')    # SLAVE NODE DAMPED Spring Connections
+    K_Vec = d_Springs[:,2]  # Stores spring stiffness associated with each Damped spring
+    RL_Vec = d_Springs[:,3] # Stores spring resting length associated with each Damped spring
+    b_Vec = d_Springs[:,4]  # Store damping coefficient for each Damped spring
+
+    fx = np.zeros(Nb)                 # Initialize storage for x-forces
+    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    
+    dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
+    dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
+    
+    dV_x = ( xLag[id_Master] - xLag_P[id_Master] ) / dt  # x-Velocity between current and prev. steps
+    dV_y = ( yLag[id_Master] - yLag_P[id_Master] ) / dt  # y-Velocity between current and prev. steps
+
+    sF_x = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dx/np.sqrt(dx**2+dy**2)) + b_Vec*dV_x 
+    sF_y = K_Vec * (np.sqrt(dx**2 + dy**2)-RL_Vec) * (dy/np.sqrt(dx**2+dy**2)) + b_Vec*dV_y
+    
+    #import pdb; pdb.set_trace()
+    for ii in range(Nsprings):
+        
+        fx[id_Master[ii]] += sF_x[ii]  # Sum total forces for node,
+                        # i in x-direction (this is MASTER node for this spring)
+        fy[id_Master[ii]] += sF_y[ii]  # Sum total forces for node, 
+                        # i in y-direction (this is MASTER node for this spring)
+        
+        fx[id_Slave[ii]] -= sF_x[ii]    # Sum total forces for node, 
+                        # i in x-direction (this is SLAVE node for this spring)
+        fy[id_Slave[ii]] -= sF_y[ii]    # Sum total forces for node, 
+                        # i in y-direction (this is SLAVE node for this spring)
+
+    # MIGHT NOT NEED THESE!
+    #fx = fx/ds**2
+    #fy = dy/ds**2
+    
+    return (fx, fy)
+
+
+
+
+
+
+
 
 
 
