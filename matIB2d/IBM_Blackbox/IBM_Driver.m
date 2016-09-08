@@ -283,7 +283,7 @@ if ( d_Springs_Yes == 1 )
         %              col 2: ending spring pt. (by lag. discretization)
         %              col 3: spring stiffness
         %              col 4: spring resting lengths
-        %              col 5: spring linearity (1=linear, >1 non-linear)
+        %              col 5: damping coefficients
 else
     d_springs_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 end
@@ -460,7 +460,7 @@ while current_time < T_FINAL
     end
     
     if ( ( update_D_Springs_Flag == 1 ) && ( d_Springs_Yes == 1) )
-       beams_info = update_Damped_Springs(dt,current_time,d_springs_info); 
+       d_springs_info = update_Damped_Springs(dt,current_time,d_springs_info); 
     end
     
     
