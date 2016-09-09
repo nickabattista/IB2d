@@ -46,7 +46,7 @@ struct_name = 'practice'; % Name for .vertex, .spring, etc files. (must match wh
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(Nx);
+[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx);
 
 
 % Plot Geometry to test
@@ -56,14 +56,15 @@ xlabel('x'); ylabel('y');
 axis square;
 
 
+
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
-ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
-print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+%k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
+%ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
+%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
@@ -77,6 +78,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 %print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints VERTEX points to a file called 'struct_name'.vertex
@@ -85,7 +87,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
-    N = length(xLag);
+    N = length(xLag); % Total # of Lag. Pts
 
     vertex_fid = fopen([struct_name '.vertex'], 'w');
 
@@ -98,7 +100,36 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
         fprintf(vertex_fid, '%1.16e %1.16e\n', X_v, Y_v);
     end
 
-    fclose(vertex_fid); 
+    fclose(vertex_fid);
+
+   
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints SPRING points to a file called 'struct_name'.spring
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
+
+    N = length(xLag);
+
+    spring_fid = fopen([struct_name '.spring'], 'w');
+
+    fprintf(spring_fid, '%d\n', N );    % Print # of springs 
+
+    %SPRINGS BETWEEN VERTICES
+    for s = 1:N
+            if s < N         
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
+            else
+                %Case s=N
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
+            end
+    end
+    fclose(spring_fid);     
+    
+    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -151,33 +182,6 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
             end
     end
     fclose(beam_fid); 
-
-
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints SPRING points to a file called 'struct_name'.spring
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
-
-    N = length(xLag);
-
-    spring_fid = fopen([struct_name '.spring'], 'w');
-
-    fprintf(spring_fid, '%d\n', N );
-
-    %SPRINGS BETWEEN VERTICES
-    for s = 1:N
-            if s < N         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
-            else
-                %Case s=N
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
-            end
-    end
-    fclose(spring_fid); 
     
     
     
@@ -222,27 +226,33 @@ for i=1:N
 end
     
     
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: creates the Lagrangian structure geometry
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(Nx)
-
+ 
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx)
+ 
 % ds: Lagrangian pt. spacing
-
+% Eulerian grid resolution
+ 
 % The immsersed structure is initially an ellipse %
-a = 0.4;              % Length of semi-major axis.
-b = 0.2;              % Length of semi-minor axis.
+% a = 0.4;              % Length of semi-major axis.
+% b = 0.2;              % Length of semi-minor axis.
+% N = 2*Nx;             % 2x # of Eulerian pts. (how many pts. we'd like in the ellipse)            
+%  
+% % Initiate storage for Lagrangian Pts.
+% xLag = zeros(N,1); yLag = xLag;
+%  
+% for i=1:N
+%     
+%     xLag(i) = 0.5 + b * cos( 2*pi/N*(i-1) );
+%     yLag(i) = 0.5 + a * sin( 2*pi/N*(i-1) );
+%     
+% end
 
-N = 2*Nx;             % 2x # of Eulerian pts.               
 
-for i=1:N
-    
-    xLag(i) = 0.5 + b * cos( 2*pi/N*(i-1) );
-    yLag(i) = 0.5 + a * sin( 2*pi/N*(i-1) );
-    
-end
+
+
 

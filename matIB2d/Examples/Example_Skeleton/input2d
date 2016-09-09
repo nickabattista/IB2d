@@ -18,7 +18,7 @@ Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
-springs = 1             % 0 (for no) or 1 (for yes)
+springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 0          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
@@ -48,4 +48,4 @@ plot_MagVelocity = 0     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colorm
 plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = practice   % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = name_here   % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
