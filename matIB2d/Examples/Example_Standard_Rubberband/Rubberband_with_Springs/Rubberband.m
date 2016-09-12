@@ -191,7 +191,6 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,rmin,rmax)
 
 % The immsersed structure is an ellipse %
-t = 2*pi/N;
 for i=1:N
     
     xLag(i) = 0.5 + rmax * cos( 2*pi/N*(i-1) );

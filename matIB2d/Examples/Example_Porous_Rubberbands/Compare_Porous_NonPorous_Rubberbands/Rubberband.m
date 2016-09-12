@@ -130,7 +130,17 @@ function print_Lagrangian_Porosity(xLag,alpha,struct_name)
 
     %Loops over all Lagrangian Pts.
     for s = 1:N
-        fprintf(porous_fid, '%d %1.16e\n', s, alpha);
+        if s == 1
+            fprintf(porous_fid, '%d %1.16e %1.16e\n', s, alpha,-2);      
+        elseif s == 2
+            fprintf(porous_fid, '%d %1.16e %1.16e\n', s, alpha,-1);
+        elseif s==N-1
+            fprintf(porous_fid, '%d %1.16e %1.16e\n', s, alpha,1);
+        elseif s==N
+            fprintf(porous_fid, '%d %1.16e %1.16e\n', s, alpha,2);
+        else
+            fprintf(porous_fid, '%d %1.16e %1.16e\n', s, alpha,0);
+        end
     end
 
     fclose(porous_fid); 
