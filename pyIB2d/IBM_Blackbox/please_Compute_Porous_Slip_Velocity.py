@@ -7,7 +7,7 @@
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
  Date Created: May 27th, 2015\
- Python 3.5 port by: Christopher Strickland
+ Initial Python 3.5 port by: Christopher Strickland
  Institution: UNC-CH
 
  This code is capable of creating Lagrangian Structures using:
@@ -48,6 +48,7 @@ def please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag):
                       col 2: x-Lag pts for lag-ids 
                       col 3: y-Lag pts for lag-ids
                       col 4: porosity coefficient
+                      col 5: porous pt. stencil flag
         F_Lag:
         
     Returns:
@@ -92,28 +93,58 @@ def give_Me_Lagrangian_Derivatives(ds,Np,porous_info):
     ''' Computes Lagrangian derivatives
     
     Args:
-        ds:
-        Np:
-        porous_info:
+        ds:             # Lagrangian spacing
+        Np:             # of Porous Pts.
+        porous_info:    # Structure holding all porous information
+               col 1:   # Porous IDs
+               col 2:   # Porous x-Values
+               col 3:   # Porous y-Values
+               col 4:   # Porosity Coefficient
+               col 5:   # Porous Pt. stencil flag
         
     Returns:
         xL_s:
         yL_s:'''
 
-    xL = porous_info[:,1]
-    yL = porous_info[:,2]
+    xL = porous_info[:,1]    # x-Values for Porous points 
+    yL = porous_info[:,2]    # y-Values for Porous points
+    c = porous_info[:,5];    # choice of where it falls on stencil
 
+    # Allocate storage for derivatives
     xL_s = np.zeros(Np)
     yL_s = np.zeros(Np)
 
-    xL_s[0] = ( xL[1] - xL[-1] ) / (2*ds)
-    yL_s[0] = ( yL[1] - yL[-1] ) / (2*ds)
+    for i in range(0,Np):
+        if c[i] == -2:
+            xL_s[i] = ( -25/12*xL[i] + 4*xL[i+1] - 3*xL[i+2] + 4/3*xL[i+3] - 1/4*xL[i+4] ) / ds
+            yL_s[i] = ( -25/12*yL[i] + 4*yL[i+1] - 3*yL[i+2] + 4/3*yL[i+3] - 1/4*yL[i+4] ) / ds
+        
+        elif c[i] == -1:
+            xL_s[i] = ( -0.25*xL[i-1] - 5/6*xL[i] + 1.5*xL[i+1] - 0.5*xL[i+2] + 1/12*xL[i+3] ) / ds;
+            yL_s[i] = ( -0.25*yL[i-1] - 5/6*yL[i] + 1.5*yL[i+1] - 0.5*yL[i+2] + 1/12*yL[i+3] ) / ds;
 
-    xL_s[1:-1] = ( xL[2:] - xL[:-2] ) / (2*ds) 
-    yL_s[1:-1] = ( yL[2:] - yL[:-2] ) / (2*ds)
-   
-    xL_s[-1] = ( xL[0] - xL[-2] ) / (2*ds)
-    yL_s[-1] = ( yL[0] - yL[-2] ) / (2*ds)
+        elif c[i] == 0:
+            xL_s[i] = ( 1/12*xL[i-2] - 2/3*xL[i-1] + 2/3*xL[i+1] - 1/12*xL[i+2] ) / ds;
+            yL_s[i] = ( 1/12*yL[i-2] - 2/3*yL[i-1] + 2/3*yL[i+1] - 1/12*yL[i+2] ) / ds;
+        
+        elif c[i] == 1:
+            xL_s[i] = ( -1/12*xL[i-3] + 0.5*xL[i-2] - 1.5*xL[i-1] + 5/6*xL[i] + 0.25*xL[i+1] ) / ds;
+            yL_s[i] = ( -1/12*yL[i-3] + 0.5*yL[i-2] - 1.5*yL[i-1] + 5/6*yL[i] + 0.25*yL[i+1] ) / ds;
+        
+        elif c[i] == 2:
+            xL_s[i] = ( 0.25*xL[i-4] - 4/3*xL[i-3] + 3*xL[i-2] - 4*xL[i-1] + 25/12*xL[i] ) / ds;
+            yL_s[i] = ( 0.25*yL[i-4] - 4/3*yL[i-3] + 3*yL[i-2] - 4*yL[i-1] + 25/12*yL[i] ) / ds;
+
+
+    # IF CLOSED POROUS STRUCTURE!!!
+    #xL_s[0] = ( xL[1] - xL[-1] ) / (2*ds)
+    #yL_s[0] = ( yL[1] - yL[-1] ) / (2*ds)
+    #
+    #xL_s[1:-1] = ( xL[2:] - xL[:-2] ) / (2*ds) 
+    #yL_s[1:-1] = ( yL[2:] - yL[:-2] ) / (2*ds)
+    #
+    #xL_s[-1] = ( xL[0] - xL[-2] ) / (2*ds)
+    #yL_s[-1] = ( yL[0] - yL[-2] ) / (2*ds)
     
     return (xL_s,yL_s)
 
