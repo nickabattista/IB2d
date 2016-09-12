@@ -122,7 +122,17 @@ def print_Lagrangian_Porosity(xLag,alpha,struct_name):
         
         #Loops over all Lagrangian Pts.
         for s in range(N):
-            porous_fid.write('{0} {1:1.16e}\n'.format(s,alpha))
+            if s == 0:
+                porous_fid.write('{0:d} {1:1.16e} {2:d}\n'.format(s,alpha,-2))
+            elif s == 1:
+                porous_fid.write('{0:d} {1:1.16e} {2:d}\n'.format(s,alpha,-1))
+            elif s == N-2:
+                porous_fid.write('{0:d} {1:1.16e} {2:d}\n'.format(s,alpha,1))
+            elif s == N-1:
+                porous_fid.write('{0:d} {1:1.16e} {2:d}\n'.format(s,alpha,2))
+            else:
+                porous_fid.write('{0:d} {1:1.16e} {2:d}\n'.format(s,alpha,0))
+           
     
 ########################################################################
 #
