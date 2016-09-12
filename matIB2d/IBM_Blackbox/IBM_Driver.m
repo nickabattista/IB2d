@@ -255,6 +255,7 @@ if ( porous_Yes == 1)
     porous_aux = read_Porous_Points(struct_name);
     %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
     %            col 2: Porosity coefficient
+    %            col 3: Flag for derivative stencil!
     porous_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
     for i=1:length(porous_info(:,1))
         id = porous_info(i,1);
@@ -263,10 +264,10 @@ if ( porous_Yes == 1)
     end
    
     porous_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+    porous_info(:,5) = porous_aux(:,3); %Stores flag for derivative stencil
 else
     porous_info = 0;
 end
-
 
 
 
@@ -431,7 +432,8 @@ ctsave = ctsave+1;
 %
 while current_time < T_FINAL
    
-
+    
+    %
     %
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
@@ -464,9 +466,10 @@ while current_time < T_FINAL
     end
     
     
-    
+    %
     %
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
+    %
     %
     [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info);
     
@@ -491,14 +494,19 @@ while current_time < T_FINAL
     end
     
     %
+    %
     %***************** STEP 3: Solve for Fluid motion ******************************************
+    %
     %
     [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
 
     
     %
+    %
     %***************** STEP 4: Update Position of Boundary of membrane again for a half time-step *******
     %
+    %
+    
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     %Uh, Vh instead of U,V?
@@ -510,9 +518,12 @@ while current_time < T_FINAL
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
        xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nX;
        yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nY;
+       porous_info(:,2) = xLag( porous_info(:,1) );    %Stores x-Lags as x-Porous Pt. Identities
+       porous_info(:,3) = yLag( porous_info(:,1) );    %Stores y-Lags as y-Porous Pt. Identities
        xLag = mod(xLag, Lx); % If structure goes outside domain
        yLag = mod(yLag, Ly); % If structure goes outside domain
     end
+    
     
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
@@ -521,6 +532,7 @@ while current_time < T_FINAL
         tracers(:,2) = xT;
         tracers(:,3) = yT;
     end
+    
     
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1
@@ -1322,14 +1334,14 @@ fileID = fopen(filename);
 
     % Read in the file, use 'CollectOutput' to gather all similar data together
     % and 'CommentStyle' to to end and be able to skip lines in file.
-    C = textscan(fileID,'%f %f','CollectOutput',1);
+    C = textscan(fileID,'%f %f %f','CollectOutput',1);
 
 fclose(fileID);        %Close the data file.
 
 porous_info = C{1};    %Stores all read in data in vertices (N+1,2) array
 
 %Store all elements on .spring file into a matrix starting w/ 2nd row of read in data.
-porosity = porous_info(2:end,1:2);
+porosity = porous_info(2:end,1:3);
 
 %porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
 %         col 2: Porosity coefficient
