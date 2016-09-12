@@ -108,7 +108,7 @@ def give_Me_Lagrangian_Derivatives(ds,Np,porous_info):
 
     xL = porous_info[:,1]    # x-Values for Porous points 
     yL = porous_info[:,2]    # y-Values for Porous points
-    c = porous_info[:,5];    # choice of where it falls on stencil
+    c = porous_info[:,4];    # choice of where it falls on stencil
 
     # Allocate storage for derivatives
     xL_s = np.zeros(Np)
