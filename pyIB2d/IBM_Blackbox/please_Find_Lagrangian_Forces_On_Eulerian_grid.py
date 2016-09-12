@@ -7,7 +7,7 @@
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
  Date Created: May 27th, 2015\
- Python 3.5 port by: Christopher Strickland
+ Initial Python 3.5 port by: Christopher Strickland
  Institution: UNC-CH
 
  This code is capable of creating Lagrangian Structures using:

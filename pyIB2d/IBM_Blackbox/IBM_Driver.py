@@ -408,6 +408,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     while current_time < T_FINAL:
         
         #
+        #
         #******Step 1: Update Position of Boundary of membrane at half time-step ******
         #                 (Variables end with h if it is a half-step)
         #
@@ -437,9 +438,12 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             from update_Damped_Springs import update_Damped_Springs
             #This function is application specific, located with main2d
             d_springs_info = update_Damped_Springs(dt,current_time,d_springs_info)    
-            
+        
+
+        #    
         #
         #*******STEP 2: Calculate Force coming from membrane at half time-step ********
+        #
         #
         Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
@@ -471,15 +475,21 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             U, V, firstExtForce, indsExtForce)
             Fxh = Fxh + Fx_Arb
             Fyh = Fyh + Fy_Arb
-            
+
+
+        #  
         #
         #******************* STEP 3: Solve for Fluid motion ************************
+        #
         #
         Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
         grid_Info, dt)
         
+        
+        #
         #
         #**** STEP 4: Update Position of Boundary of membrane again for a half time-step ****
+        #
         #
         xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
         yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
