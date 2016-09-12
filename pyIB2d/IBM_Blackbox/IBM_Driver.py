@@ -7,14 +7,17 @@
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
  Date Created: May 27th, 2015
- Python 3.5 port by: Christopher Strickland
+ Initial Python 3.5 port by: Christopher Strickland
  Institution: UNC-CH
 
  This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+    4. Mass Points
+    5. Porous Points
+	6. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+    7. 3-Element Hill Muscle Model
 
  One is able to update those Lagrangian Structure parameters, e.g., 
  spring constants, resting lengths, etc
@@ -300,16 +303,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         porous_aux = read_Porous_Points(struct_name)
         #porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
         #            col 2: Porosity coefficient
+        #            col 3: Porous Pt. 'Stencil' flag for derivative
         
         # initizlize porous_info
-        porous_info = np.empty((porous_aux.shape[0],4))
+        porous_info = np.empty((porous_aux.shape[0],5))
         
         porous_info[:,0] = porous_aux[:,0] #Stores Lag-Pt IDs in col vector
         # Stores Original x-Lags and y-Lags as x/y-Porous Pt. Identities
         porous_info[:,1] = xLag[porous_info[:,0].astype('int')]
         porous_info[:,2] = yLag[porous_info[:,0].astype('int')]
         
-        porous_info[:,3] = porous_aux[:,1] #Stores Porosity Coefficient 
+        porous_info[:,3] = porous_aux[:,1] # Stores Porosity Coefficient 
+        porous_info[:,4] = porous_aux[:,2] # Stores Porosity Stencil Flag
     else:
         porous_info = np.zeros((1,1))
 
@@ -486,10 +491,14 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         if porous_Yes: #need to test
             Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
                 porous_info,F_Lag)
+            # Update xLag,yLag positions with porous slip velocity
             xLag[porous_info[:,0].astype('int')] = xLag[porous_info[:,0].astype('int')] \
                 - dt*Por_Mat[:,0]*nX
             yLag[porous_info[:,0].astype('int')] = yLag[porous_info[:,0].astype('int')] \
                 - dt*Por_Mat[:,1]*nY
+            # Update storage of xLag, yLag positions inside porous_info structure
+            porous_info[:,1] = xLag[porous_info[:,0].astype('int')] #Stores x-Lags as x-Porous Pt. Identities
+            porous_info[:,2] = yLag[porous_info[:,0].astype('int')] #Stores y-Lags as y-Porous Pt. Identities    
             xLag = xLag % Lx # If structure goes outside domain
             yLag = yLag % Ly # If structure goes outside domain
             
@@ -840,7 +849,7 @@ def read_Porous_Points(struct_name):
 
     filename = struct_name+'.porous'  #Name of file to read in
     with open(filename) as f:
-        porosity = np.loadtxt(f,skiprows=1,usecols=(0,1))
+        porosity = np.loadtxt(f,skiprows=1,usecols=(0,1,2))
 
     #porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
     #         col 2: Porosity coefficient
