@@ -9,6 +9,7 @@ struct_name = 'coral'; % Name for .vertex, .spring, etc files.
 
 [x,y,N] = please_Give_Single_Polyp_Geometry(ratio);
 
+
 fprintf('\n\nNumber of Pts. in ONE tentacle: %d\n\n',N);
 
 % Prints .vertex file!
