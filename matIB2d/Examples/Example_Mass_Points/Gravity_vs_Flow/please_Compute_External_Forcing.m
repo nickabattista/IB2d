@@ -87,8 +87,8 @@ if first == 1
 end
 
 inds1 = inds(2:2+inds(1,1)-1,1:2);
-inds2 = inds(2+inds(1,1):2+inds(1)+inds(1,1)-1,1:2);
-inds3 = inds(2+inds(1,1)+inds(1,1):end,1:2);
+inds2 = inds(2+inds(1,1):2+inds(1,1)+inds(1,2)-1,1:2);
+inds3 = inds(2+inds(1,1)+inds(1,2):end,1:2);
 
 
 % Compute External Forces from Desired Target Velocity
