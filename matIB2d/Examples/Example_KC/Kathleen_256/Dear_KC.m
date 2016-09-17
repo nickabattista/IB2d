@@ -230,10 +230,10 @@ xC = -Lx/4;
 yC = -Lx/2;
 [xH,yH] = give_Me_The_Letter_Please(ds,len,'H',xC,yC);
 [xi,yi] = give_Me_The_Letter_Please(ds,len,'i',xC-0.1,yC);
-[xK,yK] = give_Me_The_Letter_Please(ds,len,'K',xC-0.3,yC);
+[xK,yK] = give_Me_The_Letter_Please(ds,len,'K',xC-0.28,yC);
 [xCap,yCap] = give_Me_The_Letter_Please(ds,len,'C',xC-0.46,yC);
-[xEx1,yEx1] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.54,yC);
-[xEx2,yEx2] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.58,yC);
+[xEx1,yEx1] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.55,yC);
+[xEx2,yEx2] = give_Me_The_Letter_Please(ds,1.2*len,'!',xC-0.59,yC);
 
 xBL2 =  0:ds:Lx/4+3*ds;  xBL2 = xBL2 + 3/8*Lx - 2*ds;
 yTL2 =  0.75*ones(1,length(xBL2));
@@ -535,11 +535,16 @@ elseif strcmp(letter,'C')
     end
     
     xTB = 0:3*ds/4:len/6;
-    xTB = xTB - xC;
+    xTB = xTB - xC + 0.01;
     yT = r*ones(1,length(xTB))-yC;
     yB = -r*ones(1,length(xTB))-yC;
+    
     x = [xTB x xTB];
     y = [yT y yB];
+    
+    
+
+    length(x)
     
 elseif strcmp(letter,'d')
     
@@ -689,10 +694,10 @@ elseif strcmp(letter,'K')
       xDb(i) = XD(i)*cos(pi/4)-YD(i)*sin(-pi/4);
       yDb(i) = XD(i)*sin(-pi/4)+YD(i)*cos(pi/4);
    end
-   xDt = xDt - xC - len/4;
+   xDt = xDt - xC - len/4.5;
    yDt = yDt - yC;
    
-   xDb = xDb - xC - len/4;
+   xDb = xDb - xC - len/5.5;
    yDb = yDb - yC;
    
    x = [xLine xDt xDb];
