@@ -668,24 +668,36 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 %Get out of viz_IB2d folder
 cd ..
 
-%
-% Print Lagrangian Force Data to hier_IB2d_data folder
-%
-[F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
-%
-cd('hier_IB2d_data'); %change directory to hier-data folder
-    fMagName = ['fMag.' strNUM '.vtk'];
-    fNormalName = ['fNorm.' strNUM '.vtk'];
-    fTangentName = ['fTan.' strNUM '.vtk'];
+if length( lagPts ) <= 5
+    %
+    % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
+    %
+    cd('hier_IB2d_data'); %change directory to hier-data folder
+        fMagName = ['fMag.' strNUM '.vtk'];
+        fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+    cd ..
+else
 
-    fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+    %
+    % Print Lagrangian Force Data to hier_IB2d_data folder
+    %
+    [F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
+    %
+    cd('hier_IB2d_data'); %change directory to hier-data folder
+        fMagName = ['fMag.' strNUM '.vtk'];
+        fNormalName = ['fNorm.' strNUM '.vtk'];
+        fTangentName = ['fTan.' strNUM '.vtk'];
 
-    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+        fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
-cd .. % Get out of hier_IB2d_data folder
+        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
+    cd .. % Get out of hier_IB2d_data folder
+
+end % ENDS IF-STATEMENT
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
