@@ -1039,27 +1039,45 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,
     #Get out of viz_IB2d folder
     os.chdir('..')
 
+
     #
     # Print Lagrangian Force Data to hier_IB2d_data folder
     #
-    F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
-
-    os.chdir('hier_IB2d_data') #change directory to hier-data folder
-    fMagName = 'fMag.'+strNUM+'.vtk'
-    fNormalName = 'fNorm.'+strNUM+'.vtk'
-    fTangentName = 'fTan.'+strNUM+'.vtk'
-
-    # Compute magnitude of forces on Lagrangian boundary
-    fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); 
-
-    # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
-    savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-    savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
-
-    # Get out of hier_IB2d_data folder
-    os.chdir('..') 
+    NLagPts = lagPts.shape()
     
+    # THE CASE IF LESS THAN (or =) to 5 Lag. Pts. 
+    if NLagPts[0] <= 5:
+        os.chdir('hier_IB2d_data') #change directory to hier-data folder
+        fMagName = 'fMag.'+strNUM+'.vtk'
+        
+        # Compute magnitude of forces on Lagrangian boundary
+        fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ) 
+        
+        # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
+        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag')
+        
+        # Get out of hier_IB2d_data folder
+        os.chdir('..') 
+    
+    # THE CASE IF GREATER THAN 5 Lag. Pts. 
+    else:
+        F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
+
+        os.chdir('hier_IB2d_data') #change directory to hier-data folder
+        fMagName = 'fMag.'+strNUM+'.vtk'
+        fNormalName = 'fNorm.'+strNUM+'.vtk'
+        fTangentName = 'fTan.'+strNUM+'.vtk'
+
+        # Compute magnitude of forces on Lagrangian boundary
+        fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); 
+
+        # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
+        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+
+        # Get out of hier_IB2d_data folder
+        os.chdir('..') 
     
     
 ##############################################################################
