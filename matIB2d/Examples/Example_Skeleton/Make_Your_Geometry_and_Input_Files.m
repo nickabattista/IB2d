@@ -175,10 +175,10 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     %BEAMS BETWEEN VERTICES
     for s = 2:N-1
             if  s <= N-1         
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C(s) );  
             else
                 %Case s=N
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C(s) );  
             end
     end
     fclose(beam_fid); 
@@ -191,6 +191,8 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 % 
 % NOTE: not curvature in the traditional geometric sense, in the 'discrete'
 % sense through cross product.
+%
+% NOTE: assumes a CLOSED structure
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
