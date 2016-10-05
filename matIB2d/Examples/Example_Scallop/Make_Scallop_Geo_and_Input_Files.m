@@ -34,7 +34,7 @@ function Make_Scallop_Geo_and_Input_Files()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
@@ -49,12 +49,17 @@ struct_name = 'scallop'; % Name for .vertex, .spring, etc files. (must match wha
 [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Lx);
 
 
-% Plot Geometry to test
-plot(xLag,yLag,'r-'); hold on;
-plot(xLag,yLag,'*'); hold on;
-xlabel('x'); ylabel('y');
-axis square;
+half_len = (length(xLag)-1)/2;   % Computes # of Lag Pts on each "Arm"
+ind_off = ceil( 0.33*half_len ); % Computes # of lags from center pt for muscle placement
+b_ind = half_len - ind_off;      % Bottom index
+t_ind = half_len+2 + ind_off;    % Top index
+m_dist = sqrt( ( xLag(b_ind)-xLag(t_ind) )^2 + ( yLag(b_ind)-yLag(t_ind) )^2   );
 
+%fprintf('\n\nIn give_Muscle_Activation\n --> Use %d for the Fm indices\n\n',b_ind);
+
+% Test Muscle Placement
+%plot( xLag( b_ind ), yLag( b_ind ), 'm*'); hold on;
+%plot( xLag( t_ind ), yLag( t_ind ), 'm*'); hold on;
 
 
 % Prints .vertex file!
@@ -62,15 +67,20 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
+k_Spring = 1e5;                    % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = ds;                        % Spring resting length (does not need to be equal for all springs)
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 0.5;                      % Beam Stiffness (does not need to be equal for all beams)
+k_Beam = 1e2;                      % Beam Stiffness (does not need to be equal for all beams)
 C = compute_Curvatures(xLag,yLag); % Computes curvature of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
+
+
+% Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
+LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e3;
+print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind)
 
 
 % Prints .target file!
@@ -102,6 +112,26 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid);
 
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints MUSCLE points to a file called "struct_name".muscle
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,ind_b,ind_t)
+
+    %N = length(xLag); %Number of Lagrangian Pts. Total
+
+    muscle_fid = fopen([struct_name '.muscle'], 'w');
+
+    fprintf(muscle_fid, '%d\n', 1 ); % Only 1 muscle
+
+    %MUSCLES BETWEEN VERTICES
+    fprintf(muscle_fid, '%d %d %1.16e %1.16e %1.16e %1.16e %1.16e\n', ind_b, ind_t, LFO, SK, a,b,Fmax);  
+    
+    fclose(muscle_fid);
    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -118,6 +148,8 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     fprintf(spring_fid, '%d\n', N-1 );    % Print # of springs 
 
+    %spring_force = kappa_spring*ds/(ds^2);
+        
     %SPRINGS BETWEEN VERTICES
     for s = 1:N
             if s < N         
@@ -240,8 +272,8 @@ function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Lx)
 % Lx: Length of Eulerian grid
  
 % The immsersed structure is initially "an angle" of 10 degrees %
-ang = 10*pi/180; % original angle
-L = 1/20*Lx;     % Structure will be 1/20 of the length of the grid
+ang = 70*pi/180; % original angle
+L = 1/10*Lx;     % Structure will be 1/20 of the length of the grid
 
 % Create line of points
 x = 0:ds:L;
@@ -255,11 +287,18 @@ y = zeros( 1, length( x ) );
 xLag = [ xB(end:-1:2) xT ];
 yLag = [ yB(end:-1:2) yT ];
 
+xLag = xLag + 3/4*Lx;
+yLag = yLag + 0.5*Lx;
+
 % TESTING GEOMETRY
-% plot(xB,yB,'r*'); hold on;
-% plot(xT,yT,'go'); hold on;
+plot(xB,yB,'r*'); hold on;
+plot(xT,yT,'go'); hold on;
+plot( xLag, yLag, 'k+'); hold on;
+axis([0 Lx 0 Lx]);
+
 % for i=1:length(xLag)
 %    plot( xLag(i), yLag(i), 'k+'); hold on;
+%    axis([0 Lx 0 Lx]);
 %    pause();
 % end
 
