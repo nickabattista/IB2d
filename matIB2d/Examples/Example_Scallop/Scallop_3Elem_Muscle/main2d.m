@@ -94,11 +94,15 @@ model_Info(18)= params(27);         % Damped Springs: 0 (for no) or 1 (for yes)
 model_Info(19)= params(28);         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
 
 % Path Reference to where Driving code is found %
-addpath('../../IBM_Blackbox/');
+addpath('../../../IBM_Blackbox/');
+
+                % % % % TESTING!!! % % % % 
+%-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
+[X, Y, U, V, xLags, yLags] = IBM_Driver_Testing(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
+                % % % % % % % % % % % % % %
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-[X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
-
+%[X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
 
 
 

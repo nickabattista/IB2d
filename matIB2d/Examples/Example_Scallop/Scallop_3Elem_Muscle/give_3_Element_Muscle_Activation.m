@@ -4,13 +4,13 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Fm = give_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
+function Fm = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
 
 % current_time: current time in simulation (s)
 % xLag: vector of all x-Lagrangian Pts
 
 % Fm = a_f * Fmax * F1(Lf) * F2(Vf) 
-%    = a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO
+%    = a_f * Fmax * exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO
 %
 
 % a_f: coefficient that triggers contraction (traveling square or Gaussian wave?)
@@ -62,8 +62,14 @@ function af_Val = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt)
 t = current_time;                % current time
 freq = 3;                        % frequency of traveling wave down tube
 t = rem(t,1/freq);               % Gives remainder after "modular arithmetic" ("fmod" in C++)
-af_Val = abs( sin( pi*freq*t ) );% Gives activation coefficient, e.g., btwn [0,1] 
 
+af_Val = sin( 2*pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
+
+if t < 1/(2*freq)
+   af_Val = 1;%sin( pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
+else
+   af_Val = -2;%sin( pi*freq*t );  % Gives activation coefficient, e.g., btwn [0,1];  
+end
 
 
 

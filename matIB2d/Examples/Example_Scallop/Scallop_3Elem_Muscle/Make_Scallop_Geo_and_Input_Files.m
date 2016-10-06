@@ -34,7 +34,7 @@ function Make_Scallop_Geo_and_Input_Files()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  256;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
@@ -50,16 +50,19 @@ struct_name = 'scallop'; % Name for .vertex, .spring, etc files. (must match wha
 
 
 half_len = (length(xLag)-1)/2;   % Computes # of Lag Pts on each "Arm"
-ind_off = ceil( 0.33*half_len ); % Computes # of lags from center pt for muscle placement
+ind_off = ceil( 0.4*half_len ); % Computes # of lags from center pt for muscle placement
 b_ind = half_len - ind_off;      % Bottom index
 t_ind = half_len+2 + ind_off;    % Top index
+
+%b_ind = 1;
+%t_ind = length(xLag);
 m_dist = sqrt( ( xLag(b_ind)-xLag(t_ind) )^2 + ( yLag(b_ind)-yLag(t_ind) )^2   );
 
-%fprintf('\n\nIn give_Muscle_Activation\n --> Use %d for the Fm indices\n\n',b_ind);
+
 
 % Test Muscle Placement
-%plot( xLag( b_ind ), yLag( b_ind ), 'm*'); hold on;
-%plot( xLag( t_ind ), yLag( t_ind ), 'm*'); hold on;
+plot( xLag( b_ind ), yLag( b_ind ), 'm*'); hold on;
+plot( xLag( t_ind ), yLag( t_ind ), 'm*'); hold on;
 
 
 % Prints .vertex file!
@@ -67,20 +70,21 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e5;                    % Spring stiffness (does not need to be equal for all springs)
+k_Spring = 2e6;                    % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = ds;                        % Spring resting length (does not need to be equal for all springs)
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1e2;                      % Beam Stiffness (does not need to be equal for all beams)
+k_Beam = 1e11;                      % Beam Stiffness (does not need to be equal for all beams)
 C = compute_Curvatures(xLag,yLag); % Computes curvature of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
-LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e3;
-print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind)
+LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e2;
+kSpr = 10*Fmax; alpha = 1;
+print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind,kSpr,alpha)
 
 
 % Prints .target file!
@@ -120,16 +124,16 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,ind_b,ind_t)
+function print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,ind_b,ind_t,kSpr,alpha)
 
     %N = length(xLag); %Number of Lagrangian Pts. Total
 
-    muscle_fid = fopen([struct_name '.muscle'], 'w');
+    muscle_fid = fopen([struct_name '.3_muscle'], 'w');
 
     fprintf(muscle_fid, '%d\n', 1 ); % Only 1 muscle
 
     %MUSCLES BETWEEN VERTICES
-    fprintf(muscle_fid, '%d %d %1.16e %1.16e %1.16e %1.16e %1.16e\n', ind_b, ind_t, LFO, SK, a,b,Fmax);  
+    fprintf(muscle_fid, '%d %d %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n', ind_b, ind_t, LFO, SK, a,b,Fmax,kSpr,alpha);  
     
     fclose(muscle_fid);
    
@@ -287,12 +291,16 @@ y = zeros( 1, length( x ) );
 xLag = [ xB(end:-1:2) xT ];
 yLag = [ yB(end:-1:2) yT ];
 
-xLag = xLag + 3/4*Lx;
-yLag = yLag + 0.5*Lx;
+[xLag,yLag] = rotate_geometry_please(xLag,yLag,-pi/4);
+
+length(xLag)
+
+xLag = xLag + 0.75*Lx;
+yLag = yLag + 0.25*Lx;
 
 % TESTING GEOMETRY
-plot(xB,yB,'r*'); hold on;
-plot(xT,yT,'go'); hold on;
+%plot(xB,yB,'r*'); hold on;
+%plot(xT,yT,'go'); hold on;
 plot( xLag, yLag, 'k+'); hold on;
 axis([0 Lx 0 Lx]);
 
