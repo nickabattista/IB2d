@@ -468,6 +468,7 @@ end
 
 function [fx,fy] = give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
 
+m
 
 Nmuscles = length(muscles3(:,1));  % # of Muscles
 m_1 = muscles3(:,1);               % Initialize storage for MASTER NODE Muscle Connection
@@ -477,8 +478,6 @@ SK_Vec = muscles3(:,4);            % Stores muscle constant
 a_Vec = muscles3(:,5);             % Stores Hill Parameter, a
 b_Vec = muscles3(:,6);             % Stores Hill Parameter, b
 FMAX_Vec = muscles3(:,7);          % Stores Force-Maximum for Muscle
-kSpr_Vec = muscles3(:,8);           % Stores Spring Coeffs
-alpha_pow= muscles3(:,9);          % Stores deg. of non-linearity for springs
 
 fx = zeros(Nb,1);                 % Initialize storage for x-forces
 fy = fx;                          % Initialize storage for y-forces
@@ -492,8 +491,7 @@ for i=1:Nmuscles
     a = a_Vec(i);                % Hill parameter, a, for i-th muscle
     b = b_Vec(i);                % Hill parameter, b, for i-th muscle
     Fmax = FMAX_Vec(i);          % Force-Maximum for i-th muscle
-    kSpr = kSpr_Vec(i);          % Spring coefficient for NL-spring
-    alpha = alpha_pow(i);        % Degree of linearity of i-th spring
+    alpha = alpha_pow(i);         % Degree of linearity of i-th spring
 
     
     xPt = xLag( id_Master );     % x-Pt of interest at the moment to drive muscle contraction
@@ -516,8 +514,8 @@ for i=1:Nmuscles
     mF_y = Fm*(dy/LF);           % sin(theta) = dy / LF;
     
     % Find force from series element (tendons)
-    sF_x = 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
-    sF_y = 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
+    sF_x = 0.5*(alpha+1) * Fmax * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
+    sF_y = 0.5*(alpha+1) * Fmax * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
     
     
     fx(id_Master,1) = fx(id_Master,1) + mF_x + sF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)

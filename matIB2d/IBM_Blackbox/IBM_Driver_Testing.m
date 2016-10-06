@@ -28,8 +28,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: Actual DRIVER of the code, where the time-stepping occurs ->
+% FUNCTION: TESTING IBM_DRIVER file of the code, where the time-stepping occurs ->
 %           gets called by main2d to do the "magic" :)
+%
+%           -> Turned off most data storage to run faster on finer grids.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -650,12 +652,12 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
     savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
     savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
-    savevtk_scalar(p, pfName, 'P',dx,dy);
-    savevtk_scalar(U, uXName, 'uX',dx,dy);
-    savevtk_scalar(V, uYName, 'uY',dx,dy);
-    savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
-    savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
-    savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
+    %savevtk_scalar(p, pfName, 'P',dx,dy);
+    %savevtk_scalar(U, uXName, 'uX',dx,dy);
+    %savevtk_scalar(V, uYName, 'uY',dx,dy);
+    %savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
+    %savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
+    %savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
 
 
     if concentration_Yes == 1
@@ -665,7 +667,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
-    savevtk_vector(U, V, velocityName, 'u',dx,dy)
+    %savevtk_vector(U, V, velocityName, 'u',dx,dy)
 
 %Get out of viz_IB2d folder
 cd ..
@@ -677,7 +679,7 @@ if length( lagPts ) <= 5
     cd('hier_IB2d_data'); %change directory to hier-data folder
         fMagName = ['fMag.' strNUM '.vtk'];
         fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        %savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
     cd ..
 else
 
@@ -693,9 +695,9 @@ else
 
         fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+        %savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        %savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+        %savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
     cd .. % Get out of hier_IB2d_data folder
 
