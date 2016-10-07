@@ -1043,10 +1043,10 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,
     #
     # Print Lagrangian Force Data to hier_IB2d_data folder
     #
-    NLagPts = lagPts.shape()
+    NLagPts = lagPts.shape[1]
     
     # THE CASE IF LESS THAN (or =) to 5 Lag. Pts. 
-    if NLagPts[0] <= 5:
+    if NLagPts <= 5:
         os.chdir('hier_IB2d_data') #change directory to hier-data folder
         
         # Save x-y force data!
