@@ -64,7 +64,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e7;
+k_Spring = 1e5;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
@@ -100,7 +100,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints Vertex points to a file called rubberband.vertex
 %
@@ -169,7 +169,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     %spring_force = kappa_spring*ds/(ds^2);
 
-    alpha = 1.0;
+    alpha = 2.0;
     
     %SPRINGS BETWEEN VERTICES
     for s = 1:N
