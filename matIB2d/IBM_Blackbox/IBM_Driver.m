@@ -675,6 +675,14 @@ if length( lagPts ) <= 5
     % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
     %
     cd('hier_IB2d_data'); %change directory to hier-data folder
+    
+        % Save x-y force data!
+        fLag_XName = ['fX_Lag.' strNUM '.vtk'];
+        fLag_YName = ['fY_Lag.' strNUM '.vtk'];
+        savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
+        savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
+
+        % Save force Magnitude (no normal/tangential -> not enough points)
         fMagName = ['fMag.' strNUM '.vtk'];
         fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
         savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
@@ -687,6 +695,14 @@ else
     [F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
     %
     cd('hier_IB2d_data'); %change directory to hier-data folder
+        
+        % Save x-y force data!
+        fLag_XName = ['fX_Lag.' strNUM '.vtk'];
+        fLag_YName = ['fY_Lag.' strNUM '.vtk'];
+        savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
+        savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
+    
+        % Save force Magnitude, Mag. Normal, Mag. Tangential
         fMagName = ['fMag.' strNUM '.vtk'];
         fNormalName = ['fNorm.' strNUM '.vtk'];
         fTangentName = ['fTan.' strNUM '.vtk'];
