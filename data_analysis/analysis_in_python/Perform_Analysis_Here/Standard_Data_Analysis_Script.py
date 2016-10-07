@@ -99,11 +99,13 @@ def Standard_Data_Analysis_Script():
         # Imports Lagrangian Pt. FORCE (magnitude) DATA %
         #                      DEFINITIONS 
         #
+        #      fX_Lag: forces in x-direction on boundary
+        #      fY_Lag: forces in y-direction on boundary
         #       fLagMag: magnitude of force at boundary
         #   fLagNorm: magnitude of NORMAL force at boundary
         #   fLagTan: magnitude of TANGENT force at boundary
         #
-        fLagMag,fLagNorm,fLagTan = import_Lagrangian_Force_Data(pathForce,numSim);
+        fX_Lag,fY_Lag,fLagMag,fLagNorm,fLagTan = import_Lagrangian_Force_Data(pathForce,numSim);
 
     
 if __name__ == "__main__":

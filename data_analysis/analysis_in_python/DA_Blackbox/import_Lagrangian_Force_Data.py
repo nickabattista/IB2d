@@ -36,9 +36,13 @@ from read_Force_Scalar_Data_From_vtk import read_Force_Scalar_Data_From_vtk
 
 def import_Lagrangian_Force_Data(path,numSim):
  
-    # read in mag. of forces #
-    strChoice = 'fMag';
-    fLagMag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    # read in x directed force #
+    strChoice = 'fX_Lag';
+    fX_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+
+    # read in y directed force #
+    strChoice = 'fY_Lag';
+    fY_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
     # read in mag. of normal force #
     strChoice = 'fNorm';
@@ -48,5 +52,5 @@ def import_Lagrangian_Force_Data(path,numSim):
     strChoice = 'fTan'; 
     fLagTan = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-    return fLagMag,fLagNorm,fLagTan
+    return fX_Lag,fY_Lag,fLagMag,fLagNorm,fLagTan
 
