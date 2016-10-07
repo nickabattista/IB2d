@@ -64,11 +64,11 @@ for i=start:1:finish
     
     % Points to desired data viz_IB2d data file
     if i<10
-       numSim = ['000', num2str(i)];
+       numSim = ['000', num2str(i) ];
     elseif i<100
-       numSim = ['00', num2str(i)];
+       numSim = ['00', num2str(i) ];
     elseif i<1000
-       numSim = ['0', num2str(i) '.vtk'];
+       numSim = ['0', num2str(i)];
     else
        numSim = num2str(i);
     end
@@ -89,14 +89,17 @@ for i=start:1:finish
     %
     [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim);
     
+    
     % Imports Lagrangian Pt. FORCE (magnitude) DATA %
     %                      DEFINITIONS 
     %
+    %      fX_Lag: forces in x-direction on boundary
+    %      fY_Lag: forces in y-direction on boundary
     %       fLagMag: magnitude of force at boundary
     %   fLagNorm: magnitude of NORMAL force at boundary
     %   fLagTan: magnitude of TANGENT force at boundary
     %
-    [fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
+    [fX_Lag,fY_Lag,fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
     
 
 end
