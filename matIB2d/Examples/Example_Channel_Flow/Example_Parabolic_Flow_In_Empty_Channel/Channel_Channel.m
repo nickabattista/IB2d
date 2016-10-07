@@ -34,8 +34,8 @@ function Channel_Channel()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  32;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  32;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
