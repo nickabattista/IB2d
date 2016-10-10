@@ -33,11 +33,9 @@
 %               data sets, regions of interest, etc. (see
 %               EXAMPLE_FOR_DATA_ANALYSIS for an example of this)
 %           (2) MUST make sure to 'addpath' to where DA_Blackbox is, i.e.,
-%               line 64
+%               line 56
 %           (3) MUST make sure to set path to desired dataset, i.e., in line
-%               59 and 60
-%           (4) EASIEST to move your viz_IB2d and hier_IB2d_data folders
-%               into this folder
+%               59
 %          
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,12 +53,13 @@ start=25;                             % 1ST interval # included in data analysis
 finish=25;                           % LAST interval # included in data analysis 
 dump_Times = (start:1:finish)*pDump; % Time vector when data was printed in analysis
 
-% SET PATH TO DESIRED viz_IB2d / hier_IB2d_data DATA %
-pathViz = 'viz_IB2d';
-pathForce= 'hier_IB2d_data';
+% SET PATH TO DESIRED viz_IB2d / hier_IB DATA %
+pathViz = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d';
+pathForce= '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/hier_IB2d_data';
+
 
 % SET PATH TO DA_BLACKBOX %
-addpath('../DA_Blackbox');  % <--- MAKE SURE THIS IS PASSED ACCORDINGLY
+addpath('../DA_Blackbox');
 
 
 for i=start:1:finish

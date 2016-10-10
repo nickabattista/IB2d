@@ -73,6 +73,6 @@ fclose(fileID);               % Closes the data file.
 
 Fdata = forces(:,1);         % magnitude of the force
 
-cd ..;                        % Change directory back to ../viz_IB2d/ directory
+cd ..;                        % Change directory back to ../hier_IB2d_data/ directory
 
 clear mat str filename fileID count;

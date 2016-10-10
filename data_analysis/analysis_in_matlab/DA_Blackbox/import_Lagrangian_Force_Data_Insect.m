@@ -29,39 +29,28 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim)
+function [fX_Lag,fY_Lag] = import_Lagrangian_Force_Data_Insect(path,numSim)
 
-% read in Vorticity %
-strChoice = 'Omega'; first = 1;
-[Omega,x,y] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+% read in Mag. of Force %
+strChoice = 'fX_Lag'; 
+fX_Lag =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in Pressure %
-strChoice = 'P'; first = 0;
-[P,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+% read in Mag. of Tangential Force %
+strChoice = 'fY_Lag'; 
+fY_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in Velocity Magnitude %
-strChoice = 'uMag'; first = 0;
-[uMag,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+% read in Mag. of Force %
+%strChoice = 'fMag'; 
+%fLagMag =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in x-directed Velocity Magnitude %
-strChoice = 'uX'; first = 0;
-[uX,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+% read in Mag. of Tangential Force %
+%strChoice = 'fTan'; 
+%fLagNorm = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
-% read in y-directed Velocity Magnitude %
-strChoice = 'uY'; first = 0;
-[uY,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
-
-% read in x-directed Forces %
-strChoice = 'Fx'; first = 0;
-[Fx,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
-
-% read in y-directed Forces %
-strChoice = 'Fy'; first = 0;
-[Fy,~,~] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
-
-% read in Velocity Field %
-[U,V] = read_Eulerian_Velocity_Field_vtk(path,numSim);
-
+% read in Mag. of Normal Force %
+%strChoice = 'fNorm';
+%fLagTan =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+ 
 
 clear strChoice first;
 

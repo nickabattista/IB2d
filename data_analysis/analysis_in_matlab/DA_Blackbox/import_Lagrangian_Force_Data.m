@@ -51,5 +51,6 @@ fLagNorm = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 strChoice = 'fNorm';
 fLagTan =  read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
  
+
 clear strChoice first;
 
