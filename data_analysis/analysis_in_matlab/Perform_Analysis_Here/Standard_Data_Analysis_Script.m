@@ -37,7 +37,7 @@
 %           (3) MUST make sure to set path to desired dataset, i.e., in line
 %               59 and 60
 %           (4) EASIEST to move your viz_IB2d and hier_IB2d_data folders
-%               into this folder
+%               into THIS folder
 %          
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
