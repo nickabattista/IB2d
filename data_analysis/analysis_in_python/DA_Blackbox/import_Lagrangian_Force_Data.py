@@ -44,6 +44,10 @@ def import_Lagrangian_Force_Data(path,numSim):
     strChoice = 'fY_Lag';
     fY_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
 
+    # read in y directed force #
+    strChoice = 'fMag';
+    fLagMag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+
     # read in mag. of normal force #
     strChoice = 'fNorm';
     fLagNorm = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
