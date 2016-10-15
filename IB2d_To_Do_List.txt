@@ -8,19 +8,18 @@
 %
 % LAGRANGIAN STRUCTURE 
 %
-1. Finish force calculation for 3-Element Hill Model
-2. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
-3. Add non-invariant beams (now just have torsional springs)
-4. Allow for one than one boundary to be read in
+1. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
+2. Add non-invariant beams (now just have torsional springs)
+3. Allow for one than one boundary to be read in
 
 %
 % FLUID SOLVER / BLACK-BOX
 % 
 1. Optimize muscle model force computations
 2. Stoke's Fluid Solver
-3. Non-Newtonian Fluid Solver
-4. Parallelization
-5. Port electrophysiology code to Python (thank you Christopher Strickland for all else!)
+3. Non-Newtonian Fluid Solver ("Power Law Fluid", first)
+4. Parallelization for both data dumping and mid time-stepping
+5. Port electrophysiology code to Python 
 6. Port code to Julia 
 
 %
@@ -30,11 +29,12 @@
         -update_beam() curavture example
         -springs and beams forward swimming example
         -springs only forward swimming example
-2. Fix muscle model parameters for both types
+2. Fix muscle model parameters for both types for swimmer
         -Length-Tension/Force-Velocity model
         -3-Element Hill Model / LT-FV model
 
 %
 % DOCUMENTATION
 %
-1. IB2d User Guide
+1. IB2d Software Release Paper
+2. IB2d User Guide
