@@ -46,11 +46,12 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
 
--THIS VERSION HAS VARIOUS DIFFERENT FLAVORS OF EXAMPLES:
+-THIS VERSION HAS VARIOUS DIFFERENT FLAVORS OF EXAMPLES, e.g.,:
     1. "Standard Rubberband" 
     	    ex1: - uses only linear (un-damped) springs
     	    ex2: - uses only beams (torsional springs)
     	    ex3: - uses only damped linear springs
+            ex4: - uses non-linear springs
     2. "Wobbly Beam" - torsional springs between Lagrangian pts, w/ fixed ends 
         via target points
     3. "Moving Rubberband" - rubberband moving along a zig-zag pattern, via 
@@ -183,7 +184,9 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 				    b. fLagNorm: Mag. Normal Force on each
 				       Lagrangian Pt. 
 				    c. fLagTan: Tangential Force on each 
-				       Lagrangian Pt. 
+				       Lagrangian Pt.
+                    d. fLag_X: x-directed Forces on each Lag. Pt.
+                    e. fLag_Y: y-directed Forces on each Lag. Pt.
 				       
         TRACERS: a. tracer particle locations (*if in simulation)
 
