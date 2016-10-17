@@ -50,7 +50,7 @@ struct_name = 'scallop'; % Name for .vertex, .spring, etc files. (must match wha
 
 
 half_len = (length(xLag)-1)/2;   % Computes # of Lag Pts on each "Arm"
-ind_off = ceil( 0.4*half_len ); % Computes # of lags from center pt for muscle placement
+ind_off = ceil( 0.7*half_len ); % Computes # of lags from center pt for muscle placement
 b_ind = half_len - ind_off;      % Bottom index
 t_ind = half_len+2 + ind_off;    % Top index
 
@@ -78,20 +78,20 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 % Prints .d_spring file! (DAMPED SPRINGS)
 k_Spring = 5e6;
 ds_Rest = ds;                        % Spring resting length (does not need to be equal for all springs)
-b_damp = 5.0; 
-k_Spring2= 1e3;                    % Spring stiffness between sides of swimmer
+b_damp = 0.1; 
+k_Spring2= 2.5e2;                    % Spring stiffness between sides of swimmer
 print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name,k_Spring2);
 
 
 
 % Prints .beam file!
-k_Beam = 5e10;                      % Beam Stiffness (does not need to be equal for all beams)
+k_Beam = 5e11;                      % Beam Stiffness (does not need to be equal for all beams)
 C = compute_Curvatures(xLag,yLag);    % Computes curvature of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
-LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e3;
+LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 7.5e3;
 kSpr = 2.0e3; alpha = 1;
 print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind,kSpr,alpha)
 
@@ -178,7 +178,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,k_Sprin
     for s=1:(N-1)/2
          dist = sqrt( ( xLag(s)-xLag(N-(s-1)) )^2 + ( yLag(s)-yLag(N-(s-1)) )^2 );
          if (s > (N-1)/2 - 7)
-            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, N-(s-1), 1e2*k_Spring2, dist);
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, N-(s-1), 1e7*k_Spring2, dist);
          else 
             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, N-(s-1), k_Spring2, dist);
          end
@@ -214,7 +214,7 @@ function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struc
     for s=1:(N-1)/2
          dist = sqrt( ( xLag(s)-xLag(N-(s-1)) )^2 + ( yLag(s)-yLag(N-(s-1)) )^2 );
          if (s > (N-1)/2 - 7)
-            fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, N-(s-1), 1e3*k_Spring2, dist,b_damp);
+            fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, N-(s-1), 1e2*k_Spring2, dist,b_damp);
          else 
             fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, N-(s-1), k_Spring2, dist,b_damp);
          end

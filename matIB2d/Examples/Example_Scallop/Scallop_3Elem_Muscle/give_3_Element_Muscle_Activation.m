@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [Fm,on,PE_coeff] = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
+function [Fm,on,PE_coeff,af_Val] = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
 
 % current_time: current time in simulation (s)
 % xLag: vector of all x-Lagrangian Pts
@@ -28,6 +28,9 @@ function [Fm,on,PE_coeff] = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fma
 % b:    
 % v:    velocity of muscle expansion/contraction
 
+% SERIES ELEMENT
+% sF_SE(1), sF_SE(2): force from series element in x and y directions 
+
 
 % Length Tension Model Parameters %
 Q = LF/LFO;
@@ -42,8 +45,8 @@ F2 = (1/P0)*(b*P0-a*v)/(v+b);
 
 % Actually Compute Muscle Force %
 %Fm = size( xLag );
-Fm = af_Val*Fmax*F1*F2;
-
+Fm(1) = af_Val * ( Fmax*F1*F2 );
+Fm(2) = af_Val * ( Fmax*F1*F2 );
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,7 +63,7 @@ function [af_Val,on,pE_Coeff] = give_Traveling_Triggering_Coefficient(current_ti
 % xPt: x-Pt of interest
 
 t = current_time;                % current time
-freq = 3;                        % frequency of traveling wave down tube
+freq = 6*3;                        % frequency of traveling wave down tube
 t = rem(t,1/freq);               % Gives remainder after "modular arithmetic" ("fmod" in C++)
 
 %af_Val = sin( 2*pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
