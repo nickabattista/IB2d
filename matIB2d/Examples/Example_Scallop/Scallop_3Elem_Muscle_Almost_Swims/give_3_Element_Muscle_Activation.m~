@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [Fm,on,PE_coeff] = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
+function [Fm,on] = give_3_Element_Muscle_Activation(v,LF,LFO,SK,a,b,Fmax,current_time,xPt,xLag)
 
 % current_time: current time in simulation (s)
 % xLag: vector of all x-Lagrangian Pts
@@ -38,7 +38,7 @@ P0 = Fmax;   %Same as Fmax
 F2 = (1/P0)*(b*P0-a*v)/(v+b);
 
 % Get Activation Coefficient %
-[af_Val,on,PE_coeff] = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt);
+[af_Val,on] = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt);
 
 % Actually Compute Muscle Force %
 %Fm = size( xLag );
@@ -53,7 +53,7 @@ Fm = af_Val*Fmax*F1*F2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [af_Val,on,pE_Coeff] = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt)
+function [af_Val,on] = give_Traveling_Triggering_Coefficient(current_time,xLag,xPt)
 
 % current_time: current_time in simulation
 % xLag:         x-Lagrangian pts (both bottom and top of tube)
@@ -65,18 +65,11 @@ t = rem(t,1/freq);               % Gives remainder after "modular arithmetic" ("
 
 %af_Val = sin( 2*pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
 
-if t < 1/(6*freq)
-   %af_Val = sin( pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
-   af_Val = tanh(50*t);
-   pE_Coeff = 0;
+if t < 1/(2*freq)
+   af_Val = sin( pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
    on = 0;
-elseif t < 0.66/freq;
+elseif t
    af_Val = 0;
-   pE_Coeff = 0;
-   on = 0; 
-else
-   af_Val = 0;
-   pE_Coeff = tanh( 5*( t - 0.66/freq) );
    on = 1;
    %sin( pi*freq*t );  % Gives activation coefficient, e.g., btwn [0,1];  
 end

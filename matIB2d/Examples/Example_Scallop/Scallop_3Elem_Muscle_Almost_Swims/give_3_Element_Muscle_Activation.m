@@ -65,18 +65,17 @@ t = rem(t,1/freq);               % Gives remainder after "modular arithmetic" ("
 
 %af_Val = sin( 2*pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
 
-if t < 1/(6*freq)
-   %af_Val = sin( pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
-   af_Val = tanh(50*t);
+if t < 1/(3*freq)
+   af_Val = sin( pi*freq*t );   % Gives activation coefficient, e.g., btwn [0,1] 
    pE_Coeff = 0;
    on = 0;
-elseif t < 0.66/freq;
+elseif t < 0.43/freq;
    af_Val = 0;
    pE_Coeff = 0;
    on = 0; 
 else
    af_Val = 0;
-   pE_Coeff = tanh( 5*( t - 0.66/freq) );
+   pE_Coeff = tanh( 25*( t - 0.43/freq) );
    on = 1;
    %sin( pi*freq*t );  % Gives activation coefficient, e.g., btwn [0,1];  
 end

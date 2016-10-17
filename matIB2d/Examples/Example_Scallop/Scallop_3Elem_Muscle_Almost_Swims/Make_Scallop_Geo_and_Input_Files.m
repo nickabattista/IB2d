@@ -69,30 +69,21 @@ plot( xLag( t_ind ), yLag( t_ind ), 'm*'); hold on;
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
-% Prints .spring file! (LINEAR/NS-SPRINGS)
-%k_Spring = 2.5e5;                    % Spring stiffness (does not need to be equal for all springs)
-%ds_Rest = ds;                        % Spring resting length (does not need to be equal for all springs)
-%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,k_Spring2);
-
-
-% Prints .d_spring file! (DAMPED SPRINGS)
-k_Spring = 5e6;
+% Prints .spring file!
+k_Spring = 2.5e6;                    % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = ds;                        % Spring resting length (does not need to be equal for all springs)
-b_damp = 5.0; 
-k_Spring2= 1e3;                    % Spring stiffness between sides of swimmer
-print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name,k_Spring2);
-
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 5e10;                      % Beam Stiffness (does not need to be equal for all beams)
-C = compute_Curvatures(xLag,yLag);    % Computes curvature of initial configuration
+k_Beam = 2.5e10;                      % Beam Stiffness (does not need to be equal for all beams)
+C = compute_Curvatures(xLag,yLag); % Computes curvature of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
-LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 1e3;
-kSpr = 2.0e3; alpha = 1;
+LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = 2.0e2;
+kSpr = 1e4; alpha = 1;
 print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind,kSpr,alpha)
 
 %kSpr = Fmax; gets a slow swimmmer
@@ -155,13 +146,13 @@ function print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,ind
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,k_Spring2)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag);
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', N-1 + (N-1)/2 );    % Print # of springs 
+    fprintf(spring_fid, '%d\n', N-1 );    % Print # of springs 
 
     %spring_force = kappa_spring*ds/(ds^2);
         
@@ -174,52 +165,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,k_Sprin
             %    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
             end
     end
-    
-    for s=1:(N-1)/2
-         dist = sqrt( ( xLag(s)-xLag(N-(s-1)) )^2 + ( yLag(s)-yLag(N-(s-1)) )^2 );
-         if (s > (N-1)/2 - 7)
-            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, N-(s-1), 1e2*k_Spring2, dist);
-         else 
-            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, N-(s-1), k_Spring2, dist);
-         end
-    end
     fclose(spring_fid);     
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints DAMPED SPRING points to a file called rubberband.d_spring
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name,k_Spring2)
-
-    N = length(xLag);
-
-    spring_fid = fopen([struct_name '.d_spring'], 'w');
-
-    fprintf(spring_fid, '%d\n', N-1 + (N-1)/2 );
-
-    %spring_force = kappa_spring*ds/(ds^2);
-        
-    %SPRINGS BETWEEN VERTICES
-    for s = 1:N
-            if s < N         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest,b_damp);  
-            %else
-            %    %Case s=N
-            %    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
-            end
-    end
-    
-    for s=1:(N-1)/2
-         dist = sqrt( ( xLag(s)-xLag(N-(s-1)) )^2 + ( yLag(s)-yLag(N-(s-1)) )^2 );
-         if (s > (N-1)/2 - 7)
-            fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, N-(s-1), 1e3*k_Spring2, dist,b_damp);
-         else 
-            fprintf(spring_fid, '%d %d %1.16e %1.16e %1.16e\n', s, N-(s-1), k_Spring2, dist,b_damp);
-         end
-    end
-    fclose(spring_fid);
     
     
     
