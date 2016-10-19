@@ -477,7 +477,7 @@ SK_Vec = muscles3(:,4);            % Stores muscle constant
 a_Vec = muscles3(:,5);             % Stores Hill Parameter, a
 b_Vec = muscles3(:,6);             % Stores Hill Parameter, b
 FMAX_Vec = muscles3(:,7);          % Stores Force-Maximum for Muscle
-kSpr_Vec = muscles3(:,8);           % Stores Spring Coeffs
+kSpr_Vec = muscles3(:,8);          % Stores Spring Coeffs
 alpha_pow= muscles3(:,9);          % Stores deg. of non-linearity for springs
 
 fx = zeros(Nb,1);                 % Initialize storage for x-forces
@@ -492,8 +492,8 @@ for i=1:Nmuscles
     a = a_Vec(i);                % Hill parameter, a, for i-th muscle
     b = b_Vec(i);                % Hill parameter, b, for i-th muscle
     Fmax = FMAX_Vec(i);          % Force-Maximum for i-th muscle
-    kSpr = kSpr_Vec(i);          % Spring coefficient for NL-spring
-    alpha = alpha_pow(i);        % Degree of linearity of i-th spring
+    kSpr = kSpr_Vec(i);          % Spring coefficient for PARALLEL ELEMENT NL-spring
+    alpha = alpha_pow(i);        % Degree of linearity of PARALLEL ELEMENT i-th spring
 
     
     xPt = xLag( id_Master );     % x-Pt of interest at the moment to drive muscle contraction
@@ -508,23 +508,41 @@ for i=1:Nmuscles
     LF_P = sqrt( dx_P^2 + dy_P^2 );              % Euclidean DISTANCE between master and slave node
     
     v =  abs(LF-LF_P)/dt;        % How fast the muscle is contracting/expanding 
-
-    % Find actual muscle activation magnitude for CONTRACTILE ELEMENT
-    Fm = give_3_Element_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,xPt,xLag);
     
+    % Find actual muscle activation magnitude for CONTRACTILE ELEMENT
+    [Fm,on_Parallel,PE_Coeff,af_Val] = give_3_Element_Muscle_Activation(v,LF,LFO,sk,a,b,Fmax,current_time,xPt,xLag,i);
+
+    
+    % Compute muscle force from CONTRACTILE ELEMENT in each direction
     mF_x = Fm*(dx/LF);           % cos(theta) = dx / LF;
     mF_y = Fm*(dy/LF);           % sin(theta) = dy / LF;
     
-    % Find force from series element (tendons)
-    sF_x = 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
-    sF_y = 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
+    
+    % Find muscle force from SERIES ELEMENT in each direction
+    bDamp = 1.0; 
+    dV_x = ( xLag(id_Master) - xLag_P(id_Master) )/dt;      % Compute velocity gradient terms for damping
+    dV_y = ( yLag(id_Master) - yLag_P(id_Master) )/dt;      % Compute velocity gradient terms for damping
+    sF_SE_x = af_Val * kSpr * ( (LFO-LF) - LFO ) * ( dx / sqrt(dx^2+dy^2) ) + bDamp*dV_x; % Note: L_con (LF) + L_ser = L_tot = LFO
+    sF_SE_y = af_Val * kSpr * ( (LFO-LF) - LFO ) * ( dy / sqrt(dx^2+dy^2) ) + bDamp*dV_y;
     
     
-    fx(id_Master,1) = fx(id_Master,1) + mF_x + sF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
-    fy(id_Master,1) = fy(id_Master,1) + mF_y + sF_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
     
-    fx(id_Slave,1) = fx(id_Slave,1) - mF_x - sF_x;    % Sum total forces for node, i in x-direction (this is SLAVE node for this spring)
-    fy(id_Slave,1) = fy(id_Slave,1) - mF_y - sF_y;    % Sum total forces for node, i in y-direction (this is SLAVE node for this spring)
+    if on_Parallel == 1
+        % Find force from series element (tendons)
+        sF_PE_x = PE_Coeff * 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
+        sF_PE_y = PE_Coeff * 0.5*(alpha+1) * kSpr * ( sqrt( dx^2 + dy^2 ) - LFO )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
+    else
+        % Parallel Element is off
+        sF_PE_x = 0;
+        sF_PE_y = 0;
+    end
+    
+    
+    fx(id_Master,1) = fx(id_Master,1) + mF_x + sF_SE_x + sF_PE_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
+    fy(id_Master,1) = fy(id_Master,1) + mF_y + sF_SE_y + sF_PE_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
+    
+    fx(id_Slave,1) = fx(id_Slave,1) - mF_x - sF_SE_x - sF_PE_x;    % Sum total forces for node, i in x-direction (this is SLAVE node for this spring)
+    fy(id_Slave,1) = fy(id_Slave,1) - mF_y - sF_SE_y - sF_PE_y;    % Sum total forces for node, i in y-direction (this is SLAVE node for this spring)
 
 
     

@@ -712,9 +712,9 @@ else
 
         fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+        % savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        %savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+        %savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
 
     cd .. % Get out of hier_IB2d_data folder
 
