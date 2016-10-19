@@ -360,7 +360,7 @@ yLag = [ yB(end:-1:2) yT ];
 length(xLag)
 
 xLag = xLag + 0.75*Lx;
-yLag = yLag + 0.25*Lx;
+yLag = yLag + 0.26*Lx;
 
 % TESTING GEOMETRY
 %plot(xB,yB,'r*'); hold on;

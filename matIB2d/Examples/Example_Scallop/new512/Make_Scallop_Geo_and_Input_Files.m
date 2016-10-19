@@ -34,7 +34,7 @@ function Make_Scallop_Geo_and_Input_Files()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  256;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  512;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
@@ -82,7 +82,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .d_spring file! (DAMPED SPRINGS)
-k_Spring = 1e8;
+k_Spring = 1e8; 
 ds_Rest = ds;                       % Spring resting length (does not need to be equal for all springs)
 b_damp = 0;%2.5; 
 k_Spring2= 0e2;                     % Spring stiffness between sides of swimmer
@@ -91,14 +91,14 @@ print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,b_damp,struct_name,k_
 
 
 % Prints .beam file!
-k_Beam = 1e12;                      % Beam Stiffness (does not need to be equal for all beams)
+k_Beam = 5e12;                      % Beam Stiffness (does not need to be equal for all beams)
 C = compute_Curvatures(xLag,yLag);    % Computes curvature of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .muscle file! [ a_f * Fmax *exp( -( (Q-1)/SK )^2 ) * (1/P0)*(b*P0-a*v)/(v+b); Q = LF/LFO ]
-LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = [1 2.5 6]*10^4;
-kSpr = 1e4; alpha = 1;
+LFO = m_dist; SK = 0.3; a = 0.25; b = 4.0; Fmax = [2 5 10]*10^4;
+kSpr = 1e2; alpha = 1;
 print_Lagrangian_3_Element_Muscles(xLag,LFO,SK,a,b,Fmax,struct_name,b_ind,t_ind,kSpr,alpha)
 
 %kSpr = Fmax; gets a slow swimmmer
@@ -360,7 +360,7 @@ yLag = [ yB(end:-1:2) yT ];
 length(xLag)
 
 xLag = xLag + 0.75*Lx;
-yLag = yLag + 0.25*Lx;
+yLag = yLag + 0.26*Lx;
 
 % TESTING GEOMETRY
 %plot(xB,yB,'r*'); hold on;
