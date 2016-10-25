@@ -517,7 +517,7 @@ while current_time < T_FINAL
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
     
-    %NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
+    %NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
        xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nX;
