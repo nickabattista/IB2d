@@ -58,9 +58,16 @@ for i=1:supp^2
    yL_H_ReSize = [yL_H_ReSize yLH_aux];
 end
 
-% Finds distance between specified Eulerian data and nearby Lagrangian data
-distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
-distY = give_Eulerian_Lagrangian_Distance(y(yInds), yL_H_ReSize, Ly);
+% Checks if only one Lagrangian Point (ensures dimensions line up)
+if ( length(xL_P) == 1 )
+    % Finds distance between specified Eulerian data and nearby Lagrangian data
+    distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
+    distY = give_Eulerian_Lagrangian_Distance(y(yInds)', yL_H_ReSize, Ly);
+else
+    % Finds distance between specified Eulerian data and nearby Lagrangian data
+    distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
+    distY = give_Eulerian_Lagrangian_Distance(y(yInds), yL_H_ReSize, Ly);
+end
 
 % Obtain the Dirac-delta function values.
 delta_X = give_Delta_Kernel( distX, dx);
