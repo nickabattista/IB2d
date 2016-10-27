@@ -260,17 +260,37 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 1: "Mass-spring" stiffness parameter
         #            col 2: "MASS" value parameter
         
-        # initialize mass_info
-        mass_info = np.empty((mass_aux.shape[0],5))
+        if ( mass_aux.size/3.0 < 2.0 ):  # checks if only 1 mass point
+
+            # initialize mass_info
+            mass_info = np.empty((1,5))
         
-        mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
-        #Stores Original x-Lags and y-Lags as x/y-Mass Pt. Identities
-        mass_info[:,1] = xLag[mass_info[:,0].astype('int')]
-        mass_info[:,2] = yLag[mass_info[:,0].astype('int')]
+            mass_info[0,0] = mass_aux[0] #Stores Lag-Pt IDs in col vector
+            
+            #Stores Original x-Lags and y-Lags as x/y-Mass Pt. Identities
+            if ( np.isscalar(xLag) ):
+                mass_info[0,1] = xLag
+                mass_info[0,2] = yLag
+            else:
+                mass_info[0,1] = xLag[mass_info[0].astype('int')]
+                mass_info[0,2] = yLag[mass_info[0].astype('int')]
+
+            mass_info[0,3] = mass_aux[1]   #Stores "mass-spring" parameter 
+            mass_info[0,4] = mass_aux[2]   #Stores "MASS" value parameter
         
-        mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
-        mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
+        else:
+            # initialize mass_info
+            mass_info = np.empty((mass_aux.shape[0],5))
         
+            mass_info[:,0] = mass_aux[:,0] #Stores Lag-Pt IDs in col vector
+            #Stores Original x-Lags and y-Lags as x/y-Mass Pt. Identities
+            mass_info[:,1] = xLag[mass_info[:,0].astype('int')]
+            mass_info[:,2] = yLag[mass_info[:,0].astype('int')]
+        
+            mass_info[:,3] = mass_aux[:,1]   #Stores "mass-spring" parameter 
+            mass_info[:,4] = mass_aux[:,2]   #Stores "MASS" value parameter
+
+
     else:
         mass_info = np.zeros((1,1))
 

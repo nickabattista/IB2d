@@ -96,10 +96,15 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     xL_H_ReSize = np.tile(xLH_aux,(supp**2,1)).T
     yL_H_ReSize = np.tile(yLH_aux,(supp**2,1)).T
 
+
     # Finds distance between specified Eulerian data and nearby Lagrangian data
     # x is a 1D array. x[xInds] is a 2D array of values in x
-    distX = give_Eulerian_Lagrangian_Distance(x[xInds], xL_H_ReSize, Lx)
-    distY = give_Eulerian_Lagrangian_Distance(y[yInds], yL_H_ReSize, Ly)
+    if ( np.isscalar(xL_P) ):
+        distX = give_Eulerian_Lagrangian_Distance(x[xInds], xL_H_ReSize, Lx)
+        distY = give_Eulerian_Lagrangian_Distance(y[yInds], yL_H_ReSize, Ly)
+    else:
+        distX = give_Eulerian_Lagrangian_Distance(x[xInds], xL_H_ReSize, Lx)
+        distY = give_Eulerian_Lagrangian_Distance(y[yInds], yL_H_ReSize, Ly)
 
     # Obtain the Dirac-delta function values.
     delta_X = give_Delta_Kernel(distX, dx)
