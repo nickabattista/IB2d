@@ -101,25 +101,26 @@ offset = length(xLag);
 print_Lagrangian_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,offset,indsTether_CY1, resting_length_tether1,struct_name, 'w');
 
 
-% TODO modify print_Lagrangian_Damped_Springs to take in second tether location
+% modified print_Lagrangian_Damped_Springs to take in second tether location
 % these are the tethers
 % Prints .d_spring file! (FOR DAMPED SPRINGS)
 k_Spring = 2e4; 
 resting_length_tether1 = 2*r1;
-resting_length_tether2 = 2*r2;
+%resting_length_tether2 = 2*r2;
 offset = length(xLag); 
 b_damp = 5.0;
-print_Lagrangian_Damped_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,offset,indsTether_CY1, resting_length_tether1,b_damp,struct_name, 'w');
-print_Lagrangian_Damped_Springs(x2Lag_Cy,y2Lag_Cy, k_Spring,ds,r2,offset,indsTether_CY2, resting_length_tether2,b_damp,struct_name, 'a');
+print_Lagrangian_Damped_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,offset,indsTether_CY1, indsTether_CY2, resting_length_tether1,b_damp,struct_name, 'w');
+%old way you called it 
+%print_Lagrangian_Damped_Springs(x2Lag_Cy,y2Lag_Cy, k_Spring,ds,r2,offset,indsTether_CY2, resting_length_tether2,b_damp,struct_name, 'a');
 
 
 % Change this like the undamped spring file
 % Prints .beam file!
 k_Beam = 5.0e9;  
 C1 = compute_Curvatures(x1Lag_Cy,y1Lag_Cy);
-C2 = compute_Curvatures(x2Lag_Cy, y2Lag_Cy);
+%C2 = compute_Curvatures(x2Lag_Cy, y2Lag_Cy);
 print_Lagrangian_Beams(x1Lag_Cy,y1Lag_Cy, k_Beam,C1,struct_name,offset, 'w');
-print_Lagrangian_Beams(x2Lag_Cy,y2Lag_Cy, k_Beam,C2,struct_name,offset, 'a');
+%print_Lagrangian_Beams(x2Lag_Cy,y2Lag_Cy, k_Beam,C2,struct_name,offset, 'a');
 
 % Prints .target file!
 k_Target = 2.5e7;
@@ -200,6 +201,21 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,offset, mode)
                 fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N-1+offset, N+offset, 1+offset,   k_Beam, C(s) );  
             end
     end
+    
+    %do it again for the second cylinder
+    for s = 1:N
+            if ( (s>1) && (s <= N-1) )        
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1+offset+N, s+offset+N, s+1+offset+N, k_Beam, C(s) );  
+            elseif (s==1)
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N+N+offset,   N+s+offset, N+s+1+offset, k_Beam, C(s) );  
+            elseif (s==N)
+                %Case s=N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',N+N-1+offset, N+N+offset, N+1+offset,   k_Beam, C(s) );  
+            end
+    end
+    
+    
+    
     fclose(beam_fid); 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,7 +283,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether,resting_length_tether,b_damp,struct_name, mode)
+function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether1, indsTether2,resting_length_tether,b_damp,struct_name, mode)
     % how function is called above:
     % print_Lagrangian_Damped_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,
     % offset,indsTether_CY1, resting_length_tether1,b_damp,struct_name, 'w');
@@ -280,8 +296,12 @@ function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,ind
     fprintf(dSpring_fid, '%d\n', 2 );
     
     s=1; % Reset
-    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+offset,       indsTether(2), k_Spring, resting_length_tether,b_damp);
-    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), k_Spring, resting_length_tether,b_damp);
+    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+offset,       indsTether1(2), k_Spring, resting_length_tether,b_damp);
+    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+N/2+1+offset, indsTether1(1), k_Spring, resting_length_tether,b_damp);
+    
+    % DO it again for the second cylinder
+    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+offset+N,       indsTether2(2), k_Spring, resting_length_tether,b_damp);
+    fprintf(dSpring_fid, '%d %d %1.16e %1.16e %1.16e\n', s+N+N/2+1+offset, indsTether2(1), k_Spring, resting_length_tether,b_damp);
     
     fclose(dSpring_fid);
 
