@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k)
+function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k)
 
 % C:     concentration 
 % dt:    time-step
@@ -18,11 +18,14 @@ Cx = give_Necessary_Derivative(C,dx,uX,'x');
 Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
 Cxx = DD(C,dx,'x');
 Cyy = DD(C,dy,'y');
+
+% Forms Laplacian
+laplacian_C = Cxx+Cyy;
     
 % Update Concentration 
 %C = C + dt * ( k*(Cxx+Cyy) - uX'.*Cx - uY'.*Cy );
 
-C = C + dt * ( k*(Cxx+Cyy) - uX.*Cx - uY.*Cy );
+C = C + dt * ( k*(laplacian_C) - uX.*Cx - uY.*Cy );
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
