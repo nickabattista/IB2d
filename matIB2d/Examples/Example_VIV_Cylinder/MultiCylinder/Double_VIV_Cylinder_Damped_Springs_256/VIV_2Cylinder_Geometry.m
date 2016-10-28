@@ -51,7 +51,7 @@ x2_0 = 0.5;
 y2_0 = 0.5;
 r2 = w/6;
 
-struct_name = 'v2_viv_geo2cyl';       % Name for .vertex, .spring, etc files.
+struct_name = 'viv_geo2cyl';       % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry

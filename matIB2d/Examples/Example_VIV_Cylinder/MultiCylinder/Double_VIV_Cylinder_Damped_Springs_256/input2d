@@ -50,4 +50,4 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 
 % LAGRANGIAN STRUCTURE NAME %
-string_name = v2_viv_geo2cyl  % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = viv_geo2cyl  % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
