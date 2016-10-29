@@ -20,9 +20,10 @@
 3. Non-Newtonian Fluid Solver ("Power Law Fluid", first)
 4. Incorporate Blob Projectin method
 5. Incorporate Regularized Stokeslets for Stokes Flow
-4. Parallelization for both data dumping and mid time-stepping
-5. Port electrophysiology code to Python 
-6. Port code to Julia 
+6. Parallelization for both data dumping and mid time-stepping
+7. Port electrophysiology code to Python 
+8. Port code to Julia 
+9. Higher order Advection-Diffusion solver
 
 %
 % EXAMPLES
