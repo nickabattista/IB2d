@@ -1,0 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ***** % IB2d ADDITIONS SINCE INITIAL RELEASE PAPER % ***** % 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% FIBER MODELS
+1. added DAMPED linear springs
+
+% FLUID SOLVER
+1. added functionality for using the Boussinesq Approximation
+
+% ADD-ONs
+1. added Data Analysis directory with codes for reading in simulation data, e.g., .vtk files, to analyze
