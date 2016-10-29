@@ -270,8 +270,8 @@ function C = give_Me_Initial_Concentration(Lx,Nx,dx,buff)
 xMin = buff; xMax = Lx-buff;
 yMin = buff; yMax = Lx-buff;
 
-xMin = 0; xMax = Lx;
-yMin = 0; yMax = Lx;
+%xMin = 0; xMax = Lx;
+%yMin = 0; yMax = Lx;
 
 xMid = (xMin+xMax)/2;
 yMid = (yMin+yMax)/2;
@@ -292,9 +292,9 @@ for i=1:length( inds(:,1) )
     %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     %C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     if yPt >= Lx/2+1*dx
-        C(yInd,xInd) = 0;
-    elseif yPt <= Lx/2-1*dx;
         C(yInd,xInd) = 1;
+    elseif yPt <= Lx/2-1*dx;
+        C(yInd,xInd) = 0;
     else
         C(yInd,xInd) = 0.5;
     end
