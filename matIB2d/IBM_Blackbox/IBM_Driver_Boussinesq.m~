@@ -251,7 +251,9 @@ else
 end
 
 
-
+% CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
+if boussinesq_Yes == 1
+    [fBouss_X,fBouss_Y] = for
 
 
 % READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
@@ -393,48 +395,6 @@ end
 
 
 
-
-
-
-
-
-% CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
-if boussinesq_Yes == 1
-    
-    if length(gravity_Info) == 1
-        fprintf('\n\n\n READ THE ERROR MESSAGE -> YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :) \n\n\n');
-        error('YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :)');
-    elseif concentration_Yes == 0
-        fprintf('\n\n\n READ THE ERROR MESSAGE -> YOU MUST HAVE BACKGROUND CONCENTRATION FOR BOUSSINESQ! :) \n\n\n');
-        error('YOU MUST FLAG CONCENTRATION IN INPUT FILE FOR BOUSSINESQ! :)');
-    end
-    
-    % Forms Boussinesq forcing terms, e.g., (exp_Coeff)*gVector for Momentum Eq.
-    [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx,Ny,gravity_Info);
-    
-    % Saves initial background ambient fluid density
-    rho0 = rho;  
-    
-    % Finds initial concentration Laplacian
-    Cxx = DD(C,dx,'x');
-    Cyy = DD(C,dy,'y');
-    laplacian_C = Cxx+Cyy;
-    C_0 = zeros(size(C)); % Define background concentration
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 % Initialize the initial velocities to zero.
 U = zeros(Ny,Nx);                                % x-Eulerian grid velocity
 V = U;                                           % y-Eulerian grid velocity
@@ -542,24 +502,13 @@ while current_time < T_FINAL
         Fyh = Fyh + Fy_Arb;
     end
     
-   
-    
     %
     %
     %***************** STEP 3: Solve for Fluid motion ******************************************
     %
     %
-    % Add in effect from BOUSSINESQ
-    if boussinesq_Yes == 1
-        Fxh = Fxh - rho0*fBouss_X*(C);
-        Fyh = Fyh - rho0*fBouss_Y*(C);
-        rho = rho0; %rho0*(1-exp_Coeff*laplacian_C);
-        %[Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity_Boussinesq(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
-    else
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
-    end
-    
+    [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+
     
     %
     %
@@ -596,7 +545,7 @@ while current_time < T_FINAL
     
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1
-       [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
+       C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
     
         

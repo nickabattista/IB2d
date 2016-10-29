@@ -44,8 +44,8 @@ function [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx
     %               col 1: flag if considering gravity
     %               col 2: x-component of gravity vector (normalized)
     %               col 3: y-component of gravity vector (normalized)
-    
-    g = 9.81;
+
+    g = 9.81;       % gravitational constant
     mat = ones(Ny,Nx);
     fBouss_X = exp_Coeff*g*gravity_Info(2)*mat;
     fBouss_Y = exp_Coeff*g*gravity_Info(3)*mat;
