@@ -34,7 +34,7 @@ function Make_Tub_Geometry_and_Initial_Concentration()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  256;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  128;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
@@ -270,6 +270,9 @@ function C = give_Me_Initial_Concentration(Lx,Nx,dx,buff)
 xMin = buff; xMax = Lx-buff;
 yMin = buff; yMax = Lx-buff;
 
+xMin = 0; xMax = Lx;
+yMin = 0; yMax = Lx;
+
 xMid = (xMin+xMax)/2;
 yMid = (yMin+yMax)/2;
 
@@ -289,9 +292,9 @@ for i=1:length( inds(:,1) )
     %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     %C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     if yPt >= Lx/2+1*dx
-        C(yInd,xInd) = 1;
-    elseif yPt <= Lx/2-1*dx;
         C(yInd,xInd) = 0;
+    elseif yPt <= Lx/2-1*dx;
+        C(yInd,xInd) = 1;
     else
         C(yInd,xInd) = 0.5;
     end
@@ -376,7 +379,7 @@ function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(d
 % ds: Lagrangian pt. spacing
 % Nx: Eulerian grid resolution
 
-Buff = 0.1*Lx;
+Buff = 0.025*Lx;
 
 fprintf('\nThis is the buffer on all sides: %d\n',Buff);
 
@@ -386,9 +389,10 @@ xRight= (Lx-Buff)*ones(1,length(ySide));
 
 xBottom = Buff+ds:ds:Lx-Buff-ds;
 yBottom = Buff*ones(1,length(xBottom));
+yTop = (Lx-Buff)*ones(1,length(xBottom));
 
-xLag = [xLeft xBottom xRight];
-yLag = [ySide yBottom ySide];
+xLag = [xLeft xBottom xRight xBottom];
+yLag = [ySide yBottom ySide yTop];
 
 plot(xLeft,ySide,'b*'); hold on;
 plot(xBottom,yBottom,'g*'); hold on;
