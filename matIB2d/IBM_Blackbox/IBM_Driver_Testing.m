@@ -28,10 +28,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: TESTING IBM_DRIVER file of the code, where the time-stepping occurs ->
+% FUNCTION: Actual DRIVER of the code, where the time-stepping occurs ->
 %           gets called by main2d to do the "magic" :)
-%
-%           -> Turned off most data storage to run faster on finer grids.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -97,7 +95,8 @@ concentration_Yes = model_Info(16);    % Background Concentration Gradient: 0 (f
 electro_phys_Yes = model_Info(17);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 d_Springs_Yes = model_Info(18);        % Damped Springs: 0 (for no) or 1 (for yes)
 update_D_Springs_Flag = model_Info(19);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-
+boussinesq_Yes = model_Info(20);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = model_Info(21);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -390,6 +389,34 @@ end
 
 
 
+
+% CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
+if boussinesq_Yes == 1
+    
+    if length(gravity_Info) == 1
+        fprintf('\n\n\n READ THE ERROR MESSAGE -> YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :) \n\n\n');
+        error('YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :)');
+    elseif concentration_Yes == 0
+        fprintf('\n\n\n READ THE ERROR MESSAGE -> YOU MUST HAVE BACKGROUND CONCENTRATION FOR BOUSSINESQ! :) \n\n\n');
+        error('YOU MUST FLAG CONCENTRATION IN INPUT FILE FOR BOUSSINESQ! :)');
+    end
+    
+    % Forms Boussinesq forcing terms, e.g., (exp_Coeff)*gVector for Momentum Eq.
+    [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx,Ny,gravity_Info);
+    
+    % Finds initial concentration Laplacian
+    Cxx = DD(C,dx,'x');
+    Cyy = DD(C,dy,'y');
+    laplacian_C = Cxx+Cyy;
+    C_0 = zeros(size(C)); % Define background concentration
+end
+
+
+
+
+
+
+
 % Initialize the initial velocities to zero.
 U = zeros(Ny,Nx);                                % x-Eulerian grid velocity
 V = U;                                           % y-Eulerian grid velocity
@@ -421,7 +448,7 @@ vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),
 Fxh = vort; Fyh = vort; F_Lag = zeros( length(xLag), 2); 
 print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
-fprintf('Current Time(s): %6.6f\n',current_time);
+fprintf('Current Time(s): %6.6f\n\n',current_time);
 ctsave = ctsave+1;
 
 
@@ -502,8 +529,14 @@ while current_time < T_FINAL
     %***************** STEP 3: Solve for Fluid motion ******************************************
     %
     %
-    [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
-
+    % Add in effect from BOUSSINESQ
+    if boussinesq_Yes == 1
+        Fxh = Fxh + rho*fBouss_X*(C);
+        Fyh = Fyh + rho*fBouss_Y*(C);
+        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+    else
+        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+    end
     
     %
     %
@@ -540,7 +573,7 @@ while current_time < T_FINAL
     
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1
-       C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
+       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
     
         
@@ -561,8 +594,15 @@ while current_time < T_FINAL
         print_vtk_files(ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
         
         %Print Current Time
-        fprintf('\nviz_Dump Number: %6.6f\n',ctsave);
         fprintf('Current Time(s): %6.6f\n',current_time);
+        
+        % Prints CFL For Advection:
+        maxy = max( max(max(abs(U))), max(max(abs(V))) );
+        CFL_adv = (dt/dx)*maxy;
+        %CFL_para = dt/dx^2*k;
+        %fprintf('CFL: %d\n\n',max(CFL_adv,CFL_para));
+        fprintf('CFL: %d\n\n',CFL_adv);
+        
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
@@ -583,7 +623,6 @@ while current_time < T_FINAL
     
 end %ENDS TIME-STEPPING LOOP
 
-%fclose(vizID);
 
 
 

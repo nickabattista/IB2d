@@ -623,7 +623,6 @@ while current_time < T_FINAL
     
 end %ENDS TIME-STEPPING LOOP
 
-%fclose(vizID);
 
 
 
