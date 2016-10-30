@@ -99,15 +99,8 @@ model_Info(21)= params(30);         % expansion coefficient for Boussinesq appro
 % Path Reference to where Driving code is found %
 addpath('../../../IBM_Blackbox/');
 
-% Asks if Boussinesq
-if model_Info(20) == 1
-    %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-                % USES BOUSSINESQ APPROX. %
-    [X, Y, U, V, xLags, yLags] = IBM_Driver_Boussinesq(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
-else
-     %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-    [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
-end
+%-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
+[X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

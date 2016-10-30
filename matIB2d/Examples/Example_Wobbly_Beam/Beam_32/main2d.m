@@ -63,13 +63,13 @@ grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
 grid_Info(5) = params(7)/params(5); % Spatial step-size in x
 grid_Info(6) = params(8)/params(6); % Spatial step-size in y
 grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
-grid_Info(8) = params(29);          % Print Dump (How often to plot)
-grid_Info(9) = params(30);          % Plot in Matlab? (1=YES,0=NO) 
-grid_Info(10) = params(31);         % Plot LAGRANGIAN PTs ONLY in Matlab
-grid_Info(11) = params(32);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-grid_Info(12) = params(33);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-grid_Info(13) = params(34);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-grid_Info(14) = params(35);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+grid_Info(8) = params(31);          % Print Dump (How often to plot)
+grid_Info(9) = params(32);          % Plot in Matlab? (1=YES,0=NO) 
+grid_Info(10) = params(33);         % Plot LAGRANGIAN PTs ONLY in Matlab
+grid_Info(11) = params(34);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+grid_Info(12) = params(35);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+grid_Info(13) = params(36);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+grid_Info(14) = params(37);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -92,14 +92,15 @@ model_Info(16)= params(25);         % Background Concentration Gradient: 0 (for 
 model_Info(17)= params(26);         % Electrophysiology Model (FitzHugh-Nagumo)
 model_Info(18)= params(27);         % Damped Springs: 0 (for no) or 1 (for yes)
 model_Info(19)= params(28);         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
+model_Info(20)= params(29);         % Boussinesq: 0 (for no) or 1 (for yes)
+model_Info(21)= params(30);         % expansion coefficient for Boussinesq approx.
+
 
 % Path Reference to where Driving code is found %
 addpath('../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 [X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

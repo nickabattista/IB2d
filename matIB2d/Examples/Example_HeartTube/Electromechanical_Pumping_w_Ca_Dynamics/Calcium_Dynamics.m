@@ -55,6 +55,7 @@ function [Ca,Caf] = Calcium_Dynamics(Nsteps,t_Final)
 % time:   s  = seconds
 % force:  mN = milliNewtons (milli=10^-3; Newton=Kg m/s^2)
 % velocity:  mm/s = millimeters per second
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -65,22 +66,22 @@ k3 = 40;               % Rate constant, Ca2+ binding to filaments, s^-1
 k4 = 19.4;             % Rate constant, Ca2+ release from filaments, s^-1
 
 % Dimensionless Concentrations / Conserved Quantities
-C = 200;                  % total dimensionless Ca2+ concentration
-S = 200;                  % total dimensionless concentrations of sarcoplasmic-reticular binding sites
+C = 200;               % total dimensionless Ca2+ concentration
+S = 200;               % total dimensionless concentrations of sarcoplasmic-reticular binding sites
 
 
 % Temporal Parameters for Ca-Dynamics / IBM Simulation
-dt = t_Final/Nsteps;           %compute Ca-dynamics time-step
+dt = t_Final/Nsteps;   %compute Ca-dynamics time-step
 
 % Temporal Parameters for Activation
-period = 0.5;                  % period of Ca-wave
-act_period = 0.005;             % actuation length of Ca-wave
+period = 0.5;          % period of Ca-wave
+act_period = 0.005;    % actuation length of Ca-wave
 
 % Initialization / Initial Conditions
 Ca = zeros(Nsteps,1);
 Caf = zeros(Nsteps,1);
-Ca(1) = 0;          % inital free-calcium
-Caf(1) = 0;         % initial bound calcium to filaments
+Ca(1) = 0;             % inital free-calcium
+Caf(1) = 0;            % initial bound calcium to filaments
 
 %
 % BEGIN TIME-STEPPING ROUTINE!

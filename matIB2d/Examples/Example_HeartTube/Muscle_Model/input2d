@@ -37,6 +37,9 @@ concentration = 0       % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
+boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
+expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
+
 
 % PRINTING INFORMATION
 print_dump = 10           % How often to print (PLOT) to screen
