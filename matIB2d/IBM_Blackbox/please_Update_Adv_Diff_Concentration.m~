@@ -22,9 +22,12 @@ Cyy = DD(C,dy,'y');
 % Forms Laplacian
 laplacian_C = Cxx+Cyy;
     
-% UPWIND
-C = C + dt * ( k*(laplacian_C) - uX.*Cx - uY.*Cy );
+% Update Concentration 
 
+% UPWIND
+%C = C + dt * ( k*(laplacian_C) - uX.*Cx - uY.*Cy );
+
+% Prints CFL For Advection-Diffusion:
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

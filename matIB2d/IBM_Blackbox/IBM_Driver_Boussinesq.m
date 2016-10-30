@@ -466,7 +466,7 @@ vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),
 Fxh = vort; Fyh = vort; F_Lag = zeros( length(xLag), 2); 
 print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
-fprintf('Current Time(s): %6.6f\n',current_time);
+fprintf('Current Time(s): %6.6f\n\n',current_time);
 ctsave = ctsave+1;
 
 
@@ -551,8 +551,8 @@ while current_time < T_FINAL
     %
     % Add in effect from BOUSSINESQ
     if boussinesq_Yes == 1
-        Fxh = Fxh - rho0*fBouss_X*(C);
-        Fyh = Fyh - rho0*fBouss_Y*(C);
+        Fxh = Fxh + rho0*fBouss_X*(C);
+        Fyh = Fyh + rho0*fBouss_Y*(C);
         rho = rho0; %rho0*(1-exp_Coeff*laplacian_C);
         %[Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity_Boussinesq(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
         [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
@@ -618,6 +618,14 @@ while current_time < T_FINAL
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
+        
+        % Prints CFL For Advection-Diffusion:
+        maxy = max( max(max(abs(U))), max(max(abs(V))) );
+        CFL_adv = (dt/dx)*maxy;
+        %CFL_para = dt/dx^2*k;
+        %fprintf('CFL: %d\n\n',max(CFL_adv,CFL_para));
+        fprintf('CFL: %d\n\n',CFL_adv);
+        
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
