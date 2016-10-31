@@ -42,20 +42,20 @@ Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 % Immersed Structure Geometric / Dynamic Parameters %
 ds= min(Lx/(2.1*Nx),Ly/(2.1*Ny));  % Lagrangian spacing
-L = 0.9*Lx;                    % Length of Channel
-w = 0.2*Ly;                    % Width of Channel
+channel_length = 0.9*Lx;                    % Length of Channel
+channel_width = 0.2*Ly;                    % Width of Channel
 x1_0 = 0.3;                    % x-Center for Cylinder 1
 y1_0 = 0.5;                    % y-Center for Cylinder 1
-r1 = w/6;                      % Radii of Cylinder 1
+r1 = channel_width/10;                     % Radii of Cylinder 1
 x2_0 = 0.5;
 y2_0 = 0.5;
-r2 = w/6;
+r2 = r1;
 
 struct_name = 'viv_geo2cyl';       % Name for .vertex, .spring, etc files.
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Channel_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
+[xLag,yLag] = give_Me_Channel_Immsersed_Boundary_Geometry(ds,channel_length,channel_width,Lx,Ly);
 [x1Lag_Cy,y1Lag_Cy] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r1,x1_0,y1_0);
 [x2Lag_Cy,y2Lag_Cy] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r2,x2_0,y2_0);
 
@@ -80,9 +80,9 @@ plot(x2Lag_Cy(1), y2Lag_Cy(2), 'b*'); hold on;
 plot(xLag(indsTether_CY1(1)),yLag(indsTether_CY1(1)),'b*'); hold on;
 plot(xLag(indsTether_CY2(1)), yLag(indsTether_CY2(1)), 'r*'); hold on;
 plot(xLag(indsTether_CY1(2)),yLag(indsTether_CY1(2)),'g*'); hold on;
-plot(xLag(indsTether_CY2(2)), yLag(indsTether_CY2(2)), 'm*'); hold on;
-plot(x1Lag_Cy(N/2+1),y1Lag_Cy(N/2+1),'b*'); hold on;
-plot(x2Lag_Cy(M/2+1), y2Lag_Cy(M/2+1), 'r*'); hold on;
+plot(xLag(indsTether_CY2(2)), yLag(indsTether_CY2(2)), 'm*');
+plot(x1Lag_Cy(floor(N/2)-1),y1Lag_Cy(floor(N/2)-1),'b*'); hold on;
+plot(x2Lag_Cy(floor(M/2)-1), y2Lag_Cy(floor(M/2)-1), 'r*'); hold on;
 xlabel('x'); ylabel('y');
 axis square;
 
@@ -94,7 +94,7 @@ print_Lagrangian_Vertices([xLag x_bothLag_Cy],[yLag y_bothLag_Cy],struct_name, '
 
 % Prints .spring file!
 k_Spring = 2.0e7; 
-resting_length_tether1 = 2*r1;
+resting_length_tether1 = 2*r1; %these springs span the cylinder so they have the length of the diameter
 offset = length(xLag);
 % since cylinders are identical, modified print_Lagrangian_Springs to take
 % in data for one, then it prints out two times as much data
@@ -102,7 +102,7 @@ print_Lagrangian_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,offset,indsTether_CY1
 
 
 % modified print_Lagrangian_Damped_Springs to take in second tether location
-% these are the tethers
+% these are the tethers that attach the cylinders to the channel wall
 % Prints .d_spring file! (FOR DAMPED SPRINGS)
 k_Spring = 2e4; 
 resting_length_tether1 = 2*r1;
@@ -110,8 +110,9 @@ offset = length(xLag);
 b_damp = 5.0;
 print_Lagrangian_Damped_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,offset,indsTether_CY1, indsTether_CY2, resting_length_tether1,b_damp,struct_name, 'w');
 
-
-% Change this like the undamped spring file
+% This is like the undamped spring file,
+% it takes in one of the cylinder's information and prints out twice as
+% much data to account for second identical cylinder
 % Prints .beam file!
 k_Beam = 5.0e9;  
 C1 = compute_Curvatures(x1Lag_Cy,y1Lag_Cy);
@@ -244,7 +245,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     for s=1:N/2
-        ds_Rest = sqrt( ( xLag(s) - xLag(s+N/2) )^2 +  ( yLag(s) - yLag(s+N/2) )^2 ); 
+        ds_Rest = sqrt( ( xLag(s) - xLag(s+fix(N/2)) )^2 +  ( yLag(s) - yLag(s+fix(N/2)) )^2 ); 
         fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset, s+N/2+offset, k_Spring, ds_Rest);
     end
     
@@ -261,7 +262,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     for s=1:N/2
-        ds_Rest = sqrt( ( xLag(s) - xLag(s+N/2) )^2 +  ( yLag(s) - yLag(s+N/2) )^2 ); 
+        ds_Rest = sqrt( ( xLag(s) - xLag(s+fix(N/2)) )^2 +  ( yLag(s) - yLag(s+fix(N/2)) )^2 ); 
         fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N+offset, s+N+N/2+offset, k_Spring, ds_Rest);
     end
     
@@ -281,7 +282,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
 function print_Lagrangian_Damped_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether1, indsTether2,resting_length_tether,b_damp,struct_name, mode)
     % how function is called above:
     % print_Lagrangian_Damped_Springs(x1Lag_Cy,y1Lag_Cy, k_Spring,ds,r1,
-    % offset,indsTether_CY1, resting_length_tether1,b_damp,struct_name, 'w');
+    % offset,indsTether_CY1, indsTether_CY2, resting_length_tether1,b_damp,struct_name, 'w');
     
 
     N = length(xLag); % just two damped springs to connect cylinder to channel
