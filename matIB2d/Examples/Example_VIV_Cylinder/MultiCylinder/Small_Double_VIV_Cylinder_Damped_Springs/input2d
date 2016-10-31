@@ -43,10 +43,10 @@ update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 print_dump = 400          % How often to print (PLOT) to screen
 plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
-plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
-plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
+plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
+plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
-plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
 
 % LAGRANGIAN STRUCTURE NAME %
