@@ -13,6 +13,12 @@ Institution: University of North Carolina at Chapel Hill
 Website: http://battista.web.unc.edu
 GitHub: http://www.github.com/nickabattista
 
+If you use the code for publishing, please cite the following papers:
+1. N.A. Battista, W.C. Strickland, L.A. Miller, IB2d: a Python and MATLAB implementation of the immersed
+boundary method, submitted to Bioinspiration and Biomemetics, arXiv preprint: 
+\url{https://arxiv.org/abs/1610.07944}
+2. N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
+
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
@@ -140,6 +146,8 @@ If you use this code for the purposes of teaching, research, or recreation pleas
 
 -You can have a background concentration gradient that is advected and diffused
     via the background flow.
+
+-You can use the Boussinesq approximation
 
 -It can plot the following things in Matlab, if plot_Matlab flag = 1 in input2d:
     a. Vorticity (colormap) + Lagrangian Pts.
