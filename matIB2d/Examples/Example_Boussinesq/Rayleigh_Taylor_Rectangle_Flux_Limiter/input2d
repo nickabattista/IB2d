@@ -8,7 +8,7 @@ rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
 Tfinal = 2.0            % Final time of simulation (s)
-dt = 1.25e-5               % Time-step (s)
+dt = 2.5e-5               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -42,7 +42,7 @@ expansion_coeff = 1.0  % expansion coefficient for Boussinesq approx.
 
 
 % PRINTING INFORMATION
-print_dump = 800         % How often to print (PLOT) to screen
+print_dump = 400         % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
