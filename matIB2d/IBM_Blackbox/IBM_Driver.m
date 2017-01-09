@@ -476,7 +476,7 @@ while current_time < T_FINAL
     end
     
     if ( ( electro_phys_Yes == 1) && (muscles_Yes == 0) )
-        springs_info(ePhys_Start:ePhys_End,3) = ( 1e1*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
+        springs_info(ePhys_Start:ePhys_End,3) = ( 8.5e0*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
         ePhys_Ct = ePhys_Ct + 1;
     end
     
@@ -573,6 +573,7 @@ while current_time < T_FINAL
     
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1
+       %[C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
        [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
     
