@@ -35,11 +35,16 @@ function distance = give_Eulerian_Lagrangian_Distance(x, y, L)
 %x,y: two matrices that you find the distance between (x-typically Eulerian data, y-typically Lagrangian data)
 %L:   length of domain, i.e., [0,L]
 
-[row,col] = size(x);
+%[row,col] = size(x);
 distance = abs( x - y );
-for i=1:row
-    for j=1:col
-        distance(i,j) = min( distance(i,j), L-distance(i,j) ); %Note: need to make sure that taking correct value
-    end
-end
+
+% VECTORIZED function calculations for speedup:
+distance = min( distance, L-distance );
+
+% SLOWER (for-loop, non-vectorized computation)
+% for i=1:row
+%     for j=1:col
+%         distance(i,j) = min( distance(i,j), L-distance(i,j) ); %Note: need to make sure that taking correct value
+%     end
+% end
 
