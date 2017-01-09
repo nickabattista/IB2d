@@ -192,20 +192,28 @@ vel_hat = zeros(Ny,Nx); %initialize fluid velocity
 
 if strcmp(string,'x')
     
-    for i=1:Ny
-        for j=1:Nx
-            vel_hat(i,j) = ( rhs_VEL_hat(i,j) - 1i*dt/(rho*dj)*sin(2*pi*idMat(i,j)/Nx)*p_hat(i,j) ) / A_hat(i,j);
-        end
-    end
+      % SLOWER (for-loop, non-vectorized computation)
+      %for i=1:Ny
+      %    for j=1:Nx
+      %        vel_hat(i,j) = ( rhs_VEL_hat(i,j) - 1i*dt/(rho*dj)*sin(2*pi*idMat(i,j)/Nx)*p_hat(i,j) ) / A_hat(i,j);
+      %    end
+      %end
+    
+      % VECTORIZED function for speedup:
+      vel_hat = ( rhs_VEL_hat - 1i*dt/(rho*dj)*sin(2*pi*idMat/Nx).*p_hat ) ./ A_hat;
 
 elseif strcmp(string,'y')
     
-    for i=1:Ny
-        for j=1:Nx
-            vel_hat(i,j) = ( rhs_VEL_hat(i,j) - 1i*dt/(rho*dj)*sin(2*pi*idMat(i,j)/Ny)*p_hat(i,j) ) / A_hat(i,j);
-        end
-    end
-    
+      % SLOWER (for-loop, non-vectorized computation)
+      %for i=1:Ny
+      %    for j=1:Nx
+      %        vel_hat(i,j) = ( rhs_VEL_hat(i,j) - 1i*dt/(rho*dj)*sin(2*pi*idMat(i,j)/Ny)*p_hat(i,j) ) / A_hat(i,j);
+      %    end
+      %end
+
+      % VECTORIZED function for speedup:
+      vel_hat = ( rhs_VEL_hat - 1i*dt/(rho*dj)*sin(2*pi*idMat/Ny).*p_hat ) ./ A_hat;
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -222,20 +230,28 @@ rhs = zeros(Ny,Nx); %initialize rhs
 
 if strcmp(string,'x')
     
-    for i=1:Ny
-        for j=1:Nx
-            rhs(i,j) = A(i,j) + dt/rho*( Fj(i,j) + mu/2*(Axx(i,j)+Ayy(i,j)) - 0.5*rho*(A(i,j)*Ax(i,j) + B(i,j)*Ay(i,j)) - .5*rho*(A_sq_j(i,j) + AB_j(i,j) ) ); %RHS: u-component
-        end
-    end
+    % SLOWER (for-loop, non-vectorized computation)
+    %for i=1:Ny
+    %    for j=1:Nx
+    %       rhs(i,j) = A(i,j) + dt/rho*( Fj(i,j) + mu/2*(Axx(i,j)+Ayy(i,j)) - 0.5*rho*(A(i,j)*Ax(i,j) + B(i,j)*Ay(i,j)) - .5*rho*(A_sq_j(i,j) + AB_j(i,j) ) ); %RHS: u-component
+    %    end
+    %end
+    
+    % VECTORIZED function for speedup:
+    rhs = A + (dt/rho)*( Fj + mu/2*(Axx+Ayy) - 0.5*rho*(A.*Ax + B.*Ay) - 0.5*rho*(A_sq_j + AB_j ) ); %RHS: u-component
     
 elseif strcmp(string,'y')
     
-    for i=1:Ny
-        for j=1:Nx
-            rhs(i,j) = A(i,j) + dt/rho*( Fj(i,j) + mu/2*(Axx(i,j)+Ayy(i,j)) - 0.5*rho*(B(i,j)*Ax(i,j) + A(i,j)*Ay(i,j)) - .5*rho*(AB_j(i,j) + A_sq_j(i,j) ) ); %RHS: v-compoent
-        end
-    end
-   
+    % SLOWER (for-loop, non-vectorized computation)
+    %for i=1:Ny
+    %    for j=1:Nx
+    %        rhs(i,j) = A(i,j) + dt/rho*( Fj(i,j) + mu/2*(Axx(i,j)+Ayy(i,j)) - 0.5*rho*(B(i,j)*Ax(i,j) + A(i,j)*Ay(i,j)) - .5*rho*(AB_j(i,j) + A_sq_j(i,j) ) ); %RHS: v-component
+    %    end
+    %end
+    
+    % VECTORIZED function for speedup:
+    rhs = A + (dt/rho)*( Fj + mu/2*(Axx+Ayy) - 0.5*rho*(B.*Ax + A.*Ay) - 0.5*rho*(AB_j + A_sq_j ) ); %RHS: v-component
+    
 end
 
 
@@ -255,19 +271,27 @@ rhs = zeros(Ny,Nx); %initialize rhs
 
 if strcmp(string,'x')
     
-    for i=1:Ny
-        for j=1:Nx
-            rhs(i,j) = A(i,j) + .5*dt/rho*( Fj(i,j) - .5*rho*(A(i,j)*Ax(i,j) + B(i,j)*Ay(i,j)) - .5*rho*(A_sq_j(i,j) + AB_j(i,j) ) ); %RHS: u-component
-        end
-    end
+    % SLOWER (for-loop, non-vectorized computation)
+    %for i=1:Ny
+    %    for j=1:Nx
+    %        rhs(i,j) = A(i,j) + .5*dt/rho*( Fj(i,j) - .5*rho*(A(i,j)*Ax(i,j) + B(i,j)*Ay(i,j)) - .5*rho*(A_sq_j(i,j) + AB_j(i,j) ) ); %RHS: u-component
+    %    end
+    %end
+    
+    % VECTORIZED function for speedup:
+    rhs = A + (0.5*dt/rho)*( Fj - 0.5*rho*(A.*Ax + B.*Ay) - 0.5*rho*( A_sq_j + AB_j ) ); %RHS: u-component
     
 elseif strcmp(string,'y')
     
-    for i=1:Ny
-        for j=1:Nx
-            rhs(i,j) = A(i,j) + .5*dt/rho*( Fj(i,j) - .5*rho*(B(i,j)*Ax(i,j) + A(i,j)*Ay(i,j)) - .5*rho*(AB_j(i,j) + A_sq_j(i,j) ) ); %RHS: v-compoent
-        end
-    end
+    % SLOWER (for-loop, non-vectorized computation)
+    %for i=1:Ny
+    %    for j=1:Nx
+    %        rhs(i,j) = A(i,j) + .5*dt/rho*( Fj(i,j) - .5*rho*(B(i,j)*Ax(i,j) + A(i,j)*Ay(i,j)) - .5*rho*(AB_j(i,j) + A_sq_j(i,j) ) ); %RHS: v-compoent
+    %    end
+    %end
+    
+    % VECTORIZED function for speedup:
+    rhs = A + (0.5*dt/rho)*( Fj - 0.5*rho*( B.*Ax + A.*Ay ) - .5*rho*( AB_j + A_sq_j ) ); %RHS: v-compoent
    
 end
 
@@ -280,15 +304,22 @@ end
 
 function p_hat = give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat)
 
-p_hat = zeros(Ny,Nx); %initialize fluid pressure
+% No longer need to preallocate storage bc of vectorized function calculations
+%p_hat = zeros(Ny,Nx); %initialize fluid pressure
 
-for i=1:Ny
-    for j=1:Nx
-        num = -( 1i/dx*sin(2*pi*idX(i,j)/Nx)*rhs_u_hat(i,j) + 1i/dy*sin(2*pi*idY(i,j)/Ny)*rhs_v_hat(i,j) );
-        den = ( dt/rho*( (sin(2*pi*idX(i,j)/Nx)/dx)^2 + (sin(2*pi*idY(i,j)/Ny)/dy).^2 ));
-        p_hat(i,j) = num/den;
-    end 
-end
+% SLOWER (for-loop, non-vectorized computation)
+%for i=1:Ny
+%    for j=1:Nx
+%        num = -( 1i/dx*sin(2*pi*idX(i,j)/Nx)*rhs_u_hat(i,j) + 1i/dy*sin(2*pi*idY(i,j)/Ny)*rhs_v_hat(i,j) );
+%        den = ( dt/rho*( (sin(2*pi*idX(i,j)/Nx)/dx)^2 + (sin(2*pi*idY(i,j)/Ny)/dy).^2 ));
+%        p_hat(i,j) = num/den;
+%    end 
+%end
+
+% VECTORIZED function calculations for speedup:
+num = -( 1i/dx*sin(2*pi*idX/Nx).*rhs_u_hat + 1i/dy*sin(2*pi*idY/Ny).*rhs_v_hat );
+den = ( dt/rho*( ( sin(2*pi*idX/Nx)/dx ).^2 + ( sin(2*pi*idY/Ny)/dy ).^2 ) );
+p_hat = num./den;
 
 % Zero out modes.
 p_hat(1,1) = 0;
