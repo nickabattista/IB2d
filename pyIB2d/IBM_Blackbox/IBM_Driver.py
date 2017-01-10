@@ -30,7 +30,6 @@
 ----------------------------------------------------------------------------'''
 import pdb
 import numpy as np
-import pandas as pd
 from math import sqrt
 import os
 from Supp import *
@@ -678,16 +677,15 @@ def read_Spring_Points(struct_name):
         springs: above info stored in columns'''
 
     filename = struct_name+'.spring'  #Name of file to read in
-    with open(filename) as f:
-    #Store elements on .spring file into a matrix starting w/ 2nd row of read in data.
-        #springs = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3))  # <-- this works w/o non-linearity
-
-        df = pd.read_table(f, sep='\s+',skiprows=0) # Read in table
-        df = df.reset_index()                       # Resets the header
-        df.fillna(1, inplace=True)                  # Fills in missing values with "1" (linear spring case)
-
-    # Convert pandas DataFrame to NUMPY Array
-    springs = df.values
+    try:
+        springs = np.genfromtxt(filename,skip_header=1,
+            missing_values=['-NaN', '-nan', 'N/A', 'NA', 'NULL', 'NaN', 'nan'],filling_values=1)
+    except ValueError:
+        print('Failed to load spring data from {}.\n'.format(filename)+
+              'Check that all rows (after the first) have the same number of columns;\n'+
+              'N/A, NA, NULL, NaN, and nan can be used to denote missing values if\n'+
+              'linear and non-linear springs are mixed (these entries will be replaced with a 1).')
+        raise
 
     # If no specified degreee on non-linearity in .spring file
     n,m = springs.shape
