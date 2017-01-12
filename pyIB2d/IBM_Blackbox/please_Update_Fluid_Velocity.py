@@ -72,7 +72,7 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
     Ly =   grid_Info['Ly']
     dx =   grid_Info['dx']
     dy =   grid_Info['dy']
-    supp = grid_Info['supp']
+    supp = int(grid_Info['supp'])
     Nb =   grid_Info['Nb']
     ds =   grid_Info['ds']
 

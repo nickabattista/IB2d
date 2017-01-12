@@ -88,7 +88,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     Ly =    grid_Info['Ly'] # Length of Eulerian grid in y-coordinate
     dx =    grid_Info['dx'] # Spatial-size in x
     dy =    grid_Info['dy'] # Spatial-size in y
-    supp =  grid_Info['supp'] # Delta-function support
+    supp =  int(grid_Info['supp']) # Delta-function support
     Nb =    grid_Info['Nb'] # # of Lagrangian pts. 
     ds =    grid_Info['ds'] # Lagrangian spacing
 
@@ -714,7 +714,7 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     Ly =   grid_Info['Ly']
     dx =   grid_Info['dx']
     dy =   grid_Info['dy']
-    supp = grid_Info['supp']
+    supp = int(grid_Info['supp'])
     Nb =   grid_Info['Nb']
 
     # Find the indices of the points (xi, yj) where the 1D delta functions are 
