@@ -1,5 +1,5 @@
 %*****************************************************************************%
-%***********************************% IB2d %**********************************%
+%*******************************% IB2d Python %*******************************%
 %*****************************************************************************%
 
 IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
@@ -19,7 +19,12 @@ Institution: University of North Carolina at Chapel Hill
 Website: http://www.christopherstrickland.info
 GitHub: http://www.github.com/mountaindust
 
-For info on compiling the included Cython code, please see Cython_README.md
+Dependencies:
+ 	- NumPy
+ 	- Matplotlib
+ 	- Numba
+
+Additionally, an optional C library (plus Cython glue code) is provided to improve the speed at which data writes out to disk. For info on compiling this library, please see Cython_README.md in the IBM_Blackbox directory.
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
@@ -32,11 +37,9 @@ This code is capable of creating Lagrangian Structures using:
     6. Mass Points (with or without influence of gravity)
     7. Porous Structures
 
-One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
+One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc.
  
-There are a number of ported Examples, mostly used for testing purposes.
-
-Many more are available in the Matlab code - if you port another example, please send us a pull request!
+There are a number of ported Examples, mostly used for testing and teaching purposes. Many more are available in the Matlab code - if you port another example, please send us a pull request!
 
 If you would like us to add a specific muscle model, please contact Nick (nick.battista@unc.edu) 
 
@@ -52,6 +55,11 @@ If you use this code for the purposes of teaching, research, or recreation pleas
     3. Type "python main2d.py"
     4. You can change input data in the input2d data folder, or modify the 
        geometry in the specified geometry file
+
+    Alternatively you can run pyIB2d.py, specifying a directory containing
+    the simulation files via one of its flags. Type "python pyIB2d.py -h" for
+    further info. Note: with this method, all data will be written into this
+    folder (IB2d/pyIB2d) rather than the simulation folder.
 
 -THIS VERSION HAS 6 DIFFERENT FLAVORS OF EXAMPLES:
     1. "Standard Rubberband" - only uses springs/beams between Lagrangian pts.
