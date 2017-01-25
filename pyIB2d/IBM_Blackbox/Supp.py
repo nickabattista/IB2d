@@ -80,7 +80,7 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     Ly =   grid_Info['Ly']
     dx =   grid_Info['dx']
     dy =   grid_Info['dy']
-    supp = grid_Info['supp']
+    supp = int(grid_Info['supp'])
     Nb =   grid_Info['Nb']
     ds =   grid_Info['ds']
 

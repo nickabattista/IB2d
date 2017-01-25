@@ -30,6 +30,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['image.cmap'] = 'viridis'
 from math import sqrt
+import warnings
 
 ###########################################################################
 #
@@ -237,7 +238,9 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
     plt.box(on=True)
     
     plt.draw()
-    plt.pause(0.0001) #no idea why this is necessary, but it is
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        plt.pause(0.0001) #no idea why this is necessary, but it is
 
     
 

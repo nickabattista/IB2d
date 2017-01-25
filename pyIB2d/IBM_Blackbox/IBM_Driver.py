@@ -104,7 +104,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     Ly = grid_Info['Ly']   # Length of Eulerian grid in y-coordinate
     dx = grid_Info['dx']   # Spatial-size in x
     dy = grid_Info['dy']   # Spatial-size in y
-    supp = grid_Info['supp'] # Delta-function support
+    supp = int(grid_Info['supp']) # Delta-function support
     
     # PRINTING/PLOTTING INFO #
     pDump = grid_Info['pDump']              # Print (Plot) Dump interval
