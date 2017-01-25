@@ -29,6 +29,7 @@ from math import sqrt
 import numpy as np
 from Supp import give_1D_NonZero_Delta_Indices
 from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
+from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
  
 ################################################################################
 #
@@ -40,7 +41,7 @@ from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
 
 def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,\
     xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams,\
-    muscles, muscles3, masses, d_Springs):
+    muscles, muscles3, masses, d_Springs, general_force):
     ''' Compute components of force term in Navier-Stokes from boundary deformations
 
         Args:
@@ -65,6 +66,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
             muscles3:
             masses:       Stores mass point index, correponding xLag, yLag, 
                 "spring" stiffness, and mass value parameter
+            d_Springs:    Stores damped spring inputs
+            general_force:Stores user-defined force inputs
                 
         Returns:
             Fx:
@@ -103,6 +106,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         # 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
     mass_Yes = model_Info['mass']                     # Mass Pts: 0 (for no) or 1 (for yes)
     d_Springs_Yes = model_Info['damped_springs']      # Damped Springs: 0 (for no) or 1 (for yes)
+    gen_force_Yes = model_Info['user_force']          # User-defined force: 0 (for no) or 1 (for yes)
 
     #
     # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY #
@@ -192,7 +196,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_beams = np.zeros(Nb) #No y-forces coming from beams
 
 
-    # Compute SPRING FORCE DENSITIES (if there are springs!)
+    # Compute DAMPED SPRING FORCE DENSITIES (if there are springs!)
     if ( d_Springs_Yes == 1 ):
      
         fx_dSprings, fy_dSprings = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
@@ -202,12 +206,21 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_dSprings = np.zeros(Nb) #No x-forces coming from damped springs
         fy_dSprings = np.zeros(Nb) #No y-forces coming from damped springs
 
+    # Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
+    if ( gen_force_Yes == 1 ):
+     
+        fx_genForce, fy_genForce = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,\
+            xLag_P,yLag_P,dt,current_time,general_force)
+        
+    else:
+        fx_genForce = np.zeros(Nb) #No x-forces coming from damped springs
+        fy_genForce = np.zeros(Nb) #No y-forces coming from damped springs
 
 
 
     # SUM TOTAL FORCE DENSITY! #
-    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings
-    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings
+    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce
+    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce
 
 
     # SAVE LAGRANGIAN FORCES

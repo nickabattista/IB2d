@@ -136,6 +136,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
                                                            #  0 (for no) or 1 (for yes)
     d_Springs_Yes = model_Info['damped_springs']           #Damped Springs: 0 (for no) or 1 (for yes)
     update_D_Springs_Flag = model_Info['update_D_Springs'] # Update_Damped_Springs (0=no, 1=yes)
+    general_force_Yes = model_Info['user_force']           # User-defined force model (0=no,1=yes)
     
     
     
@@ -349,6 +350,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 5: curavture
     else:
         beams_info = 0
+
+
+    # READ IN USER-DEFINED FORCE MODEL PARAMETERS (IF THERE IS A USER-DEFINED FORCE) #
+    if general_force_Yes:
+        gen_force_info = read_General_Forcing_Function(struct_name)
+        #
+        #           
+        #   ALL PARAMETERS / FORCE FUNCTION SET BY USER!            
+        #            
+        #            
+    else:
+        gen_force_info = 0    
         
     
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
@@ -466,7 +479,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #
         Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
-        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, d_springs_info)
+        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, d_springs_info,\
+        gen_force_info)
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test
@@ -915,6 +929,33 @@ def read_Beam_Points(struct_name):
     #            col 5: curavture
     
     return beams
+
+
+###########################################################################
+#
+# FUNCTION: READS IN ALL THE DATA FOR THE USER-DEFINED FORCE FUNCTION!!!
+#           NOTE: DOES NOT SPECIFY HOW MANY PARAMETERS THERE ARE.
+#           NOTE: COMPLETELY USER-DEFINED
+#
+###########################################################################
+
+def  read_General_Forcing_Function(struct_name):
+    ''' Reads in all data from user defined force .user_force file
+    
+    Args: 
+        struct_name: structure name
+        
+    Returns:
+        All parameters set by user for user-defined force'''
+
+    filename = struct_name+'.user_force'  #Name of file to read in
+    with open(filename) as f:
+        # First line in the file contains the number of Lagrangian points
+        N = int(f.readline().strip())
+        # Read in the Lagrangian mesh points
+        force_general = np.loadtxt(f,unpack=True)
+
+    return force_general   
     
     
 ##############################################################################
