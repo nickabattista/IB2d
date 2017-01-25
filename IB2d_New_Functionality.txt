@@ -6,6 +6,7 @@
 
 % FIBER MODELS
 1. added DAMPED linear springs
+2. added user-defined force fiber model capability
 
 % FLUID SOLVER
 1. added functionality for using the Boussinesq Approximation
