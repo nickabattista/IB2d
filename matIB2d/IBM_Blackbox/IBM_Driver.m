@@ -97,6 +97,7 @@ d_Springs_Yes = model_Info(18);        % Damped Springs: 0 (for no) or 1 (for ye
 update_D_Springs_Flag = model_Info(19);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
 boussinesq_Yes = model_Info(20);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
 exp_Coeff = model_Info(21);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = model_Info(22);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -272,7 +273,7 @@ end
 
 
 
-% READ IN SPRINGS (IF THERE ARE SPRINGS) %
+% READ IN DAMPED SPRINGS (IF THERE ARE SPRINGS) %
 if ( d_Springs_Yes == 1 )
     fprintf('  -Damped Springs and ');
     if update_D_Springs_Flag == 0
@@ -338,6 +339,27 @@ if ( hill_3_muscles_Yes == 1 )
         %         col 9: alpha, degree of non-linearity
 else
     muscles3_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+end
+
+
+
+
+
+
+
+
+
+% READ IN GENERAL FORCE PARAMETERS (IF THERE IS A USER-DEFINED FORCE) %
+if ( general_force_Yes == 1 )
+    fprintf('  -GENERAL FORCE MODEL (user-defined force term)\n');
+    gen_force_info = read_General_Forcing_Function(struct_name);
+        %
+        %
+        % ALL PARAMETERS / FORCE FUNCTION SET BY USER!
+        %
+        %
+else
+    gen_force_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 end
 
 
@@ -502,7 +524,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -1561,6 +1583,26 @@ muscles = muscle_info(2:end,1:9);
 %         col 7: force maximum!
 %         col 8: NL Spring stiffness, kSpr
 %         col 9: NL Spring deg. of non-linearity, alpha
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: READS IN ALL THE DATA FOR THE USER-DEFINED FORCE FUNCTION!!!
+%           NOTE: DOES NOT SPECIFY HOW MANY PARAMETERS THERE ARE.
+%           NOTE: COMPLETELY USER-DEFINED
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function force_general = read_General_Forcing_Function(struct_name)
+
+filename = [struct_name '.user_force'];  %Name of file to read in
+
+% Imports all the data into a data structure
+gen_force_info = importdata(filename,' ',1);
+
+% Save data to new variable, force_general
+force_general = gen_force_info.data;
 
 
     

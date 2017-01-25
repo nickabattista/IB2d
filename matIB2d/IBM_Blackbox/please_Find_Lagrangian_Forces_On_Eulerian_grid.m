@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential, d_Springs)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
 
 %
 % The components of the force are given by
@@ -78,6 +78,7 @@ muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for
 mass_Yes = model_Info(11);          % Mass Pts: 0 (for no) or 1 (for yes)
 electro_phys_Yes = model_Info(17);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 d_Springs_Yes = model_Info(18);     % Damped Springs: 0 (for no) or 1 (for yes)
+gen_force_Yes = model_Info(22);     % General User-Defined Force: 0 (for no) or 1 (for yes)
 
 
 %
@@ -183,11 +184,24 @@ end
 
 
 
+% Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
+if ( gen_force_Yes == 1 )
+
+    % Compute the Lagrangian GENERAL USER force densities!
+    [fx_genForce, fy_genForce] = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,xLag_P,yLag_P,dt,current_time,general_force);
+    
+else
+    fx_genForce = zeros(Nb,1);    %No x-forces coming from damped springs
+    fy_genForce = fx_genForce;    %No y-forces coming from damped springs
+end
+
+
 
 
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings;
-fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings;
+fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce;
+fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce;
+
 
 
 % SAVE LAGRANGIAN FORCES
@@ -228,7 +242,6 @@ Fy = delta_Y * fyds * delta_X;
 
 function [fx, fy] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs)
 
-%len = length(Tx(:,1));                % # of Lagrangian Pts.
 
 Nsprings = length(springs(:,1));  % # of Springs
 sp_1 = springs(:,1);              % Initialize storage for MASTER NODE Spring Connection
