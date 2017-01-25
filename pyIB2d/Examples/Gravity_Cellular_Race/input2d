@@ -37,6 +37,8 @@ concentration = 0       % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
+user_force_model = 1    % 0 (for no) or 1 (for yes)
+
 
 % PRINTING INFORMATION
 print_dump = 200         % How often to print (PLOT) to screen

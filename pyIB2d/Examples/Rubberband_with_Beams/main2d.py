@@ -149,6 +149,7 @@ def main2d():
     model_Info['electrophysiology'] = int(params[25])# Electrophysiology (FitzHugh-Nagumo)
     model_Info['damped_springs'] = int(params[26])   # Damped Springs (0=no, 1=yes)
     model_Info['update_D_Springs'] = int(params[27]) # Update Damped Springs
+    model_Info['user_force'] = int(params[28])       # User-Force Model 
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
