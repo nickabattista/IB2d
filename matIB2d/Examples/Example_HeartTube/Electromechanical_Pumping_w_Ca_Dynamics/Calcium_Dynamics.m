@@ -1,7 +1,6 @@
 function [Ca,Caf] = Calcium_Dynamics(Nsteps,t_Final)
 %function Calcium_Dynamics(Nsteps,t_Final)
 
-
 %
 % This script uses the  law of mass action to model the rates that calcium
 % ions are bound and then released from the actin filaments and the 
