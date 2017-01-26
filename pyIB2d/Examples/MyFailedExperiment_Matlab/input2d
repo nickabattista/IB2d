@@ -39,7 +39,7 @@ damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
 expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
-user_force_model = 1    % 0 (for no) or 1 (for yes)
+user_force_model = 0    % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION

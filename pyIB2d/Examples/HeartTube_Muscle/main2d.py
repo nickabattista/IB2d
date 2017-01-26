@@ -109,17 +109,17 @@ def main2d():
     grid_Info['dy'] = params[7]/params[5] # Spatial step-size in y
     grid_Info['supp'] = params[8] # num of pts used in delta-function support 
                                        #    (supp/2 in each direction)
-    grid_Info['pDump'] = params[28]            # Print Dump (How often to plot)
-    grid_Info['pMatplotlib'] = int(params[29]) # Plot in matplotlib? (1=YES,0=NO) 
-    grid_Info['lagPlot'] = int(params[30])     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info['velPlot'] = int(params[31])     # Plot LAGRANGIAN PTs + 
+    grid_Info['pDump'] = params[29]            # Print Dump (How often to plot)
+    grid_Info['pMatplotlib'] = int(params[30]) # Plot in matplotlib? (1=YES,0=NO) 
+    grid_Info['lagPlot'] = int(params[31])     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info['velPlot'] = int(params[32])     # Plot LAGRANGIAN PTs + 
                                                #  VELOCITY FIELD in matplotlib
-    grid_Info['vortPlot'] = int(params[32])    # Plot LAGRANGIAN PTs + 
+    grid_Info['vortPlot'] = int(params[33])    # Plot LAGRANGIAN PTs + 
                                                #  VORTICITY colormap in matplotlib
-    grid_Info['uMagPlot'] = int(params[33])    # Plot LAGRANGIAN PTs + 
+    grid_Info['uMagPlot'] = int(params[34])    # Plot LAGRANGIAN PTs + 
                                                #  MAGNITUDE OF VELOCITY 
                                                #     colormap in matplotlib
-    grid_Info['pressPlot'] = int(params[34])   # Plot LAGRANGIAN PTs + 
+    grid_Info['pressPlot'] = int(params[35])   # Plot LAGRANGIAN PTs + 
     #                                          # PRESSURE colormap in matplotlib
 
 
