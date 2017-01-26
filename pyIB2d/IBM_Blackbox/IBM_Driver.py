@@ -89,6 +89,16 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
     F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }'''
 
+    print('\n________________________________________________________________________________\n\n')
+    print('\n---------------->>                 IB2d                      <<----------------\n')
+    print('\n________________________________________________________________________________\n\n')
+    print('If using the code for research purposes please cite the following two papers: \n')
+    print('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n')
+    print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, arXiv: https://arxiv.org/abs/1610.07944')
+    print('\n________________________________________________________________________________')
+
+    print('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n')
+    print('\n\n--> Reading input data for simulation...\n\n')
     
     # Temporal Information
     NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
@@ -160,6 +170,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
 
+
     # READ IN LAGRANGIAN POINTS #
     Nb,xLag,yLag = read_Vertex_Points(struct_name)
     grid_Info['Nb'] = Nb          # num Total Number of Lagrangian Pts.
@@ -167,32 +178,24 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
                                #   (for use in muscle-model)
     yLag_P = yLag              # Initialize previous Lagrangian y-Values 
                                #   (for use in muscle-model)
+    
+    print('\n--> FIBER MODEL INCLUDES: \n')
+                   
                             
-                            
-    # READ IN TRACERS (IF THERE ARE TRACERS) #
-    if tracers_Yes:
-       nulvar,xT,yT = read_Tracer_Points(struct_name)
-       tracers = np.zeros((xT.size,4))
-       tracers[0,0] = 1
-       tracers[:,1] = xT
-       tracers[:,2] = yT
-            #tracers_info: col 1: xPt of Tracers
-            #              col 2: yPt of Tracers
-    else:
-       tracers = np.zeros((1,1))
+
        
        
-    # READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) #
-    if concentration_Yes:
-        C,kDiffusion = read_In_Concentration_Info(struct_name)
-            #C:           Initial background concentration
-            #kDiffusion:  Diffusion constant for Advection-Diffusion
-    else:
-        C = 0 # placeholder for plotting 
+
         
         
     # READ IN SPRINGS (IF THERE ARE SPRINGS) #
     if springs_Yes:
+        print('  - Springs and ...')
+        if update_Springs_Flag == 0:
+            print('                   NOT dynamically updating spring properties\n')
+        else:
+            print('                   dynamically updating spring properties\n')
+
         springs_info = read_Spring_Points(struct_name)
             #springs_info: col 1: starting spring pt (by lag. discretization)
             #              col 2: ending spring pt. (by lag. discretization)
@@ -204,8 +207,33 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
 
+
+    # READ IN BEAMS (IF THERE ARE BEAMS) #
+    if beams_Yes:
+        print('  - Beams ("Torsional Springs") and ... ')
+        if update_Beams_Flag == 0:
+            print('                    NOT dynamically updating beam properties\n')
+        else:
+            print('                    dynamically updating beam properties\n')
+
+        beams_info = read_Beam_Points(struct_name)
+        #beams:      col 1: 1ST PT.
+        #            col 2: MIDDLE PT. (where force is exerted)
+        #            col 3: 3RD PT.
+        #            col 4: beam stiffness
+        #            col 5: curavture
+    else:
+        beams_info = 0
+
+
     # READ IN DAMPED SPRINGS (IF THERE ARE DAMPED SPRINGS) #
     if d_Springs_Yes:
+        print('  - Damped Springs and ...')
+        if update_D_Springs_Flag == 0:
+            print('                   NOT dynamically updating damped spring properties\n')
+        else:
+            print('                   dynamically updating spring properties\n')
+
         d_springs_info = read_Damped_Spring_Points(struct_name) 
             #springs_info: col 1: starting spring pt (by lag. discretization)
             #              col 2: ending spring pt. (by lag. discretization)
@@ -217,44 +245,44 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
     
     
-    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
-    if muscles_Yes:
-        muscles_info = read_Muscle_Points(struct_name)
-            #         muscles: col 1: MASTER NODE (by lag. discretization)
-            #         col 2: SLAVE NODE (by lag. discretization)
-            #         col 3: length for max. muscle tension
-            #         col 4: muscle constant
-            #         col 5: hill parameter, a
-            #         col 6: hill parameters, b
-            #         col 7: force maximum!
-    else:
-        muscles_info = np.zeros((1,1))  #just to pass placeholder into 
-            # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 
-    
-    
-    
-    
-    
-    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
-    if hill_3_muscles_Yes:
-        muscles3_info = read_Hill_3Muscle_Points(struct_name)
-            #         muscles: col 1: MASTER NODE (by lag. discretization)
-            #         col 2: SLAVE NODE (by lag. discretization)
-            #         col 3: length for max. muscle tension
-            #         col 4: muscle constant
-            #         col 5: hill parameter, a
-            #         col 6: hill parameters, b
-            #         col 7: force maximum!
+    # READ IN TARGET POINTS (IF THERE ARE TARGET PTS) #
+    if target_pts_Yes:
+        print('  - Target Pts. and ...')
+        if update_Target_Pts == 0:
+            print('                 NOT dynamically updating target point properties\n')
+        else:
+            print('                 dynamically updating target point properties\n')
+        
+        target_aux = read_Target_Points(struct_name)
+        #target_aux: col 0: Lag Pt. ID w/ Associated Target Pt.
+        #            col 1: target STIFFNESSES
+        
+        # initialize target_info
+        target_info = np.empty((target_aux.shape[0],4))
+        
+        target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
+        # Stores Original x-Lags and y-Lags as x/y-Target Pt. Identities
+        target_info[:,1] = xLag[target_info[:,0].astype('int')]
+        target_info[:,2] = yLag[target_info[:,0].astype('int')]
+        
+        target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
     else:
-        muscles3_info = np.zeros((1,1))  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+        target_info = np.zeros((1,1))
     
     
+
     
     
     
     # READ IN MASS POINTS (IF THERE ARE MASS PTS) #
     if mass_Yes:
+        print('  - Mass Pts. with ')
+        if gravity_Yes == 0:
+            print('          NO artificial gravity\n')
+        else:
+            print('          artificial gravity\n')
+
         mass_aux = read_Mass_Points(struct_name)
         #target_aux: col 0: Lag Pt. ID w/ Associated Mass Pt.
         #            col 1: "Mass-spring" stiffness parameter
@@ -298,28 +326,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
 
 
-    # READ IN TARGET POINTS (IF THERE ARE TARGET PTS) #
-    if target_pts_Yes:
-        target_aux = read_Target_Points(struct_name)
-        #target_aux: col 0: Lag Pt. ID w/ Associated Target Pt.
-        #            col 1: target STIFFNESSES
-        
-        # initialize target_info
-        target_info = np.empty((target_aux.shape[0],4))
-        
-        target_info[:,0] = target_aux[:,0] #Stores Lag-Pt IDs in col vector
-        # Stores Original x-Lags and y-Lags as x/y-Target Pt. Identities
-        target_info[:,1] = xLag[target_info[:,0].astype('int')]
-        target_info[:,2] = yLag[target_info[:,0].astype('int')]
-        
-        target_info[:,3] = target_aux[:,1] #Stores Target Stiffnesses 
-    else:
-        target_info = np.zeros((1,1))
-    
-    
+
     
     # READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) #
     if porous_Yes:
+        print('  - Porous Points\n')
         porous_aux = read_Porous_Points(struct_name)
         #porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
         #            col 2: Porosity coefficient
@@ -339,21 +350,45 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         porous_info = np.zeros((1,1))
 
 
+  
 
-    # READ IN BEAMS (IF THERE ARE BEAMS) #
-    if beams_Yes:
-        beams_info = read_Beam_Points(struct_name)
-        #beams:      col 1: 1ST PT.
-        #            col 2: MIDDLE PT. (where force is exerted)
-        #            col 3: 3RD PT.
-        #            col 4: beam stiffness
-        #            col 5: curavture
+
+    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
+    if muscles_Yes:
+        print('  - MUSCLE MODEL (Force-Velocity / Length-Tension Model)\n')
+        muscles_info = read_Muscle_Points(struct_name)
+            #         muscles: col 1: MASTER NODE (by lag. discretization)
+            #         col 2: SLAVE NODE (by lag. discretization)
+            #         col 3: length for max. muscle tension
+            #         col 4: muscle constant
+            #         col 5: hill parameter, a
+            #         col 6: hill parameters, b
+            #         col 7: force maximum!
     else:
-        beams_info = 0
+        muscles_info = np.zeros((1,1))  #just to pass placeholder into 
+            # "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 
+
+    
+    # READ IN MUSCLES (IF THERE ARE MUSCLES) #
+    if hill_3_muscles_Yes:
+        print('  - MUSCLE MODEL (3 Element Hill Model)\n')
+        muscles3_info = read_Hill_3Muscle_Points(struct_name)
+            #         muscles: col 1: MASTER NODE (by lag. discretization)
+            #         col 2: SLAVE NODE (by lag. discretization)
+            #         col 3: length for max. muscle tension
+            #         col 4: muscle constant
+            #         col 5: hill parameter, a
+            #         col 6: hill parameters, b
+            #         col 7: force maximum!
+    else:
+        muscles3_info = np.zeros((1,1))  #just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+    
+    
 
     # READ IN USER-DEFINED FORCE MODEL PARAMETERS (IF THERE IS A USER-DEFINED FORCE) #
     if general_force_Yes:
+        print('  - GENERAL FORCE MODEL (user-defined force term)\n')
         gen_force_info = read_General_Forcing_Function(struct_name)
         #
         #           
@@ -361,9 +396,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            
         #            
     else:
-        gen_force_info = 0    
+        gen_force_info = 0  
+
         
-    
+
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
     if gravity_Yes:    
         xG = model_Info['xG']       # x-Component of Gravity Vector
@@ -379,6 +415,40 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     else:
         gravity_Info = np.zeros((1,1))
 
+
+    #
+    # BACKGROUND FLOW ITEMS
+    #
+    print('\n\n--> Background Flow Items\n')
+    if ( tracers_Yes == 0 ) and (concentration_Yes == 0):
+        print('      (No tracers nor other passive scalars immersed in fluid)\n\n')
+
+
+    # READ IN TRACERS (IF THERE ARE TRACERS) #
+    if tracers_Yes:
+        print('  -Tracer Particles included\n')
+        nulvar,xT,yT = read_Tracer_Points(struct_name)
+        tracers = np.zeros((xT.size,4))
+        tracers[0,0] = 1
+        tracers[:,1] = xT
+        tracers[:,2] = yT
+            #tracers_info: col 1: xPt of Tracers
+            #              col 2: yPt of Tracers
+    else:
+        tracers = np.zeros((1,1))
+
+
+
+    # READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) #
+    if concentration_Yes:
+        print('  -Background concentration included\n')
+        C,kDiffusion = read_In_Concentration_Info(struct_name)
+            #C:           Initial background concentration
+            #kDiffusion:  Diffusion constant for Advection-Diffusion
+    else:
+        C = 0 # placeholder for plotting 
+
+
     
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
@@ -386,6 +456,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
 
     if arb_ext_force_Yes:
+        print('  -Artificial External Forcing Onto Fluid Grid\n')
         firstExtForce = 1       # initialize external forcing
         indsExtForce = 0        # initialize for external forcing computation
     
@@ -428,6 +499,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     Fxh = np.array(vort); Fyh =np.array(vort); F_Lag = np.zeros((xLag.size,2)) 
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
+    print('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n')
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
     
@@ -559,7 +631,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
            C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
            
         # Save/Plot Lagrangian/Eulerian Dynamics! #
-        if ( cter % pDump == 0 and cter >= pDump ):
+        if ( ( cter % pDump == 0) and (cter >= pDump) ):
             
             #Compute vorticity, uMagnitude
             vort = give_Me_Vorticity(U,V,dx,dy)

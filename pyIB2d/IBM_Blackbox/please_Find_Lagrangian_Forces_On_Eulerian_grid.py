@@ -29,7 +29,7 @@ from math import sqrt
 import numpy as np
 from Supp import give_1D_NonZero_Delta_Indices
 from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
-from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
+
  
 ################################################################################
 #
@@ -108,12 +108,13 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     d_Springs_Yes = model_Info['damped_springs']      # Damped Springs: 0 (for no) or 1 (for yes)
     gen_force_Yes = model_Info['user_force']          # User-defined force: 0 (for no) or 1 (for yes)
 
+    if gen_force_Yes:
+        from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
+
     #
     # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY #
     #(if using combined length/tension-Hill model) #
     #
-    
-    
     if ( muscle_LT_FV_Yes == 1):
         fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
             xLag_P,yLag_P,muscles,current_time,dt)
@@ -208,7 +209,6 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
     if ( gen_force_Yes == 1 ):
-     
         fx_genForce, fy_genForce = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,\
             xLag_P,yLag_P,dt,current_time,general_force)
         
