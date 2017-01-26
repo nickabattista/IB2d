@@ -47,7 +47,15 @@ function [X, Y, U, V, xLag, yLag] = IBM_Driver(struct_name, mu, rho, grid_Info, 
 %    F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
 %    F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
 %
-fprintf('\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
+fprintf('\n________________________________________________________________________________\n\n');
+fprintf('\n---------------->>                 IB2d                      <<----------------\n');
+fprintf('\n________________________________________________________________________________\n\n');
+fprintf('If using the code for research purposes please cite the following two papers: \n');
+fprintf('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n');
+fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, arXiv: https://arxiv.org/abs/1610.07944');
+fprintf('\n________________________________________________________________________________');
+
+fprintf('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
 fprintf('\n\n--> Reading input data for simulation...\n\n');
 
 
