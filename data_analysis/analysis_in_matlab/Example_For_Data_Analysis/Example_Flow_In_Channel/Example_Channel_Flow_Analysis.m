@@ -101,13 +101,14 @@ for i=start:1:finish
     %   fLagTan: magnitude of TANGENT force at boundary
     %
     [fX_Lag,fY_Lag,fLagMag,fLagNorm,fLagTan] = import_Lagrangian_Force_Data(pathForce,numSim);
-
+    
     %                 
     %
     % *** USER DEFINED FUNCTIONS TO GET DESIRED ANALYSIS PT. INDICES *** %
     %                                                                    %
     if i==start
-        xPts = [0.125 0.225 0.325 0.425];
+        %xPts = [0.125 0.225 0.325 0.425];
+        xPts = [0.25 0.375 0.5 0.675];
         yPts = [0.405 0.595];
         [xInds,yInds] = give_Desired_Analysis_Points(x,y,xPts,yPts);
         vel_data = zeros(length(yInds),length(xInds),finish);
@@ -221,7 +222,9 @@ end
 
 function plot_Desired_Data(yVals,vel_data)
 
-fs = 16; %Font Size
+fs = 16; % Font Size
+lw = 5;  % Line Width
+ms = 32; % MarkerSize
 
 % Set Figure Size
 FigHand = figure(1);
@@ -232,13 +235,13 @@ set(FigHand,'Position',[100,100,1024,895]);
 subplot(3,1,1)
 mat = vel_data(:,:,1);
 maxVal = max(max(mat));
-plot(yVals,vel_data(:,1,1),'*-'); hold on;
-plot(yVals,vel_data(:,2,1),'r*-'); hold on;
-plot(yVals,vel_data(:,3,1),'g*-'); hold on;
-plot(yVals,vel_data(:,4,1),'k*-'); hold on;
+plot(yVals(2:end),vel_data(2:end,1,1),'.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,2,1),'r.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,3,1),'g.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,4,1),'k.-','LineWidth',lw,'MarkerSize',ms); hold on;
 axis([0.4 0.6 0 1.1*maxVal]);
-leg=legend('x=0.125','x=0.175','x=0.225','x=0.275');
-title('t=0.005'); 
+leg=legend('x=0.25','x=0.375','x=0.50','x=0.625');
+title('t=0.005s'); 
 ylabel('Mag. Velocity','FontSize',fs); xlabel('y','FontSize',fs);
 set(leg,'FontSize',fs);
 set(gca,'FontSize',fs-1);
@@ -246,30 +249,30 @@ set(gca,'FontSize',fs-1);
 subplot(3,1,2)
 mat = vel_data(:,:,2);
 maxVal = max(max(mat));
-plot(yVals,vel_data(:,1,2),'*-');  hold on;
-plot(yVals,vel_data(:,2,2),'r*-'); hold on;
-plot(yVals,vel_data(:,3,2),'g*-'); hold on;
-plot(yVals,vel_data(:,4,2),'k*-'); hold on;
+plot(yVals(2:end),vel_data(2:end,1,2),'.-','LineWidth',lw,'MarkerSize',ms);  hold on;
+plot(yVals(2:end),vel_data(2:end,2,2),'r.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,3,2),'g.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,4,2),'k.-','LineWidth',lw,'MarkerSize',ms); hold on;
 axis([0.4 0.6 0 1.1*maxVal]);
-leg=legend('x=0.125','x=0.175','x=0.225','x=0.275');
+leg=legend('x=0.25','x=0.375','x=0.50','x=0.625');
 ylabel('Mag. Velocity','FontSize',fs); xlabel('y','FontSize',fs);
 set(leg,'FontSize',fs);
 set(gca,'FontSize',fs-1);
-title('t=0.01');
+title('t=0.01s');
 %
 subplot(3,1,3)
 mat = vel_data(:,:,3);
 maxVal = max(max(mat));
-plot(yVals,vel_data(:,1,3),'*-'); hold on;
-plot(yVals,vel_data(:,2,3),'r*-'); hold on;
-plot(yVals,vel_data(:,3,3),'g*-'); hold on;
-plot(yVals,vel_data(:,4,3),'k*-'); hold on;
+plot(yVals(2:end),vel_data(2:end,1,3),'.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,2,3),'r.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,3,3),'g.-','LineWidth',lw,'MarkerSize',ms); hold on;
+plot(yVals(2:end),vel_data(2:end,4,3),'k.-','LineWidth',lw,'MarkerSize',ms); hold on;
 axis([0.4 0.6 0 1.1*maxVal]);
-leg=legend('x=0.125','x=0.175','x=0.225','x=0.275');
+leg=legend('x=0.25','x=0.375','x=0.50','x=0.625');
 ylabel('Mag. Velocity','FontSize',fs); xlabel('y','FontSize',fs);
 set(leg,'FontSize',fs);
 set(gca,'FontSize',fs-1);
-title('t=0.015');
+title('t=0.015s');
 
 
 
