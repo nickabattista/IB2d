@@ -520,16 +520,19 @@ def please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k):
     Returns:
         C:'''
 
-    # Compute Necessary Derivatives 
+    # Compute Necessary Derivatives for x-Advection 
     Cx = D(C,dx,'x')
-    Cy = D(C,dy,'y')
     Cxx = DD(C,dx,'x')
-    Cyy = DD(C,dy,'y')
-        
-    # Update Concentration 
-    # C = C + dt * ( k*(Cxx+Cyy) - uX.T*Cx - uY.T*Cy )
+   
+    # Time-step #1 (give auxillary) 
+    C = C + dt * ( k*(Cxx) - uX*Cx )
 
-    C = C + dt * ( k*(Cxx+Cyy) - uX*Cx - uY*Cy )
+    # Compute Necessary Derivatives for y-Advection 
+    Cy = D(C,dy,'y')
+    Cyy = DD(C,dy,'y')
+
+    # Time-step #2 (give next iterative for C) 
+    C = C + dt * ( k*(Cyy) - uY*Cy )
 
     return C
 
