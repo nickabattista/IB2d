@@ -13,6 +13,24 @@ function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY
 % uY:    y-Component of Velocity
 % k:     diffusion coefficient
 
+
+% Performs Upwind Advection WITHOUT Time-Splitting
+%C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
+
+% Performs Upwind Advection w/ Time-Splitting
+C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k);
+
+laplacian_C=1; % DUMMY VARIABLE (laplacian not used anywhere else in code.)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Advection-Diffusion Split Upwind Method
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k)
+
 % Compute Necessary Derivatives (Note: these calculations could be parallalized)
 Cx = give_Necessary_Derivative(C,dx,uX,'x');
 Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
@@ -24,6 +42,31 @@ laplacian_C = Cxx+Cyy;
     
 % UPWIND
 C = C + dt * ( k*(laplacian_C) - uX.*Cx - uY.*Cy );
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Advection-Diffusion Split Upwind Method
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k)
+
+% Compute Necessary Derivatives for x-Advection 
+Cx = give_Necessary_Derivative(C,dx,uX,'x');
+Cxx = DD(C,dx,'x');
+
+% Time-step #1 (give auxillary)
+C = C + dt * ( k*(Cxx) - uX.*Cx );
+
+% Compute Necessary Derivatives for y-Advection 
+Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
+Cyy = DD(C,dy,'y');
+ 
+% Time-step #2 (give next iteration)
+C = C + dt * ( k*(Cyy) - uY.*Cy );
+
 
 
 
