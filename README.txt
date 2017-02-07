@@ -13,7 +13,7 @@ Institution: University of North Carolina at Chapel Hill
 Website: http://battista.web.unc.edu
 GitHub: http://www.github.com/nickabattista
 
-If you use the code for publishing, please cite the following papers:
+If you use the code for research, please cite the following papers:
 1. N.A. Battista, W.C. Strickland, L.A. Miller, IB2d: a Python and MATLAB implementation of the immersed
 boundary method, submitted to Bioinspiration and Biomemetics, arXiv preprint: 
 \url{https://arxiv.org/abs/1610.07944}
