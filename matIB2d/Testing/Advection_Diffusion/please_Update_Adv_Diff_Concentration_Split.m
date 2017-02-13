@@ -53,7 +53,7 @@ if strcmp(string,'x')
         end
 
         %right side of grid
-        if signs(len,1) <= 0 
+        if signs(i,len) <= 0 
             C_z(i,len) =  ( C(i,1) - C(i,len) ) / (dz);
         else
             C_z(i,len) =  ( C(i,len) - C(i,len-1) ) / (dz);
@@ -87,7 +87,7 @@ elseif strcmp(string,'y')
         end
 
         %top of grid
-        if signs(len,1) <= 0 
+        if signs(len,i) <= 0 
             C_z(len,i) =  ( C(1,i) - C(len,i) ) / (dz);
         else
             C_z(len,i) =  ( C(len,i) - C(len-1,i) ) / (dz);

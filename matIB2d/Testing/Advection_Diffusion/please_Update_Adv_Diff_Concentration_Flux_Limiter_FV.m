@@ -62,7 +62,7 @@ if strcmp(string,'x')
     for i=1:len
 
         %left side of grid
-        if signs(i,1) <= 0 
+        if signs(i,1) <= 0
             r = ( C(i,2) - C(i,1) ) / ( C(i,1) - C(i,len) );
             phi = please_Give_Flux_Limiter(r,selection);
             C_z(i,1) =  uZ(i,1)*C(i,2) ;%  + 0.5*abs( uZ(i,1) )*( 1 - abs( 0.5*dt*uZ(i,1)/dz ) )*phi*( C(i,2) - C(i,len) );
