@@ -8,7 +8,7 @@ rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
 Tfinal = 2.0            % Final time of simulation (s)
-dt = 1.25e-5               % Time-step (s)
+dt = 1.25e-5            % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -24,6 +24,8 @@ target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
+nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
+update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)

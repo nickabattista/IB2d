@@ -63,13 +63,13 @@ grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
 grid_Info(5) = params(7)/params(5); % Spatial step-size in x
 grid_Info(6) = params(8)/params(6); % Spatial step-size in y
 grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
-grid_Info(8) = params(32);          % Print Dump (How often to plot)
-grid_Info(9) = params(33);          % Plot in Matlab? (1=YES,0=NO) 
-grid_Info(10) = params(34);         % Plot LAGRANGIAN PTs ONLY in Matlab
-grid_Info(11) = params(35);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-grid_Info(12) = params(36);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-grid_Info(13) = params(37);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-grid_Info(14) = params(38);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+grid_Info(8) = params(34);          % Print Dump (How often to plot)
+grid_Info(9) = params(35);          % Plot in Matlab? (1=YES,0=NO) 
+grid_Info(10) = params(36);         % Plot LAGRANGIAN PTs ONLY in Matlab
+grid_Info(11) = params(37);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+grid_Info(12) = params(38);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+grid_Info(13) = params(39);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+grid_Info(14) = params(40);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -77,24 +77,26 @@ model_Info(1) = params(10);         % Springs: 0 (for no) or 1 (for yes)
 model_Info(2) = params(11);         % Update_Springs: 0 (for no) or 1 (for yes)
 model_Info(3) = params(12);         % Target_Pts: 0 (for no) or 1 (for yes)
 model_Info(4) = params(13);         % Update_Target_Pts: 0 (for no) or 1 (for yes)
-model_Info(5) = params(14);         % Beams: 0 (for no) or 1 (for yes)
-model_Info(6) = params(15);         % Update_Beams: 0 (for no) or 1 (for yes)
-model_Info(7) = params(16);         % Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
-model_Info(8) = params(17);         % Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 0 (for no) or 1 (for yes)
-model_Info(9) = params(18);         % Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
-model_Info(10) = params(19);        % Tracer Particles: 0 (for no) or 1 (for yes)
-model_Info(11)= params(20);         % Mass Points: 0 (for no) or 1 (for yes)
-model_Info(12)= params(21);         % Gravity: 0 (for no) or 1 (for yes)
-model_Info(13)= params(22);         % x-Component of Gravity vector
-model_Info(14)= params(23);         % y-Component of Gravity Vector
-model_Info(15)= params(24);         % Porous Media: 0 (for no) or 1 (for yes)
-model_Info(16)= params(25);         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-model_Info(17)= params(26);         % Electrophysiology Model (FitzHugh-Nagumo)
-model_Info(18)= params(27);         % Damped Springs: 0 (for no) or 1 (for yes)
-model_Info(19)= params(28);         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
-model_Info(20)= params(29);         % Boussinesq: 0 (for no) or 1 (for yes)
-model_Info(21)= params(30);         % expansion coefficient for Boussinesq approx.
-model_Info(22)= params(31);         % user-defined general force model: 0 (for no) or 1 (for yes)
+model_Info(5) = params(14);         % Beams (Torsional Springs): 0 (for no) or 1 (for yes)
+model_Info(6) = params(15);         % Update_Beams (Torsional Springs): 0 (for no) or 1 (for yes)
+model_Info(7) = params(16);         % Non-Invariant Beams: 0 (for no) or 1 (for yes)
+model_Info(8) = params(17);         % Update_NonInvariant_Beams: 0 (for no) or 1 (for yes)
+model_Info(9) = params(18);         % Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
+model_Info(10) = params(19);        % Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 0 (for no) or 1 (for yes)
+model_Info(11) = params(20);        % Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
+model_Info(12) = params(21);        % Tracer Particles: 0 (for no) or 1 (for yes)
+model_Info(13)= params(22);         % Mass Points: 0 (for no) or 1 (for yes)
+model_Info(14)= params(23);         % Gravity: 0 (for no) or 1 (for yes)
+model_Info(15)= params(24);         % x-Component of Gravity vector
+model_Info(16)= params(25);         % y-Component of Gravity Vector
+model_Info(17)= params(26);         % Porous Media: 0 (for no) or 1 (for yes)
+model_Info(18)= params(27);         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+model_Info(19)= params(28);         % Electrophysiology Model (FitzHugh-Nagumo)
+model_Info(20)= params(29);         % Damped Springs: 0 (for no) or 1 (for yes)
+model_Info(21)= params(30);         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
+model_Info(22)= params(31);         % Boussinesq: 0 (for no) or 1 (for yes)
+model_Info(23)= params(32);         % expansion coefficient for Boussinesq approx.
+model_Info(24)= params(33);         % user-defined general force model: 0 (for no) or 1 (for yes)
 
 
 % Path Reference to where Driving code is found %
