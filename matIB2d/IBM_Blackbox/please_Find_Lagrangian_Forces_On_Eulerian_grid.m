@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
+function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
 
 %
 % The components of the force are given by
@@ -72,13 +72,14 @@ ds =    grid_Info(9); % Lagrangian spacing
 % Model Potential Forces %
 springs_Yes = model_Info(1);        % Springs: 0 (for no) or 1 (for yes) 
 target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
-beams_Yes = model_Info(5);          % Beams: 0 (for no) or 1 (for yes)
-muscle_LT_FV_Yes = model_Info(7);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
-muscle_3_Hill_Yes = model_Info(8);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
-mass_Yes = model_Info(11);          % Mass Pts: 0 (for no) or 1 (for yes)
-electro_phys_Yes = model_Info(17);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = model_Info(18);     % Damped Springs: 0 (for no) or 1 (for yes)
-gen_force_Yes = model_Info(22);     % General User-Defined Force: 0 (for no) or 1 (for yes)
+beams_Yes = model_Info(5);          % Beams (Torsional Springs): 0 (for no) or 1 (for yes)
+nonInv_beams_Yes = model_Info(7);
+muscle_LT_FV_Yes = model_Info(9);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+muscle_3_Hill_Yes = model_Info(10);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
+mass_Yes = model_Info(13);          % Mass Pts: 0 (for no) or 1 (for yes)
+electro_phys_Yes = model_Info(19);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = model_Info(20);     % Damped Springs: 0 (for no) or 1 (for yes)
+gen_force_Yes = model_Info(24);     % General User-Defined Force: 0 (for no) or 1 (for yes)
 
 
 %
@@ -134,7 +135,8 @@ end
 
 % Compute MASS PT FORCE DENSITIES (if there are mass points!)
 if ( mass_Yes == 1)
-    % Compute the Lagrangian MASS PT force densities!
+    
+    % Compute the Lagrangian MASSIVE PT force densities!
     [fx_mass, fy_mass, F_Mass] = give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses); 
 else
     fx_mass = zeros(Nb,1); %No x-forces coming from mass points
@@ -146,6 +148,7 @@ end
 
 % Compute TARGET FORCE DENSITIES (if there are target points!)
 if ( target_pts_Yes == 1)
+    
     % Compute the Lagrangian TARGET force densities!
     [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets); 
     
@@ -157,10 +160,10 @@ end
 
 
 
-% Compute BEAM FORCE DENSITIES (if there are beams!)
+% Compute BEAM (TORSIONAL SPRINGS) FORCE DENSITIES (if there are beams!)
 if ( beams_Yes == 1 )
 
-    % Compute the Lagrangian SPRING force densities!
+    % Compute the Lagrangian BEAM (TORSIONAL SPRINGS) force densities!
     [fx_beams, fy_beams] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams);
     
 else
@@ -171,10 +174,24 @@ end
 
 
 
+% Compute BEAM (NON-INVARIANT) FORCE DENSITIES (if there are non-invariant beams!)
+if ( nonInv_beams_Yes == 1 )
+
+    % Compute the Lagrangian NON-INVARIANT BEAM force densities!
+    [fx_nonInv_beams, fy_nonInv_beams] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams);
+    
+else
+    fx_nonInv_beams = zeros(Nb,1); %No x-forces coming from beams
+    fy_nonInv_beams = fx_nonInv_beams;    %No y-forces coming from beams
+end
+
+
+
+
 % Compute DAMPED SPRING FORCE DENSITIES (if there are damped springs!)
 if ( d_Springs_Yes == 1 )
 
-    % Compute the Lagrangian SPRING force densities!
+    % Compute the Lagrangian DAMPED SPRING force densities!
     [fx_dSprings, fy_dSprings] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt);
     
 else
@@ -199,8 +216,8 @@ end
 
 
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce;
-fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce;
+fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce;
+fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce;
 
 
 
@@ -568,12 +585,54 @@ end
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION computes the Lagrangian BEAM (NON-INVARIANT) Force Densities 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [fx, fy] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams)
 
 
+Nbeams = length(beams(:,1));     % # of Beams
+pts_1 = beams(:,1);              % Initialize storage for 1ST NODE for BEAM
+pts_2 = beams(:,2);              % Initialize storage for MIDDLE NODE (2ND Node) for BEAM
+pts_3 = beams(:,3);              % Initialize storage for 3RD NODE for BEAM
+K_Vec = beams(:,4);              % Stores beam stiffness associated with each beam
+CX_Vec = beams(:,5);             % Stores beam curvature in x-direction
+CY_Vec = beams(:,6);             % Stores beam curvature in y-direction
 
+fx = zeros(Nb,1);                % Initialize storage for x-forces
+fy = fx;                         % Initialize storage for y-forces
 
+for i=1:Nbeams
+    
+    id_1 = pts_1(i);          % 1ST Node index
+    id_2 = pts_2(i);          % (MIDDLE) 2nd Node index -> index that gets force applied to it!
+    id_3 = pts_3(i);          % 3RD Node index
+    k_Beam = K_Vec(i);        % Beam stiffness of i-th spring
+    Cx = CX_Vec(i) ;          % x-Curvature of the beam between these three nodes 
+    Cy = CY_Vec(i) ;          % y-Curvature of the beam between these three nodes 
 
-
+    Xp = xLag(id_1);          % xPt of 1ST Node Pt. in beam
+    Xq = xLag(id_2);          % xPt of 2ND (MIDDLE) Node Pt. in beam
+    Xr = xLag(id_3);          % xPt of 3RD Node Pt. in beam
+    
+    Yp = yLag(id_1);          % yPt of 1ST Node Pt. in beam
+    Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
+    Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
+    
+    % CALCULATE BENDING IN X
+    fx(id_3,1) = fx(id_3,1) -   k_Beam*( Xr - 2*Xq + Xp - Cx);
+    fx(id_1,1) = fx(id_1,1) -   k_Beam*( Xr - 2*Xq + Xp - Cx);
+    fx(id_2,1) = fx(id_2,1) + 2*k_Beam*( Xr - 2*Xq + Xp - Cx );
+    
+    % CALCULATE BENDING IN Y
+    fy(id_3,1) = fy(id_3,1) -   k_Beam*( Yr - 2*Yq + Yp - Cy );
+    fy(id_1,1) = fy(id_1,1) -   k_Beam*( Yr - 2*Yq + Yp - Cy );
+    fy(id_2,1) = fy(id_2,1) + 2*k_Beam*( Yr - 2*Yq + Yp - Cy );
+    
+end
 
 
 
@@ -581,7 +640,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION computes the Lagrangian BEAM Force Densities 
+% FUNCTION computes the Lagrangian BEAM (TORSIONAL SPRING) Force Densities 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -91,21 +91,24 @@ target_pts_Yes = model_Info(3);        % Target_Pts: 0 (for no) or 1 (for yes)
 update_Target_Pts = model_Info(4);     % Update_Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);             % Beams: 0 (for no) or 1 (for yes)
 update_Beams_Flag = model_Info(6);     % Update_Beams: 0 (for no) or 1 (for yes)
-muscles_Yes = model_Info(7);           % FV-LT Muscles: 0 (for no) or 1 (for yes)
-hill_3_muscles_Yes = model_Info(8);    % Hill 3-Element Muscle: 0 (for no) or 1 (for yes)
-arb_ext_force_Yes = model_Info(9);     % Arbitrary External Force: 0 (for no) or 1 (for yes)
-tracers_Yes = model_Info(10);          % Tracers: 0 (for no) or 1 (for yes)
-mass_Yes = model_Info(11);             % Mass Points: 0 (for no) or 1 (for yes)
-gravity_Yes = model_Info(12);          % Gravity: 0 (for no) or 1 (for yes)
-%NOTE: model_Info(13)/(14) - components of gravity vector
-porous_Yes = model_Info(15);           % Porous Media: 0 (for no) or 1 (for yes)
-concentration_Yes = model_Info(16);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-electro_phys_Yes = model_Info(17);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = model_Info(18);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = model_Info(19);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = model_Info(20);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = model_Info(21);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = model_Info(22);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+nonInv_beams_Yes = model_Info(7);      % Beams (non-invariant): 0 (for no) or 1 (for yes)
+update_nonInv_Beams_Flag = model_Info(8); % Update_nonInv_Beams: 0 (for no) or 1 (for yes)
+muscles_Yes = model_Info(9);           % FV-LT Muscles: 0 (for no) or 1 (for yes)
+hill_3_muscles_Yes = model_Info(10);    % Hill 3-Element Muscle: 0 (for no) or 1 (for yes)
+arb_ext_force_Yes = model_Info(11);     % Arbitrary External Force: 0 (for no) or 1 (for yes)
+tracers_Yes = model_Info(12);          % Tracers: 0 (for no) or 1 (for yes)
+mass_Yes = model_Info(13);             % Mass Points: 0 (for no) or 1 (for yes)
+gravity_Yes = model_Info(14);          % Gravity: 0 (for no) or 1 (for yes)
+%NOTE: model_Info(15)/(16) - components of gravity vector
+porous_Yes = model_Info(17);           % Porous Media: 0 (for no) or 1 (for yes)
+concentration_Yes = model_Info(18);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+electro_phys_Yes = model_Info(19);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = model_Info(20);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = model_Info(21);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = model_Info(22);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = model_Info(23);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = model_Info(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+
 
 %Lagrangian Structure Data
 ds = Lx / (2*Nx);                   %Lagrangian Spacing
@@ -166,7 +169,7 @@ end
 
 
 
-% READ IN BEAMS (IF THERE ARE BEAMS) %
+% READ IN BEAMS (IF THERE ARE BEAMS aka TORSIONAL SPRINGS) %
 if ( beams_Yes == 1)
     fprintf('  -Beams ("Torsional Springs") and ');
     if update_Beams_Flag == 0
@@ -184,6 +187,37 @@ if ( beams_Yes == 1)
 else
     beams_info = 0;
 end
+
+
+
+
+
+
+% READ IN BEAMS (IF THERE ARE NONINVARIANT BEAMS) %
+if ( nonInv_beams_Yes == 1)
+    fprintf('  -Beams ("non-Invariant") and ');
+    if update_nonInv_Beams_Flag == 0
+        fprintf('NOT dynamically updating non-invariant beam properties\n');
+    else
+        fprintf('dynamically updating non-invariant beam properties\n');
+    end
+    
+    nonInv_beams_info = read_nonInv_Beam_Points(struct_name);
+    %beams:      col 1: 1ST PT.
+    %            col 2: MIDDLE PT. (where force is exerted)
+    %            col 3: 3RD PT.
+    %            col 4: beam stiffness
+    %            col 5: x-curavture
+    %            col 6: y-curavture
+else
+    nonInv_beams_info = 0;
+end
+
+
+
+
+
+
 
 
 
@@ -244,8 +278,8 @@ end
 if gravity_Yes == 1
     %gravity_Vec(1) = model_Info(12);     % x-Component of Gravity Vector
     %gravity_Vec(2) = model_Info(13);     % y-Component of Gravity Vector
-    xG = model_Info(13);
-    yG = model_Info(14);
+    xG = model_Info(15);
+    yG = model_Info(16);
     normG = sqrt( xG^2 + yG^2 );
     gravity_Info = [gravity_Yes xG/normG yG/normG];
     %   col 1: flag if considering gravity
@@ -522,6 +556,10 @@ while current_time < T_FINAL
        beams_info = update_Beams(dt,current_time,beams_info); 
     end
     
+    if ( ( update_nonInv_Beams_Flag == 1 ) && ( nonInv_beams_Yes == 1) )
+       nonInv_beams_info = update_nonInv_Beams(dt,current_time,nonInv_beams_info); 
+    end
+    
     if ( ( update_D_Springs_Flag == 1 ) && ( d_Springs_Yes == 1) )
        d_springs_info = update_Damped_Springs(dt,current_time,d_springs_info); 
     end
@@ -532,7 +570,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -1483,6 +1521,38 @@ beams = beam_info(2:end,1:5);
     %            col 4: beam stiffness
     %            col 5: curavture
 
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in the # of NON-INVARIANT beams and all 1st Pt, MIDDLE Pt, 
+%           and 3rd Pt beam STIFFNESSES, and CURVATURE
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function beams = read_nonInv_Beam_Points(struct_name)
+
+filename = [struct_name '.nonInv_beam'];  %Name of file to read in
+
+fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,'%f %f %f %f %f %f','CollectOutput',1);
+
+fclose(fileID);      %Close the data file.
+
+beam_info = C{1};    %Stores all read in data in vertices (N+1,2) array
+
+%Store all elements on .beam file into a matrix starting w/ 2nd row of read in data.
+beams = beam_info(2:end,1:6);
+
+    %beams:      col 1: 1ST PT.
+    %            col 2: MIDDLE PT. (where force is exerted)
+    %            col 3: 3RD PT.
+    %            col 4: beam stiffness
+    %            col 5: curavture    
+    
+    
 
 
     
