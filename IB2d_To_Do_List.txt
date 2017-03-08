@@ -9,7 +9,7 @@
 % LAGRANGIAN STRUCTURE 
 %
 1. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
-2. Add non-invariant beams (now just have torsional springs)
+2. Poroelastic Boundaries
 3. Allow for one than one boundary to be read in
 
 %
