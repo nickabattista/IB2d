@@ -6,7 +6,7 @@
 
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
- Date Created: May 27th, 2015\
+ Date Created: May 27th, 2015
  Initial Python 3.5 port by: Christopher Strickland
  Institution: UNC-CH
 
@@ -40,7 +40,7 @@ from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
 
 
 def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,\
-    xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams,\
+    xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams,\
     muscles, muscles3, masses, d_Springs, general_force):
     ''' Compute components of force term in Navier-Stokes from boundary deformations
 
@@ -62,6 +62,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
                 target point stiffness
             beams:        Stores 1st Node, 2nd (MIDDLE-MAIN) Node, 3rd Nodes, 
                 Beam Stiffnesses, and Beam curvatures
+            nonInv_beams: Stores 1st Node, 2nd (MIDDLE-MAIN) Node, 3rd Nodes, 
+                Beam Stiffnesses, x-Curvature, y-Curvature
             muscles:
             muscles3:
             masses:       Stores mass point index, correponding xLag, yLag, 
@@ -99,7 +101,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     # Model Potential Forces #
     springs_Yes = model_Info['springs']               # Springs: 0 (for no) or 1 (for yes) 
     target_pts_Yes = model_Info['target_pts']         # Target_Pts: 0 (for no) or 1 (for yes)
-    beams_Yes = model_Info['beams']                   # Beams: 0 (for no) or 1 (for yes)
+    beams_Yes = model_Info['beams']                   # Beams (Torsional Springs): 0 (for no) or 1 (for yes)
+    nonInv_beams_Yes = model_Info['nonInv_beams']     # Non-Invariant Beams: 0 (for no) or 1 (for yes)
     muscle_LT_FV_Yes = model_Info['muscles']          # Length-Tension/Force-Velocity Muscle: 
         # 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
     muscle_3_Hill_Yes = model_Info['hill_3_muscles']  # 3-Element Hill Model: 
@@ -185,7 +188,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
 
-    # Compute BEAM FORCE DENSITIES (if there are beams!)
+    # Compute BEAM (TORSIONAL SPRING) FORCE DENSITIES (if there are beams!)
     if ( beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
@@ -195,6 +198,19 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     else:
         fx_beams = np.zeros(Nb) #No x-forces coming from beams
         fy_beams = np.zeros(Nb) #No y-forces coming from beams
+
+
+    # Compute BEAM (NON-INVARIANT) FORCE DENSITIES (if there are beams!)
+    if ( nonInv_beams_Yes == 1 ):
+
+        # Compute the Lagrangian SPRING force densities!
+        fx_nonInv_beams, fy_nonInv_beams = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,\
+            xLag,yLag,nonInv_beams)
+        
+    else:
+        fx_nonInv_beams = np.zeros(Nb) #No x-forces coming from beams
+        fy_nonInv_beams = np.zeros(Nb) #No y-forces coming from beams
+
 
 
     # Compute DAMPED SPRING FORCE DENSITIES (if there are springs!)
@@ -219,8 +235,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
     # SUM TOTAL FORCE DENSITY! #
-    fx = fx_springs + fx_target + fx_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce
-    fy = fy_springs + fy_target + fy_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce
+    fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce
+    fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce
 
 
     # SAVE LAGRANGIAN FORCES
@@ -636,12 +652,62 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets):
     #fy_target = fy/ds**2
 
     return fx_target, fy_target
+
+###########################################################################
+#
+# FUNCTION computes the Lagrangian BEAM (NON-INVARIANT) Force Densities 
+#
+###########################################################################    
+
+def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams):    
+
+
+    Nbeams = nonInv_beams.shape[0]     # # of Beams
+    pts_1 = nonInv_beams[:,0].astype('int')  # 1ST NODES for BEAM
+    pts_2 = nonInv_beams[:,1].astype('int')  # MIDDLE NODES (2ND Node) for BEAM
+    pts_3 = nonInv_beams[:,2].astype('int')  # 3RD NODES for BEAM
+    K_Vec = nonInv_beams[:,3]   # Stores beam stiffness associated with each spring
+    CX_Vec = nonInv_beams[:,4]  # Stores x-Curvature 
+    CY_Vec = nonInv_beams[:,5]  # Stores y-Curvature 
+
+    fx = np.zeros(Nb)                # Initialize storage for x-forces
+    fy = np.zeros(Nb)                # Initialize storage for y-forces
     
+    for ii in range(Nsprings):
+
+        id_1 = pts_1[ii]        # 1st Node Index
+        id_2 = pts_2[ii]        # 2nd Node Index
+        id_3 = pts_3[ii]        # 3rd Node Index
+        k_Beam = K_Vec[ii]      # bending stiffness
+        Cx = CX_Vec[ii]         # x-Curvature
+        Cy = CY_Vec[ii]         # y-Curvature
+
+        Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
+        Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
+        Xr = xLag[id_3]          # xPt of 3RD Node Pt. in beam
+    
+        Yp = yLag[id_1]         # yPt of 1ST Node Pt. in beam
+        Yq = yLag[id_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
+        Yr = yLag[id_3]         # yPt of 3RD Node Pt. in beam
+
+        # CALCULATE BENDING IN X
+        fx[id_3] = fx[id_3] -   k_Beam*( Xr - 2*Xq + Xp - Cx)
+        fx[id_1] = fx[id_1] -   k_Beam*( Xr - 2*Xq + Xp - Cx)
+        fx[id_2] = fx[id_2] + 2*k_Beam*( Xr - 2*Xq + Xp - Cx )
+    
+        # CALCULATE BENDING IN Y
+        fy[id_3] = fy[id_3] -   k_Beam*( Yr - 2*Yq + Yp - Cy )
+        fy[id_1] = fy[id_1] -   k_Beam*( Yr - 2*Yq + Yp - Cy )
+        fy[id_2] = fy[id_2] + 2*k_Beam*( Yr - 2*Yq + Yp - Cy )
+
+
+    # RETURN NON-INVARIANT BEAM FORCES
+    return (fx, fy)
 
     
 ###########################################################################
 #
-# FUNCTION computes the Lagrangian BEAM Force Densities 
+# FUNCTION computes the Lagrangian BEAM (TORSIONAL SPRING) Force Densities 
 #
 ###########################################################################
 

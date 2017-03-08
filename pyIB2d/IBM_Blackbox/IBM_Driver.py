@@ -132,8 +132,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     update_Springs_Flag = model_Info['update_springs']     # Update_Springs: (0=no, 1=yes)
     target_pts_Yes = model_Info['target_pts']              # Target_Pts: (0=no, 1=yes)
     update_Target_Pts = model_Info['update_target_pts']    # Update_Target_Pts: (0=no, 1=yes)
-    beams_Yes = model_Info['beams']                        # Beams: (0=no, 1=yes)
+    beams_Yes = model_Info['beams']                        # Beams (Torsional Springs): (0=no, 1=yes)
     update_Beams_Flag = model_Info['update_beams']         # Update_Beams: (0=no, 1=yes)
+    nonInv_beams_Yes = model_Info['nonInv_beams']          # Non-Invariant Beams:  (0=no, 1=yes)
+    update_nonInv_Beams_Flag = model['update_nonInv_beams']# Update_NonInv_Beams: (0=no, 1=yes)
     muscles_Yes = model_Info['muscles']                    # FV-LT Muscles: (0=no, 1=yes)
     hill_3_muscles_Yes = model_Info['hill_3_muscles']      # Hill 3-Element Muscle: (0=no, 1=yes)
     arb_ext_force_Yes = model_Info['arb_ext_force']        # Arbitrary External Force: (0=no, 1=yes)
@@ -208,7 +210,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
 
 
-    # READ IN BEAMS (IF THERE ARE BEAMS) #
+    # READ IN BEAMS (IF THERE ARE TORSIONAL SPRINGS aka BEAMS) #
     if beams_Yes:
         print('  - Beams ("Torsional Springs") and ... ')
         if update_Beams_Flag == 0:
@@ -224,6 +226,26 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #            col 5: curavture
     else:
         beams_info = 0
+
+
+
+    # READ IN NON-INVARIANT BEAMS (IF THERE ARE NON-INVARIANT BEAMS) #
+    if nonInv_beams_Yes:
+        print('  - Beams ("Non-Invariant Beams") and ... ')
+        if update_Beams_Flag == 0:
+            print('                    NOT dynamically updating beam properties\n')
+        else:
+            print('                    dynamically updating beam properties\n')
+
+        nonInv_beams_info = read_nonInv_Beam_Points(struct_name)
+        #beams:      col 1: 1ST PT.
+        #            col 2: MIDDLE PT. (where force is exerted)
+        #            col 3: 3RD PT.
+        #            col 4: beam stiffness
+        #            col 5: x-curavture
+        #            col 6: y-curvature
+    else:
+        nonInv_beams_info = 0    
 
 
     # READ IN DAMPED SPRINGS (IF THERE ARE DAMPED SPRINGS) #
@@ -538,6 +560,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
             #This function is application specific, located with main2d
             beams_info = update_Beams(dt,current_time,beams_info)
 
+        if update_nonInv_Beams_Flag and nonInv_beams_Yes:
+            from update_nonInv_Beams import update_nonInv_Beams
+            #This function is application specific, located with main2d
+            nonInv_beams_info = update_nonInv_Beams(dt,current_time,beams_info)    
+
         if update_D_Springs_Flag and d_Springs_Yes:
             from update_Damped_Springs import update_Damped_Springs
             #This function is application specific, located with main2d
@@ -551,8 +578,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #
         Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
-        springs_info, target_info, beams_info, muscles_info, muscles3_info, mass_info, d_springs_info,\
-        gen_force_info)
+        springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
+        mass_info, d_springs_info, gen_force_info)
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test
@@ -1001,6 +1028,35 @@ def read_Beam_Points(struct_name):
     #            col 5: curavture
     
     return beams
+
+
+ =###########################################################################
+#
+# FUNCTION: Reads in the # of beams and all 1st Pt, MIDDLE Pt, and 3rd Pt
+#           beam STIFFNESSES, and CURVATURE for NON-INVARIANT BEAMS
+#
+###########################################################################
+
+def read_nonInv_Beam_Points(struct_name):
+    ''' Reads in the num of beams, 1st pt, middle pt, 3 pt stiffness, curvature
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        beams: array of beam info'''
+
+    filename = struct_name+'.beam'  #Name of file to read in
+    with open(filename) as f:
+        beams = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4,5))
+
+    #beams:      col 1: 1ST PT.
+    #            col 2: MIDDLE PT. (where force is exerted)
+    #            col 3: 3RD PT.
+    #            col 4: beam stiffness
+    #            col 5: curavture
+    
+    return beams   
 
 
 ###########################################################################
