@@ -109,17 +109,17 @@ def main2d():
     grid_Info['dy'] = params[7]/params[5] # Spatial step-size in y
     grid_Info['supp'] = params[8] # num of pts used in delta-function support 
                                        #    (supp/2 in each direction)
-    grid_Info['pDump'] = params[29]            # Print Dump (How often to plot)
-    grid_Info['pMatplotlib'] = int(params[30]) # Plot in matplotlib? (1=YES,0=NO) 
-    grid_Info['lagPlot'] = int(params[31])     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info['velPlot'] = int(params[32])     # Plot LAGRANGIAN PTs + 
+    grid_Info['pDump'] = params[31]            # Print Dump (How often to plot)
+    grid_Info['pMatplotlib'] = int(params[32]) # Plot in matplotlib? (1=YES,0=NO) 
+    grid_Info['lagPlot'] = int(params[33])     # Plot LAGRANGIAN PTs ONLY in matplotlib
+    grid_Info['velPlot'] = int(params[34])     # Plot LAGRANGIAN PTs + 
                                                #  VELOCITY FIELD in matplotlib
-    grid_Info['vortPlot'] = int(params[33])    # Plot LAGRANGIAN PTs + 
+    grid_Info['vortPlot'] = int(params[35])    # Plot LAGRANGIAN PTs + 
                                                #  VORTICITY colormap in matplotlib
-    grid_Info['uMagPlot'] = int(params[34])    # Plot LAGRANGIAN PTs + 
+    grid_Info['uMagPlot'] = int(params[36])    # Plot LAGRANGIAN PTs + 
                                                #  MAGNITUDE OF VELOCITY 
                                                #     colormap in matplotlib
-    grid_Info['pressPlot'] = int(params[35])   # Plot LAGRANGIAN PTs + 
+    grid_Info['pressPlot'] = int(params[37])   # Plot LAGRANGIAN PTs + 
     #                                          # PRESSURE colormap in matplotlib
 
 
@@ -131,25 +131,27 @@ def main2d():
     model_Info['update_target_pts'] = int(params[12])# Update_Target_Pts: (0=no, 1=yes)
     model_Info['beams'] = int(params[13])            # Beams: (0=no, 1=yes)
     model_Info['update_beams'] = int(params[14])     # Update_Beams: (0=no, 1=yes)
+    model_Info['nonInv_beams'] = int(params[15])     # Non-Invariant Beams: (0=no, 1=yes)
+    model_Info['update_nonInv_beams'] = int(params[16]) # Update_NonInv_Beams: (0=no, 1=yes)
     # Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
-    model_Info['muscles'] = int(params[15])
+    model_Info['muscles'] = int(params[17])
     # Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 
     #   0 (for no) or 1 (for yes)
-    model_Info['hill_3_muscles'] = int(params[16])
+    model_Info['hill_3_muscles'] = int(params[18])
     # Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
-    model_Info['arb_ext_force'] = int(params[17]) 
-    model_Info['tracers'] = int(params[18])          # Tracer Particles: (0=no, 1=yes)
-    model_Info['mass']= int(params[19])              # Mass Points: (0=no, 1=yes)
-    model_Info['gravity']= int(params[20])           # Gravity: (0=no, 1=yes)
-    model_Info['xG']= params[21]                     # x-Component of Gravity vector
-    model_Info['yG']= params[22]                     # y-Component of Gravity Vector
-    model_Info['porous']= int(params[23])            # Porous Media: (0=no, 1=yes)
-    model_Info['concentration']= int(params[24])     # Background Concentration Gradient: 
+    model_Info['arb_ext_force'] = int(params[19]) 
+    model_Info['tracers'] = int(params[20])          # Tracer Particles: (0=no, 1=yes)
+    model_Info['mass']= int(params[21])              # Mass Points: (0=no, 1=yes)
+    model_Info['gravity']= int(params[22])           # Gravity: (0=no, 1=yes)
+    model_Info['xG']= params[23]                     # x-Component of Gravity vector
+    model_Info['yG']= params[24]                     # y-Component of Gravity Vector
+    model_Info['porous']= int(params[25])            # Porous Media: (0=no, 1=yes)
+    model_Info['concentration']= int(params[26])     # Background Concentration Gradient: 
                                                      # 0 (for no) or 1 (for yes)
-    model_Info['electrophysiology'] = int(params[25])# Electrophysiology (FitzHugh-Nagumo)
-    model_Info['damped_springs'] = int(params[26])   # Damped Springs (0=no, 1=yes)
-    model_Info['update_D_Springs'] = int(params[27]) # Update Damped Springs
-    model_Info['user_force'] = int(params[28])       # User-Force Model 
+    model_Info['electrophysiology'] = int(params[27])# Electrophysiology (FitzHugh-Nagumo)
+    model_Info['damped_springs'] = int(params[28])   # Damped Springs (0=no, 1=yes)
+    model_Info['update_D_Springs'] = int(params[29]) # Update Damped Springs
+    model_Info['user_force'] = int(params[30])       # User-Force Model 
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
