@@ -3,16 +3,16 @@
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%***%
 
 % FLUID PARAMETER VALUES %
-mu = 10.0                % Dynamic Viscosity (N*s/m^2) 
+mu = 5                % Dynamic Viscosity (N*s/m^2) 
 rho = 1000               % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
 Tfinal = 25           % Final time of simulation (s)
-dt = 1e-5               % Time-step (s)
+dt = 5e-5               % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
-Nx =  512               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  256               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 8.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 8.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -25,7 +25,7 @@ update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 0               % 0 (for no) or 1 (for yes) % "Torsional Springs"
 update_beams = 0        % 0 (for no) or 1 (for yes) % Update "Torsional Springs"
 nonInvariant_beams = 1  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
-update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
+update_nonInv_beams = 1 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
@@ -45,7 +45,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 10000       % How often to print (PLOT) to screen
+print_dump = 2000        % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

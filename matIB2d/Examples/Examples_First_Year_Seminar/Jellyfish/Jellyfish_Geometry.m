@@ -33,32 +33,36 @@
 function Jellyfish_Geometry()
 
 % FLUID GRID PARAMETERS %
-
 L = 8;                              % Length of computational domain (m)
-N = 512;                            % # of Cartesian grid meshwidths
+N = 256;                            % # of Cartesian grid meshwidths
 dx = L/N;                           % Cartesian mesh width (m)
 
+% Construct Geometry
 [xLag,yLag,ds] = give_Me_Immsersed_Boundary_Geometry(N,L);
 plot(xLag,yLag,'*'); hold on;
-plot(xLag(128),yLag(128),'ro'); hold on;
-plot(xLag(255),yLag(255),'go'); hold on;
 
+% Translate Geometry
+xLag = xLag + L/2;
+yLag = yLag + L/4;
+plot(xLag,yLag,'r*'); hold on;
   
 % NAMING CONVENTION FOR SIMULATION 
-
 struct_name = 'jelly';      % structure name
 
-% PRINT INPUT FILES (.vertex, .spring, .beam, etc)
+
+%
+% PRINT INPUT FILES (.vertex, .spring, .beam, etc) %
+%
 
 % print vertices
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 1.2750000000000000e+07;        % spring constant (Newton)
+k_Spring = 7.5*1.2750000000000000e+07;        % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 1.0363359375000002e+10;   % beam stiffness constant (Newton m^2)
+k_Beam = 7.5*1.0363359375000002e+10;   % beam stiffness constant (Newton m^2)
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 
@@ -186,7 +190,7 @@ npts_bell = ceil(2*(bell_length/L)*N); % number of points along the length of th
 npts_circ = 1;                    %number of points along the circumference (=1 for 2D)
 npts = npts_bell*npts_circ;	      % total number points 
 ds = bell_length/(npts_bell-1);   % mesh spacing along the length of bell (m)
-Zs = -2;                          %distance to top of bell (m)
+Zs = 0;                          %distance to top of bell (m)
 xb = zeros(npts);                 %holds resting positions to calculate curvatures
 zb=zeros(npts);                   %holds resting positions to calculate curvatures
 
