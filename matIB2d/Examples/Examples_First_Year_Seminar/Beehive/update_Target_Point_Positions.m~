@@ -39,10 +39,8 @@ yPts= targets(:,3);                 % Original y-Values of y-Target Pts.
 kStiffs = targets(:,4);             % Stores Target Stiffnesses 
 
 
-angVec = 0:dt:4*pi;
-
 % -> FINDING NEXT ANGULAR FREQUENCY <- % 
-angInput = give_Me_Oscillatory_Angle();
+angInput = give_Me_Oscillatory_Angle(dt,current_time);
 
 % Declare how open you want the movements to go
 full_ang = pi/3;
@@ -58,12 +56,18 @@ end
 [xRef,yRef] = read_File_In('hive.vertex');
 
 % Store Values for Centers of Rotation
-xL = xRef(1);       yL = yRef(1);
-xR = xRef(end/2+1); yR = yRef(end/2+1);
+xL_1 = xRef(1);       yL_1 = yRef(1);           % Left side of Left Pair
+xR_1 = xRef(end/4+1); yR_1 = yRef(end/4+1);     % Right side of Left Pair
+
+xL_2 = xRef(end/2+1);   yL_2 = yRef(end/2+1);   % Left side of Right Pair
+xR_2 = xRef(3*end/4+1); yR_2 = yRef(3*end/4+1); % Right side of Right Pair
 
 % Rotate Geometry
-[xR_Ref,yR_Ref] = rotate_Geometry(-ang,xR,yR,xRef(end/2+1:end),yRef(end/2+1:end) );
-[xL_Ref,yL_Ref] = rotate_Geometry(ang,xL,yL,xRef(1:end/2),yRef(1:end/2) );
+[xR_Ref_1,yR_Ref_1] = rotate_Geometry(-ang,xR_1,yR_1,xRef(end/4+1:end),yRef(end/4+1:end) );
+[xL_Ref_1,yL_Ref_1] = rotate_Geometry(ang,xL_1,yL_1,xRef(1:end/4),yRef(1:end/4) );
+
+[xR_Ref_2,yR_Ref_1] = rotate_Geometry(-ang,xR_1,yR_1,xRef(end/4+1:end),yRef(end/4+1:end) );
+[xL_Ref_2,yL_Ref_] = rotate_Geometry(ang,xL_1,yL_1,xRef(1:end/4),yRef(1:end/4) );
 
 % Store New Geometry
 targets(IDs,2) = [xL_Ref xR_Ref]; 
@@ -120,3 +124,19 @@ mat = mat_info(2:end,1:end);
 x1 =  mat(:,1); %store xVals 
 y1 =  mat(:,2); %store yVals
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives me next angle
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function angInput = give_Me_Oscillatory_Angle(dt,current_time)
+
+
+dtheta = pi*dt;
+angVec = dtheta:dtheta:2*pi;
+n = ceil((current_time+dt) / dt);
+n = mod(n,length(angVec));
+
+angInput = angVec(n);

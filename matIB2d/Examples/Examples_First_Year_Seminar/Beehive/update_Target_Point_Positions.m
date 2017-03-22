@@ -40,32 +40,45 @@ kStiffs = targets(:,4);             % Stores Target Stiffnesses
 
 
 % -> FINDING NEXT ANGULAR FREQUENCY <- % 
-angInput = give_Me_Oscillatory_Angle(dt,current_time);
+[angInput1,angInput2] = give_Me_Oscillatory_Angle(dt,current_time);
 
 % Declare how open you want the movements to go
 full_ang = pi/3;
 dbl_ang = 2*full_ang;
 
 % Find associated angle
-ang = mod( angInput, dbl_ang );
-if ( (ang > full_ang ) && (ang <= dbl_ang) )
-    ang = dbl_ang-ang;
+ang1 = mod( angInput1, dbl_ang );
+if ( (ang1 > full_ang ) && (ang1 <= dbl_ang) )
+    ang1 = dbl_ang-ang1;
 end
+
+ang2 = mod( angInput2, dbl_ang );
+if ( (ang2 > full_ang ) && (ang2 <= dbl_ang) )
+    ang2 = dbl_ang-ang2;
+end
+
 
 % Read In REFERENCE Pts!
 [xRef,yRef] = read_File_In('hive.vertex');
 
 % Store Values for Centers of Rotation
-xL = xRef(1);       yL = yRef(1);
-xR = xRef(end/2+1); yR = yRef(end/2+1);
+xL_1 = xRef(1);       yL_1 = yRef(1);           % Left side of Left Pair
+xR_1 = xRef(end/4+1); yR_1 = yRef(end/4+1);     % Right side of Left Pair
 
-% Rotate Geometry
-[xR_Ref,yR_Ref] = rotate_Geometry(-ang,xR,yR,xRef(end/2+1:end),yRef(end/2+1:end) );
-[xL_Ref,yL_Ref] = rotate_Geometry(ang,xL,yL,xRef(1:end/2),yRef(1:end/2) );
+xL_2 = xRef(end/2+1);   yL_2 = yRef(end/2+1);   % Left side of Right Pair
+xR_2 = xRef(3*end/4+1); yR_2 = yRef(3*end/4+1); % Right side of Right Pair
+
+% -> Rotate Geometry <- %
+% LEFT PAIR %
+[xR_Ref_1,yR_Ref_1] = rotate_Geometry(-ang1,xR_1,yR_1,xRef(end/4+1:end/2),yRef(end/4+1:end/2) );
+[xL_Ref_1,yL_Ref_1] = rotate_Geometry(ang1,xL_1,yL_1,xRef(1:end/4),yRef(1:end/4) );
+% RIGHT PAIR %
+[xR_Ref_2,yR_Ref_2] = rotate_Geometry(-ang2,xR_2,yR_2,xRef(3*end/4+1:end),yRef(3*end/4+1:end) );
+[xL_Ref_2,yL_Ref_2] = rotate_Geometry(ang2,xL_2,yL_2,xRef(end/2+1:3*end/4),yRef(end/2+1:3*end/4) );
 
 % Store New Geometry
-targets(IDs,2) = [xL_Ref xR_Ref]; 
-targets(IDs,3) = [yL_Ref yR_Ref]; 
+targets(IDs,2) = [xL_Ref_1 xR_Ref_1 xL_Ref_2 xR_Ref_2]; 
+targets(IDs,3) = [yL_Ref_1 yR_Ref_1 yL_Ref_2 yR_Ref_2]; 
 
 
 
@@ -125,12 +138,18 @@ y1 =  mat(:,2); %store yVals
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function angInput = give_Me_Oscillatory_Angle(dt,current_time)
+function [angInput1,angInput2] = give_Me_Oscillatory_Angle(dt,current_time)
 
+n = ceil((current_time+dt) / dt);
 
 dtheta = pi*dt;
-angVec = dtheta:dtheta:2*pi;
-n = ceil((current_time+dt) / dt);
-n = mod(n,length(angVec));
+angVec1 = dtheta:dtheta:2*pi;
+n1 = mod(n,length(angVec1));
 
-angInput = angVec(n);
+dtheta = pi*dt/2;
+angVec2 = dtheta:dtheta:2*pi;
+n2 = mod(n,length(angVec2));
+
+
+angInput1 = angVec1(n1);
+angInput2 = angVec2(n2);

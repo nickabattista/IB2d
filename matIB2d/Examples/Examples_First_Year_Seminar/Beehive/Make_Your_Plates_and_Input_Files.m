@@ -42,7 +42,7 @@ dx = Lx/Nx;      % Grid spatial resolution
 % Immersed Structure Geometric / Dynamic Parameters %
 %
 ds = 0.5*dx;              % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
-struct_name = 'hive';   % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
+struct_name = 'hive';     % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
 
 
 % Call function to construct geometry
@@ -244,22 +244,30 @@ function [xLag,yLag,dist] = give_Me_Immsersed_Boundary_Geometry(ds,Nx,L)
 % Nx: Eulerian grid resolution
 % L:  Length of computational domain
 
-yLag = 0:ds:L/5;             % Make plate of length L/10
+yLag = 0:ds:L/5;              % Make plate of length L/10
 xLag = zeros(1,length(yLag)); % Make corresponding xPts for Vertical Plate
 
 % Translate points
 yLag = yLag + (L/2-L/10);  % Translate them symmetrically
 
 % Make sides
-xLag_Left = xLag + (L/2-L/10);
-xLag_Right = xLag + (L/2+L/10);
+xLag_Left =  xLag + (L/2-L/20);
+xLag_Right = xLag + (L/2+L/20);
 
 % Combine Pts Into ONE Vector
 xLag = [xLag_Left xLag_Right];
 yLag = [yLag yLag];
 
 % Distance between plates
-dist = (L/2+L/10) - (L/2-L/10);
+dist = (L/2+L/20) - (L/2-L/20);
+
+% Make a 2ND Set of Plates
+xLag_L = xLag - 1.8*dist;
+xLag_R = xLag + 1.8*dist;
+
+% Combine into ONE Vector
+xLag = [xLag_L xLag_R];
+yLag = [yLag yLag];
 
 % Plot the Geometry
 % plot(xLag,yLag,'*'); hold on;
