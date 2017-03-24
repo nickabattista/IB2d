@@ -22,9 +22,7 @@ period = tP1+tP2;                   % Period
 t = rem(tVec(i),period);       % Current time in simulation ( 'modular arithmetic to get time in period')
 
 % Read In y_Pts for two Phases!
-[yP1,yP2] = read_File_In('swimmer.phases');
-[xP1,~] = read_File_In('swimmer.vertex');
-xP1 = xP1(2:end)
+[xP1,yP1,yP2] = read_File_In('swimmer.phases');
 
 
 %
@@ -83,7 +81,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [y1,y2] = read_File_In(file_name)
+function [x1,y1,y2] = read_File_In(file_name)
 
 filename = file_name;  %Name of file to read in
 
@@ -91,7 +89,7 @@ fileID = fopen(filename);
 
     % Read in the file, use 'CollectOutput' to gather all similar data together
     % and 'CommentStyle' to to end and be able to skip lines in file.
-    C = textscan(fileID,'%f %f','CollectOutput',1);
+    C = textscan(fileID,'%f %f %f','CollectOutput',1);
 
 fclose(fileID);        %Close the data file.
 
@@ -100,5 +98,6 @@ mat_info = C{1};   %Stores all read in data
 %Store all elements in matrix
 mat = mat_info(1:end,1:end);
 
-y1 =  mat(:,1); %store xVals 
-y2 =  mat(:,2); %store yVals
+x1 =  mat(:,1);  %store xVals 1/2
+y1 =  mat(:,2); %store yVals 1 
+y2 =  mat(:,3); %store yVals 2
