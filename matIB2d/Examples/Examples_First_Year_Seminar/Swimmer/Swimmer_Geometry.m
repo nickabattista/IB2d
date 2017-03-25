@@ -57,11 +57,11 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 print_Lagrangian_Vertices_Phases(xLag,yLag,yLag2,struct_name);
 
 % print springs
-k_Spring = 5*1.2750000000000000e+09;        % spring constant (Newton)
+k_Spring = 7.5*1.2750000000000000e+9;        % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 1.0363359375000002e+12;   % beam stiffness constant (Newton m^2)
+k_Beam = 2.0363359375000002e+12;   % beam stiffness constant (Newton m^2)
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 

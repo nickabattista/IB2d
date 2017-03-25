@@ -103,7 +103,7 @@ model_Info(24)= params(33);         % user-defined general force model: 0 (for n
 addpath('../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-[X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
+[X, Y, U, V, xLags, yLags] = IBM_Driver_Less_Printing(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

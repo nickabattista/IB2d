@@ -3,12 +3,12 @@
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%***%
 
 % FLUID PARAMETER VALUES %
-mu =  1                 % Dynamic Viscosity (N*s/m^2) 
+mu =  10                 % Dynamic Viscosity (N*s/m^2) 
 rho = 1000               % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 25           % Final time of simulation (s)
-dt = 2.5e-5               % Time-step (s)
+Tfinal = 2           % Final time of simulation (s)
+dt = 1.0e-5          % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
 Nx =  256               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
@@ -45,7 +45,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 4000        % How often to print (PLOT) to screen
+print_dump = 2000        % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
