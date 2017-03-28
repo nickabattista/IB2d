@@ -1,0 +1,53 @@
+%*****%***%***%***%***%***% INPUT2d FILE: %***%***%***%***%***%*****%
+%****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
+%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
+
+% FLUID PARAMETER VALUES %
+mu = 0.001               % Dynamic Viscosity (N*s/m^2) 
+rho = 1                  % Density (kg/m^2)
+
+% TEMPORAL INFORMATION %
+Tfinal = 1.0            % Final time of simulation (s)
+dt = 2.5e-5             % Time-step (s)
+
+% GRID PARAMETERS / INFORMATION %
+Nx =  256               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
+Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
+supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
+
+% LAGRANGIAN STRUCTURE MODEL INFORMATION %
+springs = 1             % 0 (for no) or 1 (for yes)
+update_springs = 0      % 0 (for no) or 1 (for yes)
+target_pts = 1          % 0 (for no) or 1 (for yes)
+update_target = 0       % 0 (for no) or 1 (for yes)
+beams = 1               % 0 (for no) or 1 (for yes)
+update_beams = 0        % 0 (for no) or 1 (for yes)
+FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
+3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
+arb_ext_force = 1       % 0 (for no) or 1 (for yes)
+tracers = 0             % 0 (for no) or 1 (for yes)
+mass_pts = 0            % 0 (for no) or 1 (for yes)
+gravity = 0             % 0 (for no) or 1 (for yes) %PLEASE CHECK GRAVITY VECTOR BELOW
+x_gravity_vec_comp = 0  % x-Component of Gravity Vector
+y_gravity_vec_comp = -1 % y-Component of Gravity Vector
+porous_media = 0        % 0 (for no) or 1 (for yes)
+concentration = 0       % 0 (for no) or 1 (for yes)
+electro_phys = 0        % 0 (for no) or 1 (for yes)
+damped_springs = 1      % 0 (for no) or 1 (for yes)
+update_damp_springs = 0 % 0 (for no) or 1 (for yes)
+
+
+% PRINTING INFORMATION
+print_dump = 400          % How often to print (PLOT) to screen
+plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
+plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
+plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
+plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
+plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+
+
+% LAGRANGIAN STRUCTURE NAME %
+string_name = viv_geo2cyl  % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
