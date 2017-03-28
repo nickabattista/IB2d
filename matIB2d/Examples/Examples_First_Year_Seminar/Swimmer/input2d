@@ -7,12 +7,12 @@ mu =  10                 % Dynamic Viscosity (N*s/m^2)
 rho = 1000               % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 2           % Final time of simulation (s)
-dt = 1.0e-5          % Time-step (s)
+Tfinal = 3           % Final time of simulation (s)
+dt = 2.5e-5          % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
-Nx =  256               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  512               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 8.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 8.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -45,7 +45,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 2000        % How often to print (PLOT) to screen
+print_dump = 800        % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

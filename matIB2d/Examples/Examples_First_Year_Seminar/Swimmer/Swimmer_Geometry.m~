@@ -231,8 +231,6 @@ end
 xCurve = xC + xStraight(end) + ds;
 yCurve = yC;
 
-length(yCurve)
-
 yCurve2 = -yC;
 
 xLag = [xStraight xCurve]; xLag = xLag + 0.1*L; %0.7L
