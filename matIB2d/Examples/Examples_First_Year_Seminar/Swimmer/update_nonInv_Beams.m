@@ -50,8 +50,8 @@ g = -0.015220700152207;
 h = 0.000253678335870;
 
 % Period Info
-tP1 = 0.125;                       % Down-stroke
-tP2 = 0.125;                       % Up-stroke
+tP1 = 0.25;                       % Down-stroke
+tP2 = 0.25;                       % Up-stroke
 period = tP1+tP2;                  % Period
 t = rem(current_time,period);      % Current time in simulation ( 'modular arithmetic to get time in period')
 
