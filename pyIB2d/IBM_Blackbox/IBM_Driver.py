@@ -135,7 +135,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     beams_Yes = model_Info['beams']                        # Beams (Torsional Springs): (0=no, 1=yes)
     update_Beams_Flag = model_Info['update_beams']         # Update_Beams: (0=no, 1=yes)
     nonInv_beams_Yes = model_Info['nonInv_beams']          # Non-Invariant Beams:  (0=no, 1=yes)
-    update_nonInv_Beams_Flag = model['update_nonInv_beams']# Update_NonInv_Beams: (0=no, 1=yes)
+    update_nonInv_Beams_Flag = model_Info['update_nonInv_beams']# Update_NonInv_Beams: (0=no, 1=yes)
     muscles_Yes = model_Info['muscles']                    # FV-LT Muscles: (0=no, 1=yes)
     hill_3_muscles_Yes = model_Info['hill_3_muscles']      # Hill 3-Element Muscle: (0=no, 1=yes)
     arb_ext_force_Yes = model_Info['arb_ext_force']        # Arbitrary External Force: (0=no, 1=yes)
@@ -1030,7 +1030,7 @@ def read_Beam_Points(struct_name):
     return beams
 
 
- =###########################################################################
+###########################################################################
 #
 # FUNCTION: Reads in the # of beams and all 1st Pt, MIDDLE Pt, and 3rd Pt
 #           beam STIFFNESSES, and CURVATURE for NON-INVARIANT BEAMS
