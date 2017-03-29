@@ -52,7 +52,7 @@ fprintf('\n---------------->>                 IB2d                      <<------
 fprintf('\n________________________________________________________________________________\n\n');
 fprintf('If using the code for research purposes please cite the following two papers: \n');
 fprintf('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n');
-fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, arXiv: https://arxiv.org/abs/1610.07944');
+fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)');
 fprintf('\n________________________________________________________________________________');
 
 fprintf('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
