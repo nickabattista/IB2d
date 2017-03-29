@@ -1030,7 +1030,7 @@ def read_Beam_Points(struct_name):
     return beams
 
 
- =###########################################################################
+###########################################################################
 #
 # FUNCTION: Reads in the # of beams and all 1st Pt, MIDDLE Pt, and 3rd Pt
 #           beam STIFFNESSES, and CURVATURE for NON-INVARIANT BEAMS
