@@ -14,10 +14,8 @@ Website: http://battista.web.unc.edu
 GitHub: http://www.github.com/nickabattista
 
 If you use the code for research, please cite the following papers:
-1. N.A. Battista, W.C. Strickland, L.A. Miller, IB2d: a Python and MATLAB implementation of the immersed
-boundary method, submitted to Bioinspiration and Biomemetics, arXiv preprint: 
-\url{https://arxiv.org/abs/1610.07944}
-2. N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
+[1] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+[2] N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
