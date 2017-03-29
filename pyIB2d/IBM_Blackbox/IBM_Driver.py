@@ -94,7 +94,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     print('\n________________________________________________________________________________\n\n')
     print('If using the code for research purposes please cite the following two papers: \n')
     print('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n')
-    print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, arXiv: https://arxiv.org/abs/1610.07944')
+    print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)')
     print('\n________________________________________________________________________________')
 
     print('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n')
