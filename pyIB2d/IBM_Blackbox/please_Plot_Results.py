@@ -113,7 +113,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.axis([0, Lx, 0, Ly])
         plt.title('LAGRANGIAN PTS')
         plt.xlabel('x'); plt.ylabel('y')
-        plt.hold(True)
 
         loc = np.hstack((0,loc,chiX.size-1))
         for ii in range(1,loc.size):     #=2:length(loc)
@@ -137,7 +136,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.axis([0, Lx, 0, Ly])
         plt.title('VORTICITY')
         plt.xlabel('x'); plt.ylabel('y')
-        plt.hold(True)
 
         #Compute Vorticity and Plot It against Lagrangian Grid!
         x = X[0,:]; y = Y[:,0]
@@ -164,7 +162,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.axis([0, Lx, 0, Ly])
         plt.title('PRESSURE')
         plt.xlabel('x'); plt.ylabel('y') 
-        plt.hold(True)
 
         #Use Pressure and Plot It against Lagrangian Grid!
         x = X[0,:]; y = Y[:,0]
@@ -191,7 +188,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.axis([0, Lx, 0, Ly])
         plt.title('MAGNITUDE OF VELOCITY')
         plt.xlabel('x'); plt.ylabel('y');
-        plt.hold(True)
 
         #Use Mag. Velocity and Plot It against Lagrangian Grid!
         x = X[0,:]; y = Y[:,0]
@@ -218,7 +214,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         plt.axis([0, Lx, 0, Ly])
         plt.title('VELOCITY')
         plt.xlabel('x'); plt.ylabel('y')
-        plt.hold(True)
 
         plt.quiver(X,Y,U,V) #Print Velocity Field
 
@@ -234,7 +229,6 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
         
         #ct+=1
     
-    plt.hold(False)
     plt.box(on=True)
     
     plt.draw()

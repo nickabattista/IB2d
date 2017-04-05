@@ -36,13 +36,13 @@ def read_Lagrangian_Data_From_vtk(path,simNums):
                 
     os.chdir(path); # cd's into viz_IB2d folder
     
-    filename = 'lagsPts.' + str(simNums) + '.vtk';
+    filename = 'lagsPts.' + str(simNums) + '.vtk'
 
     N = np.genfromtxt(filename, skip_header=5, usecols=(1),max_rows=1)
     lag_data = np.genfromtxt(filename, skip_header=6, usecols=(0,1),max_rows=int(N))
 
-    xLag = lag_data[:,0];
-    yLag = lag_data[:,1];
+    xLag = lag_data[:,0]
+    yLag = lag_data[:,1]
 
-    return xLag , yLag;
+    return xLag , yLag
     

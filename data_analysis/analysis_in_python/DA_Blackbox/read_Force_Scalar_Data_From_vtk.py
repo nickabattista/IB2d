@@ -34,11 +34,11 @@ import os
 
 def read_Force_Scalar_Data_From_vtk(path,simNums,strChoice):
 
-    os.chdir(path); # cd's into viz_IB2d folder
+    os.chdir(path) # cd's into viz_IB2d folder
     
-    filename = strChoice + '.' + str(simNums) + '.vtk';
+    filename = strChoice + '.' + str(simNums) + '.vtk'
 
     N = np.genfromtxt(filename, skip_header=5, usecols=(1),max_rows=1)
     Fdata = np.genfromtxt(filename, skip_header=int(6+N+5), usecols=0,max_rows=int(N))
 
-    return Fdata;
+    return Fdata

@@ -37,24 +37,24 @@ from read_Force_Scalar_Data_From_vtk import read_Force_Scalar_Data_From_vtk
 def import_Lagrangian_Force_Data(path,numSim):
  
     # read in x directed force #
-    strChoice = 'fX_Lag';
-    fX_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    strChoice = 'fX_Lag'
+    fX_Lag = read_Force_Scalar_Data_From_vtk(path, numSim, strChoice)
 
     # read in y directed force #
-    strChoice = 'fY_Lag';
-    fY_Lag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    strChoice = 'fY_Lag'
+    fY_Lag = read_Force_Scalar_Data_From_vtk(path, numSim, strChoice)
 
     # read in y directed force #
-    strChoice = 'fMag';
-    fLagMag = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    strChoice = 'fMag'
+    fLagMag = read_Force_Scalar_Data_From_vtk(path, numSim, strChoice)
 
     # read in mag. of normal force #
-    strChoice = 'fNorm';
-    fLagNorm = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    strChoice = 'fNorm'
+    fLagNorm = read_Force_Scalar_Data_From_vtk(path, numSim, strChoice)
 
     # read in mag. of tangential forces #
-    strChoice = 'fTan'; 
-    fLagTan = read_Force_Scalar_Data_From_vtk(path,numSim,strChoice);
+    strChoice = 'fTan'
+    fLagTan = read_Force_Scalar_Data_From_vtk(path, numSim, strChoice)
 
-    return fX_Lag,fY_Lag,fLagMag,fLagNorm,fLagTan
+    return fX_Lag, fY_Lag, fLagMag, fLagNorm, fLagTan
 
