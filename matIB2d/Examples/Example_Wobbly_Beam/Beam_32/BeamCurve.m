@@ -62,7 +62,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 7.5e10; C = 0.0;
+k_Beam = 7.5e9; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 % Prints .target file! 
