@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 #
 ################################################################################
 
-def Example_Channel_Flow_Analysis():
+def Standard_Data_Analysis_Script():
     
     # TEMPORAL INFO FROM input2d #
     dt = 1e-4;      # Time-step
