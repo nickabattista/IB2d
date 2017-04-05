@@ -673,15 +673,29 @@ for i=1:Nbeams
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
     
-    bF_x =  k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
-    bF_y = -k_Beam * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C ) * (  (Xr-Xq) + (Xq-Xp) );
+    % Compute Cross-Product
+    cross_prod = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp);
     
-    %bF_x = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  (Yq-Yp) + (Yr-Yq) );
-    %bF_y = -k_Beam * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C ) * (  -(Xr-Xq) - (Xq-Xp) );
+    % FORCES FOR LEFT NODE
+    bF_x_L = -k_Beam * ( cross_prod - C ) * ( Yr-Yq );
+    bF_y_L =  k_Beam * ( cross_prod - C ) * ( Xr-Xq );
     
-    fx(id_2,1) = fx(id_2,1) + bF_x;  % Sum total forces for middle node, in x-direction (this is MIDDLE node for this beam)
-    fy(id_2,1) = fy(id_2,1) + bF_y;  % Sum total forces for middle node, in y-direction (this is MIDDLE node for this beam)
+    % FORCES FOR MIDDLE NODE
+    bF_x_M =  k_Beam * ( cross_prod - C ) * (  (Yq-Yp) + (Yr-Yq) );
+    bF_y_M = -k_Beam * ( cross_prod - C ) * (  (Xr-Xq) + (Xq-Xp) );
     
+    % FORCES FOR RIGHT NODE
+    bF_x_R = -k_Beam * ( cross_prod - C ) * ( Yq-Yp );
+    bF_y_R =  k_Beam * ( cross_prod - C ) * ( Xq-Xp );
+    
+    fx(id_1,1) = fx(id_1,1) - bF_x_L;  % Sum total forces for left node, in x-direction (this is LEFT node for this beam)
+    fy(id_1,1) = fy(id_1,1) - bF_y_L;  % Sum total forces for left node, in y-direction (this is LEFT node for this beam)
+    
+    fx(id_2,1) = fx(id_2,1) + bF_x_M;  % Sum total forces for middle node, in x-direction (this is MIDDLE node for this beam)
+    fy(id_2,1) = fy(id_2,1) + bF_y_M;  % Sum total forces for middle node, in y-direction (this is MIDDLE node for this beam)
+    
+    fx(id_3,1) = fx(id_3,1) - bF_x_R;  % Sum total forces for right node, in x-direction (this is RIGHT node for this beam)
+    fy(id_3,1) = fy(id_3,1) - bF_y_R;  % Sum total forces for right node, in y-direction (this is RIGHT node for this beam)
     
 end
 
