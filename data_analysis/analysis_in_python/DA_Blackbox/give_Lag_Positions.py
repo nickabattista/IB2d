@@ -45,10 +45,10 @@ def give_Lag_Positions(path,numSim):
             xLag: x-Lagrangian point positions
             yLag: y-Lagrangian point positions'''
           
-    analysis_path = os.getcwd();    
+    analysis_path = os.getcwd()
                  
     xLag,yLag = read_Lagrangian_Data_From_vtk(path,numSim)
 
-    os.chdir(analysis_path);        
+    os.chdir(analysis_path)
 
-    return xLag,yLag;
+    return xLag,yLag
