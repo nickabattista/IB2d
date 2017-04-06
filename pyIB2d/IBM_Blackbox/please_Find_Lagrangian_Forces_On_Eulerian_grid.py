@@ -744,19 +744,36 @@ def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
     Yq = yLag[pts_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag[pts_3]         # yPt of 3RD Node Pt. in beam
     
-    bF_x =  K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Yq-Yp) + (Yr-Yq) )
-    bF_y = -K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Xr-Xq) + (Xq-Xp) )
+    # Compute Cross-Product and Beam Coefficients
+    cross_prod_coeffs = K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec )
+
+    # FORCES FOR LEFT NODE
+    bF_x_L = -cross_prod_coeffs * ( Yr-Yq )
+    bF_y_L =  cross_prod_coeffs * ( Xr-Xq )
+
+    # FORCES FOR MIDDLE NODE
+    bF_x_M =  cross_prod_coeffs * (  (Yq-Yp) + (Yr-Yq) )
+    bF_y_M = -cross_prod_coeffs * (  (Xr-Xq) + (Xq-Xp) )
     
-    #bF_x = -K_Vec * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  (Yq-Yp) + (Yr-Yq) )
-    #bF_y = -K_Vec * ( -(Xr-Xq)*(Yq-Yp) + (Yr-Yq)*(Xq-Xp) - C_Vec ) * (  -(Xr-Xq) - (Xq-Xp) )
-    
+    # FORCES FOR RIGHT NODE
+    bF_x_R = -cross_prod_coeffs * ( Yq-Yp )
+    bF_y_R =  cross_prod_coeffs * ( Xq-Xp )
+
     # Want to preserve the ability for the same id_2 to be assigned twice, so
     #   need a loop here.
     for ii in range(Nbeams):
-        fx[pts_2[ii]] += bF_x[ii]  # Sum total forces for middle node,
-                            # in x-direction (this is MIDDLE node for this beam)
-        fy[pts_2[ii]] += bF_y[ii]  # Sum total forces for middle node, 
-                            # in y-direction (this is MIDDLE node for this beam)
+        fx[pts_1[ii]] -= bF_x_L[ii]  # Sum total forces for left node,
+                                     # in x-direction (this is LEFT node for this beam)
+        fy[pts_1[ii]] -= bF_y_L[ii]  # Sum total forces for left node, 
+                                     # in y-direction (this is LEFT node for this beam)
+        fx[pts_2[ii]] += bF_x_M[ii]  # Sum total forces for middle node,
+                                     # in x-direction (this is MIDDLE node for this beam)
+        fy[pts_2[ii]] += bF_y_M[ii]  # Sum total forces for middle node, 
+                                     # in y-direction (this is MIDDLE node for this beam)
+        fx[pts_3[ii]] -= bF_x_R[ii]  # Sum total forces for right node,
+                                     # in x-direction (this is RIGHT node for this beam)
+        fy[pts_3[ii]] -= bF_y_R[ii]  # Sum total forces for right node, 
+                                     # in y-direction (this is RIGHT node for this beam)
 
     # MIGHT NOT NEED THESE!
     #fx = fx/ds**2
