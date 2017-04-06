@@ -60,8 +60,8 @@ def Example_Channel_Flow_Analysis():
     dump_Times = np.array(range(start,finish+1))*pDump # Time vector when data was printed in analysis
         
     # SET PATH TO DESIRED viz_IB2d DATA %
-    pathViz = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d/'
-    pathForce = '/Users/nick_battista/Desktop/IB2d/data_analysis/analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/hier_IB2d_data'
+    pathViz = '../../analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d/'
+    pathForce = '../../analysis_in_matlab/Example_For_Data_Analysis/Example_Flow_In_Channel/hier_IB2d_data/'
 
     # SET PATH TO DA_BLACKBOX %
     sys.path.append('../DA_Blackbox/')
@@ -183,7 +183,7 @@ def store_Desired_Magnitude_Velocity_Data(uMag,vel_data,xInds,yInds,i):
 
     for j in range(0,len(xInds)):
         for k in range(0,len(yInds)):
-            vel_data[i-1,k,j] = uMag[yInds[k],xInds[j]]
+            vel_data[i-1,k,j] = uMag[int(yInds[k]),int(xInds[j])]
 
     return vel_data
 
@@ -208,10 +208,10 @@ def plot_Desired_Data(yVals,vel_data):
     plt.subplot(3,1,1)
     mat = vel_data[0,:,:]
     maxVal = mat.max()
-    plt.plot(yVals,vel_data[0,:,0],'*-');  plt.hold(True)
-    plt.plot(yVals,vel_data[0,:,1],'r*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[0,:,2],'g*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[0,:,3],'k*-'); plt.hold(True)
+    plt.plot(yVals,vel_data[0,:,0],'*-')
+    plt.plot(yVals,vel_data[0,:,1],'r*-')
+    plt.plot(yVals,vel_data[0,:,2],'g*-')
+    plt.plot(yVals,vel_data[0,:,3],'k*-')
     plt.axis([0.4,0.6,0,1.1*maxVal])
     #leg=plt.legend('x=0.125','x=0.175','x=0.225','x=0.275')
     plt.title('t=0.005')
@@ -222,10 +222,10 @@ def plot_Desired_Data(yVals,vel_data):
     plt.subplot(3,1,2)
     mat = vel_data[1,:,:]
     maxVal = mat.max()
-    plt.plot(yVals,vel_data[1,:,0],'*-');  plt.hold(True)
-    plt.plot(yVals,vel_data[1,:,1],'r*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[1,:,2],'g*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[1,:,3],'k*-'); plt.hold(True)
+    plt.plot(yVals,vel_data[1,:,0],'*-')
+    plt.plot(yVals,vel_data[1,:,1],'r*-')
+    plt.plot(yVals,vel_data[1,:,2],'g*-')
+    plt.plot(yVals,vel_data[1,:,3],'k*-')
     plt.axis([0.4,0.6,0,1.1*maxVal])
     #leg=plt.legend('x=0.125','x=0.175','x=0.225','x=0.275')
     plt.title('t=0.01')
@@ -236,10 +236,10 @@ def plot_Desired_Data(yVals,vel_data):
     plt.subplot(3,1,3)
     mat = vel_data[2,:,:]
     maxVal = mat.max()
-    plt.plot(yVals,vel_data[2,:,0],'*-');  plt.hold(True)
-    plt.plot(yVals,vel_data[2,:,1],'r*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[2,:,2],'g*-'); plt.hold(True)
-    plt.plot(yVals,vel_data[2,:,3],'k*-'); plt.hold(True)
+    plt.plot(yVals,vel_data[2,:,0],'*-')
+    plt.plot(yVals,vel_data[2,:,1],'r*-')
+    plt.plot(yVals,vel_data[2,:,2],'g*-')
+    plt.plot(yVals,vel_data[2,:,3],'k*-')
     plt.axis([0.4,0.6,0,1.1*maxVal])
     #leg=plt.legend('x=0.125','x=0.175','x=0.225','x=0.275')
     plt.title('t=0.015')
@@ -247,10 +247,8 @@ def plot_Desired_Data(yVals,vel_data):
     plt.xlabel('y')
 
 
-    plt.hold(False)
     plt.box(on=True)
-    plt.draw()
-    plt.pause(0.0001)
+    plt.show()
 
 
 #################################################################################
