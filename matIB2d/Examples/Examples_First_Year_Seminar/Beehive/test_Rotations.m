@@ -16,9 +16,14 @@ for i=1:length(angVec)
     dbl_ang = 2*full_ang;
 
     % Find associated angle
-    ang = mod( angVec(i), dbl_ang );
-    if ( (ang > full_ang ) && (ang <= dbl_ang) )
-        ang = dbl_ang-ang;
+    ang1 = mod( angVec(i), dbl_ang );
+    if ( (ang1 > full_ang ) && (ang1 <= dbl_ang) )
+        ang1 = dbl_ang-ang1;
+    end
+
+    ang2 = mod( angVec(i), dbl_ang );
+    if ( (ang2 > full_ang ) && (ang2 <= dbl_ang) )
+        ang2 = dbl_ang-ang2;
     end
 
     % Read In Pts!
@@ -32,16 +37,31 @@ for i=1:length(angVec)
     xR_Ref = xRef(end/2+1:end); yR_Ref = yRef(end/2+1:end);
 
     % Store Values for Centers of Rotation
-    xL = xRef(1);       yL = yRef(1);
-    xR = xRef(end/2+1); yR = yRef(end/2+1);
+    %xL = xRef(1);       yL = yRef(1);
+    %xR = xRef(end/2+1); yR = yRef(end/2+1);
 
     % Rotate Geometry
-    [xR_Ref,yR_Ref] = rotate_Geometry(-ang,xR,yR,xR_Ref,yR_Ref);
-    [xL_Ref,yL_Ref] = rotate_Geometry(ang,xL,yL,xL_Ref,yL_Ref);
+    %[xR_Ref,yR_Ref] = rotate_Geometry(-ang,xR,yR,xR_Ref,yR_Ref);
+    %[xL_Ref,yL_Ref] = rotate_Geometry(ang,xL,yL,xL_Ref,yL_Ref);
+    
+    % Store Values for Centers of Rotation
+    xL_1 = xRef(1);       yL_1 = yRef(1);           % Left side of Left Pair
+    xR_1 = xRef(end/4+1); yR_1 = yRef(end/4+1);     % Right side of Left Pair
+
+    xL_2 = xRef(end/2+1);   yL_2 = yRef(end/2+1);   % Left side of Right Pair
+    xR_2 = xRef(3*end/4+1); yR_2 = yRef(3*end/4+1); % Right side of Right Pair
+
+    % -> Rotate Geometry <- %
+    % LEFT PAIR %
+    [xR_Ref_1,yR_Ref_1] = rotate_Geometry(-ang1,xR_1,yR_1,xRef(end/4+1:end/2),yRef(end/4+1:end/2) );
+    [xL_Ref_1,yL_Ref_1] = rotate_Geometry(ang1,xL_1,yL_1,xRef(1:end/4),yRef(1:end/4) );
+    % RIGHT PAIR %
+    [xR_Ref_2,yR_Ref_2] = rotate_Geometry(-ang2,xR_2,yR_2,xRef(3*end/4+1:end),yRef(3*end/4+1:end) );
+    [xL_Ref_2,yL_Ref_2] = rotate_Geometry(ang2,xL_2,yL_2,xRef(end/2+1:3*end/4),yRef(end/2+1:3*end/4) );
 
     % Store New Geometry
-    xRef2 = [xL_Ref xR_Ref]; 
-    yRef2 = [yL_Ref yR_Ref]; 
+    xRef2 = [xL_Ref_1 xR_Ref_1 xR_Ref_2 xL_Ref_2]; 
+    yRef2 = [yL_Ref_1 yR_Ref_1 yR_Ref_2 yL_Ref_2]; 
 
     plot(xRef2,yRef2,'k*'); hold on;
     axis([0 1 0 1]);

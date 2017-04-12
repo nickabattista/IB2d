@@ -76,7 +76,12 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 k_Target = 1e7;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
-
+% Prints .concentration file!
+kDiffusion = 5e-5;
+C_Left = give_Me_Initial_Concentration(Lx,Lx,Nx,Nx,dx,dx,'left');
+C_Right = give_Me_Initial_Concentration(Lx,Lx,Nx,Nx,dx,dx,'right');
+Concentration = C_Left+C_Right;
+print_Concentration_Info(Nx,Nx,Concentration,kDiffusion,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -187,6 +192,26 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
     end
     fclose(beam_fid); 
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints CONCENTRATION INFO to file called
+%           'struct_name'.concentration
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+
+    con_fid = fopen([struct_name '.concentration'], 'w');
+
+    fprintf(con_fid, '%d\n', kDiffusion );
+
+    for i=1:Ny
+        for j=1:Nx
+            fprintf(con_fid, '%1.16e ', C(i,j) );
+        end
+        fprintf(con_fid,'\n');
+    end
+    
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -262,8 +287,8 @@ yLag = [yLag yLag];
 dist = (L/2+L/20) - (L/2-L/20);
 
 % Make a 2ND Set of Plates
-xLag_L = xLag - 1.8*dist;
-xLag_R = xLag + 1.8*dist;
+xLag_L = xLag - 2.275*dist;
+xLag_R = xLag + 2.275*dist;
 
 % Combine into ONE Vector
 xLag = [xLag_L xLag_R];
@@ -273,5 +298,105 @@ yLag = [yLag yLag];
 % plot(xLag,yLag,'*'); hold on;
 % axis([0 L 0 L]);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives initial concentration gradient inside channel
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy,strFlag)
+
+%WHERE OUTER TUBE LIES
+%xMin = 0.15; xMax = 0.45;
+%yMin = 0.85; yMax = 1.15;
+
+if strcmp(strFlag,'left')
+    xMin = 0.225; xMax = 0.32;
+    yMin = 0.41; yMax = 0.59;
+else % RIGHT SIDE
+    xMin = 0.68; xMax = 0.775;
+    yMin = 0.41; yMax = 0.59;
+end
+
+xMid = (xMin+xMax)/2;
+yMid = (yMin+yMax)/2;
+
+xDiff = (xMax-xMin)/2;
+yDiff = (yMax-yMin)/2;
+
+x = 0:dx:Lx;
+y = 0:dy:Ly;
+inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+
+C = zeros(Ny,Nx);
+for i=1:length( inds(:,1) )
+    xInd = inds(i,1);
+    yInd = inds(i,2);
+    xPt = x(xInd);
+    yPt = y(yInd);
+    %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+    C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: computes indices for placing initial concentration 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax)
+
+j=1; noMinYet = 1;
+while noMinYet
+    
+    if ( x(j) >= xMin )
+        iX_min = j;
+        noMinYet = 0;
+    end
+    j=j+1;
+end
+
+j=length(x); noMaxYet = 1;
+while noMaxYet
+    
+    if ( x(j) <= xMax )
+        iX_max = j;
+        noMaxYet = 0;
+    end
+    j=j-1;
+end
+
+j=1; noMinYet = 1;
+while noMinYet
+    
+    if ( y(j) >= yMin )
+        iY_min = j;
+        noMinYet = 0;
+    end
+    j=j+1;
+end
+
+j=length(y); noMaxYet = 1;
+while noMaxYet
+    
+    if ( y(j) <= yMax )
+        iY_max = j;
+        noMaxYet = 0;
+    end
+    j=j-1;
+end
+
+iX_Vec = iX_min:1:iX_max;
+iY_Vec = iY_min:1:iY_max;
+
+n = 1;
+for i=1:length(iX_Vec)
+    for j=1:length(iY_Vec)
+        inds(n,1) = iX_Vec(i);
+        inds(n,2) = iY_Vec(j);
+        n = n+1; 
+    end
+end
 
 
