@@ -61,12 +61,28 @@ end
 % Checks if only one Lagrangian Point (ensures dimensions line up)
 if ( length(xL_P) == 1 )
     % Finds distance between specified Eulerian data and nearby Lagrangian data
-    distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
-    distY = give_Eulerian_Lagrangian_Distance(y(yInds)', yL_H_ReSize, Ly);
+    try
+        distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
+        distY = give_Eulerian_Lagrangian_Distance(y(yInds)', yL_H_ReSize, Ly);
+    catch
+        fprintf('\n\n\n - ERROR - \n');
+        fprintf('\n\n - ERROR ERROR - \n');
+        fprintf('\n\n - ERROR ERROR ERROR - \n');
+        fprintf('\n\n - ERROR ERROR ERROR ERROR - \n\n\n');
+        error('BLOW UP! (*forces TOO large*) -> try decreasing the time-step or decreasing material property stiffnesses');
+    end
 else
     % Finds distance between specified Eulerian data and nearby Lagrangian data
-    distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
-    distY = give_Eulerian_Lagrangian_Distance(y(yInds), yL_H_ReSize, Ly);
+    try 
+        distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
+        distY = give_Eulerian_Lagrangian_Distance(y(yInds), yL_H_ReSize, Ly);
+    catch
+        fprintf('\n\n\n - ERROR - \n');
+        fprintf('\n\n - ERROR ERROR - \n');
+        fprintf('\n\n - ERROR ERROR ERROR - \n');
+        fprintf('\n\n - ERROR ERROR ERROR ERROR - \n\n\n');
+        error('BLOW UP! (*forces TOO large*) -> try decreasing the time-step or decreasing material property stiffnesses');
+    end
 end
 
 % Obtain the Dirac-delta function values.
