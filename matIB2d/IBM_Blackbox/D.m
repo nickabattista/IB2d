@@ -38,10 +38,10 @@ function u_z = D(u,dz,string)
 % string: specifies which 1ST derivative to take (to enforce periodicity)
 
 
-len = length(u(:,1));
-
 if strcmp(string,'x')
 
+    len = length(u(1,:));   % LENGTH IN X-DIRECTION
+    
     %For periodicity on ends
     u_z(:,1) = ( u(:,2) - u(:,len) ) / (2*dz);
     u_z(:,len)= ( u(:,1) - u(:,len-1) ) / (2*dz);
@@ -52,6 +52,8 @@ if strcmp(string,'x')
     end
 
 elseif strcmp(string,'y')
+    
+    len = length(u(:,1));   % LENGTH IN Y-DIRECTION
     
     %For periodicity on ends
     u_z(1,:) = ( u(2,:) - u(len,:) ) / (2*dz);

@@ -37,9 +37,10 @@ function u_zz = DD(u,dz,string)
 % dz:     spatial step in "z"-direction
 % string: specifies which 2ND derivative to take (to enforce periodicity)
 
-len = length(u(:,1));
 
 if strcmp(string,'x')
+    
+    len = length(u(1,:));   % LENGTH IN X-DIRECTION
 
     %For periodicity on ends
     u_zz(:,1) =  ( u(:,2) - 2*u(:,1)   + u(:,len) )   / (dz^2);
@@ -51,6 +52,8 @@ if strcmp(string,'x')
     end
 
 elseif strcmp(string,'y')
+    
+    len = length(u(:,1));   % LENGTH IN Y-DIRECTION
 
     %For periodicity on ends
     u_zz(1,:) =  ( u(2,:) - 2*u(1,:)   + u(len,:) )   / (dz^2);

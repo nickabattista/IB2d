@@ -207,9 +207,11 @@ if velPlot == 1
     title('VELOCITY');
     xlabel('x'); ylabel('y');
     hold all;
-
+    
+    
     quiver(X,Y,U,V); %Print Velocity Field
-
+    
+    
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);

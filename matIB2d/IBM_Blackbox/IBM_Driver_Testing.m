@@ -104,16 +104,17 @@ grid_Info(9) = ds;
 
 
 % Create EULERIAN Mesh (these assume periodicity in x and y)
-x = (0:dx:Lx-dx);  X = [];
-y = (0:dy:Ly-dy)'; Y = [];
+x = (0:dx:Lx-dx); 
+y = (0:dy:Ly-dy)';
 %Create x-Mesh
-for i=1:Nx
-    X = [X; x]; 
-end
+%for i=1:Nx
+%    X = [X; x]; 
+%end
 %Create y-Mesh
-for i=1:Ny
-    Y = [Y y];
-end
+%for i=1:Ny
+%    Y = [Y y];
+%end
+[X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy);
 
 
 

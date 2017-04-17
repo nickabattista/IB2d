@@ -33,7 +33,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt)
+function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
  
 
 % Fluid (Eulerian) Grid updated using Peskin's two-step algorithm, where the advection terms
@@ -47,6 +47,7 @@ function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, m
 % mu:        Fluid dynamic viscosity
 % grid_Info: Vector of parameters relating to Eulerian grid, Lagrangian grid, numerical delta function
 % dt:        Time-step
+% idX/idY:   EULERIAN Index Matrices for FFT Operators
 
 
 % Initialize %
@@ -62,16 +63,17 @@ ds =   grid_Info(9);
 
 
 % Construct EULERIAN Index Matrices
-indy_X = (0:1:Nx-1);  idX = [];
-indy_Y = (0:1:Ny-1)'; idY = [];
+%indy_X = (0:1:Nx-1);  idX = [];
+%indy_Y = (0:1:Ny-1)'; idY = [];
 %Create x-Indices Grid
-for i=1:Nx
-    idX = [idX; indy_X]; 
-end
+%for i=1:Nx
+%    idX = [idX; indy_X]; 
+%end
 %Create y-Indices Grid
-for i=1:Ny
-    idY = [idY indy_Y];
-end
+%for i=1:Ny
+%    idY = [idY indy_Y];
+%end
+%[idX,idY] = meshgrid(0:Nx-1,0:Ny-1);
 
 
 % Create FFT Operator (used for both half time-step and full time-step computations)

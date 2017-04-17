@@ -116,17 +116,18 @@ grid_Info(9) = ds;
 
 
 % Create EULERIAN Mesh (these assume periodicity in x and y)
-x = (0:dx:Lx-dx);  X = [];
-y = (0:dy:Ly-dy)'; Y = [];
+x = (0:dx:Lx-dx); 
+y = (0:dy:Ly-dy)';
 %Create x-Mesh
-for i=1:Nx
-    X = [X; x]; 
-end
+%for i=1:Nx
+%    X = [X; x]; 
+%end
 %Create y-Mesh
-for i=1:Ny
-    Y = [Y y];
-end
-
+%for i=1:Ny
+%    Y = [Y y];
+%end
+[X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy);
+[idX,idY] = meshgrid(0:Nx-1,0:Ny-1);     % INITIALIZE FOR FLUID SOLVER FFT FUNCTION
 
 
 
@@ -601,9 +602,9 @@ while current_time < T_FINAL
     if boussinesq_Yes == 1
         Fxh = Fxh + rho*fBouss_X*(C);
         Fyh = Fyh + rho*fBouss_Y*(C);
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
     else
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt);
+        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
     end
     
     %
@@ -1140,14 +1141,14 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
 %  savevtk Save a 3-D scalar array in VTK format.
 %  savevtk(array, filename) saves a 3-D array of any size to
 %  filename in VTK format.
-    [nx, ny, nz] = size(array);
+    [ny, nx, nz] = size(array);
     fid = fopen(filename, 'wt');
     fprintf(fid, '# vtk DataFile Version 2.0\n');
     fprintf(fid, 'Comment goes here\n');
     fprintf(fid, 'ASCII\n');
     fprintf(fid, '\n');
     fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
-    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
+    fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', ny, nx, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
     %fprintf(fid, 'SPACING   1.000   1.000   1.000\n'); if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
@@ -1158,8 +1159,8 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
     fprintf(fid, 'LOOKUP_TABLE default\n');
     fprintf(fid, '\n');
     for a=1:nz
-        for b=1:ny
-            for c=1:nx
+        for b=1:nx
+            for c=1:ny
                 fprintf(fid, '%d ', array(c,b,a));
             end
             fprintf(fid, '\n');
