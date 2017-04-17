@@ -19,7 +19,7 @@ If you use the code for research, please cite the following papers:
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
- 	2. Beams (*torsional springs)
+ 	2. Beams (*torsional springs*)
  	3. Target Points
 	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
                         Hill (i.e.,Length-Tension) Model )
@@ -30,12 +30,13 @@ This code is capable of creating Lagrangian Structures using:
         8. Electrophysiology (FitzHugh-Nagumo coupling w/ or w/o calcium
 			dynamics and w/ or w/o muscle models)
 	9. Damped Springs
-
+	10. Non-invariant Beams
+	11. User-defined deformation laws
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
 There are a number of built in Examples, mostly used for teaching purposes. 
 
-If you would like us to add a specific muscle model, please contact Nick (nick.battista@unc.edu) 
+If you would like us to add a specific muscle model, please contact Nick (nickabattista@gmail.edu) 
 
 If you use this code for the purposes of teaching, research, or recreation please let Nick know as well :)
 
