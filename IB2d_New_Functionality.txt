@@ -4,6 +4,10 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+Software Release Paper Published March 29, 2017:
+[1] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB 
+    implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+
 % FIBER MODELS
 1. added DAMPED linear springs
 2. added NON-INVARIANT beams
@@ -11,6 +15,8 @@
 
 % FLUID SOLVER
 1. added functionality for using the Boussinesq Approximation
+2. functionality for non-square grids
 
 % ADD-ONs
 1. added Data Analysis directory with codes for reading in simulation data, e.g., .vtk files, to analyze
+2. additions to advection-diffusion tool kit
