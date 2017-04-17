@@ -162,14 +162,18 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     x = np.arange(0,Lx,dx)
     y = np.arange(0,Ly,dy)
     # Create x-Mesh
-    X = np.empty((Nx,x.size))
-    for ii in range(Nx):
-        X[ii,] = x
+    #X = np.empty((Nx,x.size))
+    #for ii in range(Nx):
+    #    X[ii,] = x
     # Create y-Mesh
-    Y = np.empty((y.size,Ny))
-    for ii in range(Ny):
-        Y[:,ii] = y
-        
+    #Y = np.empty((y.size,Ny))
+    #for ii in range(Ny):
+    #    Y[:,ii] = y
+    # MATLAB SYNTAX: [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy);
+    X,Y = np.meshgrid(x,y)
+    # MATLAB SYNTAX: [idX,idY] = meshgrid(0:Nx-1,0:Ny-1);  <--- INITIALIZE FOR FLUID SOLVER FFT FUNCTION    
+    idX,idY = np.meshgrid(np.arange(0,Nx,1),np.arange(0,Ny,1)) # <- INITIALIZES FOR FLUID SOLVER FFT OPERATORS
+
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
 
 
@@ -615,7 +619,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #
         #
         Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
-        grid_Info, dt)
+        grid_Info, dt, idX, idY)
         
         
         #
@@ -1532,10 +1536,10 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
     #   keep these reminants or to kill them entirely, I'm choosing to kill them.
     #   So, specifically, nz is now gone. I will keep the output the same,
     #   however, for compatibility. So 1 will be pritned in the Z column.
-    nx,ny = array.shape
+    ny,nx = array.shape
     if C_flag == True:
         narray = np.ascontiguousarray(array, dtype=np.float64)
-        write.savevtk_scalar(nx,ny,narray,filename,colorMap,dx,dy)
+        write.savevtk_scalar(ny,nx,narray,filename,colorMap,dx,dy)
     else:
         with open(filename,'w') as fid:
             fid.write('# vtk DataFile Version 2.0\n')
@@ -1544,7 +1548,7 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             fid.write('\n')
             fid.write('DATASET STRUCTURED_POINTS\n')
             # 1 below was nz
-            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(ny, nx, 1))
             fid.write('\n')
             fid.write('ORIGIN    0.000   0.000   0.000\n')
             #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
@@ -1555,8 +1559,8 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             fid.write('SCALARS '+colorMap+' double\n')
             fid.write('LOOKUP_TABLE default\n')
             fid.write('\n')
-            for b in range(ny):
-                for c in range(nx):
+            for b in range(nx):
+                for c in range(ny):
                     fid.write('{0} '.format(array[c,b]))
                 fid.write('\n')
         #Python 3.5 automatically opens in text mode unless otherwise specified

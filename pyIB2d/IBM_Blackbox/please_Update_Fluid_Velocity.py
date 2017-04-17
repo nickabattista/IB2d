@@ -43,7 +43,7 @@ from Supp import D, DD
 #
 ################################################################################
 
-def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
+def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY):
     '''Fluid (Eulerian) Grid updated using Peskin's two-step algorithm, 
     where the advection terms are written in skew symmetric form.
     
@@ -55,8 +55,9 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
         rho:       Fluid density
         mu:        Fluid dynamic viscosity
         grid_Info: Vector of parameters relating to Eulerian grid, 
-                    Lagrangian grid, numerical delta function
+                       Lagrangian grid, numerical delta function
         dt:        Time-step
+        idX/idY:   EULERIAN Index Matrices for FFT Operators
         
     Returns:
         U_h:
@@ -78,8 +79,8 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt):
 
 
     # Construct EULERIAN Index Matrices
-    idX = np.tile(np.arange(Nx),(Nx,1))
-    idY = np.tile(np.arange(Ny),(Ny,1)).T
+    #idX = np.tile(np.arange(Nx),(Nx,1))
+    #idY = np.tile(np.arange(Ny),(Ny,1)).T
 
 
     # Create FFT Operator (used for both half time-step and full time-step computations)

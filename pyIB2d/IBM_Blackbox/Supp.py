@@ -418,10 +418,12 @@ def D(u,dz,string):
     Returns:
         u_z:'''
 
-    length = u.shape[0]
-    u_z = np.zeros((length,length))
+    
+    u_z = np.zeros(u.shape)
 
     if string=='x':
+
+        length = u.shape[1]      # number of pts along X direction
 
         #For periodicity on ends
         u_z[:,0] = ( u[:,1] - u[:,length-1] ) / (2*dz)
@@ -432,6 +434,8 @@ def D(u,dz,string):
 
     elif string=='y':
         
+        length = u.shape[0]      # number of pts along Y direction
+
         #For periodicity on ends
         u_z[0,:] = ( u[1,:] - u[length-1,:] ) / (2*dz)
         u_z[length-1,:] = ( u[0,:] - u[length-2,:] ) / (2*dz)
@@ -466,10 +470,12 @@ def DD(u,dz,string):
     Returns:
         u_zz:'''
 
-    length = u.shape[0]
-    u_zz = np.zeros((length,length))
+    u_zz = np.zeros(u.shape)
 
     if string=='x':
+
+        length = u.shape[1]      # number of pts along X direction
+
 
         #For periodicity on ends
         u_zz[:,0] =  ( u[:,1] - 2*u[:,0]   + u[:,length-1] )   / (dz**2)
@@ -480,6 +486,8 @@ def DD(u,dz,string):
                                 / (dz**2)
 
     elif string=='y':
+
+        length = u.shape[0]      # number of pts along Y direction
 
         #For periodicity on ends
         u_zz[0,:] =  ( u[1,:] - 2*u[0,:]   + u[length-1,:] )   / (dz**2)
