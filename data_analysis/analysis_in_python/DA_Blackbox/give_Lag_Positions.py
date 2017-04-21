@@ -4,7 +4,7 @@
 # 	fluid-structure interaction models. This version of the code is based off of
 #	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 #
-# Author: Nicholas A. Battista
+# Author: Nicholas A. Battista, Christopher Strickland
 # Email:  nick.battista@unc.edu
 # Date Created: May 27th, 2015
 # Institution: UNC-CH
@@ -23,12 +23,9 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-#import numpy as np
-#import sys
-import os
-from read_Lagrangian_Data_From_vtk import read_Lagrangian_Data_From_vtk
-#from math import cos, sin, pi, sqrt
-#import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
+from read_vtk_data import read_vtk_Unstructured_Grid_Points
 
 #################################################################################
 #
@@ -45,10 +42,11 @@ def give_Lag_Positions(path,numSim):
             xLag: x-Lagrangian point positions
             yLag: y-Lagrangian point positions'''
           
-    analysis_path = os.getcwd()
+    filename = Path(path) / ('lagsPts.' + str(numSim) + '.vtk')
                  
-    xLag,yLag = read_Lagrangian_Data_From_vtk(path,numSim)
+    lag_data = read_vtk_Unstructured_Grid_Points(str(filename))
 
-    os.chdir(analysis_path)
+    xLag = lag_data[:,0]
+    yLag = lag_data[:,1]
 
-    return xLag,yLag
+    return xLag, yLag

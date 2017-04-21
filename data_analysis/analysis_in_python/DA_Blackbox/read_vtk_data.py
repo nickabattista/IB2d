@@ -23,15 +23,14 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-import os
 from pathlib import Path
 import numpy as np
 import vtk
 from vtk.util import numpy_support
-#from vtk.numpy_interface import dataset_adapter as dsa
+from vtk.numpy_interface import dataset_adapter as dsa
 
 def read_Eulerian_Data_From_vtk(path, simNums, strChoice, xy=False):
-    '''This is to read IB2d data, either scalar or vector.'''
+    '''This is to read Eulerian IB2d data, either scalar or vector.'''
 
     filename = Path(path) / (strChoice + '.' + str(simNums) + '.vtk')
     data = read_vtk_Structured_Points(str(filename))
@@ -89,3 +88,18 @@ def read_vtk_Structured_Points(filename):
         # Each of these are indexed via [z,y,x], since x changes, then y, then z
         #   in the flattened array.
         return e_data_X, e_data_Y, e_data_Z, origin, spacing
+
+
+
+def read_vtk_Unstructured_Grid_Points(filename):
+    '''This is to read Lagrangian mesh data.'''
+
+    reader = vtk.vtkUnstructuredGridReader()
+    reader.SetFileName(filename)
+    reader.Update()
+    vtk_data = reader.GetOutput()
+    py_data = dsa.WrapDataObject(vtk_data)
+
+    points = numpy_support.vtk_to_numpy(py_data.Points) # each row is a 2D point
+
+    return points
