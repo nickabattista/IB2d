@@ -23,6 +23,7 @@ Dependencies:
  	- NumPy
  	- Matplotlib
  	- Numba
+    - vtk
 
 Additionally, an optional C library (plus Cython glue code) is provided to improve the speed at which data writes out to disk. For info on compiling this library, please see Cython_README.md in the IBM_Blackbox directory.
 
