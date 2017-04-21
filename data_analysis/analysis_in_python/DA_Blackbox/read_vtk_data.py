@@ -91,6 +91,14 @@ def read_vtk_Structured_Points(filename):
 
 
 
+def read_Force_Scalar_Data_From_vtk(path, simNums, strChoice):
+    '''This will read force data on the Lagrangian mesh'''
+
+    filename = Path(path) / (strChoice + '.' + str(simNums) + '.vtk')
+    return read_vtk_Unstructured_Grid_Points(str(filename))
+
+
+
 def read_vtk_Unstructured_Grid_Points(filename):
     '''This is to read Lagrangian mesh data.'''
 

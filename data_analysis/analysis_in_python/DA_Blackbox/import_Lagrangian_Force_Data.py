@@ -4,7 +4,7 @@
 #     fluid-structure interaction models. This version of the code is based off of
 #    Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 #
-# Author: Nicholas A. Battista
+# Author: Nicholas A. Battista, Christopher Strickland
 # Email:  nick.battista@unc.edu
 # Date Created: May 27th, 2015
 # Institution: UNC-CH
@@ -24,9 +24,7 @@
 #--------------------------------------------------------------------------------------------------------------------#
 
 #import numpy as np
-#import sys
-#import os
-from read_Force_Scalar_Data_From_vtk import read_Force_Scalar_Data_From_vtk
+from read_vtk_data import read_Force_Scalar_Data_From_vtk
 
 #################################################################################
 #
