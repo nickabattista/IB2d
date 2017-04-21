@@ -246,7 +246,7 @@ def plot_Desired_Data(yVals,vel_data):
     plt.ylabel('Mag. Velocity')
     plt.xlabel('y')
 
-
+    plt.tight_layout()
     plt.box(on=True)
     plt.show()
 

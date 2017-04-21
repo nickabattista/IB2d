@@ -26,8 +26,7 @@
 #import numpy as np
 #import sys
 #import os
-from read_Eulerian_Data_From_vtk import read_Eulerian_Data_From_vtk
-from read_Eulerian_Velocity_Field_vtk import read_Eulerian_Velocity_Field_vtk
+from read_vtk_data import read_Eulerian_Data_From_vtk
 
 #################################################################################
 #
@@ -38,35 +37,36 @@ from read_Eulerian_Velocity_Field_vtk import read_Eulerian_Velocity_Field_vtk
 def import_Eulerian_Data(path,numSim):
  
     # read in Vorticity #
-    strChoice = 'Omega'; first = 1
-    Omega,x,y = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'Omega'; getxy = True
+    Omega,x,y = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
 
     # read in Pressure #
-    strChoice = 'P'; first = 0
-    P = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'P'; getxy = False
+    P = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
 
     # read in Velocity Magnitude #
-    strChoice = 'uMag'; first = 0
-    uMag = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'uMag'; getxy = False
+    uMag = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
  
     # read in x-directed Velocity Magnitude #
-    strChoice = 'uX'; first = 0
-    uX = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'uX'; getxy = False
+    uX = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
  
     # read in y-directed Velocity Magnitude #
-    strChoice = 'uY'; first = 0
-    uY = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'uY'; getxy = False
+    uY = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
 
     # read in x-directed Forces #
-    strChoice = 'Fx'; first = 0
-    Fx = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'Fx'; getxy = False
+    Fx = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
 
     # read in y-directed Forces #
-    strChoice = 'Fy'; first = 0
-    Fy = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first)
+    strChoice = 'Fy'; getxy = False
+    Fy = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
  
     # read in Velocity Field #
-    U,V = read_Eulerian_Velocity_Field_vtk(path,numSim)
+    strChoice = 'u'; getxy = False
+    U,V = read_Eulerian_Data_From_vtk(path,numSim,strChoice,getxy)
 
     return x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy
 
