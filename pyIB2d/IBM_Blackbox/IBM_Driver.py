@@ -49,6 +49,11 @@ try:
 except:
     C_flag = False
 
+#Switch for vtk library writes (for now, this will be overridden by C_flag)
+import vtk
+from vtk.util import numpy_support
+vtk_lib_flag = False
+
 ###############################################################################
 #
 # FUNCTION: Actual DRIVER of the code, where the time-stepping occurs ->
@@ -1331,12 +1336,11 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
     N = X.shape[0]
     Nc = connectsMat.shape[0]
 
-    if C_flag==True:
+    if C_flag:
         #Just add the measure of time for transforming the 
         nX = np.ascontiguousarray(X, dtype=np.float64)
         nconnectsMat = np.ascontiguousarray(connectsMat, dtype=np.float64)
         write.savevtk_points_connects_write(N,Nc,nX,filename,vectorName,nconnectsMat)
-
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
@@ -1378,7 +1382,7 @@ def savevtk_points( X, filename, vectorName):
 
     N = X.shape[0]
 
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
         write.savevtk_points_write(N,nX,filename,vectorName)
     else:
@@ -1481,7 +1485,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     YCol = Y.shape[1]
 
 
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
         nY = np.ascontiguousarray(Y, dtype=np.float64)
         write.savevtk_vector(XRow,XCol,YRow,YCol,nX,nY,filename,vectorName,dx,dy)
@@ -1516,15 +1520,16 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
 # FUNCTION: prints scalar matrix to vtk formated file
 #
 ##############################################################################
-def savevtk_scalar(array, filename, colorMap,dx,dy):
+def savevtk_scalar(array, filename, dataName,dx,dy):
     ''' Prints scalar matrix to vtk formatted file.
     
     Args:
         array: 2-D ndarray
         filename: file name
-        colorMap:
+        dataName: string describing the data
         dx:
         dy:'''
+        
     #  ?? Legacy:
     #  savevtk Save a 3-D scalar array in VTK format.
     #  savevtk(array, filename) saves a 3-D array of any size to
@@ -1537,9 +1542,29 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
     #   So, specifically, nz is now gone. I will keep the output the same,
     #   however, for compatibility. So 1 will be pritned in the Z column.
     ny,nx = array.shape
-    if C_flag == True:
+    if C_flag:
         narray = np.ascontiguousarray(array, dtype=np.float64)
-        write.savevtk_scalar(ny,nx,narray,filename,colorMap,dx,dy)
+        write.savevtk_scalar(ny,nx,narray,filename,dataName,dx,dy)
+    elif vtk_lib_flag:
+        ### STRUCTURED_POINTS - SCALARS ###
+        # Collect info to write
+        origin = (0.0, 0.0, 0.0)
+        spacing = (dx, dy, 1.0)
+        dimensions = (ny, nx, 1)
+        vtk_array = numpy_support.numpy_to_vtk(np.ravel(array,order='F'))
+        vtk_array.SetName(dataName)
+        # Create data object
+        vtk_obj = vtk.vtkStructuredPoints()
+        vtk_obj.SetOrigin(origin)
+        vtk_obj.SetSpacing(spacing)
+        vtk_obj.SetDimensions(dimensions)
+        vtk_obj.GetPointData().SetScalars(vtk_array)
+        # Write out data
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write() # returns 1 on success, 0 on failure
     else:
         with open(filename,'w') as fid:
             fid.write('# vtk DataFile Version 2.0\n')
@@ -1556,7 +1581,7 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             fid.write('\n')
             # The 1 below was nz
             fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
-            fid.write('SCALARS '+colorMap+' double\n')
+            fid.write('SCALARS '+dataName+' double\n')
             fid.write('LOOKUP_TABLE default\n')
             fid.write('\n')
             for b in range(nx):
@@ -1573,14 +1598,14 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
 #
 ##############################################################################
 
-def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
+def savevtk_points_with_scalar_data( X, scalarArray, filename, dataName):
     ''' Prints matrix vector data to vtk formated file
     
     Args:
         X: Matrix of size Nx3
         scalarArray:
         filename:
-        colorMap:'''
+        dataName: string describing the data'''
 
     # X is matrix of size Nx3 
     #              Col 1: x-data
@@ -1588,19 +1613,19 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
     #              Col 3: z-data
     # scalarArray: Scalar array you are assigning to each point
     # filename:    What you are saving the VTK file as (string)
-    # colorMap:  What you are naming the data you're printing (string)
+    # dataName:  What you are naming the data you're printing (string)
 
     N = X.shape[0]
     nx = scalarArray.shape[0]
 
 
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
-        write.savevtk_points_write(N,nX,filename,colorMap)
+        write.savevtk_points_write(N,nX,filename,dataName)
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
-            file.write(colorMap+'\n')
+            file.write(dataName+'\n')
             file.write('ASCII\n')
             file.write('DATASET UNSTRUCTURED_GRID\n\n')
             file.write('POINTS {0} float\n'.format(N))
@@ -1609,7 +1634,7 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
             file.write('\n')
             #
             file.write('POINT_DATA   {0}\n'.format(nx*1*1))
-            file.write('SCALARS '+colorMap+' double\n')
+            file.write('SCALARS '+dataName+' double\n')
             file.write('LOOKUP_TABLE default\n')
             file.write('\n')
             for c in range(nx):
