@@ -42,7 +42,7 @@ function beams_info = update_nonInv_Beams(dt,current_time,beams_info)
 % GEOMETRIC PARAMETERS
 pi = 4*atan(1);
 L1 = 8;                              % length of computational domain (m)
-N1 = 256;                            % number of Cartesian grid meshwidths at the finest level of the AMR grid
+N1 = 512;                            % number of Cartesian grid meshwidths at the finest level of the AMR grid
 bell_length = 2;                     % bell length (m)
 npts_bell = ceil(2*(bell_length/L1)*N1);  % number of pos along the length of the bell
 npts_circ = 1;                       %number of pos along the circumference (if in 3D)
@@ -52,7 +52,7 @@ ds1 = bell_length/(npts_bell-1);     % mesh spacing(m) along length of bell
 % Values from Alben, Peng, and Miller
 betao = 0.5;
 betam = 0.3;
-to = 0.4;
+to = 0.2;
 Zs = L1/8;
 xRef = L1/2;
 

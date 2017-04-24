@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Make_Your_Plates_Input_Files()
+function Make_Your_Plates_and_Input_Files()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)

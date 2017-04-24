@@ -34,7 +34,7 @@ function Jellyfish_Geometry()
 
 % FLUID GRID PARAMETERS %
 L = 8;                              % Length of computational domain (m)
-N = 256;                            % # of Cartesian grid meshwidths
+N = 512;                            % # of Cartesian grid meshwidths
 dx = L/N;                           % Cartesian mesh width (m)
 
 % Construct Geometry
@@ -58,11 +58,11 @@ struct_name = 'jelly';      % structure name
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 7.5*1.2750000000000000e+07;        % spring constant (Newton)
+k_Spring = 5*1.2750000000000000e+06;   % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 7.5*1.0363359375000002e+10;   % beam stiffness constant (Newton m^2)
+k_Beam = 500*1.0363359375000002e+13;   % beam stiffness constant (Newton m^2)
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 

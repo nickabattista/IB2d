@@ -1,31 +1,31 @@
 %*****%***%***%***%***%***% INPUT2d FILE: %***%***%***%***%***%*****%
 %****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
-%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%***%
+%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
 
 % FLUID PARAMETER VALUES %
-mu = 5                % Dynamic Viscosity (N*s/m^2) 
-rho = 1000               % Density (kg/m^2)
+mu = 0.0010                % Dynamic Viscosity (N*s/m^2) 
+rho = 1                 % Density (kg/m^2)
 
 % TEMPORAL INFORMATION %
-Tfinal = 25           % Final time of simulation (s)
-dt = 5e-5               % Time-step (s)
+Tfinal = 2.0            % Final time of simulation (s)
+dt = 5.0e-4             % Time-step (s)
 
 % GRID PARAMETERS / INFORMATION %
-Nx =  256               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 8.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 8.0                % Length of Eulerian Grid in y-Direction (m)
+Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
+Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 springs = 1             % 0 (for no) or 1 (for yes)
-update_springs = 0      % 0 (for no) or 1 (for yes)
+update_springs = 1      % 0 (for no) or 1 (for yes)
 target_pts = 0          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 0               % 0 (for no) or 1 (for yes) % "Torsional Springs"
-update_beams = 0        % 0 (for no) or 1 (for yes) % Update "Torsional Springs"
-nonInvariant_beams = 1  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
-update_nonInv_beams = 1 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
+beams = 1               % 0 (for no) or 1 (for yes)
+update_beams = 0        % 0 (for no) or 1 (for yes)
+nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
+update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
 arb_ext_force = 0       % 0 (for no) or 1 (for yes)
@@ -45,7 +45,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 
 
 % PRINTING INFORMATION
-print_dump = 2000        % How often to print (PLOT) to screen
+print_dump = 20          % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
@@ -53,6 +53,5 @@ plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
 plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 
-
 % LAGRANGIAN STRUCTURE NAME %
-string_name = jelly % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+string_name = jelly      % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
