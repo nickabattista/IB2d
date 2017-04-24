@@ -62,9 +62,9 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-%k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
-%ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
-%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
+k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
+ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
@@ -240,19 +240,19 @@ function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx)
 % Eulerian grid resolution
  
 % The immsersed structure is initially an ellipse %
-% a = 0.4;              % Length of semi-major axis.
-% b = 0.2;              % Length of semi-minor axis.
-% N = 2*Nx;             % 2x # of Eulerian pts. (how many pts. we'd like in the ellipse)            
-%  
-% % Initiate storage for Lagrangian Pts.
-% xLag = zeros(N,1); yLag = xLag;
-%  
-% for i=1:N
-%     
-%     xLag(i) = 0.5 + b * cos( 2*pi/N*(i-1) );
-%     yLag(i) = 0.5 + a * sin( 2*pi/N*(i-1) );
-%     
-% end
+a = 0.4;              % Length of semi-major axis.
+b = 0.2;              % Length of semi-minor axis.
+N = 2*Nx;             % 2x # of Eulerian pts. (how many pts. we'd like in the ellipse)            
+ 
+% Initiate storage for Lagrangian Pts.
+xLag = zeros(N,1); yLag = xLag;
+ 
+for i=1:N
+    
+    xLag(i) = 0.5 + b * cos( 2*pi/N*(i-1) );
+    yLag(i) = 0.5 + a * sin( 2*pi/N*(i-1) );
+    
+end
 
 
 

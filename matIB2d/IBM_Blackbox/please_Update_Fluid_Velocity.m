@@ -61,7 +61,6 @@ supp = grid_Info(7);
 Nb =   grid_Info(8);
 ds =   grid_Info(9);
 
-
 % Construct EULERIAN Index Matrices
 %indy_X = (0:1:Nx-1);  idX = [];
 %indy_Y = (0:1:Ny-1)'; idY = [];

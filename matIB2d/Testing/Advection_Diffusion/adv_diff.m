@@ -19,6 +19,7 @@ tVec = 0:dt:Tfinal; % time-vector
 plot_Vector_Field(L,uX,uY,dx);
 C = give_Initial_Concentration(N,L,dx); % Give initial concentration
 
+% SAVING DATA TO VTK %
 print_dump = 100;
 ctsave = 0;
 % CREATE VIZ_IB2D FOLDER and VISIT FILES
