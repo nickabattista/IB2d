@@ -50,7 +50,7 @@ SPEED = L/(period);                  % Speed nematocyst moves
 %    
 if current_time <= period
         
-    yPts(IDs) = yPts(IDs) + tanh(200*current_time)*SPEED*dt;
+    yPts(IDs) = yPts(IDs) + tanh(2000*current_time)*SPEED*dt;
     targets(IDs,3) = yPts(IDs);
             
     %for i=1:N_target                    % Loops over all target points!    

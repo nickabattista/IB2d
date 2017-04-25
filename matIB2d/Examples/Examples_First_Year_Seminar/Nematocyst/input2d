@@ -69,7 +69,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 %
 Output_Info {
 print_dump = 100         % How often to STORE DATA (and/or PLOT) to screen
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
