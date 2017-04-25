@@ -525,7 +525,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
     #Print initializations to .vtk
-    vort = np.zeros((Ny,Nx)); uMag = np.array(vort); p = np.array(vort)
+    vort = np.zeros((Nx,Ny)); uMag = np.array(vort); p = np.array(vort)
     lagPts = np.zeros((xLag.size,3))
     lagPts[:,0] = xLag; lagPts[:,1] = yLag
     connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info)
