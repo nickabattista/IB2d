@@ -28,7 +28,6 @@
  please let Nick (nick.battista@unc.edu) know.
 
 ----------------------------------------------------------------------------'''
-import pdb
 import numpy as np
 from math import sqrt
 import os
@@ -49,10 +48,13 @@ try:
 except:
     C_flag = False
 
-#Switch for vtk library writes (for now, this will be overridden by C_flag)
-import vtk
-from vtk.util import numpy_support
-vtk_lib_flag = True
+#Switch for vtk library writes (this will be overridden by C_flag)
+try:
+    import vtk
+    from vtk.util import numpy_support
+    vtk_lib_flag = True
+except:
+    vtk_lib_flag = False
 
 ###############################################################################
 #
@@ -696,6 +698,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         current_time = current_time+dt
         cter += 1
         #wait = input('Press enter to continue...')
+    if not vtk_lib_flag:
+        # warn that vtk library was not used
+        print('The vtk library could not be imported for this simulation.')
+        print('Install via the terminal command: conda install -c menpo vtk')
 
     
 ###########################################################################
