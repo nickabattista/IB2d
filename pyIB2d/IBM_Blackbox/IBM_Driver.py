@@ -7,7 +7,7 @@
  Author: Nicholas A. Battista
  Email:  nick.battista@unc.edu
  Date Created: May 27th, 2015
- Initial Python 3.5 port by: Christopher Strickland
+ Initial Python 3.5 port and VTK writes by Christopher Strickland
  Institution: UNC-CH
 
  This code is capable of creating Lagrangian Structures using:
@@ -28,7 +28,6 @@
  please let Nick (nick.battista@unc.edu) know.
 
 ----------------------------------------------------------------------------'''
-import pdb
 import numpy as np
 from math import sqrt
 import os
@@ -48,6 +47,14 @@ try:
     C_flag = True
 except:
     C_flag = False
+
+#Switch for vtk library writes (this will be overridden by C_flag)
+try:
+    import vtk
+    from vtk.util import numpy_support
+    vtk_lib_flag = True
+except:
+    vtk_lib_flag = False
 
 ###############################################################################
 #
@@ -691,6 +698,10 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         current_time = current_time+dt
         cter += 1
         #wait = input('Press enter to continue...')
+    if not vtk_lib_flag:
+        # warn that vtk library was not used
+        print('The vtk library could not be imported for this simulation.')
+        print('Install via the terminal command: conda install -c menpo vtk')
 
     
 ###########################################################################
@@ -1116,14 +1127,14 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info):
 
     space = 20*ds
 
-    nSprings = springs_info.shape;
+    nSprings = springs_info.shape
     connectsMat = np.zeros([nSprings[0],2])
 
     if springs_Yes:
-        connectsMat[:,0] = springs_info[:,0]; # (for .vtk counting)
-        connectsMat[:,1] = springs_info[:,1]; # (for .vtk counting)
+        connectsMat[:,0] = springs_info[:,0] # (for .vtk counting)
+        connectsMat[:,1] = springs_info[:,1] # (for .vtk counting)
     else:
-        connectsMat = 0;
+        connectsMat = 0
 
     #N = xLag.size
 
@@ -1241,10 +1252,10 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,
         os.chdir('hier_IB2d_data') #change directory to hier-data folder
         
         # Save x-y force data!
-        fLag_XName = 'fX_Lag.'+strNUM+'.vtk';
-        fLag_YName = 'fY_Lag.'+strNUM+'.vtk';
-        savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag');
-        savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag');
+        fLag_XName = 'fX_Lag.'+strNUM+'.vtk'
+        fLag_YName = 'fY_Lag.'+strNUM+'.vtk'
+        savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
+        savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
 
         # Define force magnitude name
         fMagName = 'fMag.'+strNUM+'.vtk'
@@ -1265,10 +1276,10 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,
         os.chdir('hier_IB2d_data') #change directory to hier-data folder
 
         # Save x-y force data!
-        fLag_XName = 'fX_Lag.'+strNUM+'.vtk';
-        fLag_YName = 'fY_Lag.'+strNUM+'.vtk';
-        savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag');
-        savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag');
+        fLag_XName = 'fX_Lag.'+strNUM+'.vtk'
+        fLag_YName = 'fY_Lag.'+strNUM+'.vtk'
+        savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
+        savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
 
         # Save force magnitude, mag. normal force, and mag. tangential force
         fMagName = 'fMag.'+strNUM+'.vtk'
@@ -1276,12 +1287,12 @@ def print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,
         fTangentName = 'fTan.'+strNUM+'.vtk'
 
         # Compute magnitude of forces on Lagrangian boundary
-        fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ); 
+        fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] )
 
         # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag')
+        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm')
+        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan')
 
         # Get out of hier_IB2d_data folder
         os.chdir('..') 
@@ -1331,12 +1342,38 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
     N = X.shape[0]
     Nc = connectsMat.shape[0]
 
-    if C_flag==True:
+    if C_flag:
         #Just add the measure of time for transforming the 
         nX = np.ascontiguousarray(X, dtype=np.float64)
         nconnectsMat = np.ascontiguousarray(connectsMat, dtype=np.float64)
         write.savevtk_points_connects_write(N,Nc,nX,filename,vectorName,nconnectsMat)
-
+    elif vtk_lib_flag:
+        ### UNSTRUCTURED_GRID - POINTS, CELLS, CELL_TYPES ###
+        # Create Points data type
+        vtk_points = vtk.vtkPoints()
+        vtk_points.SetData(numpy_support.numpy_to_vtk(
+                           np.require(X, dtype=np.float64, requirements=['C']),
+                           deep=1))
+        # Create CellArray data type
+        vtk_cells = vtk.vtkCellArray()
+        # Create connectivity list
+        cells = np.ones((Nc,3), dtype=np.int64)
+        cells[:,0] *= connectsMat.shape[1]
+        cells[:,1:] = connectsMat.astype(np.int64)
+        cells = np.ravel(cells)
+        # Create cell structure with args: number of cells, connectivity list
+        vtk_cells.SetCells(Nc, numpy_support.numpy_to_vtkIdTypeArray(cells))
+        vtk_obj = vtk.vtkUnstructuredGrid()
+        # Set cells with cell types, cell structure
+        vtk_obj.SetCells(np.ones(Nc, dtype=np.int64)*3, vtk_cells)
+        vtk_obj.SetPoints(vtk_points)
+        # write out
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetHeader(vectorName+" generated by IB2d Python")
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write()
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
@@ -1378,9 +1415,35 @@ def savevtk_points( X, filename, vectorName):
 
     N = X.shape[0]
 
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
         write.savevtk_points_write(N,nX,filename,vectorName)
+    elif vtk_lib_flag:
+        ### UNSTRUCTURED_GRID - POINTS, CELLS, CELL_TYPES ###
+        # Create Points data type
+        vtk_points = vtk.vtkPoints()
+        vtk_points.SetData(numpy_support.numpy_to_vtk(
+                           np.require(X, dtype=np.float64, requirements=['C']),
+                           deep=1))
+        # Create CellArray data type
+        vtk_cells = vtk.vtkCellArray()
+        # Create connectivity list
+        cells = np.stack((np.ones(N,dtype=np.int64), np.arange(N,dtype=np.int64)),
+                         axis=-1)
+        cells_r = np.ravel(cells)
+        # Create cell structure with args: number of cells, connectivity list
+        vtk_cells.SetCells(N, numpy_support.numpy_to_vtkIdTypeArray(cells_r))
+        vtk_obj = vtk.vtkUnstructuredGrid()
+        # Set cells with cell types, cell structure
+        vtk_obj.SetCells(cells[:,0], vtk_cells)
+        vtk_obj.SetPoints(vtk_points)
+        # write out
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetHeader(vectorName+" generated by IB2d Python")
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write()
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
@@ -1405,43 +1468,6 @@ def savevtk_points( X, filename, vectorName):
 
 
 
-
-    #TRY PRINTING THEM AS POLYGONAL DATA
-    # with open(filename,'w') as file:
-        # file.write('# vtk DataFile Version 2.0\n')
-        # file.write(vectorName+'\n')
-        # file.write('ASCII\n')
-        # file.write('DATASET STRUCTURED_GRID\n')
-        # file.write('DIMENSIONS 64 1 1\n')
-        # file.write('POINTS {0} float\n', N)
-        # for ii in range(N):
-            # file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
-        # file.write('1.1 1.1 0\n')
-        # file.write('CELL_DATA 1\n')
-        # file.write('POINT_DATA {0} \n',N)
-        # file.write('FIELD FieldData 1\n')
-        # file.write('nodal 1 {0} float\n'.format(N)
-        # file.write('0 1 1.1 2\n')
-        # file.write('SCALARS nodal float\n')
-        # file.write('SCALARS '+vectorName+' float 1 \n')
-        # file.write('LOOKUP_TABLE default\n')
-
-
-    # TRY PRINTING THEM AS POINTS
-    # with open(filename,'w') as file:
-        # file.write('# vtk DataFile Version 2.0\n')
-        # file.write('Cube example\n')
-        # file.write('ASCII\n')
-        # file.write('DATASET UNSTRUCTURED_GRID\n')
-        # file.write('POINTS {0} float\n'.format(N))
-        # for ii in range(N):
-            # file.write('{0:.15e} {1:.15e} {2:.15e}\n'.format(X[ii,0],X[ii,1],X[ii,2]))
-        # file.write('POINT_DATA {0} \n'.format(N)
-        # file.write('SCALARS '+vectorName+' float 1 \n')
-        # file.write('LOOKUP_TABLE default\n')
-
-
-
 ##############################################################################
 #
 # FUNCTION: prints matrix vector data to vtk formated file
@@ -1454,7 +1480,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
         X: 2-D ndarray
         Y: 2-D ndarray
         filename: file name
-        vectorName:
+        vectorName: name of the variable
         dx:
         dy:'''
     #  ?? Legacy:
@@ -1467,11 +1493,8 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     #   3-D is clearly broken in this code, but there were still some reminants 
     #   in the matlab version. Given the choice of doing try/except blocks to
     #   keep these reminants or to kill them entirely, I'm choosing to kill them.
-    #   So, specifically, nz is now gone. I will keep the output the same,
-    #   however, for compatibility. So 1 will be pritned in the Z column.
+    #   So, specifically, nz is now gone.
     
-    #I'm changing the fprintf that was here to an error. If you want, you can
-    #   catch it in the following function.
     assert (X.shape == Y.shape), 'Error: velocity arrays of unequal size'
     nx, ny = X.shape
     
@@ -1480,11 +1503,34 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     YRow = Y.shape[0]
     YCol = Y.shape[1]
 
-
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
         nY = np.ascontiguousarray(Y, dtype=np.float64)
         write.savevtk_vector(XRow,XCol,YRow,YCol,nX,nY,filename,vectorName,dx,dy)
+    elif vtk_lib_flag:
+        ### STRUCTURED_POINTS - VECTORS ###
+        # Collect info to write
+        origin = (0.0, 0.0, 0.0)
+        spacing = (dx, dy, 1.0)
+        dimensions = (ny, nx, 1)
+        vec_array = np.require(np.stack((np.ravel(X,order='F'),
+                               np.ravel(Y,order='F'), np.zeros(Y.size)), axis=-1),
+                               requirements=['C'])
+        vtk_array = numpy_support.numpy_to_vtk(vec_array)
+        vtk_array.SetName(vectorName)
+        # Create data object
+        vtk_obj = vtk.vtkStructuredPoints()
+        vtk_obj.SetOrigin(origin)
+        vtk_obj.SetSpacing(spacing)
+        vtk_obj.SetDimensions(dimensions)
+        vtk_obj.GetPointData().SetVectors(vtk_array)
+        # Write out data
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetHeader("Generated by IB2d Python")
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write()
     else:
         with open(filename,'w') as fid:
             fid.write('# vtk DataFile Version 2.0\n')
@@ -1516,15 +1562,16 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
 # FUNCTION: prints scalar matrix to vtk formated file
 #
 ##############################################################################
-def savevtk_scalar(array, filename, colorMap,dx,dy):
+def savevtk_scalar(array, filename, dataName,dx,dy):
     ''' Prints scalar matrix to vtk formatted file.
     
     Args:
         array: 2-D ndarray
         filename: file name
-        colorMap:
+        dataName: string describing the data
         dx:
         dy:'''
+
     #  ?? Legacy:
     #  savevtk Save a 3-D scalar array in VTK format.
     #  savevtk(array, filename) saves a 3-D array of any size to
@@ -1534,12 +1581,33 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
     #   3-D is clearly broken in this code, but there were still some reminants 
     #   in the matlab version. Given the choice of doing try/except blocks to
     #   keep these reminants or to kill them entirely, I'm choosing to kill them.
-    #   So, specifically, nz is now gone. I will keep the output the same,
-    #   however, for compatibility. So 1 will be pritned in the Z column.
+    #   So, specifically, nz is now gone.
     ny,nx = array.shape
-    if C_flag == True:
+    if C_flag:
         narray = np.ascontiguousarray(array, dtype=np.float64)
-        write.savevtk_scalar(ny,nx,narray,filename,colorMap,dx,dy)
+        write.savevtk_scalar(ny,nx,narray,filename,dataName,dx,dy)
+    elif vtk_lib_flag:
+        ### STRUCTURED_POINTS - SCALARS ###
+        # Collect info to write
+        origin = (0.0, 0.0, 0.0)
+        spacing = (dx, dy, 1.0)
+        dimensions = (ny, nx, 1)
+        array_r = np.ravel(array,order='F')
+        vtk_array = numpy_support.numpy_to_vtk(array_r)
+        vtk_array.SetName(dataName)
+        # Create data object
+        vtk_obj = vtk.vtkStructuredPoints()
+        vtk_obj.SetOrigin(origin)
+        vtk_obj.SetSpacing(spacing)
+        vtk_obj.SetDimensions(dimensions)
+        vtk_obj.GetPointData().SetScalars(vtk_array)
+        # Write out data
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetHeader("Generated by IB2d Python")
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write()
     else:
         with open(filename,'w') as fid:
             fid.write('# vtk DataFile Version 2.0\n')
@@ -1556,7 +1624,7 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
             fid.write('\n')
             # The 1 below was nz
             fid.write('POINT_DATA   {0}\n'.format(nx*ny*1))
-            fid.write('SCALARS '+colorMap+' double\n')
+            fid.write('SCALARS '+dataName+' double\n')
             fid.write('LOOKUP_TABLE default\n')
             fid.write('\n')
             for b in range(nx):
@@ -1573,14 +1641,14 @@ def savevtk_scalar(array, filename, colorMap,dx,dy):
 #
 ##############################################################################
 
-def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
+def savevtk_points_with_scalar_data( X, scalarArray, filename, dataName):
     ''' Prints matrix vector data to vtk formated file
     
     Args:
         X: Matrix of size Nx3
         scalarArray:
         filename:
-        colorMap:'''
+        dataName: string describing the data'''
 
     # X is matrix of size Nx3 
     #              Col 1: x-data
@@ -1588,19 +1656,39 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
     #              Col 3: z-data
     # scalarArray: Scalar array you are assigning to each point
     # filename:    What you are saving the VTK file as (string)
-    # colorMap:  What you are naming the data you're printing (string)
+    # dataName:  What you are naming the data you're printing (string)
 
     N = X.shape[0]
     nx = scalarArray.shape[0]
 
 
-    if C_flag == True:
+    if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
-        write.savevtk_points_write(N,nX,filename,colorMap)
+        write.savevtk_points_write(N,nX,filename,dataName)
+    elif vtk_lib_flag:
+        ### UNSTRUCTURED_GRID - POINTS, POINT_DATA (SCALARS) ###
+        # Create Points data type
+        vtk_points = vtk.vtkPoints()
+        vtk_points.SetData(numpy_support.numpy_to_vtk(
+                           np.require(X, dtype=np.float64, requirements=['C']),
+                           deep=1))
+        scalarArray_r = np.require(scalarArray, dtype=np.float64, requirements=['C'])
+        vtk_scalarArray = numpy_support.numpy_to_vtk(scalarArray_r)
+        vtk_scalarArray.SetName(dataName)
+        vtk_obj = vtk.vtkUnstructuredGrid()
+        vtk_obj.SetPoints(vtk_points)
+        vtk_obj.GetPointData().SetScalars(vtk_scalarArray)
+        # write out
+        writer = vtk.vtkGenericDataObjectWriter()
+        writer.SetFileName(filename)
+        writer.SetHeader(dataName+" generated by IB2d Python")
+        writer.SetInputDataObject(vtk_obj)
+        writer.Update()
+        writer.Write()
     else:
         with open(filename,'w') as file:
             file.write('# vtk DataFile Version 2.0\n')
-            file.write(colorMap+'\n')
+            file.write(dataName+'\n')
             file.write('ASCII\n')
             file.write('DATASET UNSTRUCTURED_GRID\n\n')
             file.write('POINTS {0} float\n'.format(N))
@@ -1609,7 +1697,7 @@ def savevtk_points_with_scalar_data( X, scalarArray, filename, colorMap):
             file.write('\n')
             #
             file.write('POINT_DATA   {0}\n'.format(nx*1*1))
-            file.write('SCALARS '+colorMap+' double\n')
+            file.write('SCALARS '+dataName+' double\n')
             file.write('LOOKUP_TABLE default\n')
             file.write('\n')
             for c in range(nx):
