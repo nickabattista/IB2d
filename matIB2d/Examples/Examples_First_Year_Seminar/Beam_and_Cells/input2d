@@ -7,7 +7,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 0.02                % Dynamic Viscosity (N*s/m^2) 
+mu = 0.025                % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 }
 
@@ -16,8 +16,8 @@ rho = 1                 % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 1.25            % Final time of simulation (s)
-dt = 5e-5               % Time-step (s)
+Tfinal = 0.05           % Final time of simulation (s)
+dt = 1e-5               % Time-step (s)
 }
 
 
@@ -25,8 +25,8 @@ dt = 5e-5               % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  64                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  64                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -37,13 +37,13 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 %
 Lag_Structure_Info {
-springs = 0             % 0 (for no) or 1 (for yes)
+springs = 1             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 1               % 0 (for no) or 1 (for yes)
-update_beams = 0        % 0 (for no) or 1 (for yes)
-nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
+beams = 0               % 0 (for no) or 1 (for yes) % "Torsional Springs"
+update_beams = 0        % 0 (for no) or 1 (for yes) % Update "Torsional Springs"
+nonInvariant_beams = 1  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
 update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
@@ -63,22 +63,24 @@ expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
 }
 
+
 %
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 200         % How often to print (PLOT) to screen
-plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
+print_dump = 50       % How often to print (PLOT) to screen
+plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
-plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
-plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
-plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
-plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
+plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
+plot_MagVelocity = 0     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
+plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 }
+
 
 %
 % LAGRANGIAN STRUCTURE NAME %
 %
 Lag_Name {
-string_name = "BeamCurve" % String name for simulation 
+string_name = "Beam_and_Cells" % String name for simulation 
 }
