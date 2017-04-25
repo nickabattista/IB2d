@@ -47,7 +47,7 @@ ds = Lx/(2*Nx);  % Lagrangian spacing
 struct_name = 'Beam_and_Cells'; % Name for .vertex, .spring, .beam, .target, etc files.
 r = 0.05;        % radii of circular cell
 x0 = 0.5;
-y0 = 0.5;
+y0 = 0.55;
 
 % Call function to construct geometry
 [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a);         % GIVES BEAM
