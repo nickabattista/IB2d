@@ -61,6 +61,10 @@ def read_Eulerian_Data_From_vtk(path, simNums, strChoice, xy=False):
 def read_vtk_Structured_Points(filename):
     '''This will read in either Scalar or Vector data!'''
 
+    # Check for valid filename (vtk crashes badly if filename is invalid)
+    if not Path(filename).exists():
+        raise OSError(2, "No such file", filename)
+
     # Load data
     reader = vtk.vtkStructuredPointsReader()
     reader.SetFileName(filename)
@@ -101,6 +105,10 @@ def read_Force_Scalar_Data_From_vtk(path, simNums, strChoice):
 
 def read_vtk_Unstructured_Grid_Points(filename):
     '''This is to read Lagrangian mesh data.'''
+
+    # Check for valid filename (vtk crashes badly if filename is invalid)
+    if not Path(filename).exists():
+        raise OSError(2, "No such file", filename)
 
     reader = vtk.vtkUnstructuredGridReader()
     reader.SetFileName(filename)

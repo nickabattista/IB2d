@@ -2,22 +2,39 @@
 %****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%***%
 
+%
 % FLUID PARAMETER VALUES %
-mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
+%
+Fluid_Parameters {
+mu = 0.1               % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
+}
 
+%
 % TEMPORAL INFORMATION %
+%
+Temporal_Information {
 Tfinal = 0.05           % Final time of simulation (s)
 dt = 5e-5               % Time-step (s)
+}
 
-% GRID PARAMETERS / INFORMATION %
+
+%
+% GRID PARAMETERS %
+%
+Grid_Parameters {
 Nx =  32                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny =  32                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
+}
 
+
+%
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
+%
+Lag_Structure_Info {
 springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
@@ -42,9 +59,13 @@ update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
 expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
+}
 
 
+%
 % PRINTING INFORMATION
+%
+Output_Info {
 print_dump = 10       % How often to print (PLOT) to screen
 plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
@@ -52,7 +73,11 @@ plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
 plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+}
 
-
+%
 % LAGRANGIAN STRUCTURE NAME %
-string_name = BeamCurve % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+%
+Lag_Name {
+string_name = "BeamCurve" % String name for simulation 
+}

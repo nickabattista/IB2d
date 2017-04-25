@@ -13,7 +13,6 @@
 /* Rewritten of savevtk_scalar(array, filename, colorMap,dx,dy) with int arrayRow,int arrayCol as additional inputs */
 
 void c_savevtk_scalar(int arrayRow,int arrayCol,double* array, char* filename, char* colorMap,double dx, double dy){
-    int i,j;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
@@ -48,7 +47,6 @@ void c_savevtk_scalar(int arrayRow,int arrayCol,double* array, char* filename, c
 
 /* Rewritten of savevtk_vector(X, Y, filename, vectorName,dx,dy), int Xrow, int Xcol, int Yrow, int Ycol are added as additional inputs*/
 void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double* Y,char* filename,char* vectorName,double dx,double dy){
-    int i,j;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
@@ -73,7 +71,7 @@ void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double*
         for (int j = 0; j<Xcol;j++){
             fprintf(fptr,"%f ",X[i*Xcol+j]);
             fprintf(fptr,"%f ",Y[i*Xcol+j]); /*The length of the number should e-15 !!!!!!!!! */
-            fprintf(fptr,"1");
+            fprintf(fptr,"0 ");
         }
         fprintf(fptr,"\n");
     }
@@ -85,7 +83,6 @@ void c_savevtk_vector(int Xrow, int Xcol, int Yrow, int Ycol, double* X, double*
 
 /*Rewritten of Savevtk_points, add int N as additional input */
 void c_savevtk_points_write(int N, double *x, char* filename, char* vectorName){
-    int i,j;
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL){
         puts("no file exists");
@@ -140,7 +137,7 @@ void c_savevtk_points_connects_write(int N, int Nc, double* x,char* filename, ch
         fprintf(fptr,"CELLS %d %d\n", Nc, Nc*3);
         
         for(int i = 0; i < Nc; i++){
-            fprintf(fptr, "%d %f %f\n",2,connectsMat[i*2+0],connectsMat[i*2+1]);
+            fprintf(fptr, "%d %d %d\n",2,(int) connectsMat[i*2+0],(int) connectsMat[i*2+1]);
         }
         fprintf(fptr, "\n");
         

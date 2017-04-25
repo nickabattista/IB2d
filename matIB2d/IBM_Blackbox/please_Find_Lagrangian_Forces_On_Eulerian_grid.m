@@ -818,9 +818,16 @@ end
 
 
 % Compute distance between Eulerian Pts. and Lagrangian Pts. by passing correct indices for each
-distX = give_Eulerian_Lagrangian_Distance(x(indX),xLag(ind_Lag),Lx);
-distY = give_Eulerian_Lagrangian_Distance(y(indY),yLag(ind_Lag'),Ly);
-
+try
+    distX = give_Eulerian_Lagrangian_Distance(x(indX),xLag(ind_Lag),Lx);
+    distY = give_Eulerian_Lagrangian_Distance(y(indY),yLag(ind_Lag'),Ly);
+catch
+    fprintf('\n\n\n - ERROR - \n');
+    fprintf('\n\n - ERROR ERROR - \n');
+    fprintf('\n\n - ERROR ERROR ERROR - \n');
+    fprintf('\n\n - ERROR ERROR ERROR ERROR - \n\n\n');
+    error('BLOW UP! (*forces TOO large*) -> try decreasing the time-step or decreasing material property stiffnesses');
+end
 
 % Initialize delta_X and delta_Y matrices for storing delta-function info for each Lag. Pt.
 delta_X = zeros(Nb, Nx);

@@ -38,73 +38,31 @@ function main2d()
 %Simulation. It reads in all the parameters from "input2d", and sends them
 %off to the "IBM_Driver" function to actual perform the simulation
 
+% Path Reference to where Driving code is found %
+warning('off','all');
+addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
+%addpath('../../IBM_Blackbox/');
+%addpath('../../../IBM_Blackbox/');
+%addpath('../../../../IBM_Blackbox/');
+
 
 % READ-IN INPUT PARAMETERS %
-[params,strName] = give_Me_input2d_Parameters();
+%[params,strName] = give_Me_input2d_Parameters(); % OLD WAY 
+[Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params] = please_Initialize_Simulation();
 
 
-% SIMULATION TO RUN %
-struct_name = char(strName(1));
 
 
-% FLUID PARAMETER VALUES STORED %
-mu = params(1);      % Dynamic Viscosity
-rho = params(2);     % Density
-
-% TEMPORAL INFORMATION VALUES STORED %
-T_final = params(3); % Final simulation time
-dt = params(4);      % Time-step
-
-% GRID INFO STORED %
-grid_Info(1) = params(5);           % # of Eulerian Pts in x-Direction
-grid_Info(2) = params(6);           % # of Eulerian Pts in y-Direction 
-grid_Info(3) = params(7);           % Length of Eulerian domain in x-Direction
-grid_Info(4) = params(8);           % Length of Eulerian domain in y-Direction
-grid_Info(5) = params(7)/params(5); % Spatial step-size in x
-grid_Info(6) = params(8)/params(6); % Spatial step-size in y
-grid_Info(7) = params(9);           % # of pts used in delta-function support (supp/2 in each direction)
-grid_Info(8) = params(34);          % Print Dump (How often to plot)
-grid_Info(9) = params(35);          % Plot in Matlab? (1=YES,0=NO) 
-grid_Info(10) = params(36);         % Plot LAGRANGIAN PTs ONLY in Matlab
-grid_Info(11) = params(37);         % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-grid_Info(12) = params(38);         % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-grid_Info(13) = params(39);         % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-grid_Info(14) = params(40);         % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
-
-
-% MODEL STRUCTURE DATA STORED %
-model_Info(1) = params(10);         % Springs: 0 (for no) or 1 (for yes) 
-model_Info(2) = params(11);         % Update_Springs: 0 (for no) or 1 (for yes)
-model_Info(3) = params(12);         % Target_Pts: 0 (for no) or 1 (for yes)
-model_Info(4) = params(13);         % Update_Target_Pts: 0 (for no) or 1 (for yes)
-model_Info(5) = params(14);         % Beams (Torsional Springs): 0 (for no) or 1 (for yes)
-model_Info(6) = params(15);         % Update_Beams (Torsional Springs): 0 (for no) or 1 (for yes)
-model_Info(7) = params(16);         % Non-Invariant Beams: 0 (for no) or 1 (for yes)
-model_Info(8) = params(17);         % Update_NonInvariant_Beams: 0 (for no) or 1 (for yes)
-model_Info(9) = params(18);         % Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
-model_Info(10) = params(19);        % Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 0 (for no) or 1 (for yes)
-model_Info(11) = params(20);        % Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
-model_Info(12) = params(21);        % Tracer Particles: 0 (for no) or 1 (for yes)
-model_Info(13)= params(22);         % Mass Points: 0 (for no) or 1 (for yes)
-model_Info(14)= params(23);         % Gravity: 0 (for no) or 1 (for yes)
-model_Info(15)= params(24);         % x-Component of Gravity vector
-model_Info(16)= params(25);         % y-Component of Gravity Vector
-model_Info(17)= params(26);         % Porous Media: 0 (for no) or 1 (for yes)
-model_Info(18)= params(27);         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-model_Info(19)= params(28);         % Electrophysiology Model (FitzHugh-Nagumo)
-model_Info(20)= params(29);         % Damped Springs: 0 (for no) or 1 (for yes)
-model_Info(21)= params(30);         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
-model_Info(22)= params(31);         % Boussinesq: 0 (for no) or 1 (for yes)
-model_Info(23)= params(32);         % expansion coefficient for Boussinesq approx.
-model_Info(24)= params(33);         % user-defined general force model: 0 (for no) or 1 (for yes)
-
-
-% Path Reference to where Driving code is found %
-addpath('../../../../IBM_Blackbox/');
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-[X, Y, U, V, xLags, yLags] = IBM_Driver(struct_name, mu, rho, grid_Info, dt, T_final, model_Info);
-
+%try
+    [X, Y, U, V, xLags, yLags] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params);
+%catch
+    fprintf('\n\n\n');
+    fprintf('           ERROR ERROR ERROR!\n\n\n\n'); 
+    fprintf('PATH NOT CORRECTLY SET TO IBM_Blackbox/IBM_Driver.m FILE! \n\n\n\n'); 
+    error('PATH NOT CORRECTLY SET TO IBM_Blackbox/IBM_Driver.m FILE -> Change Path in main2d.m file!');
+%end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
