@@ -462,7 +462,7 @@ mkdir('hier_IB2d_data');
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
-vort=zeros(Ny,Nx); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)]; 
+vort=zeros(Nx,Ny); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(length(xLag),1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
 Fxh = vort; Fyh = vort; F_Lag = zeros( length(xLag), 2); 
 print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
