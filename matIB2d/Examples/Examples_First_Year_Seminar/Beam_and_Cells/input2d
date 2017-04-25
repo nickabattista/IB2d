@@ -16,8 +16,8 @@ rho = 1                 % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 0.05           % Final time of simulation (s)
-dt = 1e-5               % Time-step (s)
+Tfinal = 1.25           % Final time of simulation (s)
+dt = 5e-5               % Time-step (s)
 }
 
 
@@ -25,8 +25,8 @@ dt = 1e-5               % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  64                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  64                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx = 256                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny = 256                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -41,9 +41,9 @@ springs = 1             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 0               % 0 (for no) or 1 (for yes) % "Torsional Springs"
+beams = 1               % 0 (for no) or 1 (for yes) % "Torsional Springs"
 update_beams = 0        % 0 (for no) or 1 (for yes) % Update "Torsional Springs"
-nonInvariant_beams = 1  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
+nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
 update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
@@ -68,7 +68,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 50       % How often to print (PLOT) to screen
+print_dump = 200       % How often to print (PLOT) to screen
 plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

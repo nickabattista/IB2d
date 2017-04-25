@@ -34,8 +34,8 @@ function Beam_and_Cells()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  64;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx = 256;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny = 256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
@@ -70,21 +70,21 @@ yLag = yLag + 0.25;                         % just change vertical placement of 
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .spring file! 
-k_Spring = 5e7; ds_Rest = a/(N-1);
+k_Spring = 5e5; ds_Rest = a/(N-1);
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,len_beam)
 
 
 % Prints .beam file! (TORSIONAL SPRINGS)
-%k_Beam = 7.5e10; C = 0.0;
-%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
+k_Beam = 5.0e11; C = 0.0;
+print_Lagrangian_Beams(xLag(1:len_beam),yLag(1:len_beam),k_Beam,C,struct_name)
 
 
 % Prints .nonInv_beam file! (NON-INVARIANT))
-k_Beam = 3.0e10; 
+k_Beam = 1.0e10; 
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name,len_beam)
 
 % Prints .target file! 
-k_Target = 2e8;
+k_Target = 1.75e8;
 print_Lagrangian_Target_Pts(xLag(1:len_beam),k_Target,struct_name)
 
 
