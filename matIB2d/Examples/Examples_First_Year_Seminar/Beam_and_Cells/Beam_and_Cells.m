@@ -29,45 +29,63 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function BeamCurve()
+function Beam_and_Cells()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx = 128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny = 128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  64;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  64;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
 
 % Immersed Structure Geometric / Dynamic Parameters %
-N = 1.5*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
+N = 2*Nx;        % Number of Lagrangian Pts. (2x resolution of Eulerian grid)
 a = 0.5;         % Length of beam (only in x-coordinate)
-struct_name = 'BeamCurve'; % Name for .vertex, .spring, .beam, .target, etc files.
-
+ds = Lx/(2*Nx);  % Lagrangian spacing
+struct_name = 'Beam_and_Cells'; % Name for .vertex, .spring, .beam, .target, etc files.
+r = 0.05;        % radii of circular cell
+x0 = 0.5;
+y0 = 0.55;
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a);
-
+[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(N,Lx,a);         % GIVES BEAM
+[xLag2,yLag2] = give_Me_Immsersed_Boundary_Geometry_Cell(ds,r,x0,y0);    % GIVES CELL
 
 % Plot Geometry to test
 plot(xLag,yLag,'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
+plot(xLag2,yLag2,'b-'); hold on;
+plot(xLag2,yLag2,'*'); hold on;
 xlabel('x'); ylabel('y');
 axis square;
 
+% BOOK KEEPING FOR PRINTING INPUT FILES
+len_beam = length(xLag);                    % # of beam pts
+xLag = [xLag xLag2]; yLag = [yLag yLag2];   % # combine into single vector
+yLag = yLag + 0.25;                         % just change vertical placement of geometry
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
+% Prints .spring file! 
+k_Spring = 5e7; ds_Rest = a/(N-1);
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,len_beam)
 
-% Prints .beam file!
-k_Beam = 5e10; C = 0.0;
-print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
+
+% Prints .beam file! (TORSIONAL SPRINGS)
+%k_Beam = 7.5e10; C = 0.0;
+%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
+
+
+% Prints .nonInv_beam file! (NON-INVARIANT))
+k_Beam = 3.0e10; 
+print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name,len_beam)
 
 % Prints .target file! 
-k_Target = 1.75e8;
-print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
+k_Target = 2e8;
+print_Lagrangian_Target_Pts(xLag(1:len_beam),k_Target,struct_name)
 
 
 
@@ -94,7 +112,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints Vertex points to a file called rubberband.vertex
 %
@@ -112,6 +130,65 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
     fprintf(target_fid, '%d %1.16e\n', N, k_Target);
 
     fclose(target_fid); 
+ 
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints BEAM (NON-INVARIANT) points to a file called rubberband.nonInv_beam
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name,lag_beam)
+
+    % k_Beam: beam stiffness
+    % C: beam curvature
+    
+    Ntot = length(xLag); % NOTE: Total number of beams = Number of Total Lag Pts. - 2
+
+    beam_fid = fopen([struct_name '.nonInv_beam'], 'w');
+
+    fprintf(beam_fid, '%d\n', Ntot -3  );
+
+    %spring_force = kappa_spring*ds/(ds^2);
+
+    %BEAMS BETWEEN VERTICES
+    for s = 2:lag_beam-1
+            if  s <= lag_beam-1         
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, s+1, k_Beam, 0, 0);  
+            else
+                %Case s=N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, 1,   k_Beam, 0, 0);  
+            end
+    end
+    
+    for s = lag_beam+1:Ntot-1
+            if  s <= lag_beam+1
+                left = Ntot;
+                mid = s;
+                right = s+1;
+                xBeam = xLag(left)-2*xLag(mid)+xLag(right);
+                yBeam = yLag(left)-2*yLag(mid)+yLag(right);
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',Ntot, s, s+1, k_Beam/1e5, xBeam, yBeam);  
+            elseif s == Ntot-1
+                %Case s=N
+                left = s-1;
+                mid = s;
+                right = Ntot;
+                xBeam = xLag(left)-2*xLag(mid)+xLag(right);
+                yBeam = yLag(left)-2*yLag(mid)+yLag(right);
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, Ntot,   k_Beam/1e5, xBeam, yBeam);
+            else
+                left = s-1;
+                mid = s;
+                right = s+1;
+                xBeam = xLag(left)-2*xLag(mid)+xLag(right);
+                yBeam = yLag(left)-2*yLag(mid)+yLag(right);
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, s+1,   k_Beam/1e5, xBeam, yBeam);
+            end        
+    end
+    fclose(beam_fid); 
+    
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,23 +228,28 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,len_beam)
 
     N = length(xLag);
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', N );
+    fprintf(spring_fid, '%d\n', N-1 );
 
     %spring_force = kappa_spring*ds/(ds^2);
 
-    %SPRINGS BETWEEN VERTICES
-    for s = 1:N
-            if s < N         
+    %SPRINGS BETWEEN VERTICES ON BEAM
+    for s = 1:len_beam
+            if s < len_beam         
                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
+            end
+    end
+    
+    for s=len_beam+1:N
+            if s < N        
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring/100, ds_Rest);  
             else
-                %Case s=N
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', N, len_beam+1, k_Spring/100, ds_Rest);
             end
     end
     fclose(spring_fid); 
@@ -197,3 +279,28 @@ end
 
 xLag = xLag + Lx/2;
 yLag = yLag + Lx/2;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: creates the Lagrangian structure geometry
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry_Cell(ds,r,x0,y0)
+
+    % ds:      Lagrangian spacing
+    % r:       radius
+    % (x0,y0): center of circle
+
+Npts = floor(2*pi*r/ds);
+theta = linspace(0,2*pi,Npts+1);
+theta = theta(1:end-1);
+
+% The immsersed structure is an ellipse %
+for i=1:Npts
+    
+    xLag(i) = x0 + r * cos( theta(i) );
+    yLag(i) = y0 + r * sin( theta(i) );
+    
+end
+
