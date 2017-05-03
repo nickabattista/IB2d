@@ -504,7 +504,11 @@ end
 
 % CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
 if boussinesq_Yes == 1
-    
+    fprintf('  -Boussinesq Approximation included\n');
+    if exp_Coeff == 0
+        fprintf('    -> exp_Coeff set to 1.0 by default, was assigned 0 in input2d <-\n');
+        exp_Coeff = 1.0;
+    end
     if length(gravity_Info) == 1
         fprintf('\n\n\n READ THE ERROR MESSAGE -> YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :) \n\n\n');
         error('YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :)');
