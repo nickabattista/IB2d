@@ -42,7 +42,7 @@ dx = L/N;                           % Cartesian mesh width (m)
 plot(xLag,yLag,'*'); hold on;
 
 % Translate Geometry
-xLag = xLag + L/2;
+xLag = xLag + L/8;
 yLag = yLag + L/4;
 plot(xLag,yLag,'r*'); hold on;
   
@@ -58,11 +58,11 @@ struct_name = 'jelly';      % structure name
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 5*1.2750000000000000e+07;   % spring constant (Newton)
+k_Spring = 50*1.2750000000000000e+07;   % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 500*1.0363359375000002e+13;   % beam stiffness constant (Newton m^2)
+k_Beam = 3.5*1.0363359375000002e+13;   % beam stiffness constant (Newton m^2) %5.1816796875000010e+12
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 
@@ -186,7 +186,7 @@ function [xLag,yLag,ds] = give_Me_Immsersed_Boundary_Geometry(N,L)
 % JELLYFISH GEOMETRY PARAMETERS %
 
 bell_length = 2;                    % bell length (m)
-npts_bell = ceil(2*(bell_length/L)*N); % number of points along the length of the entire bell
+npts_bell = ceil(2.5*(bell_length/L)*N); % number of points along the length of the entire bell
 npts_circ = 1;                    %number of points along the circumference (=1 for 2D)
 npts = npts_bell*npts_circ;	      % total number points 
 ds = bell_length/(npts_bell-1);   % mesh spacing along the length of bell (m)
