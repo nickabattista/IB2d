@@ -255,6 +255,8 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
     Lag_Struct_Params = np.zeros(24)
 
     try: 
+
+        # SPRINGS
         try:
             ind = Lag_Struct_Input[0][:].index('springs')
             Lag_Struct_Params[0] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'springs ')),2};
@@ -265,74 +267,280 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
             except ValueError:
                 Lag_Struct_Params[0] = 0
 
-        ind = Lag_Struct_Input[0][:].index('update_springs')
-        Lag_Struct_Params[1] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_springs ')),2};
+        # UPDATE_SPRINGS
+        try:        
+            ind = Lag_Struct_Input[0][:].index('update_springs')
+            Lag_Struct_Params[1] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_springs ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('update_spring')
+                Lag_Struct_Params[1] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_springs ')),2};
+            except ValueError:
+                Lag_Struct_Params[1] = 0
 
-        ind = Lag_Struct_Input[0][:].index('target_pts')
-        Lag_Struct_Params[2] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'target_pts ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('update_target')
-        Lag_Struct_Params[3] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_target_pts ')),2};
+       # TARGET PTS
+        try:         
+            ind = Lag_Struct_Input[0][:].index('target_pts')
+            Lag_Struct_Params[2] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'target_pts ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('target_pt')
+                Lag_Struct_Params[2] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'target_pts ')),2};
+            except ValueError:
+                Lag_Struct_Params[2] = 0
 
-        ind = Lag_Struct_Input[0][:].index('beams')
-        Lag_Struct_Params[4] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'beams ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('update_beams')
-        Lag_Struct_Params[5] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_beams ')),2};
 
-        ind = Lag_Struct_Input[0][:].index('nonInvariant_beams')
-        Lag_Struct_Params[6] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'nonInvariant_beams ')),2};
+        # UPDATE_TARGET PTS
+        try:         
+            ind = Lag_Struct_Input[0][:].index('update_target')
+            Lag_Struct_Params[3] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_target_pts ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('update_targe')
+                Lag_Struct_Params[3] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_target_pts ')),2};
+            except ValueError:
+                Lag_Struct_Params[3] = 0
     
-        ind = Lag_Struct_Input[0][:].index('update_nonInv_beams')
-        Lag_Struct_Params[7] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_nonInv_beams ')),2};
 
-        ind = Lag_Struct_Input[0][:].index('FV_LT_muscle')
-        Lag_Struct_Params[8] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'FV_LT_muscle ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('3_element_muscle')
-        Lag_Struct_Params[9] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'3_element_muscle ')),2};
+        # BEAM (TORSIONAL SPRING)
+        try:
+            ind = Lag_Struct_Input[0][:].index('beams')
+            Lag_Struct_Params[4] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'beams ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('beam')
+                Lag_Struct_Params[4] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'beams ')),2};
+            except ValueError:
+                Lag_Struct_Params[4] = 0
 
-        ind = Lag_Struct_Input[0][:].index('arb_ext_force')
-        Lag_Struct_Params[10] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'arb_ext_force ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('tracers')
-        Lag_Struct_Params[11] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'tracers ')),2};
+        # UPDATE_BEAMS (TORSIONAL SPRINGS)
+        try:
+            ind = Lag_Struct_Input[0][:].index('update_beams')
+            Lag_Struct_Params[5] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_beams ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('update_beam')
+                Lag_Struct_Params[5] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_beams ')),2};
+            except ValueError:
+                Lag_Struct_Params[5] = 0
 
-        ind = Lag_Struct_Input[0][:].index('mass_pts')
-        Lag_Struct_Params[12] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'mass_pts ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('gravity')
-        Lag_Struct_Params[13] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'gravity ')),2};
+        # NON-INVARIANT BEAMS
+        try:
+            ind = Lag_Struct_Input[0][:].index('nonInvariant_beams')
+            Lag_Struct_Params[6] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'nonInvariant_beams ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('nonInvariant_beam')
+                Lag_Struct_Params[6] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'nonInvariant_beams ')),2};
+            except ValueError:
+                Lag_Struct_Params[6] = 0
 
-        ind = Lag_Struct_Input[0][:].index('x_gravity_vec_comp')
-        Lag_Struct_Params[14] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('y_gravity_vec_comp')
-        Lag_Struct_Params[15] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
 
-        ind = Lag_Struct_Input[0][:].index('porous_media')
-        Lag_Struct_Params[16] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
+        # UPDATE_NON-INVARIANT_BEAMS
+        try:
+            ind = Lag_Struct_Input[0][:].index('update_nonInv_beams')
+            Lag_Struct_Params[7] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_nonInv_beams ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('update_nonInv_beam')
+                Lag_Struct_Params[7] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_nonInv_beams ')),2};
+            except ValueError:
+                Lag_Struct_Params[7] = 0
     
-        ind = Lag_Struct_Input[0][:].index('concentration')
-        Lag_Struct_Params[17] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
 
-        ind = Lag_Struct_Input[0][:].index('electro_phys')
-        Lag_Struct_Params[18] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('damped_springs')
-        Lag_Struct_Params[19] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
+        # FV-LT MUSCLE
+        try:
+            ind = Lag_Struct_Input[0][:].index('FV_LT_muscle')
+            Lag_Struct_Params[8] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'FV_LT_muscle ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('FV_LT_muscl')
+                Lag_Struct_Params[8] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'FV_LT_muscle ')),2};
+            except ValueError:
+                Lag_Struct_Params[8] = 0
 
-        ind = Lag_Struct_Input[0][:].index('update_damp_springs')
-        Lag_Struct_Params[20] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
-    
-        ind = Lag_Struct_Input[0][:].index('boussinesq')
-        Lag_Struct_Params[21] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
 
-        ind = Lag_Struct_Input[0][:].index('expansion_coeff')
-        Lag_Struct_Params[22] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
+        # 3-ELEMENT HILL MUSCLE
+        try:
+            ind = Lag_Struct_Input[0][:].index('3_element_muscle')
+            Lag_Struct_Params[9] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'3_element_muscle ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('3_element_muscl')
+                Lag_Struct_Params[9] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'3_element_muscle ')),2};
+            except ValueError:
+                Lag_Struct_Params[9] = 0
+
+
+        # ARBITRARY_EXTERNAL_FORCE
+        try:
+            ind = Lag_Struct_Input[0][:].index('arb_ext_force')
+            Lag_Struct_Params[10] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'arb_ext_force ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('arb_ext_forc')
+                Lag_Struct_Params[10] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'arb_ext_force ')),2};
+            except ValueError:
+                Lag_Struct_Params[10] = 0
     
-        ind = Lag_Struct_Input[0][:].index('user_force_model')
-        Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
+
+        # TRACERS
+        try:
+            ind = Lag_Struct_Input[0][:].index('tracers')
+            Lag_Struct_Params[11] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'tracers ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('tracer')
+                Lag_Struct_Params[11] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'tracers ')),2};
+            except ValueError:
+                Lag_Struct_Params[11] = 0
+
+    
+        # MASS_POINTS
+        try:
+            ind = Lag_Struct_Input[0][:].index('mass_pts')
+            Lag_Struct_Params[12] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'mass_pts ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('mass_pt')
+                Lag_Struct_Params[12] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'mass_pts ')),2};
+            except ValueError:
+                Lag_Struct_Params[12] = 0
+
+
+        # GRAVITY
+        try:
+            ind = Lag_Struct_Input[0][:].index('gravity')
+            Lag_Struct_Params[13] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'gravity ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('gravit')
+                Lag_Struct_Params[13] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'gravity ')),2};
+            except ValueError:
+                Lag_Struct_Params[13] = 0
+
+
+         # x-GRAVITY COMPONENT
+        try:
+            ind = Lag_Struct_Input[0][:].index('x_gravity_vec_comp')
+            Lag_Struct_Params[14] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('x_gravity_vec_com')
+                Lag_Struct_Params[14] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
+            except ValueError:
+                Lag_Struct_Params[14] = 0   
+
+
+        # y-GRAVITY COMPONENT
+        try:
+            ind = Lag_Struct_Input[0][:].index('y_gravity_vec_comp')
+            Lag_Struct_Params[15] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('y_gravity_vec_com')
+                Lag_Struct_Params[15] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
+            except ValueError:
+                Lag_Struct_Params[15] = 0   
+
+    
+        # POROUS_MEDIA
+        try:
+            ind = Lag_Struct_Input[0][:].index('porous_media')
+            Lag_Struct_Params[16] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('porous_medi')
+                Lag_Struct_Params[16] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
+            except ValueError:
+                Lag_Struct_Params[16] = 0  
+
+
+        # CONCENTRATION
+        try:
+            ind = Lag_Struct_Input[0][:].index('concentration')
+            Lag_Struct_Params[17] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('concentratio')
+                Lag_Struct_Params[17] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
+            except ValueError:
+                Lag_Struct_Params[17] = 0 
+    
+
+        # ELECTROPHYS
+        try:
+            ind = Lag_Struct_Input[0][:].index('electro_phys')
+            Lag_Struct_Params[18] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('electro_phy')
+                Lag_Struct_Params[18] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
+            except ValueError:
+                Lag_Struct_Params[18] = 0 
+
+
+        # DAMPED_SPRINGS
+        try:
+            ind = Lag_Struct_Input[0][:].index('damped_springs')
+            Lag_Struct_Params[19] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('damped_spring')
+                Lag_Struct_Params[19] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
+            except ValueError:
+                Lag_Struct_Params[19] = 0 
+
+
+        # UPDATE_DAMPED_SPRINGS
+        try:
+            ind = Lag_Struct_Input[0][:].index('update_damp_springs')
+            Lag_Struct_Params[20] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('update_damp_spring')
+                Lag_Struct_Params[20] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
+            except ValueError:
+                Lag_Struct_Params[20] = 0    
+
+
+        # BOUSSINESQ
+        try:
+            ind = Lag_Struct_Input[0][:].index('boussinesq')
+            Lag_Struct_Params[21] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('boussines')
+                Lag_Struct_Params[21] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
+            except ValueError:
+                Lag_Struct_Params[21] = 0  
+
+
+        # EXPANSION_COEFFICIENT_FOR_BOUSSINESQ
+        try:
+            ind = Lag_Struct_Input[0][:].index('expansion_coeff')
+            Lag_Struct_Params[22] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('expansion_coef')
+                Lag_Struct_Params[22] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
+            except ValueError:
+                Lag_Struct_Params[22] = 0
+
+
+        # EXPANSION_COEFFICIENT_FOR_BOUSSINESQ
+        try:
+            ind = Lag_Struct_Input[0][:].index('user_force_model')
+            Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('user_force_model')
+                Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
+            except ValueError:
+                Lag_Struct_Params[23] = 0
+
+    
+
 
 
       
@@ -443,7 +651,7 @@ def please_Initialize_Simulation():
     #print(Fluid_Input)
     #print(Grid_Input)
     #print(Time_Input)
-    print(Lag_Struct_Input)
+    #print(Lag_Struct_Input)
     #print(Output_Info)
     #print(Lag_Name_Input)
 
@@ -465,7 +673,7 @@ def please_Initialize_Simulation():
     #print(Grid_Params)
     #print(Time_Params)
     #print(Output_Params)
-    print(Lag_Struct_Params)
+    #print(Lag_Struct_Params)
     #print(Lag_Name_Params)
 
 #    return Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params

@@ -257,7 +257,7 @@ def please_Read_input2d_File(file_name):
     '''
 
     FID.close()                # Closes temp input file, MATLAB: close(FID)
-    #os.remove(file_name)       # Deletes temp input file, MATLAB: delete(file_name)
+    os.remove(file_name)       # Deletes temp input file, MATLAB: delete(file_name)
 
     return parameters          # Returns Parameters
 
