@@ -46,6 +46,9 @@ Lag_Struct_Input = params{find(strcmp({params{:,1}},'Lag_Structure_Info')),2};
 Output_Input = params{find(strcmp({params{:,1}},'Output_Info')),2};
 Lag_Name_Input = params{find(strcmp({params{:,1}},'Lag_Name')),2};
 
+Lag_Struct_Input
+%Lag_Struct_Input = strtrim(Lag_Struct_Input{:,1});
+%Lag_Struct_Input
 
 % INITIALIZE PARAMETERS FOR IBM_DRIVER FILE %
 Fluid_Params = please_Initialize_Fluid_Inputs(Fluid_Input);
@@ -55,6 +58,9 @@ Lag_Struct_Params = please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input);
 Output_Params = please_Initialize_Output_Inputs(Output_Input);
 Lag_Name_Params = please_Initialize_Lag_Name_Inputs(Lag_Name_Input);
 
+Lag_Struct_Params
+
+pause();
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -257,73 +263,73 @@ try
     end
 
     % x-GRAVITY VECTOR COMPONENT %
-    if ( find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp')) > 0 || find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp')) < 0 )
-        Lag_Struct_Params(15) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp')) > 0
+        Lag_Struct_Params(15) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
     else
         Lag_Struct_Params(15) = 0;
     end
 
     % y-GRAVITY VECTOR COMPONENT %
-    if ( find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp')) > 0 || find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp')) < 0 )
-        Lag_Struct_Params(16) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')) > 0
+        Lag_Struct_Params(16) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
     else
         Lag_Struct_Params(16) = 0;
     end
 
     % POROUS MEDIA %
-    if find(strcmp({Lag_Struct_Input{:,1}},'porous_media')) > 0
-        Lag_Struct_Params(17) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')) > 0
+        Lag_Struct_Params(17) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
     else
         Lag_Struct_Params(17) = 0;
     end
 
     % CONCENTRATION GRADIENT %
-    if find(strcmp({Lag_Struct_Input{:,1}},'concentration')) > 0
-        Lag_Struct_Params(18) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'concentration ')) > 0
+        Lag_Struct_Params(18) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
     else
         Lag_Struct_Params(18) = 0;
     end
 
 
     % ELECTROPHYSIOLOGY %
-    if find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')) > 0
-        Lag_Struct_Params(19) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')) > 0
+        Lag_Struct_Params(19) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
     else
         Lag_Struct_Params(19) = 0;
     end
 
     % DAMPED SPRINGS %
-    if find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')) > 0
-        Lag_Struct_Params(20) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')) > 0
+        Lag_Struct_Params(20) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
     else
         Lag_Struct_Params(20) = 0;
     end
 
 
     % UPDATE DAMPED SPRINGS %
-    if find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')) > 0
-        Lag_Struct_Params(21) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')) > 0
+        Lag_Struct_Params(21) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
     else
         Lag_Struct_Params(21) = 0;
     end
 
     % BOUSSINESQ %
-    if find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')) > 0
-        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')) > 0
+        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
     else
         Lag_Struct_Params(22) = 0;
     end
 
     % EXPANSION COEFFICIENT (BOUSSINESQ) %
-    if find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')) > 0
-        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')) > 0
+        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
     else
         Lag_Struct_Params(23) = 0;
     end
 
     % USER-FORCE MODEL %
-    if find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')) > 0
-        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')),2};
+    if find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')) > 0
+        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
     else
         Lag_Struct_Params(24) = 0;
     end
@@ -353,51 +359,51 @@ function Output_Params = please_Initialize_Output_Inputs(Output_Input)
 try
     
     % PRINT DUMP INTERVAL %
-    if find(strcmp({Output_Input{:,1}},'print_dump')) > 0
-        Output_Params(1) = Output_Input{find(strcmp({Output_Input{:,1}},'print_dump')),2};
+    if find(strcmp({Output_Input{:,1}},'print_dump ')) > 0
+        Output_Params(1) = Output_Input{find(strcmp({Output_Input{:,1}},'print_dump ')),2};
     else
         Output_Params(1) = 0;
     end
 
     % PLOT IN MATLAB FLAG %
-    if find(strcmp({Output_Input{:,1}},'plot_Matlab')) > 0
-        Output_Params(2) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_Matlab ')) > 0
+        Output_Params(2) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
     else
         Output_Params(2) = 0;
     end
 
     % PLOT LAG. PTS IN MATLAB %
-    if find(strcmp({Output_Input{:,1}},'plot_LagPts')) > 0
-        Output_Params(3) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_LagPts')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_LagPts ')) > 0
+        Output_Params(3) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_LagPts ')),2};
     else
         Output_Params(3) = 0;
     end
 
     % PLOT VELOCITY IN MATLAB %
-    if find(strcmp({Output_Input{:,1}},'plot_Velocity')) > 0
-        Output_Params(4) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Velocity')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_Velocity ')) > 0
+        Output_Params(4) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Velocity ')),2};
     else
         Output_Params(4) = 0;
     end
 
     % PLOT VORTICITY IN MATLAB %
-    if find(strcmp({Output_Input{:,1}},'plot_Vorticity')) > 0
-        Output_Params(5) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Vorticity')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_Vorticity ')) > 0
+        Output_Params(5) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Vorticity ')),2};
     else
         Output_Params(5) = 0;
     end
 
 
     % PLOT MAG. VELOCITY IN MATLAB %
-    if find(strcmp({Output_Input{:,1}},'plot_MagVelocity')) > 0
-        Output_Params(6) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_MagVelocity')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_MagVelocity ')) > 0
+        Output_Params(6) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_MagVelocity ')),2};
     else
         Output_Params(6) = 0;
     end
     
     % PLOT PRESSURE IN MATLAB %
-    if find(strcmp({Output_Input{:,1}},'plot_Pressure')) > 0
-        Output_Params(7) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Pressure')),2};
+    if find(strcmp({Output_Input{:,1}},'plot_Pressure ')) > 0
+        Output_Params(7) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Pressure ')),2};
     else
         Output_Params(7) = 0;
     end

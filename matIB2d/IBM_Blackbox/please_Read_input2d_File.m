@@ -45,7 +45,7 @@ i = 1;
 while(ischar(tline))
     find_brace = strfind(tline,'{');
     if(find_brace)
-        parameters{i,1} = strtrim(tline(1:find_brace(1)-1));
+        parameters{i,1} = strtrim(tline(1:find_brace(1)-1 ));
         parameters{i,2} = readBrace(FID);
         i = i+1;
     end
@@ -58,7 +58,7 @@ if (isempty(parameters{1,1}))
     parameters = readNoBrace(FID);
 end
 fclose(FID);
-delete(file_name);
+%delete(file_name);
 
 end
 
@@ -92,6 +92,16 @@ fclose(FID);
 fclose(FID_temp);
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads values from input file either numeric or string
+%        
+% Author:  Nick Battista, UNC-CH, nickabattista@gmail.com (edits)
+%          Aaron Barrett, UNC-CH, abarret@live.unc.edu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function value = readValue(string)
 find_quote = strfind(string, '"');
 if(find_quote)
@@ -102,6 +112,15 @@ else
     value = str2num(string);
 end
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads from input file 
+%        
+% Author:  Nick Battista, UNC-CH, nickabattista@gmail.com (edits)
+%          Aaron Barrett, UNC-CH, abarret@live.unc.edu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function params = readBrace(fid)
 params = cell(1,2);
@@ -115,7 +134,7 @@ while(isempty(brace_close))
         params{i,2} = readBrace(fid);
     else
         find_equal = strfind(tline, '=');
-        params{i,1} = tline(1:find_equal(1)-1);
+        params{i,1} = strtrim(tline(1:find_equal(1)-1));
         params{i,2} = readValue(tline(find_equal(1)+1:end));
     end
     tline = fgets(fid);
@@ -123,6 +142,15 @@ while(isempty(brace_close))
     i = i+1;
 end
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads info from input file
+%        
+% Author:  Nick Battista, UNC-CH, nickabattista@gmail.com (edits)
+%          Aaron Barrett, UNC-CH, abarret@live.unc.edu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function params = readNoBrace(fid)
 params = cell(1,2);

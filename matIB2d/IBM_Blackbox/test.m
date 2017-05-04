@@ -1,7 +1,7 @@
 %%
 % Get input file without braces.
 % Outputs grid info:
-params = read_input_file('input2d.IB2D.2');
+params = read_input_file('input2d.IB2D');
 Nx = params{find(strcmp({params{:,1}},'Nx')),2}
 Ny = params{find(strcmp({params{:,1}},'Ny')),2}
 Lx = params{find(strcmp({params{:,1}},'Lx')),2}
