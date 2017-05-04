@@ -2,22 +2,37 @@
 %****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
 %***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
 
+%
 % FLUID PARAMETER VALUES %
+%
+Fluid_Parameters {
 mu = 0.0025                % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
+}
 
+%
 % TEMPORAL INFORMATION %
+%
+Temporal_Information {
 Tfinal = 25            % Final time of simulation (s)
 dt = 1e-2              % Time-step (s)
+}
 
-% GRID PARAMETERS / INFORMATION %
+%
+# GRID PARAMETERS %
+%
+Grid_Parameters {
 Nx =  64               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny =  64               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
+}
 
-% LAGRANGIAN STRUCTURE MODEL INFORMATION %
+%
+% LAGRANGIAN STRUCTURE MODEL INFORMATION % 
+%
+Lag_Structure_Info {
 springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 0          % 0 (for no) or 1 (for yes)
@@ -40,9 +55,12 @@ electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 user_force_model = 0    % 0 (for no) or 1 (for yes)
+}
 
-
+%
 % PRINTING INFORMATION
+%
+Output_Info {
 print_dump = 20          % How often to print (PLOT) to screen
 plot_Matplotlib = 0      % Plot in Matplotlib? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
@@ -50,6 +68,11 @@ plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
 plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+}
 
+%
 % LAGRANGIAN STRUCTURE NAME %
-string_name = rubberband % String name for simulation (NO QUOTATIONs ARE NECESSARY!!!)
+%
+Lag_Name {
+string_name = "rubberband" % String name for simulation 
+}
