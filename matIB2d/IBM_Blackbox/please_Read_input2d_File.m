@@ -58,7 +58,7 @@ if (isempty(parameters{1,1}))
     parameters = readNoBrace(FID);
 end
 fclose(FID);
-%delete(file_name);
+delete(file_name);
 
 end
 
