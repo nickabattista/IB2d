@@ -168,9 +168,19 @@ def please_Initialize_Output_Inputs(Output_Input):
     #              (5): plot_Vorticity
     #              (6): plot_MagVelocity
     #              (7): plot_Pressure
+    #              (8):  save_Vorticity 
+    #              (9):  save_Pressure 
+    #              (10): save_uVec 
+    #              (11): save_uMag 
+    #              (12): save_uX 
+    #              (13): save_uY 
+    #              (14): save_fMag 
+    #              (15): save_fX 
+    #              (16): save_fY 
+    #              (17): save_hier 
 
     # Initialize 
-    Output_Params = np.zeros(7)
+    Output_Params = np.zeros(17)
 
     try: 
 
@@ -184,6 +194,11 @@ def please_Initialize_Output_Inputs(Output_Input):
                 Output_Params[0] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'print_dump ')),2};
             except ValueError:
                 Output_Params[0] = 100  # DEFAULT
+
+        
+        #%%%%%                                         %%%%%%
+        #%%%%% OUTPUT INFO PLOTTING DIRECTLY IN MATLAB %%%%%%
+        #%%%%%                                         %%%%%%
 
 
         # plot_MATLAB flag
@@ -257,6 +272,123 @@ def please_Initialize_Output_Inputs(Output_Input):
                 Output_Params[6] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
             except ValueError:
                 Output_Params[6] = 0    # DEFAULT
+
+        #%%%%%                                                %%%%%%
+        #%%%%% OUTPUT INFO FOR WHAT GETS SAVED TO .VTK FORMAT %%%%%%
+        #%%%%%                                                %%%%%%
+
+        # save_Vorticity flag
+        try:
+            ind = Output_Input[0][:].index('save_Vorticity')
+            Output_Params[7] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_Vorticit')
+                Output_Params[7] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[7] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
+
+        # save_Pressure flag
+        try:
+            ind = Output_Input[0][:].index('save_Pressure')
+            Output_Params[8] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_Pressur')
+                Output_Params[8] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[8] = 1    # DEFAULTS TO ALWAYS SAVE DATA  
+
+
+        # save_uVec flag
+        try:
+            ind = Output_Input[0][:].index('save_uVec')
+            Output_Params[9] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_uVe')
+                Output_Params[9] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[9] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
+
+        # save_uMag flag
+        try:
+            ind = Output_Input[0][:].index('save_uMag')
+            Output_Params[10] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_uMa')
+                Output_Params[10] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[10] = 1    # DEFAULTS TO ALWAYS SAVE DATA                 
+
+        # save_uX flag
+        try:
+            ind = Output_Input[0][:].index('save_uX')
+            Output_Params[11] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_uX')
+                Output_Params[11] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[11] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
+
+        # save_uY flag
+        try:
+            ind = Output_Input[0][:].index('save_uY')
+            Output_Params[12] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_uY')
+                Output_Params[12] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[12] = 1    # DEFAULTS TO ALWAYS SAVE DATA 
+
+
+        # save_fMag flag
+        try:
+            ind = Output_Input[0][:].index('save_fMag')
+            Output_Params[13] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_fMa')
+                Output_Params[13] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[13] = 1    # DEFAULTS TO ALWAYS SAVE DATA                 
+
+        # save_fX flag
+        try:
+            ind = Output_Input[0][:].index('save_fX')
+            Output_Params[14] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_fX')
+                Output_Params[14] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[14] = 1    # DEFAULTS TO ALWAYS SAVE DATA   
+
+         # save_fY flag
+        try:
+            ind = Output_Input[0][:].index('save_fY')
+            Output_Params[15] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_fY')
+                Output_Params[15] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[15] = 1    # DEFAULTS TO ALWAYS SAVE DATA                
+
+         # save_hier flag
+        try:
+            ind = Output_Input[0][:].index('save_hier')
+            Output_Params[16] = Output_Input[1][ind] 
+        except ValueError:
+            try:
+                ind = Output_Input[0][:].index('save_hier')
+                Output_Params[16] = Output_Input[1][ind] 
+            except ValueError:
+                Output_Params[16] = 1    # DEFAULTS TO ALWAYS SAVE DATA
+
 
 
 
