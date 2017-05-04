@@ -7,7 +7,7 @@ IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear
 	off of Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
 Author: Nicholas A. Battista
-Email:  nick.battista@unc.edu
+Email:  nickabattista@gmail.com
 Date Created: May 27th, 2015
 Institution: University of North Carolina at Chapel Hill
 Website: http://battista.web.unc.edu
@@ -26,7 +26,7 @@ This code is capable of creating Lagrangian Structures using:
         5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
                         Force-Velocity/Length-Tension Model)
         6. Mass Points (with or without influence of gravity)
-        7. Porous Structures 
+        7. Porous Structures (via Darcy’s Law) 
         8. Electrophysiology (FitzHugh-Nagumo coupling w/ or w/o calcium
 			dynamics and w/ or w/o muscle models)
 	9. Damped Springs
