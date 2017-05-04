@@ -1568,10 +1568,12 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
     assert (X.shape == Y.shape), 'Error: velocity arrays of unequal size'
     nx, ny = X.shape
     
+
     XRow = X.shape[0]
     XCol = X.shape[1]
     YRow = Y.shape[0]
     YCol = Y.shape[1]
+
 
     if C_flag:
         nX = np.ascontiguousarray(X, dtype=np.float64)
@@ -1582,7 +1584,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
         # Collect info to write
         origin = (0.0, 0.0, 0.0)
         spacing = (dx, dy, 1.0)
-        dimensions = (ny, nx, 1)
+        dimensions = (nx, ny, 1)
         vec_array = np.require(np.stack((np.ravel(X,order='F'),
                                np.ravel(Y,order='F'), np.zeros(Y.size)), axis=-1),
                                requirements=['C'])
@@ -1609,7 +1611,7 @@ def savevtk_vector(X, Y, filename, vectorName,dx,dy):
             fid.write('\n')
             fid.write('DATASET STRUCTURED_POINTS\n')
             # 1 below was nz
-            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(nx, ny, 1))
+            fid.write('DIMENSIONS    {0}   {1}   {2}\n'.format(ny, nx, 1))
             fid.write('\n')
             fid.write('ORIGIN    0.000   0.000   0.000\n')
             #fid.write('SPACING   1.000   1.000   1.000\n') #if want [1,32]x[1,32] rather than [0,Lx]x[0,Ly]
