@@ -87,29 +87,29 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
                    f = ( \LagPts_s * ( 1 - L / abs(\LagPts_s) )  )/ds^2'''
 
     # Grid Info - list#
-    Nx =    grid_Info['Nx'] # # of Eulerian pts. in x-direction
-    Ny =    grid_Info['Ny'] # # of Eulerian pts. in y-direction
-    Lx =    grid_Info['Lx'] # Length of Eulerian grid in x-coordinate
-    Ly =    grid_Info['Ly'] # Length of Eulerian grid in y-coordinate
-    dx =    grid_Info['dx'] # Spatial-size in x
-    dy =    grid_Info['dy'] # Spatial-size in y
-    supp =  int(grid_Info['supp']) # Delta-function support
-    Nb =    grid_Info['Nb'] # # of Lagrangian pts. 
-    ds =    grid_Info['ds'] # Lagrangian spacing
+    Nx =    grid_Info[0] # # of Eulerian pts. in x-direction
+    Ny =    grid_Info[1] # # of Eulerian pts. in y-direction
+    Lx =    grid_Info[2] # Length of Eulerian grid in x-coordinate
+    Ly =    grid_Info[3] # Length of Eulerian grid in y-coordinate
+    dx =    grid_Info[4] # Spatial-size in x
+    dy =    grid_Info[5] # Spatial-size in y
+    supp =  int(grid_Info[6]) # Delta-function support
+    Nb =    grid_Info[7] # # of Lagrangian pts. 
+    ds =    grid_Info[8] # Lagrangian spacing
 
 
     # Model Potential Forces #
-    springs_Yes = model_Info['springs']               # Springs: 0 (for no) or 1 (for yes) 
-    target_pts_Yes = model_Info['target_pts']         # Target_Pts: 0 (for no) or 1 (for yes)
-    beams_Yes = model_Info['beams']                   # Beams (Torsional Springs): 0 (for no) or 1 (for yes)
-    nonInv_beams_Yes = model_Info['nonInv_beams']     # Non-Invariant Beams: 0 (for no) or 1 (for yes)
-    muscle_LT_FV_Yes = model_Info['muscles']          # Length-Tension/Force-Velocity Muscle: 
-        # 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
-    muscle_3_Hill_Yes = model_Info['hill_3_muscles']  # 3-Element Hill Model: 
-        # 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
-    mass_Yes = model_Info['mass']                     # Mass Pts: 0 (for no) or 1 (for yes)
-    d_Springs_Yes = model_Info['damped_springs']      # Damped Springs: 0 (for no) or 1 (for yes)
-    gen_force_Yes = model_Info['user_force']          # User-defined force: 0 (for no) or 1 (for yes)
+    springs_Yes = model_Info[0]         # Springs: 0 (for no) or 1 (for yes) 
+    target_pts_Yes = model_Info[2]      # Target_Pts: 0 (for no) or 1 (for yes)
+    beams_Yes = model_Info[4]           # Beams (Torsional Springs): 0 (for no) or 1 (for yes)
+    nonInv_beams_Yes = model_Info[6]    # Non-Invariant Beams: 0 (for no) or 1 (for yes)
+    muscle_LT_FV_Yes = model_Info[8]    # Length-Tension/Force-Velocity Muscle: 
+                                        # 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
+    muscle_3_Hill_Yes = model_Info[9]   # 3-Element Hill Model: 
+                                        # 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
+    mass_Yes = model_Info[12]           # Mass Pts: 0 (for no) or 1 (for yes)
+    d_Springs_Yes = model_Info[19]      # Damped Springs: 0 (for no) or 1 (for yes)
+    gen_force_Yes = model_Info[23]      # User-defined force: 0 (for no) or 1 (for yes)
 
     if gen_force_Yes:
         from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
@@ -804,14 +804,14 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
         delta_Y:'''
 
     # Grid Info
-    Nx =   grid_Info['Nx']
-    Ny =   grid_Info['Ny']
-    Lx =   grid_Info['Lx']
-    Ly =   grid_Info['Ly']
-    dx =   grid_Info['dx']
-    dy =   grid_Info['dy']
-    supp = int(grid_Info['supp'])
-    Nb =   grid_Info['Nb']
+    Nx =   grid_Info[0]
+    Ny =   grid_Info[1]
+    Lx =   grid_Info[2]
+    Ly =   grid_Info[3]
+    dx =   grid_Info[4]
+    dy =   grid_Info[5]
+    supp = int(grid_Info[6])
+    Nb =   grid_Info[7]
 
     # Find the indices of the points (xi, yj) where the 1D delta functions are 
     # non-zero in EULERIAN FRAME

@@ -63,7 +63,7 @@ except:
 #
 ###############################################################################
 
-def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
+def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params):
 
     ''' 2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 
@@ -107,62 +107,116 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     print('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n')
     print('\n\n--> Reading input data for simulation...\n\n')
     
-    # Temporal Information
-    NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
-                                # (floored, so exact number of time-steps)
-    dt = T_FINAL/NTime #time-step (slightly perturbed dt, so exact number of 
-                       #time-steps are used
-    current_time = 0.0
-    
+
+        #
+    # ** IBM_DRIVER INPUT DEFINITIONS ** :
+    #
+    #               Fluid_Params[1]: mu
+    #                           [2]: density
+    #
+    #               Grid_Params[1]: Nx
+    #                          [2]: Ny
+    #                          [3]: Lx
+    #                          [4]: Ly
+    #                          [5]: Supp
+    #
+    #               Time_Params[1]: Tfinal [end time of simulation]
+    #                          [2]: dt [time-step]
+    #
+    #               Lag_Struct_Params[1]: springs
+    #                                [2]: update_springs
+    #                                [3]: target points
+    #                                [4]: update_target_points
+    #                                [5]: beams [torsional beams]
+    #                                [6]: update_beams
+    #                                 .         .
+    #                                 .         .
+    #                                 .         .
+    #
+    #               Output_Params[1]: print_dump
+    #                            [2]: plot_Matlab
+    #                            [3]: plot_LagPts
+    #                            [4]: plot_Velocity
+    #                            [5]: plot_Vorticity
+    #                            [6]: plot_MagVelocity
+    #                            [7]: plot_Pressure
+
+
+    # SIMULATION NAME STRING TO RUN .vertex, .spring, etc. #
+    struct_name = Lag_Name_Params
+
+    # FLUID PARAMETER VALUES STORED #
+    mu = Fluid_Params[0]      # Dynamic Viscosity
+    rho = Fluid_Params[1]     # Density
+
+    # TEMPORAL INFORMATION VALUES STORED #
+    T_FINAL = Time_Params[0]     # Final simulation time
+    dt = Time_Params[1]          # Time-step
+    #NTime = floor[T_FINAL/dt]+1 # # of total time-steps [floor'd so exact number of time-steps]
+    #dt = T_FINAL/NTime          # revised time-step [slightly perturbed dt, so exact # of time-steps are used]
+    current_time = 0.0           # initialize start of simulation to time, 0 
+
+
     # GRID INFO #
-    Nx = grid_Info['Nx']   # num of Eulerian pts. in x-direction (int)
-    Ny = grid_Info['Ny']   # num of Eulerian pts. in y-direction (int)
-    Lx = grid_Info['Lx']   # Length of Eulerian grid in x-coordinate
-    Ly = grid_Info['Ly']   # Length of Eulerian grid in y-coordinate
-    dx = grid_Info['dx']   # Spatial-size in x
-    dy = grid_Info['dy']   # Spatial-size in y
-    supp = int(grid_Info['supp']) # Delta-function support
-    
+    Nx =   int(Grid_Params[0])               # # of Eulerian pts. in x-direction
+    Ny =   int(Grid_Params[1])                # # of Eulerian pts. in y-direction
+    Lx =   Grid_Params[2]                # Length of Eulerian grid in x-coordinate
+    Ly =   Grid_Params[3]                # Length of Eulerian grid in y-coordinate
+    dx =   Grid_Params[2]/Grid_Params[0] # Spatial-size in x
+    dy =   Grid_Params[3]/Grid_Params[1] # Spatial-size in y
+    supp = Grid_Params[4]                # Delta-function support
+    grid_Info = [Nx,Ny,Lx,Ly,dx,dy,supp] # Store for passing values into IB time-loop sub-functions
+                                         # NOTE: grid_Info[8] = Nb, grid_Info[9] = ds [THEY GET STORED LATER]
+
     # PRINTING/PLOTTING INFO #
-    pDump = grid_Info['pDump']              # Print (Plot) Dump interval
-    pMatplotlib = grid_Info['pMatplotlib']  # Plot in matplotlib? (1=YES,0=NO)
-    lagPlot = grid_Info['lagPlot']     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    velPlot = grid_Info['velPlot']     # Plot LAGRANGIAN PTs + VELOCITY FIELD in matplotlib
-    vortPlot = grid_Info['vortPlot']   # Plot LAGRANGIAN PTs + VORTICITY colormap in matplotlib
-    uMagPlot = grid_Info['uMagPlot']   # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
-                                       #   colormap in matplotlib
-    pressPlot = grid_Info['pressPlot'] # Plot LAGRANTIAN PTs + PRESSURE colormap in matplotlib
-    
-    
+    pDump = Output_Params[0]          # Print [Plot] Dump interval
+    pMatplotlib = Output_Params[1]        # Plot in Matlab? [1=YES,0=NO]
+    lagPlot = Output_Params[2]        # Plot LAGRANGIAN PTs ONLY in Matlab
+    velPlot = Output_Params[3]        # Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+    vortPlot = Output_Params[4]       # Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+    uMagPlot = Output_Params[5]       # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+    pressPlot = Output_Params[6]      # Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+
+
     # MODEL STRUCTURE DATA STORED #
-    springs_Yes = model_Info['springs']                    # Springs: 0 (0=no, 1=yes)
-    update_Springs_Flag = model_Info['update_springs']     # Update_Springs: (0=no, 1=yes)
-    target_pts_Yes = model_Info['target_pts']              # Target_Pts: (0=no, 1=yes)
-    update_Target_Pts = model_Info['update_target_pts']    # Update_Target_Pts: (0=no, 1=yes)
-    beams_Yes = model_Info['beams']                        # Beams (Torsional Springs): (0=no, 1=yes)
-    update_Beams_Flag = model_Info['update_beams']         # Update_Beams: (0=no, 1=yes)
-    nonInv_beams_Yes = model_Info['nonInv_beams']          # Non-Invariant Beams:  (0=no, 1=yes)
-    update_nonInv_Beams_Flag = model_Info['update_nonInv_beams']# Update_NonInv_Beams: (0=no, 1=yes)
-    muscles_Yes = model_Info['muscles']                    # FV-LT Muscles: (0=no, 1=yes)
-    hill_3_muscles_Yes = model_Info['hill_3_muscles']      # Hill 3-Element Muscle: (0=no, 1=yes)
-    arb_ext_force_Yes = model_Info['arb_ext_force']        # Arbitrary External Force: (0=no, 1=yes)
-    tracers_Yes = model_Info['tracers']                    # Tracers: (0=no, 1=yes)
-    mass_Yes = model_Info['mass']                          # Mass Points: (0=no, 1=yes)
-    gravity_Yes = model_Info['gravity']                    # Gravity: (0=no, 1=yes)
-    #NOTE: model_Info['xG']/['yG'] - components of gravity vector
-    porous_Yes = model_Info['porous']                      # Porous Media: (0=no, 1=yes)
-    concentration_Yes = model_Info['concentration']        # Background Concentration Gradient: 
-                                                           #  0 (for no) or 1 (for yes)
-    d_Springs_Yes = model_Info['damped_springs']           #Damped Springs: 0 (for no) or 1 (for yes)
-    update_D_Springs_Flag = model_Info['update_D_Springs'] # Update_Damped_Springs (0=no, 1=yes)
-    general_force_Yes = model_Info['user_force']           # User-defined force model (0=no,1=yes)
+    springs_Yes = Lag_Struct_Params[0]           # Springs: 0 [for no] or 1 [for yes] 
+    update_Springs_Flag = Lag_Struct_Params[1]   # Update_Springs: 0 [for no] or 1 [for yes]
+    target_pts_Yes = Lag_Struct_Params[2]        # Target_Pts: 0 [for no] or 1 [for yes]
+    update_Target_Pts = Lag_Struct_Params[3]     # Update_Target_Pts: 0 [for no] or 1 [for yes]
+    beams_Yes = Lag_Struct_Params[4]             # Beams: 0 [for no] or 1 [for yes]
+    update_Beams_Flag = Lag_Struct_Params[5]     # Update_Beams: 0 [for no] or 1 [for yes]
+    nonInv_beams_Yes = Lag_Struct_Params[6]      # Beams [non-invariant]: 0 [for no] or 1 [for yes]
+    update_nonInv_Beams_Flag = Lag_Struct_Params[7] # Update_nonInv_Beams: 0 [for no] or 1 [for yes]
+    muscles_Yes = Lag_Struct_Params[8]           # FV-LT Muscles: 0 [for no] or 1 [for yes]
+    hill_3_muscles_Yes = Lag_Struct_Params[9]    # Hill 3-Element Muscle: 0 [for no] or 1 [for yes]
+    arb_ext_force_Yes = Lag_Struct_Params[10]     # Arbitrary External Force: 0 [for no] or 1 [for yes]
+    tracers_Yes = Lag_Struct_Params[11]          # Tracers: 0 [for no] or 1 [for yes]
+    mass_Yes = Lag_Struct_Params[12]             # Mass Points: 0 [for no] or 1 [for yes]
+    gravity_Yes = Lag_Struct_Params[13]          # Gravity: 0 [for no] or 1 [for yes]
+    # NOTE: Lag_Struct_Params[14],[15]:            <- components of gravity vector [if gravity, initialize them below]
+    porous_Yes = Lag_Struct_Params[16]           # Porous Media: 0 [for no] or 1 [for yes]
+    concentration_Yes = Lag_Struct_Params[17]    # Background Concentration Gradient: 0 [for no] or 1 [for yes]
+    electro_phys_Yes = Lag_Struct_Params[18]     # Electrophysiology [FitzHugh-Nagumo]: 0 [for no] or 1 [for yes]
+    d_Springs_Yes = Lag_Struct_Params[19]        # Damped Springs: 0 [for no] or 1 [for yes]
+    update_D_Springs_Flag = Lag_Struct_Params[20]# Update_Damped_Springs: # 0 [for no] or 1 [for yes]
+    boussinesq_Yes = Lag_Struct_Params[21]       # Boussinesq Approx.: 0 [for no] or 1 [for yes]
+    exp_Coeff = Lag_Struct_Params[22]            # Expansion Coefficient [e.g., thermal, etc] for Boussinesq approx.
+    general_force_Yes = Lag_Struct_Params[23]    # General User-Defined Force Term: 0 [for no] or 1 [for yes]
+
+    # CLEAR INPUT DATA #
+
+
+    # Temporal Information
+    #NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
+                                # (floored, so exact number of time-steps)
+    #dt = T_FINAL/NTime #time-step (slightly perturbed dt, so exact number of 
+                       #time-steps are used
+    #current_time = 0.0
     
+
+
     
-    
-    
-    #Lagrangian Structure Data
-    ds = Lx/(2.*Nx)             #Lagrangian Spacing
-    grid_Info['ds'] = ds
+
     
     
     # Create EULERIAN Mesh (these assume periodicity in x and y)
@@ -176,9 +230,9 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     #Y = np.empty((y.size,Ny))
     #for ii in range(Ny):
     #    Y[:,ii] = y
-    # MATLAB SYNTAX: [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy);
+    # MATLAB SYNTAX: [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy)
     X,Y = np.meshgrid(x,y)
-    # MATLAB SYNTAX: [idX,idY] = meshgrid(0:Nx-1,0:Ny-1);  <--- INITIALIZE FOR FLUID SOLVER FFT FUNCTION    
+    # MATLAB SYNTAX: [idX,idY] = meshgrid(0:Nx-1,0:Ny-1)  <--- INITIALIZE FOR FLUID SOLVER FFT FUNCTION    
     idX,idY = np.meshgrid(np.arange(0,Nx,1),np.arange(0,Ny,1)) # <- INITIALIZES FOR FLUID SOLVER FFT OPERATORS
 
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
@@ -186,11 +240,15 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
     # READ IN LAGRANGIAN POINTS #
     Nb,xLag,yLag = read_Vertex_Points(struct_name)
-    grid_Info['Nb'] = Nb          # num Total Number of Lagrangian Pts.
+    grid_Info.append(Nb)       # Total Number of Lagrangian Pts. (grid_Info[7]=Nb)
     xLag_P = xLag              # Initialize previous Lagrangian x-Values 
                                #   (for use in muscle-model)
     yLag_P = yLag              # Initialize previous Lagrangian y-Values 
                                #   (for use in muscle-model)
+
+    #Lagrangian Structure Data
+    ds = Lx/(2.*Nx)             # Lagrangian Spacing
+    grid_Info.append(ds)        # grid_Info[8] = ds                  
     
     print('\n--> FIBER MODEL INCLUDES: \n')
                    
@@ -435,8 +493,8 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
 
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
     if gravity_Yes:    
-        xG = model_Info['xG']       # x-Component of Gravity Vector
-        yG = model_Info['yG']       # y-Component of Gravity Vector
+        xG = Lag_Struct_Params[14]       # x-Component of Gravity Vector
+        yG = Lag_Struct_Params[15]      # y-Component of Gravity Vector
         normG = sqrt( xG**2 + yG**2 )
         gravity_Info = [gravity_Yes, xG/normG, yG/normG]
         #   col 1: flag if considering gravity
@@ -486,6 +544,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
     V = np.zeros((Ny,Nx))                           # y-Eulerian grid velocity
+    U.shape
     mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
 
     if arb_ext_force_Yes:
@@ -495,7 +554,11 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     
     # ACTUAL TIME-STEPPING IBM SCHEME! 
     #(flags for storing structure connects for printing and printing to .vtk)
-    cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1
+    cter = 0 
+    ctsave = 0 
+    firstPrint = 1 
+    loc = 1 
+    diffy = 1
     
     # CREATE VIZ_IB2D FOLDER, HIER_IB2D_DATA FOLDER and VISIT FILES
     try:
@@ -512,24 +575,31 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
     vizID = 1 #JUST INITIALIZE BC dumps.visit isn't working correctly...yet
     os.chdir('viz_IB2d')
 
+
+
     #Save grid_Info and model_Info in human readable format
-    with open('_grid_Info.txt','w') as fobj:
-        for key in sorted(grid_Info):
-            fobj.write('{0} = {1}\n'.format(key,grid_Info[key]))
-    with open('_model_Info.txt','w') as fobj:
-        for key in sorted(model_Info):
-            fobj.write('{0} = {1}\n'.format(key,model_Info[key]))
+    #with open('_grid_Info.txt','w') as fobj:
+    #    for key in sorted(grid_Info):
+    #        fobj.write('{0} = {1}\n'.format(key,grid_Info[key]))
+    #with open('_model_Info.txt','w') as fobj:
+    #    for key in sorted(model_Info):
+    #        fobj.write('{0} = {1}\n'.format(key,model_Info[key]))
     #vizID = open('dumps.visit','w')
     #vizID.write('!NBLOCKS 6\n')
     #os.chdir('..')
     
     #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
     #Print initializations to .vtk
-    vort = np.zeros((Nx,Ny)); uMag = np.array(vort); p = np.array(vort)
+    vort = np.zeros((Nx,Ny)) 
+    uMag = np.array(vort) 
+    p = np.array(vort)
     lagPts = np.zeros((xLag.size,3))
-    lagPts[:,0] = xLag; lagPts[:,1] = yLag
+    lagPts[:,0] = xLag 
+    lagPts[:,1] = yLag
     connectsMat,spacing = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info)
-    Fxh = np.array(vort); Fyh =np.array(vort); F_Lag = np.zeros((xLag.size,2)) 
+    Fxh = np.array(vort) 
+    Fyh =np.array(vort) 
+    F_Lag = np.zeros((xLag.size,2)) 
     print_vtk_files(ctsave,vizID,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
     print('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n')
@@ -588,7 +658,7 @@ def main(struct_name, mu, rho, grid_Info, dt, T_FINAL, model_Info):
         #
         #
         Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
-        dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, model_Info,\
+        dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params,\
         springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
         mass_info, d_springs_info, gen_force_info)
         
@@ -810,7 +880,7 @@ def read_Spring_Points(struct_name):
             missing_values=['-NaN', '-nan', 'N/A', 'NA', 'NULL', 'NaN', 'nan'],filling_values=1)
     except ValueError:
         print('Failed to load spring data from {}.\n'.format(filename)+
-              'Check that all rows (after the first) have the same number of columns;\n'+
+              'Check that all rows (after the first) have the same number of columns\n'+
               'N/A, NA, NULL, NaN, and nan can be used to denote missing values if\n'+
               'linear and non-linear springs are mixed (these entries will be replaced with a 1).')
         raise

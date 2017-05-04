@@ -74,15 +74,15 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
 
 
     # Grid Info. grid_Info is a dict
-    Nx =   grid_Info['Nx']
-    Ny =   grid_Info['Ny']
-    Lx =   grid_Info['Lx']
-    Ly =   grid_Info['Ly']
-    dx =   grid_Info['dx']
-    dy =   grid_Info['dy']
-    supp = int(grid_Info['supp'])
-    Nb =   grid_Info['Nb']
-    ds =   grid_Info['ds']
+    Nx =   grid_Info[0]
+    Ny =   grid_Info[1]
+    Lx =   grid_Info[2]
+    Ly =   grid_Info[3]
+    dx =   grid_Info[4]
+    dy =   grid_Info[5]
+    supp = int(grid_Info[6])
+    Nb =   grid_Info[7]
+    ds =   grid_Info[8]
 
 
     # Find indices where the delta-function kernels are non-zero for both x and y.
