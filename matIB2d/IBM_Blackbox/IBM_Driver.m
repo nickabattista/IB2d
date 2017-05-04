@@ -84,13 +84,23 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                                 .         .
 %                                 .         .
 %
-%               Output_Params(1): print_dump
-%                            (2): plot_Matlab
-%                            (3): plot_LagPts
-%                            (4): plot_Velocity
-%                            (5): plot_Vorticity
-%                            (6): plot_MagVelocity
-%                            (7): plot_Pressure
+%               Output_Params(1):  print_dump
+%                            (2):  plot_Matlab
+%                            (3):  plot_LagPts
+%                            (4):  plot_Velocity
+%                            (5):  plot_Vorticity
+%                            (6):  plot_MagVelocity
+%                            (7):  plot_Pressure
+%                            (8):  save_Vorticity 
+%                            (9):  save_Pressure 
+%                            (10): save_uVec 
+%                            (11): save_uMag 
+%                            (12): save_uX 
+%                            (13): save_uY 
+%                            (14): save_fMag 
+%                            (15): save_fX 
+%                            (16): save_fY 
+%                            (17): save_hier 
 
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
@@ -154,7 +164,7 @@ exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., the
 general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
-clear Fluid_Params Grid_Params Time_Params Output_Params Lag_Name_Params;
+clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
 
 
 %Lagrangian Structure Data
@@ -548,21 +558,18 @@ end
 cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 
-% CREATE VIZ_IB2D FOLDER and VISIT FILES
+% CREATE VIZ_IB2D/HIER_IB2d_DATA FOLDER for .VTK FILES
 mkdir('viz_IB2d');
-mkdir('hier_IB2d_data'); 
-%cd('viz_IB2d');
-%vizID = fopen('dumps.visit','w'); 
-%fprintf(vizID,'!NBLOCKS 6\n');
-%cd ..
-
+if Output_Params(17) == 1
+    mkdir('hier_IB2d_data'); 
+end
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
 %Print initializations to .vtk
 vort=zeros(Nx,Ny); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(Nb,1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
 Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
+print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n\n',current_time);
 ctsave = ctsave+1;
@@ -712,7 +719,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
+        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -760,9 +767,29 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
+function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
 
-%Give spacing for grid
+    %
+    %  Output_Params(1):  print_dump
+    %               (2):  plot_Matlab
+    %               (3):  plot_LagPts
+    %               (4):  plot_Velocity
+    %               (5):  plot_Vorticity
+    %               (6):  plot_MagVelocity
+    %               (7):  plot_Pressure
+    %               (8):  save_Vorticity 
+    %               (9):  save_Pressure 
+    %               (10): save_uVec 
+    %               (11): save_uMag 
+    %               (12): save_uX 
+    %               (13): save_uY 
+    %               (14): save_fMag 
+    %               (15): save_fX 
+    %               (16): save_fY 
+    %               (17): save_hier 
+
+    
+%Give EULERIAN spacing for grid
 dx = Lx/Nx; 
 dy = Ly/Ny;
 
@@ -801,24 +828,33 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
     end
 
-    %Print another cycle to .visit file
-    %fprintf(vizID,[vortfName '\n']);
-    %fprintf(vizID,[uMagfName '\n']);
-    %fprintf(vizID,[pfName '\n']);
-    %fprintf(vizID,[uXName '\n']);
-    %fprintf(vizID,[uYName '\n']);
-    %fprintf(vizID,[velocityName '\n']);
-
 
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
-    savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
-    savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
-    savevtk_scalar(p, pfName, 'P',dx,dy);
-    savevtk_scalar(U, uXName, 'uX',dx,dy);
-    savevtk_scalar(V, uYName, 'uY',dx,dy);
+    if Output_Params(8) == 1
+        savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
+    end
+    if Output_Params(9) == 1
+        savevtk_scalar(p, pfName, 'P',dx,dy);
+    end
+    if Output_Params(11) == 1
+        savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
+    end
+    if Output_Params(12) == 1
+        savevtk_scalar(U, uXName, 'uX',dx,dy);
+    end
+    if Output_Params(13) == 1
+        savevtk_scalar(V, uYName, 'uY',dx,dy);
+    end
+    if Output_Params(15) == 1
     savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
-    savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
-    savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
+    end
+    if Output_Params(16) == 1
+        savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
+    end
+    if Output_Params(14) == 1
+        savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
+    end
+    
 
 
     if concentration_Yes == 1
@@ -828,57 +864,60 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
-    savevtk_vector(U, V, velocityName, 'u',dx,dy)
+    if Output_Params(10) == 1
+        savevtk_vector(U, V, velocityName, 'u',dx,dy);
+    end
 
 %Get out of viz_IB2d folder
 cd ..
 
-if length( lagPts ) <= 5
-    %
-    % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
-    %
-    cd('hier_IB2d_data'); %change directory to hier-data folder
-    
-        % Save x-y force data!
-        fLag_XName = ['fX_Lag.' strNUM '.vtk'];
-        fLag_YName = ['fY_Lag.' strNUM '.vtk'];
-        savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
-        savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
+if Output_Params(17) == 1
+    if length( lagPts ) <= 5
+        %
+        % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
+        %
+        cd('hier_IB2d_data'); %change directory to hier-data folder
 
-        % Save force Magnitude (no normal/tangential -> not enough points)
-        fMagName = ['fMag.' strNUM '.vtk'];
-        fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-    cd ..
-else
+            % Save x-y force data!
+            fLag_XName = ['fX_Lag.' strNUM '.vtk'];
+            fLag_YName = ['fY_Lag.' strNUM '.vtk'];
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
 
-    %
-    % Print Lagrangian Force Data to hier_IB2d_data folder
-    %
-    [F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
-    %
-    cd('hier_IB2d_data'); %change directory to hier-data folder
-        
-        % Save x-y force data!
-        fLag_XName = ['fX_Lag.' strNUM '.vtk'];
-        fLag_YName = ['fY_Lag.' strNUM '.vtk'];
-        savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
-        savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
-    
-        % Save force Magnitude, Mag. Normal, Mag. Tangential
-        fMagName = ['fMag.' strNUM '.vtk'];
-        fNormalName = ['fNorm.' strNUM '.vtk'];
-        fTangentName = ['fTan.' strNUM '.vtk'];
+            % Save force Magnitude (no normal/tangential -> not enough points)
+            fMagName = ['fMag.' strNUM '.vtk'];
+            fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+        cd ..
+    else
 
-        fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+        %
+        % Print Lagrangian Force Data to hier_IB2d_data folder
+        %
+        [F_Tan_Mag,F_Normal_Mag] = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag);
+        %
+        cd('hier_IB2d_data'); %change directory to hier-data folder
 
-        savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-        savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-        savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+            % Save x-y force data!
+            fLag_XName = ['fX_Lag.' strNUM '.vtk'];
+            fLag_YName = ['fY_Lag.' strNUM '.vtk'];
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
 
-    cd .. % Get out of hier_IB2d_data folder
+            % Save force Magnitude, Mag. Normal, Mag. Tangential
+            fMagName = ['fMag.' strNUM '.vtk'];
+            fNormalName = ['fNorm.' strNUM '.vtk'];
+            fTangentName = ['fTan.' strNUM '.vtk'];
 
-end % ENDS IF-STATEMENT
+            fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
+
+            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+            savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
+            savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+
+        cd .. % Get out of hier_IB2d_data folder
+    end
+end % ENDS IF-STATEMENT FOR IF SAVE_HIER
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
