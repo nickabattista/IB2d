@@ -800,15 +800,6 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     %Find string number for storing files
     strNUM = give_String_Number_For_VTK(ctsave);
-    vortfName = ['Omega.' strNUM '.vtk'];
-    uMagfName = ['uMag.' strNUM '.vtk'];
-    pfName = ['P.' strNUM '.vtk'];
-    uXName = ['uX.' strNUM '.vtk'];
-    uYName = ['uY.' strNUM '.vtk'];
-    fXName = ['fX.' strNUM '.vtk'];
-    fYName = ['fY.' strNUM '.vtk'];
-    fMagName = ['fMag.' strNUM '.vtk'];
-    velocityName = ['u.' strNUM '.vtk'];
     lagPtsName = ['lagsPts.' strNUM '.vtk'];
 
     %Print Lagrangian Pts to .vtk format
@@ -831,27 +822,35 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
     if Output_Params(8) == 1
+        vortfName = ['Omega.' strNUM '.vtk'];
         savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
     end
     if Output_Params(9) == 1
+        pfName = ['P.' strNUM '.vtk'];
         savevtk_scalar(p, pfName, 'P',dx,dy);
     end
     if Output_Params(11) == 1
+        uMagfName = ['uMag.' strNUM '.vtk'];
         savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
     end
     if Output_Params(12) == 1
+        uXName = ['uX.' strNUM '.vtk'];
         savevtk_scalar(U, uXName, 'uX',dx,dy);
     end
     if Output_Params(13) == 1
+        uYName = ['uY.' strNUM '.vtk'];
         savevtk_scalar(V, uYName, 'uY',dx,dy);
     end
     if Output_Params(15) == 1
-    savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
+        fXName = ['fX.' strNUM '.vtk'];
+        savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
     end
     if Output_Params(16) == 1
+        fYName = ['fY.' strNUM '.vtk'];
         savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
     end
     if Output_Params(14) == 1
+        fMagName = ['fMag.' strNUM '.vtk'];
         savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
     end
     
@@ -865,6 +864,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
     if Output_Params(10) == 1
+        velocityName = ['u.' strNUM '.vtk'];
         savevtk_vector(U, V, velocityName, 'u',dx,dy);
     end
 
