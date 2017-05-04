@@ -33,6 +33,7 @@ import sys
 # Path Reference to where Driving code is found #
 sys.path.append('../../IBM_Blackbox')
 import IBM_Driver as Driver
+from please_Initialize_Simulation import *
 
 ###############################################################################
 #
@@ -88,77 +89,23 @@ def main2d():
     "input2d", and sends them off to the "IBM_Driver" function to actually 
     perform the simulation.'''
     
-    # READ-IN INPUT PARAMTERS #
-    params,struct_name = give_Me_input2d_Parameters()
+    # OLD FORMAT #
+    # READ-IN INPUT2d PARAMTERS #
+    # params,struct_name = give_Me_input2d_Parameters()
     
-    # FLUID PARAMETER VALUES STORED #
-    mu = params[0]      # Dynamic Viscosity
-    rho = params[1]     # Density
-
-    # TEMPORAL INFORMATION VALUES STORED #
-    T_final = params[2] # Final simulation time
-    dt = params[3]      # Time-step
-
-    # GRID INFO STORED #
-    grid_Info = {}
-    grid_Info['Nx'] = int(params[4])      # num of Eulerian Pts in x-Direction
-    grid_Info['Ny'] = int(params[5])      # num of Eulerian Pts in y-Direction 
-    grid_Info['Lx'] = params[6]           # Length of Eulerian domain in x-Direction
-    grid_Info['Ly'] = params[7]           # Length of Eulerian domain in y-Direction
-    grid_Info['dx'] = params[6]/params[4] # Spatial step-size in x
-    grid_Info['dy'] = params[7]/params[5] # Spatial step-size in y
-    grid_Info['supp'] = params[8] # num of pts used in delta-function support 
-                                       #    (supp/2 in each direction)
-    grid_Info['pDump'] = params[31]            # Print Dump (How often to plot)
-    grid_Info['pMatplotlib'] = int(params[32]) # Plot in matplotlib? (1=YES,0=NO) 
-    grid_Info['lagPlot'] = int(params[33])     # Plot LAGRANGIAN PTs ONLY in matplotlib
-    grid_Info['velPlot'] = int(params[34])     # Plot LAGRANGIAN PTs + 
-                                               #  VELOCITY FIELD in matplotlib
-    grid_Info['vortPlot'] = int(params[35])    # Plot LAGRANGIAN PTs + 
-                                               #  VORTICITY colormap in matplotlib
-    grid_Info['uMagPlot'] = int(params[36])    # Plot LAGRANGIAN PTs + 
-                                               #  MAGNITUDE OF VELOCITY 
-                                               #     colormap in matplotlib
-    grid_Info['pressPlot'] = int(params[37])   # Plot LAGRANGIAN PTs + 
-    #                                          # PRESSURE colormap in matplotlib
+    # NEW FORMAT #
+    # READ-IN INPUT2d PARAMETERS #
+    Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params = please_Initialize_Simulation()    
 
 
-    # MODEL STRUCTURE DATA STORED #
-    model_Info = {}
-    model_Info['springs'] = int(params[9])           # Springs: (0=no, 1=yes)
-    model_Info['update_springs'] = int(params[10])   # Update_Springs: (0=no, 1=yes)
-    model_Info['target_pts'] = int(params[11])       # Target_Pts: (0=no, 1=yes)
-    model_Info['update_target_pts'] = int(params[12])# Update_Target_Pts: (0=no, 1=yes)
-    model_Info['beams'] = int(params[13])            # Beams: (0=no, 1=yes)
-    model_Info['update_beams'] = int(params[14])     # Update_Beams: (0=no, 1=yes)
-    model_Info['nonInv_beams'] = int(params[15])     # Non-Invariant Beams: (0=no, 1=yes)
-    model_Info['update_nonInv_beams'] = int(params[16]) # Update_NonInv_Beams: (0=no, 1=yes)
-    # Muscle Activation (Length/Tension-Hill Model): 0 (for no) or 1 (for yes)
-    model_Info['muscles'] = int(params[17])
-    # Muscle Activation 3-ELEMENT HILL MODEL w/ Length-Tension/Force-Velocity: 
-    #   0 (for no) or 1 (for yes)
-    model_Info['hill_3_muscles'] = int(params[18])
-    # Arbirtary External Force Onto Fluid Grid: 0 (for no) or 1 (for yes)
-    model_Info['arb_ext_force'] = int(params[19]) 
-    model_Info['tracers'] = int(params[20])          # Tracer Particles: (0=no, 1=yes)
-    model_Info['mass']= int(params[21])              # Mass Points: (0=no, 1=yes)
-    model_Info['gravity']= int(params[22])           # Gravity: (0=no, 1=yes)
-    model_Info['xG']= params[23]                     # x-Component of Gravity vector
-    model_Info['yG']= params[24]                     # y-Component of Gravity Vector
-    model_Info['porous']= int(params[25])            # Porous Media: (0=no, 1=yes)
-    model_Info['concentration']= int(params[26])     # Background Concentration Gradient: 
-                                                     # 0 (for no) or 1 (for yes)
-    model_Info['electrophysiology'] = int(params[27])# Electrophysiology (FitzHugh-Nagumo)
-    model_Info['damped_springs'] = int(params[28])   # Damped Springs (0=no, 1=yes)
-    model_Info['update_D_Springs'] = int(params[29]) # Update Damped Springs
-    model_Info['user_force'] = int(params[30])       # User-Force Model 
 
 
     #-#-#-# DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! #-#-#-#
     #[X, Y, U, V, xLags, yLags] = Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
     
     #For debugging only!
-    Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
+    #Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
+    Driver.main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
     
 if __name__ == "__main__":
     main2d()
