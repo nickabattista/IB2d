@@ -64,7 +64,17 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 %
 Output_Info {
 print_dump = 20          % How often to print (PLOT) to screen
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+save_Vorticity = 1       % Save Vorticity Scalar Data to .vtk format
+save_Pressure = 1        % Save Pressure Scalar Data to .vtk format
+save_uVec = 1            % Save u-Vector Data to .vtk format
+save_uMag = 1            % Save uMagnitude Scalar Data to .vtk format
+save_uX = 0              % Save uX Scalar Data to .vtk format
+save_uY = 0              % Save uY Scalar Data to .vtk format
+save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
+save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
+save_fY = 0              % Save y-Force Component Scalar Data to .vtk format
+save_hier = 1            % Save Scalar Force Data on Lag. Structure to .vtk format
+plot_Matlab = 1          % Plot using MatPlotlib? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity =  1      % Plot Lagrangian Points + VORTICITY colormap in Matlab
