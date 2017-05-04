@@ -150,6 +150,8 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
             plt.plot(xTemp[0:2],yTemp[0:2],'m',linewidth=3)
         
         plt.axis('square')
+        plt.axis([0, Lx, 0, Ly])
+
 
         ct+=1
 
@@ -176,6 +178,8 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
             plt.plot(xTemp[0:2],yTemp[0:2],'m',linewidth=3)
 
         plt.axis('square')
+        plt.axis([0, Lx, 0, Ly])
+
 
         ct+=1
 
@@ -202,6 +206,8 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
             plt.plot(xTemp[0:2],yTemp[0:2],'m',linewidth=3)
 
         plt.axis('square')
+        plt.axis([0, Lx, 0, Ly])
+
 
         ct+=1
 
@@ -226,6 +232,8 @@ def please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,\
             plt.plot(xTemp[0:2],yTemp[0:2],'m',linewidth=3)
 
         plt.axis('square')
+        plt.axis([0, Lx, 0, Ly])
+
         
         #ct+=1
     
