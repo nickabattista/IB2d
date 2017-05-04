@@ -24,3 +24,4 @@ First IB2d Paper Published September 3, 2015:
 1. added Data Analysis directory with codes for reading in simulation data, e.g., .vtk files, to analyze
 2. additions to advection-diffusion tool kit
 3. New input2d format
+4. Declare what simulation data you want to be saved to .vtk format in input2d

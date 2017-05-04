@@ -24,7 +24,6 @@
 7. Port electrophysiology code to Python 
 8. Port code to Julia 
 9. Higher order Advection-Diffusion solver
-10. Functionality to declare what data you’d like printed in input2d files
 
 %
 % EXAMPLES
