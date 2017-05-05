@@ -202,16 +202,16 @@ def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string)
     ''' Calculates the fluid velocity
 
     Args:
-        dt:
-        rho:
-        dj:
-        Nx:
-        Ny:
-        rhs_VEL_hat:
-        p_hat:
-        A_hat:
-        idMat:
-        string:
+        dt: double
+        rho: double
+        dj: double
+        Nx: int
+        Ny: int
+        rhs_VEL_hat: 2D array complex128
+        p_hat: 2D array complex128
+        A_hat: 2D array float
+        idMat: 2D array int
+        string: char
         
     Returns:
         vel_hat: fluid velocity'''
@@ -325,16 +325,16 @@ def give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat):
     ''' Calculates the fluid pressure
     
     Args:
-        dt:
-        rho:
-        dx:
-        dy:
-        Nx:
-        Ny:
-        idX:
-        idY:
-        rhs_u_hat:
-        rhs_v_hat:
+        dt: double
+        rho: double
+        dx: double
+        dy: double
+        Nx: int
+        Ny: int
+        idX: 2D array of ints
+        idY: 2D array of ints
+        rhs_u_hat: 2D array of complex128
+        rhs_v_hat: 2D array of complex128
         
     Returns:
         p_hat:'''
