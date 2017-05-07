@@ -58,7 +58,7 @@ struct_name = 'jelly';      % structure name
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 50*1.2750000000000000e+07;   % spring constant (Newton)
+k_Spring = 100*1.2750000000000000e+07;   % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams

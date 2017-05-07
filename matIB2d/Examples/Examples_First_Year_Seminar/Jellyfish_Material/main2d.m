@@ -56,7 +56,7 @@ addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../..
 
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 %try
-    [X, Y, U, V, xLags, yLags] = IBM_Driver_Less_Printing(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params);
+    [X, Y, U, V, xLags, yLags] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params);
 %catch
 %     fprintf('\n\n\n');
 %     fprintf('           ERROR ERROR ERROR!\n\n\n\n'); 
