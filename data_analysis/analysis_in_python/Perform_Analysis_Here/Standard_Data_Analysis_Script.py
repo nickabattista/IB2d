@@ -33,19 +33,17 @@ import matplotlib.pyplot as plt
 #           from your stored viz_IB2d information
 #
 #     Note:
-#           (1) This code analyzes viz_IB2d code for channel flow in
-#               /data_analysis/Example_For_Data_Analysis/Example_Flow_In_Channel/viz_IB2d
-#           (2) Produces a plot of cross-sectional mag. of velocity for
-#               different points along the channel at three times.
-#           (3) USER-DEFINED functions are functions that users should make to
-#               analyze their specific data sets
-#           (4) MUST make sure to 'addpath' to where DA_Blackbox is, i.e.,
-#               line 67
-#           (5) MUST make sure to set path to desired dataset, i.e., in line
-#               63,64
-#           (6) USUALLY EASIEST TO SIMPLY PUT viz_IB2d and hier_IB2d_data folders
-#               in this directory
 #
+#           (1) USER-DEFINED functions are functions that users should make to
+#               analyze their specific data sets
+#           (2) MUST make sure to 'addpath' to where DA_Blackbox is, i.e.,
+#               line 67
+#           (3) MUST make sure to set path to desired dataset, i.e., in line
+#               63,64
+#           (4) USUALLY EASIEST TO SIMPLY PUT viz_IB2d and hier_IB2d_data folders
+#               in this directory
+#           (5) MUST have VTK library installed, if using Python3 with Anaconda, 
+#               please type <conda install -c menpo vtk> into your terminal
 #
 ################################################################################
 

@@ -43,6 +43,8 @@ import matplotlib.pyplot as plt
 #               line 61
 #           (5) MUST make sure to set path to desired dataset, i.e., in line
 #               56
+#           (6) MUST have VTK library installed, if using Python3 with Anaconda, 
+#               please type <conda install -c menpo vtk> into your terminal
 #          
 #
 ################################################################################
