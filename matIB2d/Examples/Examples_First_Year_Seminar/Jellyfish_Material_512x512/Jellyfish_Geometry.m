@@ -39,12 +39,20 @@ dx = L/N;                           % Cartesian mesh width (m)
 
 % Construct Geometry
 [xLag,yLag,ds] = give_Me_Immsersed_Boundary_Geometry(N,L);
-plot(xLag,yLag,'*'); hold on;
+
+for i =1:length(xLag)
+    plot(xLag(i),yLag(i),'*'); hold on;
+    pause(0.1);
+end
 
 % Translate Geometry
-xLag = xLag + L/2;
+xLag = xLag + L/8;
 yLag = yLag + L/4;
-plot(xLag,yLag,'r*'); hold on;
+plot(xLag,yLag,'b*'); hold on;
+plot(xLag(1),yLag(1),'m*'); hold on;
+plot(xLag(127),yLag(127),'y*'); hold on;
+plot(xLag(end),yLag(end),'g*'); hold on;
+
   
 % NAMING CONVENTION FOR SIMULATION 
 struct_name = 'jelly';      % structure name
@@ -58,11 +66,11 @@ struct_name = 'jelly';      % structure name
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 5*1.2750000000000000e+06;   % spring constant (Newton)
+k_Spring = 1.2750000000000000e+07;   % spring constant (Newton)
 print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 500*1.0363359375000002e+13;   % beam stiffness constant (Newton m^2)
+k_Beam = 1.0363359375000002e+15;   % beam stiffness constant (Newton m^2)
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 
@@ -100,7 +108,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
 function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,struct_name)
 
-    N = length(xLag);
+    N = length(xLag);  % N IS ODD
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
@@ -109,19 +117,26 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,struct_name)
     %spring_force = kappa_spring*ds/(ds^2);
 
     % SPRINGS BETWEEN VERTICES ON RHS
-    for s = 1:ceil(N/2)
-            if s <= floor(N/2)         
+    for s = 1:(N-1)/2
+            %if s < (N-1)/2+1        
                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
-            elseif s == ceil(N/2)
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, ceil(N/2)+1, k_Spring, ds_Rest);  
-            end
+            %elseif s == ceil(N/2)
+            %    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, ceil(N/2)+1, k_Spring, ds_Rest);  
+            %end
     end
     
     % SPRINGS BETWEEN VERTICES ON LHS
-    for s=1:floor(N/2)-1
-                s1 = ceil(N/2)+s;
-                s2 = ceil(N/2)+s+1;
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s1, s2, k_Spring, ds_Rest);  
+    for s=(N-1)/2+2:N
+            
+        if s==(N-1)/2+2
+            s1 = 1;%ceil(N/2)+s;
+            s2 = s;%ceil(N/2)+s+1;
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s1, s2, k_Spring, ds_Rest);  
+        else
+            s1 = s-1;%ceil(N/2)+s;
+            s2 = s;%ceil(N/2)+s+1;
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s1, s2, k_Spring, ds_Rest);      
+        end
     end
     fclose(spring_fid); 
     
@@ -146,30 +161,35 @@ function print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name)
     % beam_force = kappa_beam*ds/(ds^4)
     
     %BEAMS BETWEEN VERTICES ON RHS
-    for s = 1:ceil(N/2)+1
-            if s <= floor(N/2)-1  
-                Cx = xLag(s) - 2*xLag(s+1) + xLag(s+2);
-                Cy = yLag(s) - 2*yLag(s+1) + yLag(s+2);
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', s,s+1,s+2, k_Beam, Cx, Cy);  
-            elseif s == ceil(N/2)
-                Cx = xLag(ceil(N/2)+1) - 2*xLag(1) + xLag(2);
-                Cy = yLag(ceil(N/2)+1) - 2*yLag(1) + yLag(2);
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', ceil(N/2)+1,1,2, k_Beam, Cx,Cy);  
-            elseif s == ceil(N/2)+1
-                Cx = xLag(ceil(N/2)+2) - 2*xLag( ceil(N/2)+1 ) + xLag(1);
-                Cy = yLag(ceil(N/2)+2) - 2*yLag( ceil(N/2)+1 ) + yLag(1);
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', ceil(N/2)+2,ceil(N/2)+1,1, k_Beam, Cx,Cy);  
-            end
+    for s = 1:(N-1)/2
+        if s==1
+            Cx = xLag((N-1)/2+2) - 2*xLag(1) + xLag(2);
+            Cy = yLag((N-1)/2+2) - 2*yLag(1) + yLag(2);
+            fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', (N-1)/2+2,1,2, k_Beam, Cx,Cy);
+        elseif s <= (N-1)/2  
+            Cx = xLag(s-1) - 2*xLag(s) + xLag(s+1);
+            Cy = yLag(s-1) - 2*yLag(s) + yLag(s+1);
+            fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', s-1,s,s+1, k_Beam, Cx, Cy); 
+        end
     end
     
     % BEAMS BETWEEN VERTICES ON LHS
-    for s=1:floor(N/2)-2
-                s1 = ceil(N/2)+s;
-                s2 = ceil(N/2)+s+1;
-                s3 = ceil(N/2)+s+2;
-                Cx = xLag(s3) - 2*xLag(s2) + xLag(s1);
-                Cy = yLag(s3) - 2*yLag(s2) + yLag(s1);
-                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', s3, s2, s1, k_Beam, Cx, Cy);  
+    for s=(N-1)/2+2:N-1
+         if s==(N-1)/2+2
+            s1 = 1;
+            s2 = s;
+            s3 = s+1;
+            Cx = xLag(s3) - 2*xLag(s2) + xLag(s1);
+            Cy = yLag(s3) - 2*yLag(s2) + yLag(s1);
+            fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', s3, s2, s1, k_Beam, Cx, Cy);  
+         else
+            s1 = s-1;
+            s2 = s;
+            s3 = s+1;
+            Cx = xLag(s3) - 2*xLag(s2) + xLag(s1);
+            Cy = yLag(s3) - 2*yLag(s2) + yLag(s1);
+            fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', s3, s2, s1, k_Beam, Cx, Cy);  
+         end
     end
     fclose(beam_fid); 
     

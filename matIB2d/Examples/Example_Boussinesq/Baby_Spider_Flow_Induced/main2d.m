@@ -14,12 +14,15 @@
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
+%   .
+%   .
+%   .
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific fiber model or example, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -32,37 +35,45 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 function main2d()
 
-%This is the "main" file, which gets called to run the Immersed Boundary
-%Simulation. It reads in all the parameters from "input2d", and sends them
-%off to the "IBM_Driver" function to actual perform the simulation
+% This is the "main" file, which gets called to initialized the Immersed Boundary
+% Simulation. It reads in all the parameters from "input2d", and sends them
+% off to the "IBM_Driver.m" function to actual perform the simulation
 
+%
 % Path Reference to where Driving code is found %
+%
 warning('off','all');
 addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
-%addpath('../../IBM_Blackbox/');
-%addpath('../../../IBM_Blackbox/');
-%addpath('../../../../IBM_Blackbox/');
 
 
+%
+% THROW ERROR TO CORRECT PATH IF DRIVER IS NOT FOUND
+%
+assert( exist( 'IBM_Driver.m', 'file' ) == 2, 'IBM_Driver.m not found -> Please check path to IBM_Blackbox in main2d.m!' );
+
+
+%
 % READ-IN INPUT PARAMETERS %
-%[params,strName] = give_Me_input2d_Parameters(); % OLD WAY 
+%
 [Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params] = please_Initialize_Simulation();
 
 
-
-
-
+%
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
-%try
-    [X, Y, U, V, xLags, yLags] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params);
-%catch
-    fprintf('\n\n\n');
-    fprintf('           ERROR ERROR ERROR!\n\n\n\n'); 
-    fprintf('PATH NOT CORRECTLY SET TO IBM_Blackbox/IBM_Driver.m FILE! \n\n\n\n'); 
-    error('PATH NOT CORRECTLY SET TO IBM_Blackbox/IBM_Driver.m FILE -> Change Path in main2d.m file!');
-%end
+%
+[X, Y, U, V, xLags, yLags] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params);
+
+
+%
+% Print simulation has completed.
+%
+fprintf('\n\n');
+fprintf(' |****** IMMERSED BOUNDARY SIMULATION HAS FINISHED! ******|\n\n')
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

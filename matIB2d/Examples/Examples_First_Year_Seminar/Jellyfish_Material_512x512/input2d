@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 10.0                 % Dynamic Viscosity (N*s/m^2) 
+mu = 10.0                % Dynamic Viscosity (N*s/m^2) 
 rho = 1000               % Density (kg/m^2)
 }
 
@@ -15,17 +15,17 @@ rho = 1000               % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 25           % Final time of simulation (s)
-dt = 2.5e-5           % Time-step (s)
+Tfinal = 1.0         % Final time of simulation (s)
+dt = 1.0e-5          % Time-step (s)
 }
 
 %
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  512               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 8.0                % Length of Eulerian Grid in x-Direction (m)
+Lx = 2.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 8.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
@@ -64,13 +64,13 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 4000        % How often to print (PLOT) to screen
+print_dump = 2500        % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
-plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
-plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
-plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
-plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
+plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
+plot_MagVelocity = 0     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
+plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 }
 
 %

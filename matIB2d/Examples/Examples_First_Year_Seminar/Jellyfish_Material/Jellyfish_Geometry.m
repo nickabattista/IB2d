@@ -36,6 +36,7 @@ function Jellyfish_Geometry()
 L = 8;                              % Length of computational domain (m)
 N = 256;                            % # of Cartesian grid meshwidths
 dx = L/N;                           % Cartesian mesh width (m)
+ds = L/(2.0*N);                     % Ideal Lagrangian spacing (m)
 
 % Construct Geometry
 [xLag,yLag,ds] = give_Me_Immsersed_Boundary_Geometry(N,L);
@@ -58,11 +59,11 @@ struct_name = 'jelly';      % structure name
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % print springs
-k_Spring = 100*1.2750000000000000e+07;   % spring constant (Newton)
-print_Lagrangian_Springs(xLag,k_Spring,ds,struct_name);
+k_Spring = 500*1.2750000000000000e+07; %500   % spring constant (Newton) dt=2.5e-6
+print_Lagrangian_Springs(xLag,yLag,k_Spring,ds,struct_name);
 
 % print beams
-k_Beam = 3.5*1.0363359375000002e+13;   % beam stiffness constant (Newton m^2) %5.1816796875000010e+12
+k_Beam = 1.0363359375000002e+13;  %100 % beam stiffness constant (Newton m^2) %5.1816796875000010e+12
 print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name);
 
 
@@ -98,7 +99,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag);
 
@@ -110,10 +111,16 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,struct_name)
 
     % SPRINGS BETWEEN VERTICES ON RHS
     for s = 1:ceil(N/2)
-            if s <= floor(N/2)         
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
+            if s <= floor(N/2)
+                x1 = xLag(s); x2 = xLag(s+1);
+                y1 = yLag(s); y2 = yLag(s+1);
+                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);  
             elseif s == ceil(N/2)
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, ceil(N/2)+1, k_Spring, ds_Rest);  
+                x1 = xLag(1); x2 = xLag( ceil(N/2)+1 );
+                y1 = yLag(1); y2 = yLag( ceil(N/2)+1 );
+                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', 1, ceil(N/2)+1, k_Spring, ds);  
             end
     end
     
@@ -121,7 +128,10 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,struct_name)
     for s=1:floor(N/2)-1
                 s1 = ceil(N/2)+s;
                 s2 = ceil(N/2)+s+1;
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s1, s2, k_Spring, ds_Rest);  
+                x1 = xLag(s1); x2 = xLag(s2);
+                y1 = yLag(s1); y2 = yLag(s2);
+                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s1, s2, k_Spring, ds);  
     end
     fclose(spring_fid); 
     
@@ -186,7 +196,7 @@ function [xLag,yLag,ds] = give_Me_Immsersed_Boundary_Geometry(N,L)
 % JELLYFISH GEOMETRY PARAMETERS %
 
 bell_length = 2;                    % bell length (m)
-npts_bell = ceil(2.5*(bell_length/L)*N); % number of points along the length of the entire bell
+npts_bell = ceil(2.0*(bell_length/L)*N); % number of points along the length of the entire bell
 npts_circ = 1;                    %number of points along the circumference (=1 for 2D)
 npts = npts_bell*npts_circ;	      % total number points 
 ds = bell_length/(npts_bell-1);   % mesh spacing along the length of bell (m)
