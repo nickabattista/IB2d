@@ -378,14 +378,17 @@ end
 
 % READ IN PORO-ELASTIC MEDIA INFO (IF THERE IS PORO-ELASTICITY) %
 if ( poroelastic_Yes == 1)
-    fprintf('  -Poroelastic media\n');
-    poroelastic_info = read_PoroElastic_Points(struct_name);
-    F_Poro(:,2) = zeros( length( poroelastic_info(:,1) ), 2);   % Initialization
-    %poroelastic_info: col 1: Lag Pt. ID w/ Associated Porous Pt.
-    %                  col 2: Porosity coefficient
+    fprintf('  -Poro-elastic media\n');
+    porous_aux = read_PoroElastic_Points(struct_name);
+    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+    %            col 2: Porosity coefficient
+    %            col 3: Flag for derivative stencil!
+    poroelastic_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
+    
+    poroelastic_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+    poroelastic_info(:,5) = porous_aux(:,3); %Stores flag for derivative stencil
 else
     poroelastic_info = 0;
-    F_Poro = 0;
 end
 
 
@@ -612,7 +615,7 @@ while current_time < T_FINAL
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
     %
-    [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
+    [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0);
     
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
@@ -695,7 +698,7 @@ while current_time < T_FINAL
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     %Uh, Vh instead of U,V?
-    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro);
+    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes);
 
     
     %IF POROUS NODES, NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
@@ -711,11 +714,26 @@ while current_time < T_FINAL
     
     
     
+    %IF POROELASTIC
+%     if poroelastic_Yes == 1
+%             
+%        %array1[i] = array1[i] + (uarray[i]+(1/(0.001*porosity))*(arrayf1[i]))*dt;
+%        %array2[i] = array2[i] + (varray[i]+(1/(0.001*porosity))*(arrayf2[i]))*dt;  
+%        xLag( poroelastic_info(:,1) ) = xLag( poroelastic_info(:,1) ) + dt*1;
+%        yLag( poroelastic_info(:,1) ) = yLag( poroelastic_info(:,1) ) + dt*1;
+%        poroelastic_info(:,2) = xLag( poroelastic_info(:,1) );    % Stores x-Lags as x-Porous Pt. Identities
+%        poroelastic_info(:,3) = yLag( poroelastic_info(:,1) );    % Stores y-Lags as y-Porous Pt. Identities
+%        xLag = mod(xLag, Lx);                                     % If structure goes outside domain
+%        yLag = mod(yLag, Ly);                                     % If structure goes outside domain
+%     end
+%     
+    
+    
     
     % If there are tracers, update tracer positions %
     if tracers_Yes == 1
         %Uh, Vh instead of U,V?
-        [xT, yT] = please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info,0,0,0,0); %0 for always no porous tracers / poroelastic elements
+        [xT, yT] = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT, x, y, dt, grid_Info,0); %0 for always no porous tracers
         tracers(:,2) = xT;
         tracers(:,3) = yT;
     end

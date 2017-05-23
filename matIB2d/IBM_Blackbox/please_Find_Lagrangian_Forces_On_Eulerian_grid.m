@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag, F_Poro] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
+function [Fx, Fy, F_Mass, F_Lag, F_Poro] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info)
 
 %
 % The components of the force are given by
@@ -223,8 +223,8 @@ fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscl
 
 % Save Poro-Elastic Forces, if poroelastic elements %
 if poroelastic_Yes
-    F_Poro(:,1) = fx_springs;
-    F_Poro(:,2) = fy_springs;
+    F_Poro(:,1) = fx_springs(poroelastic_info(:,1));
+    F_Poro(:,2) = fy_springs(poroelastic_info(:,1));
 else
     F_Poro = 0;
 end
