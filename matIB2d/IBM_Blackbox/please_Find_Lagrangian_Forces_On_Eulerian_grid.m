@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -15,11 +15,11 @@
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
+function [Fx, Fy, F_Mass, F_Lag, F_Poro] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force)
 
 %
 % The components of the force are given by
@@ -80,6 +80,7 @@ mass_Yes = model_Info(13);          % Mass Pts: 0 (for no) or 1 (for yes)
 electro_phys_Yes = model_Info(19);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 d_Springs_Yes = model_Info(20);     % Damped Springs: 0 (for no) or 1 (for yes)
 gen_force_Yes = model_Info(24);     % General User-Defined Force: 0 (for no) or 1 (for yes)
+poroelastic_Yes = model_Info(25);    % Poroelastic Media: 0 (for no) or 1 (for yes)
 
 
 %
@@ -214,11 +215,19 @@ end
 
 
 
-
 % SUM TOTAL FORCE DENSITY! %
 fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce;
 fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce;
 
+
+
+% Save Poro-Elastic Forces, if poroelastic elements %
+if poroelastic_Yes
+    F_Poro(:,1) = fx_springs;
+    F_Poro(:,2) = fy_springs;
+else
+    F_Poro = 0;
+end
 
 
 % SAVE LAGRANGIAN FORCES

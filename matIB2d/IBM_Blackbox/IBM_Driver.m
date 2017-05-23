@@ -162,6 +162,7 @@ update_D_Springs_Flag = Lag_Struct_Params(21);% Update_Damped_Springs: % 0 (for 
 boussinesq_Yes = Lag_Struct_Params(22);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
 exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
 general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(25);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -370,6 +371,33 @@ if ( porous_Yes == 1)
 else
     porous_info = 0;
 end
+
+
+
+
+
+% READ IN PORO-ELASTIC MEDIA INFO (IF THERE IS PORO-ELASTICITY) %
+if ( poroelastic_Yes == 1)
+    fprintf('  -Poro-elastic media\n');
+    porous_aux = read_PoroElastic_Points(struct_name);
+    %porous_aux: col 1: Lag Pt. ID w/ Associated Porous Pt.
+    %            col 2: Porosity coefficient
+    %            col 3: Flag for derivative stencil!
+    poroelastic_info(:,1) = porous_aux(:,1); %Stores Lag-Pt IDs in col vector
+    for i=1:length(porous_info(:,1))
+        id = porous_info(i,1);
+        poroelastic_info(i,2) = xLag(id);    %Stores Original x-Lags as x-Porous Pt. Identities
+        poroelastic_info(i,3) = yLag(id);    %Stores Original y-Lags as y-Porous Pt. Identities
+    end
+   
+    poroelastic_info(:,4) = porous_aux(:,2); %Stores Porosity Coefficient 
+    poroelastic_info(:,5) = porous_aux(:,3); %Stores flag for derivative stencil
+else
+    poroelastic_info = 0;
+end
+
+
+
 
 
 
@@ -629,7 +657,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -650,6 +678,7 @@ while current_time < T_FINAL
         Fxh = Fxh + Fx_Arb;
         Fyh = Fyh + Fy_Arb;
     end
+    
     
     %
     %
@@ -677,16 +706,33 @@ while current_time < T_FINAL
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes);
 
     
-    %NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
+    %IF POROUS NODES, NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
        xLag( porous_info(:,1) ) = xLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nX;
        yLag( porous_info(:,1) ) = yLag( porous_info(:,1) ) - dt*( Por_Mat(:,1)+Por_Mat(:,2) ).*nY;
        porous_info(:,2) = xLag( porous_info(:,1) );    %Stores x-Lags as x-Porous Pt. Identities
        porous_info(:,3) = yLag( porous_info(:,1) );    %Stores y-Lags as y-Porous Pt. Identities
-       xLag = mod(xLag, Lx); % If structure goes outside domain
-       yLag = mod(yLag, Ly); % If structure goes outside domain
+       xLag = mod(xLag, Lx);                           % If structure goes outside domain
+       yLag = mod(yLag, Ly);                           % If structure goes outside domain
     end
+    
+    
+    
+    %IF POROELASTIC
+    if poroelastic_Yes == 1
+            
+       %array1[i] = array1[i] + (uarray[i]+(1/(0.001*porosity))*(arrayf1[i]))*dt;
+       %array2[i] = array2[i] + (varray[i]+(1/(0.001*porosity))*(arrayf2[i]))*dt;  
+       xLag( poroelastic_info(:,1) ) = xLag( poroelastic_info(:,1) ) - dt*1;
+       yLag( poroelastic_info(:,1) ) = yLag( poroelastic_info(:,1) ) - dt*1;
+       poroelastic_info(:,2) = xLag( poroelastic_info(:,1) );    % Stores x-Lags as x-Porous Pt. Identities
+       poroelastic_info(:,3) = yLag( poroelastic_info(:,1) );    % Stores y-Lags as y-Porous Pt. Identities
+       xLag = mod(xLag, Lx);                                     % If structure goes outside domain
+       yLag = mod(yLag, Ly);                                     % If structure goes outside domain
+    end
+    
+    
     
     
     % If there are tracers, update tracer positions %
@@ -1577,6 +1623,45 @@ porosity = porous_info(2:end,1:3);
 
 %porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
 %         col 2: Porosity coefficient
+%         col 3: flag for stencil point
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in the # of POROELASTIC PTS, PORO-ELASTIC PT-NODEs, and 
+%           their POROUSITY-COEFFICIENTS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function porosity = read_PoroElastic_Points(struct_name)
+
+filename = [struct_name '.poroelastic'];  %Name of file to read in
+
+fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,'%f %f','CollectOutput',1);
+
+fclose(fileID);        %Close the data file.
+
+porous_info = C{1};    %Stores all read in data in vertices (N+1,2) array
+
+%Store all elements on .spring file into a matrix starting w/ 2nd row of read in data.
+porosity = porous_info(2:end,1:2);
+
+%poroelastic:  col 1: Lag Pt. ID w/ Associated Porous Pt.
+%              col 2: Porosity coefficient
+
+
+
+
+
 
 
 

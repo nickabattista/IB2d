@@ -97,7 +97,7 @@ xL_Next = xL_P + (dt) * move_X;
 yL_Next = yL_P + (dt) * move_Y;
 
 
-% Shift so that all values are in [0,Lx or Ly).
+% Shift so that all values are in [0,Lx) or [0,Ly).
 if porous_Yes == 0
     xL_Next = mod(xL_Next, Lx);
     yL_Next = mod(yL_Next, Ly);

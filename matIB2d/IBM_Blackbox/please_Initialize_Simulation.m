@@ -327,6 +327,14 @@ try
     else
         Lag_Struct_Params(24) = 0;
     end
+    
+    % PORO-ELASTIC MEDIA %
+    if find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')) > 0
+        Lag_Struct_Params(25) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')),2};
+    else
+        Lag_Struct_Params(25) = 0;
+    end
+    
 
 catch
     fprintf('\n \n');
