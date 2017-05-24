@@ -98,13 +98,14 @@ yL_Next = yL_P + (dt) * move_Y;
 
 % Update the Lagrangian Point Positions with poroelasticity.
 if poroelastic_Yes
-    %array1[i] = array1[i] + (uarray[i]+(1/(0.001*porosity))*(arrayf1[i]))*dt;
-    %array2[i] = array2[i] + (varray[i]+(1/(0.001*porosity))*(arrayf2[i]))*dt;
+    %
+    % poroelastic_info(:,1): index of poroelastic point
+    % poroelastic_info(:,2): Brinkman constant
+    %
     xL_Next(poroelastic_info(:,1)) = xL_Next(poroelastic_info(:,1)) + (  1./(mu*poroelastic_info(:,2)) .* F_Poro(:,1) ) * dt;
     yL_Next(poroelastic_info(:,1)) = yL_Next(poroelastic_info(:,1)) + (  1./(mu*poroelastic_info(:,2)) .* F_Poro(:,2) ) * dt;
 
 end
-
 
 
 % Shift so that all values are in [0,Lx) or [0,Ly).

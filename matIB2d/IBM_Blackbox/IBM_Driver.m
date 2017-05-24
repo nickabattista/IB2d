@@ -380,7 +380,7 @@ end
 if ( poroelastic_Yes == 1)
     fprintf('  -Poroelastic media\n');
     poroelastic_info = read_PoroElastic_Points(struct_name);
-    F_Poro(:,2) = zeros( length( poroelastic_info(:,1) ), 2);   % Initialization
+    F_Poro = zeros( length( poroelastic_info(:,1) ), 2);   % Initialization
     %poroelastic_info: col 1: Lag Pt. ID w/ Associated Porous Pt.
     %                  col 2: Porosity coefficient
 else
@@ -649,7 +649,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
