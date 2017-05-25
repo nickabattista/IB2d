@@ -643,7 +643,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #******Step 1: Update Position of Boundary of membrane at half time-step ******
         #                 (Variables end with h if it is a half-step)
         #
-        xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
+        xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag,\
             xLag, yLag, x, y, dt/2, grid_Info, 0, poroelastic_Yes, poroelastic_info, F_Poro)
             
         if mass_Yes:
@@ -731,7 +731,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
         yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
         #Uh, Vh instead of U,V?
-        xLag, yLag = please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag,\
+        xLag, yLag = please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag,\
             xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes, poroelastic_Yes, poroelastic_info, F_Poro)
             
 

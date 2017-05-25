@@ -244,8 +244,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Save Poro-Elastic Forces, if poroelastic elements #
     if poroelastic_Yes:
-        F_Poro[0:,0] = fx_springs[poroelastic_info[0:,1]]
-        F_Poro[0:,1] = fy_springs[poroelastic_info[0:,1]]
+        F_Poro = np.zeros( ( len(poroelastic_info) , 2) )
+        F_Poro[0:,0] = fx_springs[poroelastic_info[0:,0].astype(int)]
+        F_Poro[0:,1] = fy_springs[poroelastic_info[0:,0].astype(int)]
     else:
         F_Poro = np.zeros((1,1))
 

@@ -53,7 +53,7 @@ from numba import jit
 #
 ################################################################################
 
-def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
+def please_Move_Lagrangian_Point_Positions(mu, u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
     dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro):
     ''' Moves Lagrangian point positions
         u: 2D array
@@ -123,8 +123,8 @@ def please_Move_Lagrangian_Point_Positions(u, v, xL_P, yL_P, xL_H, yL_H, x, y,\
         # poroelastic_info[:,1]: index of poroelastic point
         # poroelastic_info[:,2]: Brinkman constant
         #
-        xL_Next[poroelastic_info[0:,0]] = xL_Next[poroelastic_info[0:,0]] + (  1/(mu*poroelastic_info[0:,1]) * F_Poro[0:,0] ) * dt
-        yL_Next[poroelastic_info[0:,0]] = yL_Next[poroelastic_info[0:,0]] + (  1/(mu*poroelastic_info[0:,1]) * F_Poro[0:,1] ) * dt
+        xL_Next[poroelastic_info[0:,0].astype(int)] = xL_Next[poroelastic_info[0:,0].astype(int)] + (  1/(mu*poroelastic_info[0:,1]) * F_Poro[0:,0] ) * dt
+        yL_Next[poroelastic_info[0:,0].astype(int)] = yL_Next[poroelastic_info[0:,0].astype(int)] + (  1/(mu*poroelastic_info[0:,1]) * F_Poro[0:,1] ) * dt
 
 
 
