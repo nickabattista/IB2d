@@ -15,6 +15,7 @@ First IB2d Paper Published September 3, 2015:
 1. added DAMPED linear springs
 2. added NON-INVARIANT beams
 3. added USER-DEFINED DEFORMATION FORCE fiber model capability
+4. added POROELASTIC MEDIA (based on Brinkman-like term)
 
 % FLUID SOLVER
 1. added functionality for using the Boussinesq Approximation

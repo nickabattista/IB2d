@@ -32,6 +32,7 @@ This code is capable of creating Lagrangian Structures using:
 	9. Damped Springs
 	10. Non-invariant Beams
 	11. User-defined deformation laws
+    12. Poroelastic Media (based on Brinkman-like forces)
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
 There are a number of built in Examples, mostly used for teaching purposes. 

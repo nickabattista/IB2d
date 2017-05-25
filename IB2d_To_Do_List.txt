@@ -9,8 +9,7 @@
 % LAGRANGIAN STRUCTURE / FIBER MODELS
 %
 1. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
-2. Poroelastic Boundaries
-3. Allow for one than one boundary to be read in
+2. Allow for one than one boundary to be read in
 
 %
 % FLUID SOLVER / BLACK-BOX
@@ -39,5 +38,5 @@
 %
 % DOCUMENTATION
 %
-1. IB2d Software Release Paper (Accepted Bioinspiration & Biomimetics!)
+1. IB2d Software Release Paper (Published: Bioinspiration & Biomimetics!)
 2. IB2d User Guide
