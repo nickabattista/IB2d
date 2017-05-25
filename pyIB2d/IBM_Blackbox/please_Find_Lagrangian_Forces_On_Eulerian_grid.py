@@ -41,7 +41,7 @@ from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
 
 def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,\
     xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams,\
-    muscles, muscles3, masses, d_Springs, general_force):
+    muscles, muscles3, masses, d_Springs, general_force, poroelastic_info):
     ''' Compute components of force term in Navier-Stokes from boundary deformations
 
         Args:
@@ -110,9 +110,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     mass_Yes = model_Info[12]           # Mass Pts: 0 (for no) or 1 (for yes)
     d_Springs_Yes = model_Info[19]      # Damped Springs: 0 (for no) or 1 (for yes)
     gen_force_Yes = model_Info[23]      # User-defined force: 0 (for no) or 1 (for yes)
+    poroelastic_Yes = model_Info[24]    # Poroelastic Media: 0 (for no) or 1 (for yes)
+
 
     if gen_force_Yes:
         from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
+
 
     #
     # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY #
@@ -239,6 +242,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce
 
 
+    # Save Poro-Elastic Forces, if poroelastic elements #
+    if poroelastic_Yes:
+        F_Poro[0:,0] = fx_springs[poroelastic_info[0:,1]]
+        F_Poro[0:,1] = fy_springs[poroelastic_info[0:,1]]
+    else:
+        F_Poro = np.zeros((1,1))
+
+
     # SAVE LAGRANGIAN FORCES
     F_Lag = np.empty((fx.size,2))
     F_Lag[:,0] = fx
@@ -260,7 +271,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     Fx = delta_Y @ fxds @ delta_X
     Fy = delta_Y @ fyds @ delta_X
 
-    return (Fx, Fy, F_Mass, F_Lag)
+    return (Fx, Fy, F_Mass, F_Lag, F_Poro)
     
     
     

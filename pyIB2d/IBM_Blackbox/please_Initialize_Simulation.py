@@ -450,7 +450,7 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
 #                   .         .
 
     # Initialize 
-    Lag_Struct_Params = np.zeros(24)
+    Lag_Struct_Params = np.zeros(25)
 
     try: 
 
@@ -732,10 +732,21 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
             Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
         except ValueError:
             try:
-                ind = Lag_Struct_Input[0][:].index('user_force_model')
+                ind = Lag_Struct_Input[0][:].index('user_force_mode')
                 Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
             except ValueError:
                 Lag_Struct_Params[23] = 0
+
+        # POROELASTIC_MEDIA
+        try:
+            ind = Lag_Struct_Input[0][:].index('poroelastic')
+            Lag_Struct_Params[24] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
+        except ValueError:
+            try:
+                ind = Lag_Struct_Input[0][:].index('poroelasti')
+                Lag_Struct_Params[24] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
+            except ValueError:
+                Lag_Struct_Params[24] = 0        
 
     
 
@@ -772,6 +783,7 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
         print('      boussinesq = <0 or 1>\n')
         print('      expansion_coeff = <# (EXPANSION COEFFICIENT FOR BOUSSINESQ) >\n')
         print('      user_force_model = <0 or 1>\n')
+        print('      poroelastic = <0 or 1>\n')
         print('      }\n')
         print('ERROR ERROR ERROR\n\n')
         sys.exit(0)

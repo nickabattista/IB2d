@@ -214,6 +214,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     boussinesq_Yes = Lag_Struct_Params[21]       # Boussinesq Approx.: 0 [for no] or 1 [for yes]
     exp_Coeff = Lag_Struct_Params[22]            # Expansion Coefficient [e.g., thermal, etc] for Boussinesq approx.
     general_force_Yes = Lag_Struct_Params[23]    # General User-Defined Force Term: 0 [for no] or 1 [for yes]
+    poroelastic_Yes = Lag_Struct_Params[24]      # Poroelastic media 0 [for no] or 1 [for yes]
 
     # CLEAR INPUT DATA #
 
@@ -453,6 +454,18 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         porous_info = np.zeros((1,1))
 
 
+
+    # READ IN PORO-ELASTIC MEDIA INFO (IF THERE IS PORO-ELASTICITY) #
+    if ( poroelastic_Yes ):
+        print('  -Poroelastic media\n')
+        poroelastic_info = read_PoroElastic_Points(struct_name)
+        F_Poro = np.zeros( ( len(poroelastic_info), 2) )   # Initialization
+        #poroelastic_info: col 1: Lag Pt. ID w/ Associated Porous Pt.
+        #                  col 2: Porosity coefficient
+    else:
+        poroelastic_info = np.zeros((1,1))
+        F_Poro = np.zeros((1,1))
+
   
 
 
@@ -631,7 +644,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #                 (Variables end with h if it is a half-step)
         #
         xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(U, V, xLag, yLag,\
-            xLag, yLag, x, y, dt/2, grid_Info, 0)
+            xLag, yLag, x, y, dt/2, grid_Info, 0, poroelastic_Yes, poroelastic_info, F_Poro)
             
         if mass_Yes:
             mass_info, massLagsOld = please_Move_Massive_Boundary(dt/2,\
@@ -668,10 +681,10 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #*******STEP 2: Calculate Force coming from membrane at half time-step ********
         #
         #
-        Fxh, Fyh, F_Mass_Bnd, F_Lag = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
+        Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params,\
         springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
-        mass_info, d_springs_info, gen_force_info)
+        mass_info, d_springs_info, gen_force_info, poroelastic_info)
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test
@@ -719,9 +732,10 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
         #Uh, Vh instead of U,V?
         xLag, yLag = please_Move_Lagrangian_Point_Positions(Uh, Vh, xLag, yLag,\
-            xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes)
+            xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes, poroelastic_Yes, poroelastic_info, F_Poro)
             
-        #NOTE: ONLY SET UP FOR CLOSED SYSTEMS NOW!!!
+
+        # NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
         if porous_Yes: #need to test
             Por_Mat,nX,nY = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,\
                 porous_info,F_Lag)
@@ -1092,6 +1106,38 @@ def read_Porous_Points(struct_name):
     #         col 2: Porosity coefficient
     
     return porosity
+
+
+
+###########################################################################
+#
+# FUNCTION: Reads in the # of POROUS PTS, POROUS-PT-NODEs, and their
+#           POROUSITY-COEFFICIENTS
+#
+###########################################################################
+
+def read_PoroElastic_Points(struct_name):
+    ''' Reads in the num of porous pts, pt-nodes, and porousity coefficients
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        porosity: array of porosity info'''
+
+    filename = struct_name+'.poroelastic'  #Name of file to read in
+    with open(filename) as f:
+        porosity = np.loadtxt(f,skiprows=1,usecols=(0,1))
+
+    #porous:  col 1: Lag Pt. ID w/ Associated Porous Pt.
+    #         col 2: Brinkman coefficient
+    
+    return porosity
+
+
+
+
+
 
 
 
