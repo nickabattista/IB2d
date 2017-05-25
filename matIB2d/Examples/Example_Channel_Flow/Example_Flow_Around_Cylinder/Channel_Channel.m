@@ -54,6 +54,10 @@ struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 [xLag,yLag] = give_Me_Channel_Immsersed_Boundary_Geometry(ds,L,w,Lx,Ly);
 [xLag_C,yLag_C] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r,x0,y0);
 
+% Translate down for rectangular domain
+yLag = yLag - 0.375;
+yLag_C = yLag_C - 0.375;
+
 % Plot Geometry to test
 plot(xLag(1:end/2),yLag(1:end/2),'r-'); hold on;
 plot(xLag(end/2+1:end),yLag(end/2+1:end),'r-'); hold on;

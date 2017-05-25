@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
+mu = 0.005               % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 }
 
@@ -23,9 +23,9 @@ dt = 5.0e-5             % Time-step (s)
 %
 Grid_Parameters {
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Ny =  32               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
+Ly = 0.25                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
@@ -63,7 +63,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 200          % How often to print (PLOT) to screen
+print_dump = 1000          % How often to print (PLOT) to screen
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
