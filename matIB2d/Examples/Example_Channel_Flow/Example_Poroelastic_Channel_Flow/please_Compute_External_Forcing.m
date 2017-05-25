@@ -174,10 +174,10 @@ for n=1:length(inds(:,1))
     i = inds(n,1);
     j = inds(n,2);
     
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,j,i,w,Umax);    
+    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
         
-    fx(j,i) = fx(j,i) + kStiff*( uX(j,i) - uX_Tar );
-    fy(j,i) = fy(j,i) + kStiff*( uY(j,i) - uY_Tar );
+    fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
+    fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
     
 end
 
@@ -213,7 +213,7 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 y = yGrid(j);  % y-Value considered
 
 %uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
-uX_Tar = -Umax * (5*abs( sin(10*pi*t) ) ) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+uX_Tar = -Umax * (5*abs( sin(10*pi*t) ) ) * ( (Ly/2+w/2) - y )*( (Ly/2-w/2) - y ); % Only external forces in x-direction
 
 uY_Tar = 0;                                                           % No external forces in y-direction
 
