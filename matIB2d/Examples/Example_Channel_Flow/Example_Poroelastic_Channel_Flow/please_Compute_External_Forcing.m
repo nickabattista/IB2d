@@ -61,18 +61,18 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e4;
 
 % Width of Channel
-w = 0.2;
+w = 0.15;
 
 % Max Velocity Desired
-uMax = 250.0;
+uMax = 150.0;
 
 if first == 1
     
     % Compute Where You Want to Apply Force
     xMin = 0.1;
     xMax = 0.16;
-    yMin = 0.41;
-    yMax = 0.59;
+    yMin = 0.06;
+    yMax = 0.19;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -174,10 +174,10 @@ for n=1:length(inds(:,1))
     i = inds(n,1);
     j = inds(n,2);
     
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
+    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,j,i,w,Umax);    
         
-    fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
-    fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
+    fx(j,i) = fx(j,i) + kStiff*( uX(j,i) - uX_Tar );
+    fy(j,i) = fy(j,i) + kStiff*( uY(j,i) - uY_Tar );
     
 end
 

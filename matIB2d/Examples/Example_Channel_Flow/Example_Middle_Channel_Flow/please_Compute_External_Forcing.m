@@ -165,7 +165,7 @@ function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,d
 % inds: indices on the fluid grid for where to apply the arbitrary external force
 
 
-fx = zeros(Nx,Ny);         % Initialize storage for x-force density from EXTERNAL FORCES
+fx = zeros(Ny,Nx);         % Initialize storage for x-force density from EXTERNAL FORCES
 fy = fx;                   % Initialize storage for y-force density from EXTERNAL FORCES
 
 for n=1:length(inds(:,1))
