@@ -34,8 +34,8 @@ function Channel_Channel()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  128;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  512;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  512;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 Ly = 1.0;        % Length of Eulerian Grid in y-Direction
 
@@ -75,7 +75,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 1e5;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
