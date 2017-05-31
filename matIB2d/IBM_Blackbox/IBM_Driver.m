@@ -836,7 +836,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     % Print Spring Connections (* if springs *)
     if springs_Yes == 1
-         %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+        %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
         lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
         savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
     end
@@ -844,7 +844,6 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     %Print Tracer Pts (*if tracers*)
     if tracers(1,1) == 1
         tracersPtsName = ['tracer.' strNUM '.vtk'];
-        %tMatrix = tracers(:,2:4);
         savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
     end
 
