@@ -499,6 +499,13 @@ end
 
 
 fprintf('\n\n--> Background Flow Items\n');
+
+% PRINT IF PRESCRIBED BACKGROUND FLOW %
+if ( arb_ext_force_Yes == 1)
+fprintf('  -Prescribed background flow w/ penalty force\n');    
+end
+
+% PRINT IF TRACERS %
 if ( tracers_Yes == 0 ) && (concentration_Yes == 0)
     fprintf('      (No tracers nor other passive scalars immersed in fluid)\n\n');
 end
@@ -667,6 +674,8 @@ while current_time < T_FINAL
     % Add artificial force from fluid boundary, if desired. 
     if arb_ext_force_Yes == 1 
         [Fx_Arb, Fy_Arb, firstExtForce, indsExtForce] = please_Compute_External_Forcing(dt, current_time, x, y, grid_Info, U, V, firstExtForce, indsExtForce);
+        %size(Fx_Arb)
+        %size(Fxh)
         Fxh = Fxh + Fx_Arb;
         Fyh = Fyh + Fy_Arb;
     end
@@ -726,7 +735,6 @@ while current_time < T_FINAL
        %[C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
        [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
     end
-    
         
     % Plot Lagrangian/Eulerian Dynamics! %
     if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )
@@ -757,11 +765,9 @@ while current_time < T_FINAL
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
-        %pause();
-         %electro_potential(ePhys_Ct,:)'
-         %springs_info(ePhys_Start:ePhys_End,3)
-         %springs_info(:,3)
-         %pause();
+        %electro_potential(ePhys_Ct,:)'
+        %springs_info(ePhys_Start:ePhys_End,3)
+        %springs_info(:,3)
         
     end
 
