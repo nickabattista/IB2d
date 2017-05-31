@@ -64,7 +64,7 @@ kStiff = 1e4;
 w = 0.15;
 
 % Max Velocity Desired
-uMax = 150.0;
+uMax = 200.0;
 
 if first == 1
     
@@ -213,7 +213,7 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 y = yGrid(j);  % y-Value considered
 
 %uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
-uX_Tar = -Umax * (5*abs( sin(10*pi*t) ) ) * ( (Ly/2+w/2) - y )*( (Ly/2-w/2) - y ); % Only external forces in x-direction
+uX_Tar = -Umax * (5* ( sin(2*10*pi*t) ) * ( (Ly/2+w/2) - y )*( (Ly/2-w/2) - y ) ); % Only external forces in x-direction
 
 uY_Tar = 0;                                                           % No external forces in y-direction
 
