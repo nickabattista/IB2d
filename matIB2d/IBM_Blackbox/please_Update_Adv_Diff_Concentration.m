@@ -80,32 +80,32 @@ C = C + dt * ( k*(Cyy) - uY.*Cy );
 function C_z = give_Necessary_Derivative(C,dz,uZ,string)
 
 C_z = zeros(size(C));
-len = length(uZ(:,1));
 signs = sign(uZ);
+[lenY,lenX] = size(uZ);
 
 if strcmp(string,'x')
 
     %For periodicity on ends w/ UPWIND
-    for i=1:len
+    for i=1:lenY
 
         %left side of grid
         if signs(i,1) <= 0 
             C_z(i,1) =  ( C(i,2) - C(i,1) ) / (dz);
         else
-            C_z(i,1) =  ( C(i,1) - C(i,len) ) / (dz);
+            C_z(i,1) =  ( C(i,1) - C(i,lenX) ) / (dz);
         end
 
         %right side of grid
-        if signs(len,1) <= 0 
-            C_z(i,len) =  ( C(i,1) - C(i,len) ) / (dz);
+        if signs(i,lenX) <= 0 
+            C_z(i,lenX) =  ( C(i,1) - C(i,lenX) ) / (dz);
         else
-            C_z(i,len) =  ( C(i,len) - C(i,len-1) ) / (dz);
+            C_z(i,lenX) =  ( C(i,lenX) - C(i,lenX-1) ) / (dz);
         end
 
     end
     %Standard Upwind 
-    for i=1:len
-        for j=2:len-1
+    for i=1:lenY
+        for j=2:lenX-1
             if signs(i,j) <= 0
                 C_z(i,j) = ( C(i,j+1) - C(i,j) ) / (dz);
             else
@@ -117,29 +117,29 @@ if strcmp(string,'x')
     % Ends x-Direction calculation %
     
 elseif strcmp(string,'y') 
-
+    
     %For periodicity on ends w/ UPWIND
-    for i=1:len
+    for i=1:lenX
 
         %bottom of grid
         if signs(1,i) <= 0 
             C_z(1,i) =  ( C(2,i) - C(1,i) ) / (dz);
         else
-            C_z(1,i) =  ( C(1,i) - C(len,i) ) / (dz);
+            C_z(1,i) =  ( C(1,i) - C(lenY,i) ) / (dz);
         end
 
         %top of grid
-        if signs(len,1) <= 0 
-            C_z(len,i) =  ( C(1,i) - C(len,i) ) / (dz);
+        if signs(lenY,i) <= 0 
+            C_z(lenY,i) =  ( C(1,i) - C(lenY,i) ) / (dz);
         else
-            C_z(len,i) =  ( C(len,i) - C(len-1,i) ) / (dz);
+            C_z(lenY,i) =  ( C(lenY,i) - C(lenY-1,i) ) / (dz);
         end
 
     end
     
     %Standard Upwind
-    for i=2:len-1
-        for j=1:len
+    for i=2:lenY-1
+        for j=1:lenX
             if signs(i,j) <= 0
                 C_z(i,j) = ( C(i+1,j) - C(i,j) ) / (dz);
             else
