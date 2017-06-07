@@ -97,7 +97,21 @@ def Standard_Data_Analysis_Script():
         #
         #  Note: U(j,i): j-corresponds to y-index, i to the x-index
         #
-        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(pathViz,numSim)
+        # 
+        # <<- CHOOSE WHAT EULERIAN DATA YOU WANT TO ANALYZE ->>
+        #
+        Eulerian_Flags = np.zeros(8) # Initialize Eulerian_Flags
+        Eulerian_Flags[0] = 0   # OMEGA
+        Eulerian_Flags[1] = 0   # PRESSURE
+        Eulerian_Flags[2] = 0   # uMAG
+        Eulerian_Flags[3] = 0   # uX [mag. x-component of velocity]
+        Eulerian_Flags[4] = 0   # uY [mag. x-component of velocity]
+        Eulerian_Flags[5] = 0   # uVEC [vector components of velocity: U,V]
+        Eulerian_Flags[6] = 0   # Fx [x-component of force ]
+        Eulerian_Flags[7] = 0   # Fy [y-component of force]
+        #
+        #
+        x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy = import_Eulerian_Data(pathViz,numSim,Eulerian_Flags)
 
 
         # Imports Lagrangian Pt. FORCE (magnitude) DATA %
