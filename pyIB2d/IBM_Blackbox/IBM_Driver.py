@@ -597,7 +597,6 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         except FileExistsError:
             #File already exists
             pass
-    os.chdir('viz_IB2d')
 
 
 
@@ -610,7 +609,6 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     #        fobj.write('{0} = {1}\n'.format(key,model_Info[key]))
     #vizID = open('dumps.visit','w')
     #vizID.write('!NBLOCKS 6\n')
-    #os.chdir('..')
     
     #Initialize Vorticity, uMagnitude, and Pressure for initial colormap
     #Print initializations to .vtk
@@ -1327,13 +1325,11 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
     dy = Ly/Ny
 
 
-    #Go into viz_IB2d directory. This was throwing an error because we're already there!
-    if os.path.split(os.getcwd())[1] != 'viz_IB2d':
-        os.chdir('viz_IB2d')
+    #Print data into viz_IB2d directory.
 
     #Find string number for storing files
     strNUM = give_String_Number_For_VTK(ctsave)
-    lagPtsName = 'lagsPts.'+strNUM+'.vtk'
+    lagPtsName = os.path.join('viz_IB2d','lagsPts.'+strNUM+'.vtk')
 
     #Print Lagrangian Pts to .vtk format
     savevtk_points(lagPts, lagPtsName, 'lagPts')
@@ -1341,60 +1337,57 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
     # Print Spring Connections (* if springs *)
     if springs_Yes:
         #Print Lagrangian Pts w/ CONNECTIONS to .vtk format
-        lagPtsConName = 'lagPtsConnect.'+strNUM+'.vtk'
+        lagPtsConName = os.path.join('viz_IB2d','lagPtsConnect.'+strNUM+'.vtk')
         savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat )
 
     #Print Tracer Pts (*if tracers*)
     if tracers[0,0] == 1:
-        tracersPtsName = 'tracer.'+strNUM+'.vtk'
+        tracersPtsName = os.path.join('viz_IB2d','tracer.'+strNUM+'.vtk')
         #tMatrix = tracers[:,1:4]
         savevtk_points(tracers[:,1:4],tracersPtsName, 'tracers') 
 
 
     #Print SCALAR DATA (i.e., colormap data) to .vtk file
     if Output_Params[7] == 1:
-        vortfName = 'Omega.'+strNUM+'.vtk'
+        vortfName = os.path.join('viz_IB2d','Omega.'+strNUM+'.vtk')
         savevtk_scalar(vort, vortfName, 'Omega',dx,dy)
 
     if Output_Params[8] == 1:
-        pfName = 'P.'+strNUM+'.vtk'
+        pfName = os.path.join('viz_IB2d','P.'+strNUM+'.vtk')
         savevtk_scalar(p, pfName, 'P',dx,dy)
 
     if Output_Params[10] == 1:
-        uMagfName = 'uMag.'+strNUM+'.vtk'
+        uMagfName = os.path.join('viz_IB2d','uMag.'+strNUM+'.vtk')
         savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy)
 
     if Output_Params[11] == 1:
-        uXName = 'uX.'+strNUM+'.vtk'
+        uXName = os.path.join('viz_IB2d','uX.'+strNUM+'.vtk')
         savevtk_scalar(U, uXName, 'uX',dx,dy)
     
     if Output_Params[12] == 1:
-        uYName = 'uY.'+strNUM+'.vtk'    
+        uYName = os.path.join('viz_IB2d','uY.'+strNUM+'.vtk')
         savevtk_scalar(V, uYName, 'uY',dx,dy)
 
     if Output_Params[14] == 1:
-        fXName = 'fX.'+strNUM+'.vtk'
+        fXName = os.path.join('viz_IB2d','fX.'+strNUM+'.vtk')
         savevtk_scalar(fXGrid, fXName, 'fX',dx,dy)
 
     if Output_Params[15] == 1:
-        fYName = 'fY.'+strNUM+'.vtk'
+        fYName = os.path.join('viz_IB2d','fY.'+strNUM+'.vtk')
         savevtk_scalar(fYGrid, fYName, 'fY',dx,dy)
     
     if Output_Params[13] == 1:
-        fMagName = 'fMag.'+strNUM+'.vtk'
+        fMagName = os.path.join('viz_IB2d','fMag.'+strNUM+'.vtk')
         savevtk_scalar(np.sqrt( fXGrid*fXGrid + fYGrid*fYGrid ), fMagName, 'fMag',dx,dy)
 
     if concentration_Yes:
-        confName = 'concentration.'+strNUM+'.vtk'
+        confName = os.path.join('viz_IB2d','concentration.'+strNUM+'.vtk')
         savevtk_scalar(C.T, confName, 'Concentration',dx,dy)
 
     #Print VECTOR DATA (i.e., velocity data) to .vtk file
     if Output_Params[9] == 1:
-        velocityName = 'u.'+strNUM+'.vtk'
+        velocityName = os.path.join('viz_IB2d','u.'+strNUM+'.vtk')
         savevtk_vector(U, V, velocityName, 'u',dx,dy)
-
-    #Get out of viz_IB2d folder
-    os.chdir('..')
 
 
     #
@@ -1406,42 +1399,39 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
 
     # THE CASE IF LESS THAN (or =) to 5 Lag. Pts. 
         if NLagPts <= 5:
-            os.chdir('hier_IB2d_data') #change directory to hier-data folder
+            #print data to hier-data folder
         
             # Save x-y force data!
-            fLag_XName = 'fX_Lag.'+strNUM+'.vtk'
-            fLag_YName = 'fY_Lag.'+strNUM+'.vtk'
+            fLag_XName = os.path.join('hier_IB2d_data','fX_Lag.'+strNUM+'.vtk')
+            fLag_YName = os.path.join('hier_IB2d_data','fY_Lag.'+strNUM+'.vtk')
             savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
             savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
 
             # Define force magnitude name
-            fMagName = 'fMag.'+strNUM+'.vtk'
+            fMagName = os.path.join('hier_IB2d_data','fMag.'+strNUM+'.vtk')
         
             # Compute magnitude of forces on Lagrangian boundary
             fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] ) 
         
             # Print UNSTRUCTURED POINT DATA w/ SCALAR associated with it
             savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag')
-        
-            # Get out of hier_IB2d_data folder
-            os.chdir('..') 
     
         # THE CASE IF GREATER THAN 5 Lag. Pts. 
         else:
             F_Tan_Mag,F_Normal_Mag = please_Compute_Normal_Tangential_Forces_On_Lag_Pts(lagPts,F_Lag)
 
-            os.chdir('hier_IB2d_data') #change directory to hier-data folder
+            #print data to hier-data folder
 
             # Save x-y force data!
-            fLag_XName = 'fX_Lag.'+strNUM+'.vtk'
-            fLag_YName = 'fY_Lag.'+strNUM+'.vtk'
+            fLag_XName = os.path.join('hier_IB2d_data','fX_Lag.'+strNUM+'.vtk')
+            fLag_YName = os.path.join('hier_IB2d_data','fY_Lag.'+strNUM+'.vtk')
             savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
             savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
 
             # Save force magnitude, mag. normal force, and mag. tangential force
-            fMagName = 'fMag.'+strNUM+'.vtk'
-            fNormalName = 'fNorm.'+strNUM+'.vtk'
-            fTangentName = 'fTan.'+strNUM+'.vtk'
+            fMagName = os.path.join('hier_IB2d_data','fMag.'+strNUM+'.vtk')
+            fNormalName = os.path.join('hier_IB2d_data','fNorm.'+strNUM+'.vtk')
+            fTangentName = os.path.join('hier_IB2d_data','fTan.'+strNUM+'.vtk')
 
             # Compute magnitude of forces on Lagrangian boundary
             fLagMag = np.sqrt( F_Lag[:,0]*F_Lag[:,0] + F_Lag[:,1]*F_Lag[:,1] )
@@ -1451,8 +1441,6 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
             savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm')
             savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan')
 
-            # Get out of hier_IB2d_data folder
-            os.chdir('..') 
     
     
 ##############################################################################
