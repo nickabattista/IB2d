@@ -269,8 +269,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Find Eulerian forces on grids by approximating the line integral, 
     #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    Fx = delta_Y @ fxds @ delta_X
-    Fy = delta_Y @ fyds @ delta_X
+    Fx = np.dot(np.dot(delta_Y,fxds),delta_X)
+    Fy = np.dot(np.dot(delta_Y,fyds),delta_X)
 
     return (Fx, Fy, F_Mass, F_Lag, F_Poro)
     
