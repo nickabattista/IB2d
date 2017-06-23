@@ -103,8 +103,8 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     print('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n')
     print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)')
     print('\n________________________________________________________________________________')
-    print('\n\nNOTE: If running pyIB2d with Anaconda, please note must have vtk installed.\n')
-    print('          If not, type the following line into your terminal: <conda install -c menpo vtk> in your terminal')
+    print('\n\nNOTE: If running pyIB2d with Anaconda, please note that it will run faster with vtk installed.\n')
+    print('          To install, type the following line into your terminal: <conda install -c menpo vtk> in your terminal')
     print('\n________________________________________________________________________________')
     print('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n')
     print('\n\n--> Reading input data for simulation...\n\n')
@@ -793,8 +793,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #wait = input('Press enter to continue...')
     if not vtk_lib_flag:
         # warn that vtk library was not used
-        print('The vtk library could not be imported for this simulation.')
-        print('Install via the terminal command: conda install -c menpo vtk')
+        print('Note: the vtk library could not be imported for this simulation.')
 
     
 ###########################################################################
