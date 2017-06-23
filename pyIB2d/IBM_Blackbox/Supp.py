@@ -43,7 +43,11 @@
 
 import numpy as np
 from math import sqrt
-from numba import jit
+try:
+    from numba import jit
+    numba_flag = True
+except:
+    numba_flag = False
     
 ################################################################################
 #
@@ -249,7 +253,6 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
-@jit(nopython=True)
 def give_Delta_Kernel(x,dx):
     ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
     
@@ -282,6 +285,8 @@ def give_Delta_Kernel(x,dx):
     return delta
 
 
+if numba_flag:
+    give_Delta_Kernel = jit(nopython=True)(give_Delta_Kernel)
 
 ###########################################################################
 #
