@@ -71,7 +71,13 @@ if first == 1
     for i=2:Nx
         x(i) = x(i-1)+dx;
     end
-    y = x';
+    
+    dy = sscanf(str,'%*s %*f %f %*f',1);
+    y=0;
+    for i=2:Ny
+        y(i) = y(i-1)+dy;
+    end
+    
 else
     x=1; y=1; % Store arbitrary values
 end
@@ -90,8 +96,8 @@ for i=2:Nx
 end
 
 % read in the vertices %
-[e_Data,count] = fscanf(fileID,strVec,Nx*Nx);
-if count ~= Nx*Nx
+[e_Data,count] = fscanf(fileID,strVec,Nx*Ny);
+if count ~= Nx*Ny
    error('\nProblem reading in Eulerian Data.'); 
 end
 

@@ -55,8 +55,9 @@ str = fgets(fileID);
 str = fgets(fileID);
 
 % Store grid info
-N = sscanf(str,'%*s %f %*f %*s',1); 
-Nx = N(1);
+Nx = sscanf(str,'%*s %f %*f %*s',1);
+Ny = sscanf(str,'%*s %*f %f %*s',1);
+
 
 % bypass lines in header %
 str = fgets(fileID);
@@ -75,8 +76,8 @@ for i=2:3*Nx
 end
 
 % read in the vertices %
-[e_Data,count] = fscanf(fileID,strVec,3*Nx*Nx);
-if count ~= 3*Nx*Nx
+[e_Data,count] = fscanf(fileID,strVec,3*Nx*Ny);
+if count ~= 3*Nx*Ny
    error('Problem reading in Eulerian Data.'); 
 end
 
@@ -87,8 +88,8 @@ e_Data = e_Data';                     % Store vertices in new matrix
 U = e_Data(:,1);       % Store U data
 V = e_Data(:,2);       % Store V data
 
-U = reshape(U,Nx,Nx)';  % Reshape (Nx*Nx,1) matrix to  (Nx,Nx)
-V = reshape(V,Nx,Nx)';  % Reshape (Nx*Nx,1) matrix to  (Nx,Nx)
+U = reshape(U,Nx,Ny)';  % Reshape (Nx*Nx,1) matrix to  (Nx,Nx)
+V = reshape(V,Nx,Ny)';  % Reshape (Nx*Nx,1) matrix to  (Nx,Nx)
  
 fclose(fileID);         % Closes the data file.
 
