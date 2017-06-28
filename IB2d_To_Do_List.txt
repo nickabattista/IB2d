@@ -9,6 +9,9 @@
 % LAGRANGIAN STRUCTURE / FIBER MODELS
 %
 1. Fix Lagrangian Pts. passing through boundaries (for periodic domains)
+	a. Fixed for springs (linear, non-linear, damped) and 
+           beams (torsional, non-invariant) in MATLAB
+	b. Need to update similarly in pyIB2d
 2. Allow for one than one boundary to be read in
 
 %
@@ -23,6 +26,7 @@
 7. Port electrophysiology code to Python 
 8. Port code to Julia 
 9. Higher order Advection-Diffusion solver
+10.Port coagulation model code to pyIB2d 
 
 %
 % EXAMPLES
@@ -34,6 +38,7 @@
 2. Fix muscle model parameters for both types for swimmer
         -Length-Tension/Force-Velocity model
         -3-Element Hill Model / LT-FV model
+3. Better coagulation example
 
 %
 % DOCUMENTATION
