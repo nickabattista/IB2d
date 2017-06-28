@@ -31,7 +31,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag, F_Poro] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info)
+function [Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info, coagulation, aggregate_list)
+
 
 %
 % The components of the force are given by
@@ -39,17 +40,21 @@ function [Fx, Fy, F_Mass, F_Lag, F_Poro] = please_Find_Lagrangian_Forces_On_Eule
 % 
 % where s parameteriizes the Lagrangian structure.
 
-% xLag:         x positions of Lagrangian structure
-% yLag:         y positions of Lagrangian structure  
-% x:            x positions on Eulerian grid
-% y:            y positions on Eulerian grid
-% grid_Info:    holds lots of geometric pieces about grid / simulations
-% model_Info:   Stores if springs, if update_springs, if target_pts, if update_target_pts (as 0 (no) or 1 (yes) )
-% springs:      Stores Master Node, Slave Node, Spring Stiffness, Restling-Lengths, all in column vecs
-% beams:        Stores 1st Node, 2nd (MIDDLE-MAIN) Node, 3rd Nodes, Beam Stiffnesses, and Beam curvatures
-% targets:      Stores target point index, correponding xLag, yLag and target point stiffness
-% masses:       Stores mass point index, correponding xLag, yLag, "spring" stiffness, and mass value parameter
-% current_time: Current time of simulation (in seconds)
+% xLag:           x positions of Lagrangian structure
+% yLag:           y positions of Lagrangian structure  
+% x:              x positions on Eulerian grid
+% y:              y positions on Eulerian grid
+% grid_Info:      holds lots of geometric pieces about grid / simulations
+% model_Info:     Stores if springs, if update_springs, if target_pts, if update_target_pts (as 0 (no) or 1 (yes) )
+% springs:        Stores Master Node, Slave Node, Spring Stiffness, Restling-Lengths, all in column vecs
+% beams:          Stores 1st Node, 2nd (MIDDLE-MAIN) Node, 3rd Nodes, Beam Stiffnesses, and Beam curvatures
+% targets:        Stores target point index, correponding xLag, yLag and target point stiffness
+% masses:         Stores mass point index, correponding xLag, yLag, "spring" stiffness, and mass value parameter
+%    .
+%    .
+% coagulation:    Stores coagulation data: first index of lag pt. of cell, threshold radii, fracture force, # of pts in each cell
+% aggregate_list: Stores list of bonds between Lag. Pt. Indices (INDICES OF CELLS AS A WHOLE)
+% current_time:   Current time of simulation (in seconds)
 
 
 % Force density is computed using a SIMPLE LINEAR SPRING model w/ resting length L.  
@@ -75,12 +80,13 @@ target_pts_Yes = model_Info(3);     % Target_Pts: 0 (for no) or 1 (for yes)
 beams_Yes = model_Info(5);          % Beams (Torsional Springs): 0 (for no) or 1 (for yes)
 nonInv_beams_Yes = model_Info(7);
 muscle_LT_FV_Yes = model_Info(9);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
-muscle_3_Hill_Yes = model_Info(10);  % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
+muscle_3_Hill_Yes = model_Info(10); % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
 mass_Yes = model_Info(13);          % Mass Pts: 0 (for no) or 1 (for yes)
 electro_phys_Yes = model_Info(19);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
 d_Springs_Yes = model_Info(20);     % Damped Springs: 0 (for no) or 1 (for yes)
 gen_force_Yes = model_Info(24);     % General User-Defined Force: 0 (for no) or 1 (for yes)
-poroelastic_Yes = model_Info(25);    % Poroelastic Media: 0 (for no) or 1 (for yes)
+poroelastic_Yes = model_Info(25);   % Poroelastic Media: 0 (for no) or 1 (for yes)
+coagulation_Yes = model_Info(26);   % Coagulation Model: 0 (for no) or 1 (for yes)
 
 
 %
@@ -125,7 +131,7 @@ if ( springs_Yes == 1 )
     %[Tx Ty] = give_Me_Spring_Lagrangian_Tension(Nb,dLag_x,dLag_y,springs);
 
     % Compute the Lagrangian SPRING force densities!
-    [fx_springs, fy_springs] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs);
+    [fx_springs, fy_springs] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs,Lx,Ly);
     
 else
     fx_springs = zeros(Nb,1); %No x-forces coming from springs
@@ -165,7 +171,7 @@ end
 if ( beams_Yes == 1 )
 
     % Compute the Lagrangian BEAM (TORSIONAL SPRINGS) force densities!
-    [fx_beams, fy_beams] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams);
+    [fx_beams, fy_beams] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams,Lx,Ly);
     
 else
     fx_beams = zeros(Nb,1); %No x-forces coming from beams
@@ -182,7 +188,7 @@ if ( nonInv_beams_Yes == 1 )
     [fx_nonInv_beams, fy_nonInv_beams] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams);
     
 else
-    fx_nonInv_beams = zeros(Nb,1); %No x-forces coming from beams
+    fx_nonInv_beams = zeros(Nb,1);        %No x-forces coming from beams
     fy_nonInv_beams = fx_nonInv_beams;    %No y-forces coming from beams
 end
 
@@ -193,7 +199,7 @@ end
 if ( d_Springs_Yes == 1 )
 
     % Compute the Lagrangian DAMPED SPRING force densities!
-    [fx_dSprings, fy_dSprings] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt);
+    [fx_dSprings, fy_dSprings] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt,Lx,Ly);
     
 else
     fx_dSprings = zeros(Nb,1);    %No x-forces coming from damped springs
@@ -209,15 +215,28 @@ if ( gen_force_Yes == 1 )
     [fx_genForce, fy_genForce] = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,xLag_P,yLag_P,dt,current_time,general_force);
     
 else
-    fx_genForce = zeros(Nb,1);    %No x-forces coming from damped springs
-    fy_genForce = fx_genForce;    %No y-forces coming from damped springs
+    fx_genForce = zeros(Nb,1);    %No x-forces coming from general force model
+    fy_genForce = fx_genForce;    %No y-forces coming from general force model
+end
+
+
+% Compute COAGULATION MODEL AND FORCE DENSITIES (if there is coagulation!)
+if ( coagulation_Yes == 1 )
+
+    % Compute the Lagrangian COAGULATION force densities!
+    [fx_coag, fy_coag, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,yLag,coagulation,aggregate_list);
+    
+else
+    fx_coag = zeros(Nb,1);   % No x-forces coming from coagulation
+    fy_coag = fx_coag;       % No y-forces coming from coagulation
 end
 
 
 
+
 % SUM TOTAL FORCE DENSITY! %
-fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce;
-fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce;
+fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce + fx_coag;
+fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce + fy_coag;
 
 
 
@@ -262,11 +281,11 @@ Fy = delta_Y * fyds * delta_X;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION computes the Lagrangian SPRING Force Densities .
+% FUNCTION computes the Lagrangian SPRING Force Densities.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs)
+function [fx, fy] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs,Lx,Ly)
 
 
 Nsprings = length(springs(:,1));  % # of Springs
@@ -286,9 +305,20 @@ for i=1:Nsprings
     k_Spring = K_Vec(i);          % Spring stiffness of i-th spring
     L_r = RL_Vec(i);              % Resting length of i-th spring
     alpha = alpha_pow(i);         % Degree of linearity of i-th spring
-    
+ 
     dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
+
+    %
+    % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
+    %
+    if abs(dx) > Lx/2
+        dx = sign(dx)*( Lx - sign(dx)*dx );
+    end
+    
+    if abs(dy) > Ly/2
+        dy = sign(dy)*( Ly - sign(dy)*dy );
+    end
     
     sF_x = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
     sF_y = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
@@ -304,7 +334,7 @@ end
 
 % MIGHT NOT NEED THESE!
 %fx = fx/ds^2;
-%fy = dy/ds^2;
+%fy = fy/ds^2;
 
 
 
@@ -314,7 +344,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt)
+function [fx, fy] = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt,Lx,Ly)
 
 
 Ndsprings = length(d_Springs(:,1));  % # of DAMPED Springs
@@ -338,8 +368,35 @@ for i=1:Ndsprings
     dx = xLag(id_Slave) - xLag(id_Master);      % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master);      % y-Distance btwn slave and master node
     
+    %
+    % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
+    %
+    if abs(dx) > Lx/2
+       dx = sign(dx)*( Lx - sign(dx)*dx );
+    end
+    
+    if abs(dy) > Lx/2
+        dy = sign(dy)*( Ly - sign(dy)*dy );
+    end
+    
     dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Velocity between current and prev. steps
     dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Velocity between current and prev. steps
+    
+    %
+    % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
+    %
+    if abs(dV_x) > Lx/2
+       dV_x = sign(dV_x)*( Lx - sign(dV_x)*dV_x );
+    end
+    
+    if abs(dV_y) > Lx/2
+        dV_y = sign(dV_y)*( Ly - sign(dV_y)*dV_y );
+    end
+    
+    
+    dV_x = ( dV_x ) / dt ; % x-Velocity between current and prev. steps
+    dV_y = ( dV_y ) / dt ; % y-Velocity between current and prev. steps
+    
     
     sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
     sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
@@ -631,6 +688,7 @@ for i=1:Nbeams
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
     
+    
     % CALCULATE BENDING IN X
     fx(id_3,1) = fx(id_3,1) -   k_Beam*( Xr - 2*Xq + Xp - Cx);
     fx(id_1,1) = fx(id_1,1) -   k_Beam*( Xr - 2*Xq + Xp - Cx);
@@ -653,7 +711,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams)
+function [fx, fy] = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams,Lx,Ly)
 
 
 Nbeams = length(beams(:,1));     % # of Beams
@@ -681,6 +739,12 @@ for i=1:Nbeams
     Yp = yLag(id_1);          % yPt of 1ST Node Pt. in beam
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
+    
+    
+    % CHecks if Lag. Pts. have passed through the boundary and translates appropriately
+    [Xp,Xq,Xr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr);
+    [Yp,Yq,Yr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Ly,Yp,Yq,Yr);
+   
     
     % Compute Cross-Product
     cross_prod = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp);
@@ -861,4 +925,91 @@ for i=1:row
         
     end
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION CHECK if BEAM points have passed through boundary, and translates them accordingly for calculation
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [Xp_N,Xq_N,Xr_N] = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr)
+
+    % CHECKS FOR IF POINTS PASSED THRU BNDRY
+    dX_pq = ( Xp - Xq );
+    dX_qr = ( Xq - Xr );
+    
+    if abs(dX_pq) > 5*ds
+       %if abs(dX_pq) > abs(dX_qr)
+
+            % MEANS point p has moved thru; check if moved through right/left bndry
+            if dX_pq < 0
+                Xp_N = Lx + Xp;
+            else
+                Xp_N = -Lx+Xp;
+            end
+            Xq_N = Xq;
+            Xr_N = Xr;
+       %else
+            %% MEANS point q has moved thru; check if moved through right/left bndry
+            %if dX_pq > 0
+            %    Xq_N = Lx + Xq;
+            %else
+            %    Xq_N = -Xq;
+            %end
+            %Xp_N = Xp;
+            %Xr_N = Xr;
+       %end
+
+%        fprintf('\n\n\n\n'); 
+%        Xp
+%        Xq
+%        Xr
+%        Xp_N
+%        Xq_N
+%        Xr_N
+%        pause();
+       
+    else
+       Xp_N = Xp;
+       Xq_N = Xq;
+       Xr_N = Xr;
+    end
+    
+    
+    if abs(dX_qr) > 5*ds
+       %if abs(dX_qr) > abs(dX_pq)
+            % MEANS point r has moved thru; check if moved through right/left bndry
+            if dX_qr < 0
+                Xr_N = -Lx+Xr;
+            else
+                Xr_N = Lx + Xr;
+            end
+            Xq_N = Xq;
+            if abs(dX_pq) < 5*ds 
+                Xp_N = Xp;
+            end
+%        else
+%             % MEANS point q has moved thru; check if moved through right/left bndry
+%             if dX_qr > 0
+%                 Xq_N = Lx + Xq;
+%             else
+%                 Xq_N = -Xq;
+%             end
+%             Xr_N = Xr;
+%             if abs(dX_pq) < 5*ds 
+%                 Xp_N = Xp;
+%             end
+       %end
+       
+%        fprintf('\n\n\n\n'); 
+%        Xp
+%        Xq
+%        Xr
+%        Xp_N
+%        Xq_N
+%        Xr_N
+%        pause();
+
+    end
 
