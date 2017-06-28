@@ -42,8 +42,8 @@ Ly =   grid_Info(4);
 dx =   grid_Info(5);
 dy =   grid_Info(6);
 supp = grid_Info(7);
-Nb =   grid_Info(8);
-ds =   grid_Info(9);
+%Nb =   grid_Info(8);
+%ds =   grid_Info(9);
 
 
 % Find indices where the delta-function kernels are non-zero for both x and y.
@@ -107,6 +107,17 @@ if poroelastic_Yes
 
 end
 
+%
+% TESTING FOR LAG. PTS. MOVING THRU BOUNDARIES
+%
+%xL_NextB = xL_Next;
+% if find(xL_NextB>Lx)
+%     mat(:,1)=xL_NextB;
+%     mat(:,2)=mod(xL_Next,Lx);
+%     mat
+%     current_time
+%     error('problem with lag pts moving through boundary');
+% end
 
 % Shift so that all values are in [0,Lx) or [0,Ly).
 if porous_Yes == 0
