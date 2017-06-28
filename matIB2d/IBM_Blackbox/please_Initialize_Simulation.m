@@ -335,6 +335,13 @@ try
         Lag_Struct_Params(25) = 0;
     end
     
+    % PORO-ELASTIC MEDIA %
+    if find(strcmp({Lag_Struct_Input{:,1}},'coagulation')) > 0
+        Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
+    else
+        Lag_Struct_Params(26) = 0;
+    end
+    
 
 catch
     fprintf('\n \n');
@@ -538,6 +545,9 @@ Lag_Struct_Params(21)= 0;         % Update_Damped_Springs: 0 (for no) or 1 (for 
 Lag_Struct_Params(22)= 0;         % Boussinesq: 0 (for no) or 1 (for yes)
 Lag_Struct_Params(23)= 0;         % expansion coefficient for Boussinesq approx.
 Lag_Struct_Params(24)= 0;         % user-defined general force model: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(25)= 0;         % poroelastic media: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(26)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
+
 
 Output_Params(1) = 1000;          % Print Dump (How often to plot)
 Output_Params(2) = 0;             % Plot in Matlab? (1=YES,0=NO) 
