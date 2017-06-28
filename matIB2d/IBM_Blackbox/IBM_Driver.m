@@ -163,6 +163,7 @@ boussinesq_Yes = Lag_Struct_Params(22);       % Boussinesq Approx.: 0 (for no) o
 exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
 general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
 poroelastic_Yes = Lag_Struct_Params(25);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(26);      % Coagulation Model: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -252,7 +253,7 @@ end
 
 
 
-% READ IN BEAMS (IF THERE ARE NONINVARIANT BEAMS) %
+% READ IN NON-INVARIANT BEAMS (IF THERE ARE NONINVARIANT BEAMS) %
 if ( nonInv_beams_Yes == 1)
     fprintf('  -Beams ("non-Invariant") and ');
     if update_nonInv_Beams_Flag == 0
@@ -467,8 +468,6 @@ end
 
 
 
-
-
 % READ IN GENERAL FORCE PARAMETERS (IF THERE IS A USER-DEFINED FORCE) %
 if ( general_force_Yes == 1 )
     fprintf('  -GENERAL FORCE MODEL (user-defined force term)\n');
@@ -481,6 +480,28 @@ if ( general_force_Yes == 1 )
 else
     gen_force_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
 end
+
+
+
+
+
+
+% READ IN COAGULATION PARAMETERS (IF THERE IS COAGULATION) %
+if ( coagulation_Yes == 1 )
+    fprintf('  -COAGULATION MODEL INCLUDED)\n');
+    coagulation_info = read_Coagulation_Input_File(struct_name);
+    aggregate_list = 0;
+        %
+        %
+        % ALL PARAMETERS / FORCE FUNCTION SET BY USER!
+        %
+        %
+else
+    coagulation_info = 0;  %just to pass placeholder into "please_Find_Lagrangian_Forces_On_Eulerian_grid function"
+    aggregate_list = 0;
+end
+
+
 
 
 
@@ -596,7 +617,7 @@ end
 vort=zeros(Nx,Ny); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(Nb,1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
 Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag);
+print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n\n',current_time);
 ctsave = ctsave+1;
@@ -621,12 +642,13 @@ while current_time < T_FINAL
     %
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
     
+    
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
     end
     
-    if ( ( electro_phys_Yes == 1) && (muscles_Yes == 0) )
-        springs_info(ePhys_Start:ePhys_End,3) = ( 8.5e0*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
+    if ( ( electro_phys_Yes == 1) && (muscles_Yes == 0) ) %0.75e0 %1e1 for Re=3.4    %2.25e1 for Re=0.5 D=10
+        springs_info(ePhys_Start:ePhys_End,3) = ( 1.6e1*electro_potential(ePhys_Ct,:)') .^4;%( 1e4*electro_potential(ePhys_Ct,:)'.*springs_info(ePhys_Start:ePhys_End,3) ).^4;
         ePhys_Ct = ePhys_Ct + 1;
     end
     
@@ -656,7 +678,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -705,8 +727,8 @@ while current_time < T_FINAL
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     %Uh, Vh instead of U,V?
     [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro);
-
     
+
     %IF POROUS NODES, NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
@@ -716,9 +738,7 @@ while current_time < T_FINAL
        porous_info(:,3) = yLag( porous_info(:,1) );    %Stores y-Lags as y-Porous Pt. Identities
        xLag = mod(xLag, Lx);                           % If structure goes outside domain
        yLag = mod(yLag, Ly);                           % If structure goes outside domain
-    end
-    
-    
+    end    
     
     
     % If there are tracers, update tracer positions %
@@ -750,7 +770,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag);
+        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -796,7 +816,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag)
+function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list)
 
     %
     %  Output_Params(1):  print_dump
@@ -839,6 +859,12 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
         lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
         savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
+    end
+    
+    if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
+        %Print COAGULATION CONNECTIONS to .vtk format
+        CoagConName=['Coag_Connect.' strNUM '.vtk'];
+        savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',aggregate_list(:,3:4)-1);
     end
     
     %Print Tracer Pts (*if tracers*)
@@ -1840,5 +1866,39 @@ gen_force_info = importdata(filename,' ',1);
 % Save data to new variable, force_general
 force_general = gen_force_info.data;
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: READS IN ALL THE DATA FOR THE COAGULATION MODEL
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function coag = read_Coagulation_Input_File(struct_name)
+
+filename = [struct_name '.coagulation'];  %Name of file to read in
+
+
+fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,'%f','CollectOutput',1);
+
+fclose(fileID);      % Close the data file.
+
+coag_Info = C{1};    % Stores all read in data
+
+%Store all elements on .coagulation file into a matrix starting w/ 2nd row of read in data.
+coag = coag_Info(1:end,1);
+
+% coag:     row 1: staring index for coagulation cells
+%           row 2: threshold radii
+%           row 3: threshold force
+%           row 4: row N+1: # of Lag. Pts in Cell, 1
+%           row 5: row N+1: # of Lag. Pts in Cell, 2
+%            .  
+%            .  
+%            . 
+%           row N+3: # of Lag. Pts in Cell, N
 
     
