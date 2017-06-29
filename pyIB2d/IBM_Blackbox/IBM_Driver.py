@@ -63,7 +63,7 @@ except:
 #
 ###############################################################################
 
-def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params):
+def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,pool=None):
 
     ''' 2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 
@@ -684,7 +684,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params,\
         springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
-        mass_info, d_springs_info, gen_force_info, poroelastic_info)
+        mass_info, d_springs_info, gen_force_info, poroelastic_info, pool)
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test

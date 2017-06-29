@@ -29,11 +29,17 @@
 ----------------------------------------------------------------------------'''
 
 import numpy as np
-import sys
+import sys, os
 # Path Reference to where Driving code is found #
 sys.path.append('../../IBM_Blackbox')
+from multiprocessing import Pool
+import argparse
 import IBM_Driver as Driver
 from please_Initialize_Simulation import *
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-n', '--nproc', help='number of worker processes to use, 2 by default',
+                    type=int, default=0)
 
 ###############################################################################
 #
@@ -82,7 +88,7 @@ def give_Me_input2d_Parameters():
 #
 ###############################################################################
 
-def main2d():
+def main2d(pool=None):
     
     '''This is the "main" function, which ets called to run the 
     Immersed Boundary Simulation. It reads in all the parameters from 
@@ -103,7 +109,13 @@ def main2d():
     
     #For debugging only!
     #Driver.main(struct_name, mu, rho, grid_Info, dt, T_final, model_Info)
-    Driver.main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
+    Driver.main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,
+                pool)
     
 if __name__ == "__main__":
-    main2d()
+    args = parser.parse_args()
+    if args.nproc == 0:
+        main2d()
+    else:
+        with Pool(processes=args.nproc) as pool:
+            main2d(pool)
