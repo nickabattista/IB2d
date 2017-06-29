@@ -59,7 +59,7 @@ except:
     vtk_lib_flag = False
 
 # Number of threads for debugging    
-THREADS = 2
+THREADS = 8
 
 # Define workers
 class WorkerObj(Thread):
@@ -1347,7 +1347,30 @@ def give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info):
 
 def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,io_queue):
-    ''' Gives appropriate string number for filename in printing the .vtk files'''
+    ''' Gives appropriate string number for filename in printing the .vtk files
+    
+    Arguments:
+        Output_Params: ndarray
+        ctsave: int
+        vort: ndarray
+        uMag: ndarray
+        p: ndarray
+        U: ndarray
+        V: ndarray
+        Lx: float
+        Ly: float
+        Nx: int
+        Ny: int
+        lagPts: ndarray
+        springs_Yes: float
+        connectsMat: ndarray
+        tracers: ndarray
+        concentration_Yes: float
+        C: int
+        fXGrid: ndarray
+        fYGrid: ndarray
+        F_Lag: ndarray
+        io_queue: None or queue'''
 
 
     #               Output_Params[0]: print_dump
@@ -1379,12 +1402,22 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
     #Find string number for storing files
     strNUM = give_String_Number_For_VTK(ctsave)
     lagPtsName = os.path.join('viz_IB2d','lagsPts.'+strNUM+'.vtk')
+    
+    if io_queue is not None and (Output_Params[14] == 1 or Output_Params[13] == 1):
+        this_fXGrid = np.copy(fXGrid)
+    if io_queue is not None and (Output_Params[15] == 1 or Output_Params[13] == 1):
+        this_fYGrid = np.copy(fYGrid)
+    if io_queue is not None and (Output_Params[11] == 1 or Output_Params[9] == 1):
+        this_U = np.copy(U)
+    if io_queue is not None and (Output_Params[12] == 1 or Output_Params[9] == 1):
+        this_V = np.copy(V)
 
     #Print Lagrangian Pts to .vtk format
     if io_queue is None:
         savevtk_points(lagPts, lagPtsName, 'lagPts')
     else:
-        io_queue.put(('points', lagPts, lagPtsName, 'lagPts'))
+        this_lagPts = np.copy(lagPts)
+        io_queue.put(('points', this_lagPts, lagPtsName, 'lagPts'))
 
     # Print Spring Connections (* if springs *)
     if springs_Yes:
@@ -1393,7 +1426,9 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
         if io_queue is None:
             savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected', connectsMat)
         else:
-            io_queue.put(('points_connects', lagPts, lagPtsConName, 'lagPtsConnected', connectsMat))
+            this_connectsMat = np.copy(connectsMat)
+            io_queue.put(('points_connects', this_lagPts, lagPtsConName, 'lagPtsConnected',
+                          this_connectsMat))
 
     #Print Tracer Pts (*if tracers*)
     if tracers[0,0] == 1:
@@ -1402,7 +1437,8 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
         if io_queue is None:
             savevtk_points(tracers[:,1:4], tracersPtsName, 'tracers')
         else:
-            io_queue.put(('points', tracers[:,1:4], tracersPtsName, 'tracers'))
+            this_tracers = np.copy(tracers[:,1:4])
+            io_queue.put(('points', this_tracers, tracersPtsName, 'tracers'))
 
 
     #Print SCALAR DATA (i.e., colormap data) to .vtk file
@@ -1411,49 +1447,52 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
         if io_queue is None:
             savevtk_scalar(vort, vortfName, 'Omega', dx, dy)
         else:
-            io_queue.put(('scalar', vort, vortfName, 'Omega', dx, dy))
+            this_vort = np.copy(vort)
+            io_queue.put(('scalar', this_vort, vortfName, 'Omega', dx, dy))
 
     if Output_Params[8] == 1:
         pfName = os.path.join('viz_IB2d','P.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(p, pfName, 'P',dx,dy)
         else:
-            io_queue.put(('scalar', p, pfName, 'P', dx, dy))
+            this_p = np.copy(p)
+            io_queue.put(('scalar', this_p, pfName, 'P', dx, dy))
 
     if Output_Params[10] == 1:
         uMagfName = os.path.join('viz_IB2d','uMag.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy)
         else:
-            io_queue.put(('scalar', uMag, uMagfName, 'uMag', dx, dy))
+            this_uMag = np.copy(uMag)
+            io_queue.put(('scalar', this_uMag, uMagfName, 'uMag', dx, dy))
 
     if Output_Params[11] == 1:
         uXName = os.path.join('viz_IB2d','uX.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(U, uXName, 'uX',dx,dy)
         else:
-            io_queue.put(('scalar', U, uXName, 'uX', dx, dy))
+            io_queue.put(('scalar', this_U, uXName, 'uX', dx, dy))
     
     if Output_Params[12] == 1:
         uYName = os.path.join('viz_IB2d','uY.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(V, uYName, 'uY',dx,dy)
         else:
-            io_queue.put(('scalar', V, uYName, 'uY', dx, dy))
+            io_queue.put(('scalar', this_V, uYName, 'uY', dx, dy))
 
     if Output_Params[14] == 1:
         fXName = os.path.join('viz_IB2d','fX.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(fXGrid, fXName, 'fX',dx,dy)
         else:
-            io_queue.put(('scalar', fXGrid, fXName, 'fX', dx, dy))
+            io_queue.put(('scalar', this_fXGrid, fXName, 'fX', dx, dy))
 
     if Output_Params[15] == 1:
         fYName = os.path.join('viz_IB2d','fY.'+strNUM+'.vtk')
         if io_queue is None:
             savevtk_scalar(fYGrid, fYName, 'fY',dx,dy)
         else:
-            io_queue.put(('scalar', fYGrid, fYName, 'fY', dx, dy))
+            io_queue.put(('scalar', this_fYGrid, fYName, 'fY', dx, dy))
     
     if Output_Params[13] == 1:
         fMagName = os.path.join('viz_IB2d','fMag.'+strNUM+'.vtk')
@@ -1467,7 +1506,8 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
         if io_queue is None:
             savevtk_scalar(C.T, confName, 'Concentration',dx,dy)
         else:
-            io_queue.put(('scalar', C.T, confName, 'Concentration', dx, dy))
+            this_CT = np.copy(C.T)
+            io_queue.put(('scalar', this_CT, confName, 'Concentration', dx, dy))
 
     #Print VECTOR DATA (i.e., velocity data) to .vtk file
     if Output_Params[9] == 1:
@@ -1496,8 +1536,9 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
                 savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
                 savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
             else:
-                io_queue.put(('points_with_scalar', lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag'))
-                io_queue.put(('points_with_scalar', lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag'))
+                this_F_Lag = np.copy(F_Lag)
+                io_queue.put(('points_with_scalar', this_lagPts, this_F_Lag[:,0], fLag_XName, 'fX_Lag'))
+                io_queue.put(('points_with_scalar', this_lagPts, this_F_Lag[:,1], fLag_YName, 'fY_Lag'))
 
             # Define force magnitude name
             fMagName = os.path.join('hier_IB2d_data','fMag.'+strNUM+'.vtk')
@@ -1509,7 +1550,7 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
             if io_queue is None:
                 savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag')
             else:
-                io_queue.put(('points_with_scalar', lagPts, fLagMag, fMagName, 'fMag'))
+                io_queue.put(('points_with_scalar', this_lagPts, fLagMag, fMagName, 'fMag'))
     
         # THE CASE IF GREATER THAN 5 Lag. Pts. 
         else:
@@ -1524,8 +1565,9 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
                 savevtk_points_with_scalar_data( lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag')
                 savevtk_points_with_scalar_data( lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag')
             else:
-                io_queue.put(('points_with_scalar', lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag'))
-                io_queue.put(('points_with_scalar', lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag'))
+                this_F_Lag = np.copy(F_Lag)
+                io_queue.put(('points_with_scalar', this_lagPts, F_Lag[:,0], fLag_XName, 'fX_Lag'))
+                io_queue.put(('points_with_scalar', this_lagPts, F_Lag[:,1], fLag_YName, 'fY_Lag'))
 
             # Save force magnitude, mag. normal force, and mag. tangential force
             fMagName = os.path.join('hier_IB2d_data','fMag.'+strNUM+'.vtk')
@@ -1541,9 +1583,9 @@ def print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,spri
                 savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm')
                 savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan')
             else:
-                io_queue.put(('points_with_scalar', lagPts, fLagMag, fMagName, 'fMag'))
-                io_queue.put(('points_with_scalar', lagPts, F_Normal_Mag, fNormalName, 'fNorm'))
-                io_queue.put(('points_with_scalar', lagPts, F_Tan_Mag, fTangentName, 'fTan'))
+                io_queue.put(('points_with_scalar', this_lagPts, fLagMag, fMagName, 'fMag'))
+                io_queue.put(('points_with_scalar', this_lagPts, F_Normal_Mag, fNormalName, 'fNorm'))
+                io_queue.put(('points_with_scalar', this_lagPts, F_Tan_Mag, fTangentName, 'fTan'))
 
     
     
