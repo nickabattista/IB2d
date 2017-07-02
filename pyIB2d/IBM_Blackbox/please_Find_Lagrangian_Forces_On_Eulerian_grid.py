@@ -41,7 +41,7 @@ from Supp import give_Eulerian_Lagrangian_Distance, give_Delta_Kernel
 
 def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,\
     xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams,\
-    muscles, muscles3, masses, d_Springs, general_force, poroelastic_info):
+    muscles, muscles3, masses, d_Springs, general_force, poroelastic_info, pool=None):
     ''' Compute components of force term in Navier-Stokes from boundary deformations
 
         Args:
@@ -112,6 +112,11 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     gen_force_Yes = model_Info[23]      # User-defined force: 0 (for no) or 1 (for yes)
     poroelastic_Yes = model_Info[24]    # Poroelastic Media: 0 (for no) or 1 (for yes)
 
+    # SET UP MULTIPROCESSING IF POOL IS PRESENT #
+    if pool is not None:
+        from collections import deque
+        result_objs = deque()
+
 
     if gen_force_Yes:
         from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
@@ -122,8 +127,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     #(if using combined length/tension-Hill model) #
     #
     if ( muscle_LT_FV_Yes == 1):
-        fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
-            xLag_P,yLag_P,muscles,current_time,dt)
+        if pool is None:
+            fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
+                xLag_P,yLag_P,muscles,current_time,dt)
+        else:
+            result_objs.append(pool.apply_async(give_Muscle_Force_Densities,
+                               (Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt)))
     else:
         fx_muscles = np.zeros(xLag.size)
         fy_muscles = np.zeros(xLag.size)
@@ -134,8 +143,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     # Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) #
     #
     if ( muscle_3_Hill_Yes == 1):
-        fx_muscles3, fy_muscles3 = give_3_Element_Muscle_Force_Densities(Nb,\
-            xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
+        if pool is None:
+            fx_muscles3, fy_muscles3 = give_3_Element_Muscle_Force_Densities(Nb,\
+                xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
+        else:
+            result_objs.append(pool.apply_async(give_3_Element_Muscle_Force_Densities,
+                               (Nb,xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)))
     else:
         fx_muscles3 = np.zeros(xLag.size)
         fy_muscles3 = np.zeros(xLag.size)
@@ -157,8 +170,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         #[Tx Ty] = give_Me_Spring_Lagrangian_Tension(Nb,dLag_x,dLag_y,springs);
 
         # Compute the Lagrangian SPRING force densities!
-        fx_springs, fy_springs = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,springs)
+        if pool is None:
+            fx_springs, fy_springs = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,\
+                xLag,yLag,springs)
+        else:
+            result_objs.append(pool.apply_async(give_Me_Spring_Lagrangian_Force_Densities,
+                               (ds,Nb,xLag,yLag,springs)))
         
     else:
         fx_springs = np.zeros(Nb) #No x-forces coming from springs
@@ -169,8 +186,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     # Compute MASS PT FORCE DENSITIES (if there are mass points!)
     if ( mass_Yes == 1):
         # Compute the Lagrangian MASS PT force densities!
-        fx_mass, fy_mass, F_Mass = give_Me_Mass_Lagrangian_Force_Densities(ds,\
-            xLag,yLag,masses)
+        if pool is None:
+            fx_mass, fy_mass, F_Mass = give_Me_Mass_Lagrangian_Force_Densities(ds,\
+                xLag,yLag,masses)
+        else:
+            result_objs.append(pool.apply_async(give_Me_Mass_Lagrangian_Force_Densities,
+                               (ds,xLag,yLag,masses)))
     else:
         fx_mass = np.zeros(Nb) #No x-forces coming from mass points
         fy_mass = np.zeros(Nb) #No y-forces coming from mass points
@@ -181,8 +202,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     # Compute TARGET FORCE DENSITIES (if there are target points!)
     if ( target_pts_Yes == 1):
         # Compute the Lagrangian TARGET force densities!
-        fx_target, fy_target = give_Me_Target_Lagrangian_Force_Densities(ds,\
-            xLag,yLag,targets)
+        if pool is None:
+            fx_target, fy_target = give_Me_Target_Lagrangian_Force_Densities(ds,\
+                xLag,yLag,targets)
+        else:
+            result_objs.append(pool.apply_async(give_Me_Target_Lagrangian_Force_Densities,
+                               (ds,xLag,yLag,targets)))
         
     else:
         fx_target = np.zeros(Nb) #No x-forces coming from target points
@@ -195,8 +220,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     if ( beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
-        fx_beams, fy_beams = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,beams)
+        if pool is None:
+            fx_beams, fy_beams = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,\
+                xLag,yLag,beams)
+        else:
+            result_objs.append(pool.apply_async(give_Me_Beam_Lagrangian_Force_Densities,
+                               (ds,Nb,xLag,yLag,beams)))
         
     else:
         fx_beams = np.zeros(Nb) #No x-forces coming from beams
@@ -207,8 +236,12 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     if ( nonInv_beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
-        fx_nonInv_beams, fy_nonInv_beams = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,nonInv_beams)
+        if pool is None:
+            fx_nonInv_beams, fy_nonInv_beams = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,\
+                xLag,yLag,nonInv_beams)
+        else:
+            result_objs.append(pool.apply_async(give_Me_nonInv_Beam_Lagrangian_Force_Densities,
+                               (ds,Nb,xLag,yLag,nonInv_beams)))
         
     else:
         fx_nonInv_beams = np.zeros(Nb) #No x-forces coming from beams
@@ -218,9 +251,13 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Compute DAMPED SPRING FORCE DENSITIES (if there are springs!)
     if ( d_Springs_Yes == 1 ):
-     
-        fx_dSprings, fy_dSprings = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,d_Springs,xLag_P,yLag_P,dt)
+        
+        if pool is None:
+            fx_dSprings, fy_dSprings = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
+                xLag,yLag,d_Springs,xLag_P,yLag_P,dt)
+        else:
+            result_objs.append(pool.apply_async(give_Me_Damped_Springs_Lagrangian_Force_Densities,
+                               (ds,Nb,xLag,yLag,d_Springs,xLag_P,yLag_P,dt)))
         
     else:
         fx_dSprings = np.zeros(Nb) #No x-forces coming from damped springs
@@ -228,14 +265,42 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
     if ( gen_force_Yes == 1 ):
-        fx_genForce, fy_genForce = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,\
-            xLag_P,yLag_P,dt,current_time,general_force)
+        if pool is None:
+            fx_genForce, fy_genForce = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,\
+                xLag_P,yLag_P,dt,current_time,general_force)
+        else:
+            result_objs.append(pool.apply_async(give_Me_General_User_Defined_Force_Densities,
+                               (ds,Nb,xLag,yLag,xLag_P,yLag_P,dt,current_time,general_force)))
         
     else:
         fx_genForce = np.zeros(Nb) #No x-forces coming from damped springs
         fy_genForce = np.zeros(Nb) #No y-forces coming from damped springs
 
-
+    
+    
+    # COLLECT RESULTS FROM POOL #
+    if pool is not None:
+        # pull out results FIFO
+        if ( muscle_LT_FV_Yes == 1):
+            fx_muscles, fy_muscles = result_objs.popleft().get()
+        if ( muscle_3_Hill_Yes == 1):
+            fx_muscles3, fy_muscles3 = result_objs.popleft().get()
+        if ( springs_Yes == 1 ):
+            fx_springs, fy_springs = result_objs.popleft().get()
+        if ( mass_Yes == 1):
+            fx_mass, fy_mass, F_Mass = result_objs.popleft().get()
+        if ( target_pts_Yes == 1):
+            fx_target, fy_target = result_objs.popleft().get()
+        if ( beams_Yes == 1 ):
+            fx_beams, fy_beams = result_objs.popleft().get()
+        if ( nonInv_beams_Yes == 1 ):
+            fx_nonInv_beams, fy_nonInv_beams = result_objs.popleft().get()
+        if ( d_Springs_Yes == 1 ):
+            fx_dSprings, fy_dSprings = result_objs.popleft().get()
+        if ( gen_force_Yes == 1 ):
+            fx_genForce, fy_genForce = result_objs.popleft().get()
+    
+    
 
     # SUM TOTAL FORCE DENSITY! #
     fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce
@@ -269,8 +334,8 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     # Find Eulerian forces on grids by approximating the line integral, 
     #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    Fx = delta_Y @ fxds @ delta_X
-    Fy = delta_Y @ fyds @ delta_X
+    Fx = np.dot(np.dot(delta_Y,fxds),delta_X)
+    Fy = np.dot(np.dot(delta_Y,fyds),delta_X)
 
     return (Fx, Fy, F_Mass, F_Lag, F_Poro)
     
