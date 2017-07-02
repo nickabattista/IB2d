@@ -38,7 +38,7 @@ import IBM_Driver as Driver
 from please_Initialize_Simulation import *
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-n', '--nproc', help='number of worker processes to use, 2 by default',
+parser.add_argument('-n', '--nproc', help='number of worker processes to use, 0 by default',
                     type=int, default=0)
 
 ###############################################################################
