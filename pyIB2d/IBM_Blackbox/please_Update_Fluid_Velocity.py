@@ -156,10 +156,10 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     # Calculate Fluid Velocity and take IFFT to get velocities in real space
     u_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,idX,'x')
     if FFTW:
-        U_h = np.real(ifft2(u_hat)) # the last here ifft2 replaces ifft_mat.
+        U_h = np.real(np.array(ifft2(u_hat))) # the last here ifft2 replaces ifft_mat.
     v_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,idY,'y')
     if FFTW:
-        V_h = np.real(ifft2())
+        V_h = np.real(np.array(ifft2()))
     if not FFTW:
         U_h = np.real(np.fft.ifft2(u_hat))   #Half-step velocity, u
         V_h = np.real(np.fft.ifft2(v_hat))   #Half-step velocity, v
@@ -191,7 +191,7 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,
                                         U_h_sq_x,U_h_V_h_y,V,Fx,Uxx,Uyy,'x')
     if FFTW:
-        rhs_u_hat = np.array(fft2())
+        rhs_u_hat = np.array(fft2()) #overwrites rhs_v_hat from before
     rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,
                                         V_h_sq_y,U_h_V_h_x,U,Fy,Vxx,Vyy,'y')
     if FFTW:
@@ -208,11 +208,11 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     # Calculate Fluid Velocity and take IFFT to get real velocities/pressure
     u_hat = give_Me_Fluid_Velocity(dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,idX,'x')
     if FFTW:
-        U = np.real(ifft2())
+        U = np.real(np.array(ifft2()))
     v_hat = give_Me_Fluid_Velocity(dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,idY,'y')
     if FFTW:
-        V = np.real(ifft2())
-        p = np.real(ifft2(p_hat))
+        V = np.real(np.array(ifft2()))
+        p = np.real(np.array(ifft2(p_hat)))
     if not FFTW:
         U = np.real(np.fft.ifft2(u_hat))
         V = np.real(np.fft.ifft2(v_hat))
