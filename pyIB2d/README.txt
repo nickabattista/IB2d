@@ -20,9 +20,9 @@ Website: http://www.christopherstrickland.info
 GitHub: http://www.github.com/mountaindust
 
 Dependencies:
- 	- NumPy
- 	- Matplotlib
- 	- Numba (available via Anaconda. not optional b/c the code crawls without it: 600% speedup)
+    - NumPy
+    - Matplotlib
+    - Numba (available via Anaconda. not optional b/c the code crawls without it: 600% speedup)
     - pyFFTW (optional. if not already installed, "pip install pyfftw")
     - vtk (optional. if not already installed, "conda install -c menpo vtk")
 
@@ -33,10 +33,10 @@ For info on compiling this library, please see Cython_README.md in the IBM_Black
 it will be used instead of the vtk package (if installed).
 
 This code is capable of creating Lagrangian Structures using:
- 	1. Springs
- 	2. Beams (*torsional springs)
- 	3. Target Points
-	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
+    1. Springs
+    2. Beams (*torsional springs)
+    3. Target Points
+    4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
             Hill (i.e.,Length-Tension) Model )
     5. 3-Element Hill Muscle (combined 3-element hill mode coupled w/
             Force-Velocity/Length-Tension Model) -- UNTESTED!! THIS IS LIKELY BROKEN.
