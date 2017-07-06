@@ -22,10 +22,15 @@ GitHub: http://www.github.com/mountaindust
 Dependencies:
  	- NumPy
  	- Matplotlib
- 	- Numba
+ 	- Numba (available via Anaconda. not optional b/c the code crawls without it: 600% speedup)
+    - pyFFTW (optional. if not already installed, "pip install pyfftw")
     - vtk (optional. if not already installed, "conda install -c menpo vtk")
 
-Additionally, an optional C library (plus Cython glue code) is provided to improve the speed at which data writes out to disk. For info on compiling this library, please see Cython_README.md in the IBM_Blackbox directory.
+The optional libraries, while not necessary, will speed up the simulations 
+significantly (e.g. in the case of pyFFTW, approximately 20%). Additionally, an
+optional C library (plus Cython glue code) is provided to improve the speed at which data writes out to disk. 
+For info on compiling this library, please see Cython_README.md in the IBM_Blackbox directory. If the C library is present,
+it will be used instead of the vtk package (if installed).
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
