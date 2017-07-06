@@ -36,8 +36,9 @@ try:
     fft_mat = None
     ifft_mat = None
     FFTW = True
+    print('Running with pyFFTW.')
 except:
-    print('Failed to import/setup pyFFTW.'
+    print('Running without pyFFTW library.')
     FFTW = False
 from Supp import D, DD
 

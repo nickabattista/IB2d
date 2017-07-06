@@ -45,6 +45,7 @@ from please_Compute_Normal_Tangential_Forces_On_Lag_Pts import\
 try:
     import write
     C_flag = True
+    print('Running with compiled C I/O library.')
 except:
     C_flag = False
 
@@ -55,6 +56,8 @@ try:
     vtk_lib_flag = True
 except:
     vtk_lib_flag = False
+    if not C_flag:
+        print('Running without optimized IO libraries (VTK or C).')
 
 ###############################################################################
 #
@@ -793,9 +796,6 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         current_time = current_time+dt
         cter += 1
         #wait = input('Press enter to continue...')
-    if not vtk_lib_flag:
-        # warn that vtk library was not used
-        print('Note: the vtk library could not be imported for this simulation.')
 
     
 ###########################################################################
