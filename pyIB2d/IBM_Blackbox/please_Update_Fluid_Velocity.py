@@ -98,10 +98,10 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     if FFTW:
         global fft2, ifft2, fft_mat, ifft_mat
         if fft2 is None:
-            fft_mat = pyfftw.empty_aligned((Ny,Nx), dtype='float64')
-            fft2 = pyfftw.builders.rfft2(fft_mat)
+            fft_mat = pyfftw.empty_aligned((Ny,Nx), dtype='complex128')
+            fft2 = pyfftw.builders.fft2(fft_mat)
             ifft_mat = pyfftw.empty_aligned((Ny,Nx), dtype='complex128')
-            ifft2 = pyfftw.builders.irfft2(ifft_mat)
+            ifft2 = pyfftw.builders.ifft2(ifft_mat)
             
 
     # Create FFT Operator (used for both half time-step and full time-step computations)
@@ -156,10 +156,10 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     # Calculate Fluid Velocity and take IFFT to get velocities in real space
     u_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,idX,'x')
     if FFTW:
-        U_h = np.array(ifft2(u_hat)) # the last here ifft2 replaces ifft_mat.
+        U_h = np.real(ifft2(u_hat)) # the last here ifft2 replaces ifft_mat.
     v_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,idY,'y')
     if FFTW:
-        V_h = ifft2()
+        V_h = np.real(ifft2())
     if not FFTW:
         U_h = np.real(np.fft.ifft2(u_hat))   #Half-step velocity, u
         V_h = np.real(np.fft.ifft2(v_hat))   #Half-step velocity, v
@@ -208,11 +208,11 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY)
     # Calculate Fluid Velocity and take IFFT to get real velocities/pressure
     u_hat = give_Me_Fluid_Velocity(dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,idX,'x')
     if FFTW:
-        U = np.array(ifft2())
+        U = np.real(ifft2())
     v_hat = give_Me_Fluid_Velocity(dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,idY,'y')
     if FFTW:
-        V = np.array(ifft2())
-        p = ifft2(p_hat)
+        V = np.real(ifft2())
+        p = np.real(ifft2(p_hat))
     if not FFTW:
         U = np.real(np.fft.ifft2(u_hat))
         V = np.real(np.fft.ifft2(v_hat))
