@@ -6,27 +6,26 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
+mu = 0.0005               % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 }
-
 
 %
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 1.25           % Final time of simulation (s)
-dt = 5.0e-5             % Time-step (s)
+Tfinal = 0.15           % Final time of simulation (s)
+dt = 1e-5               % Time-step (s)
 }
 
 %
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx =  64                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
+Lx = 0.1                % Length of Eulerian Grid in x-Direction (m)
+Ly = 0.2                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
@@ -34,11 +33,11 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 %
 Lag_Structure_Info {
-springs = 1             % 0 (for no) or 1 (for yes)
+springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
 target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
-beams = 1               % 0 (for no) or 1 (for yes)
+beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
 nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
 update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
@@ -64,7 +63,17 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 200         % How often to print (PLOT) to screen
+print_dump = 100         % How often to print (PLOT) to screen
+save_Vorticity = 1;      % Save Vorticity Scalar Data to .vtk format
+save_Pressure = 1;       % Save Pressure Scalar Data to .vtk format
+save_uVec = 1;           % Save u-Vector Data to .vtk format
+save_uMag = 1;           % Save uMagnitude Scalar Data to .vtk format
+save_uX = 0;             % Save uX Scalar Data to .vtk format
+save_uY = 1;             % Save uY Scalar Data to .vtk format
+save_fMag = 0;           % Save Force Magnitude Scalar Data to .vtk format
+save_fX = 0;             % Save x-Force Component Scalar Data to .vtk format
+save_fY = 0;             % Save y-Force Component Scalar Data to .vtk format
+save_hier = 0;           % Save Scalar Force Data on Lag. Structure to .vtk format
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
@@ -77,5 +86,5 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 % LAGRANGIAN STRUCTURE NAME %
 %
 Lag_Name {
-string_name = "channel"   % String name for simulation 
+string_name = "leaf"   % String name for simulation
 }
