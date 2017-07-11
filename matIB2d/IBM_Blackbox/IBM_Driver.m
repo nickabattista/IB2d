@@ -488,7 +488,7 @@ end
 
 % READ IN COAGULATION PARAMETERS (IF THERE IS COAGULATION) %
 if ( coagulation_Yes == 1 )
-    fprintf('  -COAGULATION MODEL INCLUDED)\n');
+    fprintf('  -COAGULATION MODEL included\n');
     coagulation_info = read_Coagulation_Input_File(struct_name);
     aggregate_list = 0;
         %
@@ -861,10 +861,15 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
     end
     
-    if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
+    %if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
+    if ( coag_Yes == 1 )
         %Print COAGULATION CONNECTIONS to .vtk format
         CoagConName=['Coag_Connect.' strNUM '.vtk'];
-        savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',aggregate_list(:,3:4)-1);
+        if aggregate_list(1) > 0
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',[connectsMat; aggregate_list(:,3:4)-1]);
+        else
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',connectsMat);
+        end
     end
     
     %Print Tracer Pts (*if tracers*)

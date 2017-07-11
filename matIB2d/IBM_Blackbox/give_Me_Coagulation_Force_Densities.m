@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
+% If you would like us to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,yLag,coagulation,aggregate_list)
+function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,yLag,coagulation,aggregate_list,Lx,Ly)
 
 
     % 1st: Find Cell (x,y) Centers
@@ -55,45 +55,41 @@ function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,
     % Find Centers of each Cell
     [xC, yC, Ncells] = please_Find_Cell_Centers(coagulation(4:end),start_id,xLag,yLag);
     
-    % Compute distance between each cell and store connection if less than threshold and not already a bond between cells
+    % Compute distance between each cell and store connection if less than threshold AND NOT already a bond between cells
     coag_connects = please_Find_Distances_Between_Cells(xC,yC,Ncells,threshold_radius,aggregate_list);
-    %coag_connects
-    %pause();
-    
+
+    % find indices for placing NEW bond between
     if coag_connects > 0
         % Find closest lag-pts for each cell
         lag_indices_connects = please_Find_Closest_Lag_Pts_To_Cell_Centers(start_id,xC,yC,xLag,yLag,coag_connects,coagulation(4:end),threshold_radius);
     end
-        %lag_indices_connects
-        %pause();
+
     
     % Make Spring Connections and Compute Forces!
     if coag_connects > 0
         if (aggregate_list ~= 0)
             Ncoag_already = length( aggregate_list(:,1) );                           % # of bonds already previous to this time-step
             aggregate_list = [aggregate_list; coag_connects lag_indices_connects];   % Store all info for connections (NOTE: RL_Vec previously incoroporated into lag_indices_connects matrix)
-            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force);
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
         else
             Ncoag_already = 0;
             aggregate_list = [coag_connects lag_indices_connects];   % Store all info for connections (NOTE: RL_Vec previously incoroporated into lag_indices_connects matrix)
-            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force);
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
         end
     else
-         Ncoag_already = length( aggregate_list(:,1) );                           % # of bonds already previous to this time-step
-         [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force);
+         if aggregate_list ~= 0
+            Ncoag_already = length( aggregate_list(:,1) );                          % # of bonds already previous to this time-step
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
+         else
+             remove_Bonds = 0;
+             fx = zeros(Nb,1);
+             fy = zeros(Nb,1);
+         end
     end
 
     
     % Remove Bonds from aggregate_list (based off row marker indices in remove_Bonds)
     if remove_Bonds ~= 0
-        xLag(35)
-        yLag(35)
-        xLag(69)
-        yLag(69)
-        ds1 = sqrt( (xLag(1)-xLag(35))^2 + (yLag(1)-yLag(35))^2 )
-        ds2 = sqrt( (xLag(35)-xLag(69))^2 + (yLag(35)-yLag(69))^2 )
-        xLag(34:69)
-        yLag(34:69)
         aggregate_list = please_Remove_Bonds(remove_Bonds,aggregate_list);
     end
     
@@ -252,6 +248,7 @@ for i=1:Nconnects
        
 end % End loop over all new bonds
 
+
 % Combine into one matrix
 lag_indices_connects = [lag_indices_connects RL_Vec];
 
@@ -261,14 +258,14 @@ lag_indices_connects = [lag_indices_connects RL_Vec];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,agg_list,Ncoag_already,fracture_force)
+function [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,agg_list,Ncoag_already,fracture_force,Lx,Ly)
 
 
 Nsprings = length(agg_list(:,1)); % # of Springs (BONDS)
 sp_1 = agg_list(:,3);             % Initialize storage for MASTER NODE Spring Connection
 sp_2 = agg_list(:,4);             % Initialize storage for SLAVE NODE Spring Connection
 RL_Vec = agg_list(:,5);           % Resting length of bond (whatever initial distance is when bond is formed)
-K_Vec = 1e0;                      % Stores spring stiffness associated with each spring
+K_Vec = 1e3;                      % Stores spring stiffness associated with each spring
 alpha_pow = 1;                    % Degree of linearity (1=linear, >1 = non-linear)
 
 fx = zeros(Nb,1);                 % Initialize storage for x-forces
@@ -288,6 +285,18 @@ for i=1:Nsprings
     dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
     
+    %
+    % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
+    %
+    if abs(dx) > Lx/2
+        dx = sign(dx)*( Lx - sign(dx)*dx );
+    end
+    
+    if abs(dy) > Ly/2
+        dy = sign(dy)*( Ly - sign(dy)*dy );
+    end
+    
+    % Compute spring deformation force
     sF_x = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dx / sqrt(dx^2+dy^2) );
     sF_y = 0.5*(alpha+1) * k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r )^(alpha) * ( dy / sqrt(dx^2+dy^2) );
     

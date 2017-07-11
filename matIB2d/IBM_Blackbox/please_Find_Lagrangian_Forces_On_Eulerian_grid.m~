@@ -767,6 +767,11 @@ for i=1:Nbeams
 end
 
 
+% MIGHT NOT NEED THESE!
+%fx = fx/ds^2;
+%fy = dy/ds^2;
+
+
 
 
 
