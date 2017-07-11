@@ -60,7 +60,7 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e3;
 
 % Width of Channel
-w = 0.04;
+w = 0.08;
 
 % Max Velocity Desired
 uMax = 5.0;
@@ -68,8 +68,9 @@ uMax = 5.0;
 if first == 1
     
     % Compute Where You Want to Apply Force
-    xMin = 0.015;
-    xMax = 0.085;
+    offset = 0.03;
+    xMin = 0.01 + offset;
+    xMax = 0.13 + offset;
     yMin = 0.005;
     yMax = 0.009;
     
@@ -212,7 +213,7 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 x = xGrid(i);  % y-Value considered
 
-poly_coeff = 5/abs(( (Lx/2+w/2) - Lx/2 )*( (Lx/2-w/2) - Lx/2 ));
+poly_coeff = 2.5/abs(( (Lx/2+w/2) - Lx/2 )*( (Lx/2-w/2) - Lx/2 ));
 
 
 uX_Tar = 0;                                                             % No external forces in x-direction

@@ -39,11 +39,12 @@ yLag = yLag + 0.035;
 % Rotate the geometry
 [xLag,yLag] = please_Rotate_Geometry(xLag,yLag);
 
+xLag = xLag + 0.05;
 yLag = yLag + 0.03; % just to push it up a bit further in domain :)
 
 plot(xLag,yLag,'r*'); hold on;
 plot(xLag,yLag,'bo'); hold on;
-axis([0 0.1 0 0.2]); hold on;
+axis([0 0.2 0 0.3]); hold on;
 
 print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
