@@ -57,7 +57,7 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Stiffness for Arbitrary External Force to Fluid Grid
-kStiff = 1e2;
+kStiff = 1e3;
 
 % Width of Channel
 w = 0.04;
@@ -68,10 +68,10 @@ uMax = 5.0;
 if first == 1
     
     % Compute Where You Want to Apply Force
-    xMin = 0.03;
-    xMax = 0.07;
-    yMin = 0.01;
-    yMax = 0.015;
+    xMin = 0.015;
+    xMax = 0.085;
+    yMin = 0.005;
+    yMax = 0.009;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;

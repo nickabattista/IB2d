@@ -22,10 +22,10 @@ dt = 1e-5               % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  64                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  64                                      % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  192 % NOTE 64*3 for 3x as long domain   % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 0.1                % Length of Eulerian Grid in x-Direction (m)
-Ly = 0.2                % Length of Eulerian Grid in y-Direction (m)
+Ly = 0.3                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
