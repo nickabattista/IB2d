@@ -1,0 +1,72 @@
+%*****%***%***%***%***%***% INPUT2d FILE: %***%***%***%***%***%*****%
+%****%***% DO NOT SWAP ROWS OR ELSE THERE WILL BE ERRORS! %***%****%
+%***%***%***%***%**% KEEP SPACES BETWEEN '='s! %***%***%***%***%**%
+
+%
+% FLUID PARAMETER VALUES %
+%
+Fluid_Parameters {
+mu = 0.05               % Dynamic Viscosity (N*s/m^2) 
+rho = 1                 % Density (kg/m^2)
+}
+
+
+%
+% TEMPORAL INFORMATION %
+%
+Temporal_Information {
+Tfinal = 1.25           % Final time of simulation (s)
+dt = 2.5e-5             % Time-step (s)
+}
+
+%
+% GRID PARAMETERS %
+%
+Grid_Parameters {
+Nx =  512        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!)
+Ny =  128        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!)
+Lx = 1.0         % Length of Eulerian Grid in x-Direction (m)
+Ly = 0.25        % Length of Eulerian Grid in y-Direction (m)
+supp = 4         % Choose dirac-delta support (KEEP IT EVEN!)
+}
+
+%
+% LAGRANGIAN STRUCTURE MODEL INFORMATION %
+%
+Lag_Structure_Info {
+springs = 1             % 0 (for no) or 1 (for yes) % springs (linear, nonlinear)
+target_pts = 1          % 0 (for no) or 1 (for yes) % target points
+update_target = 1       % 0 (for no) or 1 (for yes) % update target pts. dynamically
+beams = 1               % 0 (for no) or 1 (for yes) % beams (torsional springs)
+coagulation = 1         % 0 (for no) or 1 (for yes) % coagulation model
+}
+
+%
+% PRINTING INFORMATION
+%
+Output_Info {
+print_dump = 200         % How often to print (PLOT) to screen
+save_Vorticity = 1;      % Save Vorticity Scalar Data to .vtk format
+save_Pressure = 0;       % Save Pressure Scalar Data to .vtk format
+save_uVec = 1;           % Save u-Vector Data to .vtk format
+save_uMag = 0;           % Save uMagnitude Scalar Data to .vtk format
+save_uX = 0;             % Save uX Scalar Data to .vtk format
+save_uY = 0;             % Save uY Scalar Data to .vtk format
+save_fMag = 1;           % Save Force Magnitude Scalar Data to .vtk format
+save_fX = 0;             % Save x-Force Component Scalar Data to .vtk format
+save_fY = 0;             % Save y-Force Component Scalar Data to .vtk format
+save_hier = 1;           % Save Scalar Force Data on Lag. Structure to .vtk format
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
+plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
+plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
+plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY in Matlab
+plot_MagVelocity = 1     % Plot Lagrangian Points + MAG. VELOCITY  in Matlab
+plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE in Matlab
+}
+
+%
+% LAGRANGIAN STRUCTURE NAME %
+%
+Lag_Name {
+string_name = "channel"   % String name for simulation 
+}
