@@ -22,7 +22,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -858,7 +858,8 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     if springs_Yes == 1
         %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
         lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
-        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat);
+        connectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),connectsMat);
+        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat2);
     end
     
     %if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
@@ -866,11 +867,14 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         %Print COAGULATION CONNECTIONS to .vtk format
         CoagConName=['Coag_Connect.' strNUM '.vtk'];
         if aggregate_list(1) > 0
-            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',[connectsMat; aggregate_list(:,3:4)-1]);
+            agg_list_aux = test_Connects_Distances(lagPts(:,1),lagPts(:,2),aggregate_list(:,3:4));
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',[connectsMat2; agg_list_aux]);
         else
-            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',connectsMat);
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',connectsMat2);
         end
     end
+    
+    clear connectsMat2;
     
     %Print Tracer Pts (*if tracers*)
     if tracers(1,1) == 1
@@ -977,6 +981,32 @@ if Output_Params(17) == 1
         cd .. % Get out of hier_IB2d_data folder
     end
 end % ENDS IF-STATEMENT FOR IF SAVE_HIER
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: tests ConnectsMat for too far of distances to print connection!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function connectsMat2 = test_Connects_Distances(xLag,yLag,connectsMat)
+
+Lx = 1;
+r = 0.2*Lx/18.1;
+connectsMat = connectsMat + 1;
+j=1;
+
+for i=1:length( connectsMat(:,1) )
+    ind1 = connectsMat(i,1);
+    ind2 = connectsMat(i,2);
+    dist = sqrt( ( xLag(ind1)-xLag(ind2) )^2 + ( yLag(ind1)- yLag(ind2) )^2   );
+    if dist < 5*r
+        connectsMat2(j,1) = ind1-1;  % minus for Cpp notation
+        connectsMat2(j,2) = ind2-1;  % minus for Cpp notation
+        j=j+1;
+    end
+end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

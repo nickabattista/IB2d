@@ -339,7 +339,7 @@ end
 
 function aggregate_list = please_Remove_Bonds(remove_Bonds,aggregate_list)
 
-aggregate_list
+%aggregate_list;
 
 % place zeros as markers to get rid of spots
 aggregate_list(remove_Bonds,:) = 0;
@@ -348,6 +348,6 @@ aggregate_list(remove_Bonds,:) = 0;
 aggregate_list = aggregate_list(find(aggregate_list > 0));
 
 % reshape into previous form 
-aggregate_list
+%aggregate_list;
 N = length(aggregate_list);   % # of total entries in vector formed by find above
 aggregate_list = reshape(aggregate_list,N/5,5);
