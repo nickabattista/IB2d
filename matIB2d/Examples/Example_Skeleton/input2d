@@ -54,6 +54,7 @@ gravity = 0             % 0 (for no) or 1 (for yes) %PLEASE CHECK GRAVITY VECTOR
 x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
+poroelastic = 0         % 0 (for no) or 1 (for yes)
 concentration = 0       % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
@@ -61,6 +62,7 @@ update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
 expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
+coagulation = 0         % 0 (for no) or 1 (for yes)
 }
 
 

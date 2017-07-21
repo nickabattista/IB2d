@@ -41,7 +41,7 @@ T_final = T_final * 2500;% scale time-info
 PLAY_MOVIE = 0; % (1 for YES, 0 for NO)
 
 % Parameters in model %
-D = 10.0;       % Diffusion coefficient
+D = 0.001;       % Diffusion coefficient % 10.0 -> Gives traveling wave
 a = 0.3;        % Threshold potential (Note: a=0.3 is traveling wave value, a=0.335 is interesting)
 gamma = 1.0;    % Resetting rate (Note: large values give 'funky thick' traveling wave, gamma = 1.0 is desired)
 eps = 0.001;    % Blocking strength (Note: eps = 0.001 is desired)

@@ -106,14 +106,14 @@ for i=2:Nsteps;
     
 end
 
-% plot results
-% figure(1)
-% time = 0:dt:t_Final;           %vector of times to solve ODEs
-% plot(time,Ca,time,Caf,'linewidth',2)
-% xlabel('Time (sec)');
-% ylabel('Dimensionless Concentration');
-% legend('[Ca]', '[Caf]');
-% maxY = 1.05*max(max(Ca,Caf));
-% axis([0 t_Final 0 maxY] );
-% set(gca,'fontsize',18)
-% pause();
+figure(1)
+time = 0:dt:t_Final;           %vector of times to solve ODEs
+plot(time,Ca,time,Caf,'linewidth',2)
+xlabel('Dimensionless Time');
+ylabel('Dimensionless Concentration');
+leg=legend(' [Ca]: free Ca ions', ' [Caf]: Ca bound filament sites');
+maxY = 1.075*max(max(Ca,Caf));
+axis([0 1.7 0 maxY] );
+set(gca,'fontsize',18)
+set(leg,'fontsize',18)
+pause();

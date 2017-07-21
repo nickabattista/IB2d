@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -51,7 +51,7 @@ function [fx_genForce, fy_genForce] = give_Me_General_User_Defined_Force_Densiti
     %         dt: time-step value
     %         current_time: current time in simulation
     %         general_force: matrix containing all data from input file
-
+    %
     
     %
     % NOTE: THIS EXAMPLE CREATES A USER-DEFINED FORCE THAT IS JUST AN
@@ -80,8 +80,8 @@ function [fx_genForce, fy_genForce] = give_Me_General_User_Defined_Force_Densiti
         dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
         dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
 
-        sF_x =  k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) );
-        sF_y =  k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) );
+        sF_x =  k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ); % Compute x-Force
+        sF_y =  k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ); % Compute y-Force
 
         fx(id_Master,1) = fx(id_Master,1) + sF_x;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
         fy(id_Master,1) = fy(id_Master,1) + sF_y;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)

@@ -73,7 +73,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e7;
+k_Spring = 5e7;      %2.5e6 for first runs %2.5e7 for Re3.4-BeamStr %1e8 for Wo=3.5
 print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 % Prints .muscle file!
@@ -82,12 +82,12 @@ print_Lagrangian_Springs(xLag,k_Spring,ds,d,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 2.5e6; C = 0.0;
+k_Beam = 2e10; C = 0.0; %2.5e6  %2.5e9 for Wo=3.5 , $3.25e10 for Wo=0.5
 print_Lagrangian_Beams(xLag,k_Beam,C,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 3e8;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 % Prints .concentration file!
@@ -243,7 +243,7 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,d,struct_name)
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
-    fprintf(spring_fid, '%d\n', N-2 + N/2 ); %(N-2) btwn adajcent Lag. Pts, (N/2) btwn opposite sides of HT
+    fprintf(spring_fid, '%d\n', N-2  );% + N/2 %(N-2) btwn adajcent Lag. Pts, (N/2) btwn opposite sides of HT
 
     %spring_force = kappa_spring*ds/(ds^2);
 
@@ -258,7 +258,7 @@ function print_Lagrangian_Springs(xLag,k_Spring,ds_Rest,d,struct_name)
     end
     
     for s = 1:N/2
-        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+N/2,   k_Spring/1e10, 0.0); 
+        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+N/2, k_Spring/1e10, 0.0); 
     end
     fclose(spring_fid); 
     
