@@ -379,8 +379,8 @@ for i=1:Ndsprings
         dy = sign(dy)*( Ly - sign(dy)*dy );
     end
     
-    dV_x = ( xLag(id_Master) - xLag_P(id_Master) ) / dt ; % x-Velocity between current and prev. steps
-    dV_y = ( yLag(id_Master) - yLag_P(id_Master) ) / dt ; % y-Velocity between current and prev. steps
+    dV_x = ( xLag(id_Master) - xLag_P(id_Master) ); % dt*(x-Velocity) between current and prev. steps
+    dV_y = ( yLag(id_Master) - yLag_P(id_Master) ); % dt*(y-Velocity) between current and prev. steps
     
     %
     % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION

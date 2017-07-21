@@ -616,8 +616,9 @@ end
 %Print initializations to .vtk
 vort=zeros(Nx,Ny); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(Nb,1)]; 
 [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
+[dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
 Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list);
+print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat);
 fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
 fprintf('Current Time(s): %6.6f\n\n',current_time);
 ctsave = ctsave+1;
@@ -770,7 +771,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list);
+        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -816,7 +817,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list)
+function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat)
 
     %
     %  Output_Params(1):  print_dump
@@ -858,8 +859,18 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     if springs_Yes == 1
         %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
         lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
-        connectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),connectsMat);
+        %connectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),connectsMat);
+        connectsMat2 = connectsMat;
         savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat2);
+    end
+    
+    % Print DAMP Spring Connections (* if damped springs *)
+    if d_springs_Yes == 1 
+        %Print Lagrangian Pts w/ CONNECTIONS to .vtk format
+        dlagPtsConName=['damp_Connect.' strNUM '.vtk'];
+        %dconnectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),dconnectsMat);
+        dconnectsMat2 = dconnectsMat;
+        savevtk_points_connects(lagPts, dlagPtsConName, 'dampConnected',dconnectsMat2);
     end
     
     %if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
@@ -1428,6 +1439,7 @@ fclose(file);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [N,xLag,yLag] = read_Vertex_Points(struct_name)
+
 
 filename = [struct_name '.vertex'];  %Name of file to read in
 fileID = fopen(filename);
