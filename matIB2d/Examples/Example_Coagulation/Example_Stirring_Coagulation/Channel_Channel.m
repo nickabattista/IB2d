@@ -126,9 +126,10 @@ print_Lagrangian_Beams(xLag_C,yLag_C,k_Beam,C,struct_name,NTotCells);
 % Prints .coagulation file!
 %
 starting_index = 1;         % index of first cellular Lagrangian Pt.
-threshold_radius = 3*r;   % how close do cells need to be to form a bond
+threshold_radius = 3*r;     % how close do cells need to be to form a bond
+bond_strength = 1e3;        % bond strength
 fracture_force = 1e1;       % how strong of force to break bond
-print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,NTotCells);
+print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,bond_strength,NTotCells);
 
 
 %
@@ -167,12 +168,13 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,NTotCells)
+function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,bond_strength,NTotCells)
 
     % Ncell_Lag_Pts:    -gives # of Lag. Pts in each cell (# of Lag. Pts that compose each cell)
     % starting_index:   -gives first index of first cell Lag. Pt. in vertex file
     %                   -NOTE: IB2d Assumes all cell Lag. Pts are next to each other in .vertex file
     % threshold_radius: -how close do cells need to be to form a bond
+    % bond_strength:    -bond strength (eg, spring stiffness coefficient)
     % fracture_force:   -how strong of force to break bond between cells
 
     %Ncell_Lag_Pts = length(Ncell_Lag_Pts);   % gives total number of cells
@@ -182,6 +184,7 @@ function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_
 
     fprintf(coag_fid, '%d\n', starting_index );   % Prints first index of a Lag. Pt. associated to a Cell
     fprintf(coag_fid, '%d\n', threshold_radius ); % Prints threshold radii 
+    fprintf(coag_fid, '%d\n', bond_strength );    % Prints bonding strength
     fprintf(coag_fid, '%d\n', fracture_force );   % Prints fracture_force
 
 

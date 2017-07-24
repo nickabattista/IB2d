@@ -132,8 +132,9 @@ print_Lagrangian_Beams(xLag_C,yLag_C,k_Beam,C,struct_name,NTotCells);
 %
 starting_index = 1;         % index of first cellular Lagrangian Pt.
 threshold_radius = 0.075;   % how close do cells need to be to form a bond
+bond_strength = 1e3;        % bond strength
 fracture_force = 1e2;       % how strong of force to break bond
-print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force);
+print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,bond_strength);
 
 
 %
@@ -172,7 +173,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force)
+function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_index,threshold_radius,fracture_force,bond_strength)
 
     % Ncell_Lag_Pts:    -gives # of Lag. Pts in each cell (# of Lag. Pts that compose each cell)
     % starting_index:   -gives first index of first cell Lag. Pt. in vertex file
@@ -186,6 +187,7 @@ function print_Lagrangian_Coagulation_Inputs(struct_name,Ncell_Lag_Pts,starting_
 
     fprintf(coag_fid, '%d\n', starting_index );   % Prints first index of a Lag. Pt. associated to a Cell
     fprintf(coag_fid, '%d\n', threshold_radius ); % Prints threshold radii 
+    fprintf(coag_fid, '%d\n', bond_strength );    % Prints bond strength
     fprintf(coag_fid, '%d\n', fracture_force );   % Prints fracture_force
 
 
