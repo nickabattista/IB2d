@@ -185,7 +185,7 @@ end
 if ( nonInv_beams_Yes == 1 )
 
     % Compute the Lagrangian NON-INVARIANT BEAM force densities!
-    [fx_nonInv_beams, fy_nonInv_beams] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams);
+    [fx_nonInv_beams, fy_nonInv_beams] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams,Lx,Ly);
     
 else
     fx_nonInv_beams = zeros(Nb,1);        %No x-forces coming from beams
@@ -655,7 +655,7 @@ end
 % FUNCTION computes the Lagrangian BEAM (NON-INVARIANT) Force Densities 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams)
+function [fx, fy] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams,Lx,Ly)
 
 Nbeams = length(beams(:,1));     % # of Beams
 pts_1 = beams(:,1);              % Initialize storage for 1ST NODE for BEAM
@@ -684,6 +684,10 @@ for i=1:Nbeams
     Yp = yLag(id_1);          % yPt of 1ST Node Pt. in beam
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
+    
+    % Checks if Lag. Pts. have passed through the boundary and translates appropriately
+    [Xp,Xq,Xr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr);
+    [Yp,Yq,Yr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Ly,Yp,Yq,Yr);
     
     % CALCULATE BENDING IN X
     fx(id_3,1) = fx(id_3,1) -   k_Beam*( Xr - 2*Xq + Xp - Cx);
@@ -736,7 +740,7 @@ for i=1:Nbeams
     Yq = yLag(id_2);          % yPt of 2ND (MIDDLE) Node Pt. in beam
     Yr = yLag(id_3);          % yPt of 3RD Node Pt. in beam
     
-    % CHecks if Lag. Pts. have passed through the boundary and translates appropriately
+    % Checks if Lag. Pts. have passed through the boundary and translates appropriately
     [Xp,Xq,Xr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr);
     [Yp,Yq,Yr] = check_If_Beam_Points_Pass_Through_Boundary(ds,Ly,Yp,Yq,Yr);
    
