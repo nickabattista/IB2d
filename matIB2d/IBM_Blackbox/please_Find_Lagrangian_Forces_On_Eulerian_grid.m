@@ -157,7 +157,7 @@ end
 if ( target_pts_Yes == 1)
     
     % Compute the Lagrangian TARGET force densities!
-    [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets); 
+    [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets,Lx,Ly); 
     
 else
     fx_target = zeros(Nb,1); %No x-forces coming from target points
@@ -820,7 +820,7 @@ F_Mass(:,2) = fy;  % Store for updating massive boundary pts
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets)
+function [fx_target, fy_target] = give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets,Lx,Ly)
 
 IDs = targets(:,1);                 % Stores Lag-Pt IDs in col vector
 xPts= targets(:,2);                 % Original x-Values of x-Target Pts.
@@ -834,8 +834,22 @@ fy = fx;                            % Initialize storage for y-force density fro
 
 for i=1:N_targets
    
-    fx(IDs(i),1) = fx(IDs(i),1) + kStiffs(i)*( xPts(i) - xLag(IDs(i)) );
-    fy(IDs(i),1) = fy(IDs(i),1) + kStiffs(i)*( yPts(i) - yLag(IDs(i)) ); 
+    dx = xPts(i) - xLag(IDs(i)); % x-Distance btwn Lag Pt. and Virtual pt
+    dy = yPts(i) - yLag(IDs(i)); % y-Distance btwn Lag Pt. and Virtual pt
+    
+    %
+    % TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
+    %
+    if abs(dx) > Lx/2
+        dx = sign(dx)*( Lx - sign(dx)*dx );
+    end
+    
+    if abs(dy) > Ly/2
+        dy = sign(dy)*( Ly - sign(dy)*dy );
+    end  
+    
+    fx(IDs(i),1) = fx(IDs(i),1) + kStiffs(i)*( dx );
+    fy(IDs(i),1) = fy(IDs(i),1) + kStiffs(i)*( dy ); 
    
 end
 
