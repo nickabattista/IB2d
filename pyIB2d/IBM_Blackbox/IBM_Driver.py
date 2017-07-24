@@ -1187,7 +1187,7 @@ def read_nonInv_Beam_Points(struct_name):
     Returns:
         beams: array of beam info'''
 
-    filename = struct_name+'.beam'  #Name of file to read in
+    filename = struct_name+'.nonInv_beam'  #Name of file to read in
     with open(filename) as f:
         beams = np.loadtxt(f,skiprows=1,usecols=(0,1,2,3,4,5))
 

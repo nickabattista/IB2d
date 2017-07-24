@@ -196,7 +196,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
         # Compute the Lagrangian SPRING force densities!
         fx_beams, fy_beams = give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,beams)
+            xLag,yLag,beams,Lx,Ly)
         
     else:
         fx_beams = np.zeros(Nb) #No x-forces coming from beams
@@ -208,7 +208,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
         # Compute the Lagrangian SPRING force densities!
         fx_nonInv_beams, fy_nonInv_beams = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,\
-            xLag,yLag,nonInv_beams)
+            xLag,yLag,nonInv_beams,Lx,Ly)
         
     else:
         fx_nonInv_beams = np.zeros(Nb) #No x-forces coming from beams
@@ -685,19 +685,19 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets,Lx,Ly):
         fy_target:'''
 
     IDs = targets[:,0].astype('int')   # Stores Lag-Pt IDs in col vector
-    xPts= targets[:,1]                 # Original x-Values of x-Target Pts.
-    yPts= targets[:,2]                 # Original y-Values of y-Target Pts.
+    xPts = targets[:,1]                # Original x-Values of x-Target Pts.
+    yPts = targets[:,2]                # Original y-Values of y-Target Pts.
     kStiffs = targets[:,3]             # Stores Target Stiffnesses 
 
-    N_targets = targets.shape[0]            # # of target points!
+    N_targets = targets.shape[0]       # # of target points!
 
     fx = np.zeros(xLag.size)  # Initialize storage for x-force density from TARGET PTS
     fy = np.zeros(xLag.size)  # Initialize storage for y-force density from TARGET PTS
 
     for ii in range(N_targets):
 
-        dx = xPts[ii] - xLag(IDs[ii]) # x-Distance btwn Lag Pt. and Virtual pt
-        dy = yPts[ii] - yLag(IDs[ii]) # y-Distance btwn Lag Pt. and Virtual pt
+        dx = xPts[ii] - xLag[IDs[ii]] # x-Distance btwn Lag Pt. and Virtual pt
+        dy = yPts[ii] - yLag[IDs[ii]] # y-Distance btwn Lag Pt. and Virtual pt
 
         #
         # TESTING FOR LAG PT. PASSED THRU BNDRY MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
@@ -727,7 +727,7 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets,Lx,Ly):
 #
 ###########################################################################    
 
-def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams):    
+def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams,Lx,Ly):    
 
 
     Nbeams = nonInv_beams.shape[0]     # # of Beams
@@ -741,7 +741,7 @@ def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams)
     fx = np.zeros(Nb)                # Initialize storage for x-forces
     fy = np.zeros(Nb)                # Initialize storage for y-forces
     
-    for ii in range(Nsprings):
+    for ii in range(Nbeams):
 
         id_1 = pts_1[ii]        # 1st Node Index
         id_2 = pts_2[ii]        # 2nd Node Index
@@ -757,6 +757,10 @@ def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams)
         Yp = yLag[id_1]         # yPt of 1ST Node Pt. in beam
         Yq = yLag[id_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
         Yr = yLag[id_3]         # yPt of 3RD Node Pt. in beam
+
+        # Checks if Lag. Pts. have passed through the boundary and translates appropriately
+        Xp,Xq,Xr = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr)
+        Yp,Yq,Yr = check_If_Beam_Points_Pass_Through_Boundary(ds,Ly,Yp,Yq,Yr)
 
         # CALCULATE BENDING IN X
         fx[id_3] = fx[id_3] -   k_Beam*( Xr - 2*Xq + Xp - Cx)
@@ -779,7 +783,7 @@ def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams)
 #
 ###########################################################################
 
-def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
+def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams,Lx,Ly):
     '''Computes the Lagrangian BEAM Force Densities
     
     Args:
@@ -804,43 +808,54 @@ def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams):
     fx = np.zeros(Nb)                # Initialize storage for x-forces
     fy = np.zeros(Nb)                # Initialize storage for y-forces
     
-    Xp = xLag[pts_1]          # xPt of 1ST Node Pt. in beam
-    Xq = xLag[pts_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
-    Xr = xLag[pts_3]          # xPt of 3RD Node Pt. in beam
-    
-    Yp = yLag[pts_1]         # yPt of 1ST Node Pt. in beam
-    Yq = yLag[pts_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
-    Yr = yLag[pts_3]         # yPt of 3RD Node Pt. in beam
-    
-    # Compute Cross-Product and Beam Coefficients
-    cross_prod_coeffs = K_Vec * ( (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp) - C_Vec )
-
-    # FORCES FOR LEFT NODE
-    bF_x_L = -cross_prod_coeffs * ( Yr-Yq )
-    bF_y_L =  cross_prod_coeffs * ( Xr-Xq )
-
-    # FORCES FOR MIDDLE NODE
-    bF_x_M =  cross_prod_coeffs * (  (Yq-Yp) + (Yr-Yq) )
-    bF_y_M = -cross_prod_coeffs * (  (Xr-Xq) + (Xq-Xp) )
-    
-    # FORCES FOR RIGHT NODE
-    bF_x_R = -cross_prod_coeffs * ( Yq-Yp )
-    bF_y_R =  cross_prod_coeffs * ( Xq-Xp )
-
     # Want to preserve the ability for the same id_2 to be assigned twice, so
     #   need a loop here.
     for ii in range(Nbeams):
-        fx[pts_1[ii]] -= bF_x_L[ii]  # Sum total forces for left node,
+
+        id_1 = pts_1[ii]          # 1ST Node index
+        id_2 = pts_2[ii]          # (MIDDLE) 2nd Node index -> index that gets force applied to it!
+        id_3 = pts_3[ii]          # 3RD Node index
+        k_Beam = K_Vec[ii]        # Beam stiffness of i-th spring
+        C = C_Vec[ii]             # Curvature of the beam between these three nodes 
+
+        Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
+        Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
+        Xr = xLag[id_3]          # xPt of 3RD Node Pt. in beam
+
+        Yp = yLag[id_1]          # yPt of 1ST Node Pt. in beam
+        Yq = yLag[id_2]          # yPt of 2ND (MIDDLE) Node Pt. in beam
+        Yr = yLag[id_3]          # yPt of 3RD Node Pt. in beam
+
+        # Checks if Lag. Pts. have passed through the boundary and translates appropriately
+        Xp,Xq,Xr = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr)
+        Yp,Yq,Yr = check_If_Beam_Points_Pass_Through_Boundary(ds,Ly,Yp,Yq,Yr)
+
+        # Compute Cross-Product
+        cross_prod = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp)
+
+        # FORCES FOR LEFT NODE
+        bF_x_L = -k_Beam * ( cross_prod - C ) * ( Yr-Yq )
+        bF_y_L =  k_Beam * ( cross_prod - C ) * ( Xr-Xq )
+
+        # FORCES FOR MIDDLE NODE
+        bF_x_M =  k_Beam * ( cross_prod - C ) * (  (Yq-Yp) + (Yr-Yq) )
+        bF_y_M = -k_Beam * ( cross_prod - C ) * (  (Xr-Xq) + (Xq-Xp) )
+
+        # FORCES FOR RIGHT NODE
+        bF_x_R = -k_Beam * ( cross_prod - C ) * ( Yq-Yp )
+        bF_y_R =  k_Beam * ( cross_prod - C ) * ( Xq-Xp )
+
+        fx[id_1] -= bF_x_L  # Sum total forces for left node,
                                      # in x-direction (this is LEFT node for this beam)
-        fy[pts_1[ii]] -= bF_y_L[ii]  # Sum total forces for left node, 
+        fy[id_1] -= bF_y_L  # Sum total forces for left node, 
                                      # in y-direction (this is LEFT node for this beam)
-        fx[pts_2[ii]] += bF_x_M[ii]  # Sum total forces for middle node,
+        fx[id_2] += bF_x_M  # Sum total forces for middle node,
                                      # in x-direction (this is MIDDLE node for this beam)
-        fy[pts_2[ii]] += bF_y_M[ii]  # Sum total forces for middle node, 
+        fy[id_2] += bF_y_M  # Sum total forces for middle node, 
                                      # in y-direction (this is MIDDLE node for this beam)
-        fx[pts_3[ii]] -= bF_x_R[ii]  # Sum total forces for right node,
+        fx[id_3] -= bF_x_R  # Sum total forces for right node,
                                      # in x-direction (this is RIGHT node for this beam)
-        fy[pts_3[ii]] -= bF_y_R[ii]  # Sum total forces for right node, 
+        fy[id_3] -= bF_y_R  # Sum total forces for right node, 
                                      # in y-direction (this is RIGHT node for this beam)
 
     # MIGHT NOT NEED THESE!
@@ -915,3 +930,48 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     row,col = ind_Lag.shape
 
     return (delta_X, delta_Y)
+
+
+########################################################################################################
+#
+# FUNCTION CHECK if BEAM points have passed through boundary, and translates them accordingly for calculation
+#
+########################################################################################################
+
+def check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,Xq,Xr):
+
+    # CHECKS FOR IF POINTS PASSED THRU BNDRY
+    dX_pq = ( Xp - Xq )
+    dX_qr = ( Xq - Xr )
+    
+    if np.abs(dX_pq) > 5*ds:
+
+        # MEANS point p has moved thru# check if moved through right/left bndry
+        if dX_pq < 0:
+            Xp_N = Lx + Xp
+        else:
+            Xp_N = -Lx+Xp
+
+        Xq_N = Xq
+        Xr_N = Xr
+
+    else:
+       Xp_N = Xp
+       Xq_N = Xq
+       Xr_N = Xr
+    
+    
+    if abs(dX_qr) > 5*ds:
+       #if abs(dX_qr) > abs(dX_pq)
+        # MEANS point r has moved thru# check if moved through right/left bndry
+        if dX_qr < 0:
+            Xr_N = -Lx+Xr
+        else:
+            Xr_N = Lx + Xr
+
+        Xq_N = Xq
+
+        if np.abs(dX_pq) < 5*ds:
+            Xp_N = Xp
+    
+    return Xp_N,Xq_N,Xr
