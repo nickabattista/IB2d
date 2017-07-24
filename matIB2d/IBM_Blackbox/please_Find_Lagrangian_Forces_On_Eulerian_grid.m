@@ -398,8 +398,8 @@ for i=1:Ndsprings
     dV_y = ( dV_y ) / dt ; % y-Velocity between current and prev. steps
     
     
-    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) + b*dV_x;
-    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) + b*dV_y;
+    sF_x = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dx / sqrt(dx^2+dy^2) ) - b*dV_x; %added negative for testing
+    sF_y = k_Spring * ( sqrt( dx^2 + dy^2 ) - L_r ) * ( dy / sqrt(dx^2+dy^2) ) - b*dV_y;
     
     fx(id_Master,1) = fx(id_Master,1) + sF_x ;  % Sum total forces for node, i in x-direction (this is MASTER node for this spring)
     fy(id_Master,1) = fy(id_Master,1) + sF_y ;  % Sum total forces for node, i in y-direction (this is MASTER node for this spring)
