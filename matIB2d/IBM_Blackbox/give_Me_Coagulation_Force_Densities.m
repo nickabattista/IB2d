@@ -40,20 +40,22 @@ function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,
     
     % coagulation:     row 1: staring index for coagulation cells
     %                  row 2: threshold radii
-    %                  row 3: threshold force
-    %                  row 4: row N+1: # of Lag. Pts in Cell, 1
-    %                  row 5: row N+1: # of Lag. Pts in Cell, 2
+    %                  row 3: bond strength
+    %                  row 4: threshold force
+    %                  row 5: row N+1: # of Lag. Pts in Cell, 1
+    %                  row 6: row N+1: # of Lag. Pts in Cell, 2
     %                   .  
     %                   .  
     %                   . 
-    %                  row N+3: # of Lag. Pts in Cell, N
+    %                  row N+4: # of Lag. Pts in Cell, N
     
     start_id = coagulation(1);
     threshold_radius = coagulation(2);
-    fracture_force = coagulation(3);
+    bond_strength = coagulation(3);
+    fracture_force = coagulation(4);
     
     % Find Centers of each Cell
-    [xC, yC, Ncells] = please_Find_Cell_Centers(coagulation(4:end),start_id,xLag,yLag);
+    [xC, yC, Ncells] = please_Find_Cell_Centers(coagulation(5:end),start_id,xLag,yLag);
     
     % Compute distance between each cell and store connection if less than threshold AND NOT already a bond between cells
     coag_connects = please_Find_Distances_Between_Cells(xC,yC,Ncells,threshold_radius,aggregate_list);
@@ -61,7 +63,7 @@ function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,
     % find indices for placing NEW bond between
     if coag_connects > 0
         % Find closest lag-pts for each cell
-        lag_indices_connects = please_Find_Closest_Lag_Pts_To_Cell_Centers(start_id,xC,yC,xLag,yLag,coag_connects,coagulation(4:end),threshold_radius);
+        lag_indices_connects = please_Find_Closest_Lag_Pts_To_Cell_Centers(start_id,xC,yC,xLag,yLag,coag_connects,coagulation(5:end),threshold_radius);
     end
 
     
@@ -70,16 +72,16 @@ function [fx, fy, aggregate_list] = give_Me_Coagulation_Force_Densities(Nb,xLag,
         if (aggregate_list ~= 0)
             Ncoag_already = length( aggregate_list(:,1) );                           % # of bonds already previous to this time-step
             aggregate_list = [aggregate_list; coag_connects lag_indices_connects];   % Store all info for connections (NOTE: RL_Vec previously incoroporated into lag_indices_connects matrix)
-            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,bond_strength,Lx,Ly);
         else
             Ncoag_already = 0;
             aggregate_list = [coag_connects lag_indices_connects];   % Store all info for connections (NOTE: RL_Vec previously incoroporated into lag_indices_connects matrix)
-            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,bond_strength,Lx,Ly);
         end
     else
          if aggregate_list ~= 0
             Ncoag_already = length( aggregate_list(:,1) );                          % # of bonds already previous to this time-step
-            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,Lx,Ly);
+            [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,aggregate_list,Ncoag_already,fracture_force,bond_strength,Lx,Ly);
          else
              remove_Bonds = 0;
              fx = zeros(Nb,1);
@@ -258,14 +260,13 @@ lag_indices_connects = [lag_indices_connects RL_Vec];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,agg_list,Ncoag_already,fracture_force,Lx,Ly)
+function [fx, fy, remove_Bonds] = give_Me_Coagulation_Spring_Lagrangian_Force_Densities(Nb,xLag,yLag,agg_list,Ncoag_already,fracture_force,bond_strength,Lx,Ly)
 
 
 Nsprings = length(agg_list(:,1)); % # of Springs (BONDS)
 sp_1 = agg_list(:,3);             % Initialize storage for MASTER NODE Spring Connection
 sp_2 = agg_list(:,4);             % Initialize storage for SLAVE NODE Spring Connection
 RL_Vec = agg_list(:,5);           % Resting length of bond (whatever initial distance is when bond is formed)
-K_Vec = 1e3;                      % Stores spring stiffness associated with each spring
 alpha_pow = 1;                    % Degree of linearity (1=linear, >1 = non-linear)
 
 fx = zeros(Nb,1);                 % Initialize storage for x-forces
@@ -278,7 +279,7 @@ for i=1:Nsprings
     
     id_Master = sp_1(i);          % Master Node index
     id_Slave = sp_2(i);           % Slave Node index
-    k_Spring = K_Vec;             % Spring stiffness of i-th spring (CONSTANT FOR NOW)
+    k_Spring = bond_strength;     % Spring stiffness of i-th spring (CONSTANT FOR NOW)
     L_r = RL_Vec(i);              % Resting length of i-th spring
     alpha = alpha_pow;            % Degree of linearity of i-th spring (CONSTANT FOR NOW)
  
