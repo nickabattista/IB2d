@@ -5,7 +5,7 @@
 	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
  Author: Nicholas A. Battista
- Email:  nick.battista@unc.edu
+ Email:  nickabattista@gmail.com
  Date Created: May 27th, 2015
  Initial Python 3.5 port and VTK writes by Christopher Strickland
  Institution: UNC-CH
@@ -25,7 +25,7 @@
  There are a number of built in Examples, mostly used for teaching purposes. 
  
  If you would like us to add a specific muscle model, 
- please let Nick (nick.battista@unc.edu) know.
+ please let Nick (nickabattista@gmail.com) know.
 
 ----------------------------------------------------------------------------'''
 import numpy as np
@@ -38,8 +38,15 @@ from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 from please_Compute_Porous_Slip_Velocity import\
     please_Compute_Porous_Slip_Velocity
 from please_Plot_Results import please_Plot_Results
-from please_Compute_Normal_Tangential_Forces_On_Lag_Pts import\
+from please_Compute_Normal_Tangential_Forces_On_Lag_Pts import \
     please_Compute_Normal_Tangential_Forces_On_Lag_Pts
+
+
+# IF BOUSSINESQ
+try:
+    from please_Form_Boussinesq_Forcing_Terms import *
+except ImportError:
+    pass
 
 #Here is the try import C part
 try:
@@ -521,7 +528,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
 
     # CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) #
     if gravity_Yes:    
-        xG = Lag_Struct_Params[14]       # x-Component of Gravity Vector
+        xG = Lag_Struct_Params[14]      # x-Component of Gravity Vector
         yG = Lag_Struct_Params[15]      # y-Component of Gravity Vector
         normG = sqrt( xG**2 + yG**2 )
         gravity_Info = [gravity_Yes, xG/normG, yG/normG]
@@ -566,6 +573,35 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             #kDiffusion:  Diffusion constant for Advection-Diffusion
     else:
         C = 0 # placeholder for plotting 
+
+
+
+    # CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) #
+    if boussinesq_Yes:
+        print('  -Boussinesq Approximation included\n')
+        print('     -> NEED: 1. gravity flag w/ gravity components \n')
+        print('              2. background concentration \n')
+
+        if exp_Coeff == 0:
+            print('     -> exp_Coeff set to 1.0 by default, was assigned 0 in input2d <-\n')
+            exp_Coeff = 1.0
+
+        #if gravity_Info == 0:
+        #    print('\n\n\n READ THE ERROR MESSAGE -> YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :) \n\n\n')
+        #    error('YOU MUST FLAG GRAVITY IN INPUT FILE FOR BOUSSINESQ! :)')
+        #elif concentration_Yes == 0:
+        #    print('\n\n\n READ THE ERROR MESSAGE -> YOU MUST HAVE BACKGROUND CONCENTRATION FOR BOUSSINESQ! :) \n\n\n')
+        #    error('YOU MUST FLAG CONCENTRATION IN INPUT FILE FOR BOUSSINESQ! :)')
+
+        # Forms Boussinesq forcing terms, e.g., (exp_Coeff)*gVector for Momentum Eq.
+        fBouss_X,fBouss_Y = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx,Ny,gravity_Info)
+
+        # Finds initial concentration Laplacian (may not be necessary)
+        #Cxx = DD(C,dx,'x')
+        #Cyy = DD(C,dy,'y')
+        #laplacian_C = Cxx+Cyy
+        #C_0 = np.zeros(C.shape) # Define background concentration
+
 
 
     
@@ -722,9 +758,15 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #******************* STEP 3: Solve for Fluid motion ************************
         #
         #
-        Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu,\
-        grid_Info, dt, idX, idY)
-        
+        # Add in effect from BOUSSINESQ
+        if boussinesq_Yes:
+            Fxh = Fxh + rho*fBouss_X*C
+            Fyh = Fyh + rho*fBouss_Y*C
+            Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
+        else:
+            Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
+
+
         
         #
         #
