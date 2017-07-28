@@ -760,8 +760,8 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #
         # Add in effect from BOUSSINESQ
         if boussinesq_Yes:
-            Fxh = Fxh + rho*fBouss_X*C
-            Fyh = Fyh + rho*fBouss_Y*C
+            Fxh = Fxh + rho*np.dot(fBouss_X,C)
+            Fyh = Fyh + rho*np.dot(fBouss_Y,C)
             Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
         else:
             Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
