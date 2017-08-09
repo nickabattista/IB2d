@@ -51,7 +51,7 @@ def get_Inds_Please():
     filename = 'boussinesq.mesh'  # Name of file to read in
     with open(filename) as f:
         # First line in the file contains the number of Lagrangian points
-        N = int(f.readline().strip())
+        # N = int(f.readline().strip())
         # Read in the Lagrangian mesh points
         xInds,yInds = np.loadtxt(f,unpack=True)
     

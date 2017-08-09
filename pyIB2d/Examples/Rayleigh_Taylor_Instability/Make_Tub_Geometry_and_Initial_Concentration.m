@@ -35,8 +35,9 @@ function Make_Tub_Geometry_and_Initial_Concentration()
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
 Nx =  128;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny = 256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
-dx = Lx/Nx;      % Grid spatial resolution
+dx = Lx/Ny;      % Grid spatial resolution
 
 %
 % Immersed Structure Geometric / Dynamic Parameters %
@@ -46,8 +47,10 @@ struct_name = 'boussinesq'; % Name for .vertex, .spring, etc files. (must match 
 
 
 % Call function to construct geometry
-[xLag,yLag,Concentration,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Lx,dx);
+[xLag,yLag,Concentration,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx);
+xLag = xLag - 0.25;
 
+size(Concentration)
 
 % Plot Geometry to test
 plot(xLag,yLag,'r-'); hold on;
@@ -79,36 +82,10 @@ print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 % Prints .concentration file!
 kDiffusion = 1e-6;
-print_Concentration_Info(Nx,Nx,Concentration,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
 
 % Print .mesh file where Boussinesq is on Eulerian Mesh
 print_Boussinesq_Mesh(inds)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints BOUSSINESQ affected EULERIAN point indices
-%           boussinesq.mesh
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function print_Boussinesq_Mesh(inds)
-
-    N = length(inds(:,1)); % Total # of Affected Eulerian Pts
-
-    bouss_fid = fopen('boussinesq.mesh', 'w');
-
-    fprintf(bouss_fid, '%d\n', N );
-
-    %Loops over all Lagrangian Pts.
-    for s = 1:N
-        xInd = inds(s,1);
-        yInd = inds(s,2);
-        fprintf(bouss_fid, '%1.16e %1.16e\n', xInd-1,yInd-1);
-    end
-
-    fclose(bouss_fid);
-
-   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -133,6 +110,28 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid);
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints BOUSSINESQ affected EULERIAN point indices
+%           boussinesq.mesh
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Boussinesq_Mesh(inds)
+
+    N = length(inds(:,1)); % Total # of Affected Eulerian Pts
+
+    bouss_fid = fopen('boussinesq.mesh', 'w');
+
+    %Loops over all Lagrangian Pts.
+    for s = 1:N
+        xInd = inds(s,1);
+        yInd = inds(s,2);
+        fprintf(bouss_fid, '%d %d\n', xInd-1,yInd-1);
+    end
+
+    fclose(bouss_fid);
    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,7 +177,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
     %Loops over all Lagrangian Pts.
     for s = 1:N
-        fprintf(target_fid, '%d %1.16e\n', s-1, k_Target); % s-1 for python indexing
+        fprintf(target_fid, '%d %1.16e\n', s-1, k_Target);
     end
 
     fclose(target_fid); 
@@ -289,13 +288,15 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,inds] = give_Me_Initial_Concentration(Lx,Nx,dx,buffx,buffy)
+function [C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,buffx,buffy)
 
 %WHERE OUTER TUBE LIES
 %xMin = 0.15; xMax = 0.45;
 %yMin = 0.85; yMax = 1.15;
 
-xMin = buffx; xMax = Lx-buffx;
+xMin = buffx-0.25; xMax = Lx-buffx-0.25;
+xMin
+xMax
 yMin = buffy; yMax = Lx-buffy;
 
 % xMin = 0; xMax = Lx;
@@ -314,7 +315,7 @@ inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 %inds(1:length(inds(:,1))/2,:)
 %inds(length(inds(:,1))/2+1:end,:)
 
-C = ones(Nx,Nx);
+C = ones(Ny,Nx);
 for i=1:length( inds(:,1) )
     xInd = inds(i,1);
     yInd = inds(i,2);
@@ -334,7 +335,6 @@ for i=1:length( inds(:,1) )
 %     end
 
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -399,6 +399,8 @@ end
 
 
 
+
+
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -406,7 +408,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-function [xLag,yLag,C,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Lx,dx)
+function [xLag,yLag,C,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx)
  
 % ds: Lagrangian pt. spacing
 % Nx: Eulerian grid resolution
@@ -432,7 +434,7 @@ plot(xBottom,yBottom,'g*'); hold on;
 plot(xRight,ySide,'r*'); hold on;
 axis([0 Lx 0 Lx]); 
  
-[C,inds] = give_Me_Initial_Concentration(Lx,Nx,dx,Buffx,Buffy);
+[C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,Buffx,Buffy);
 
 
 
