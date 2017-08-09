@@ -711,8 +711,8 @@ while current_time < T_FINAL
     %
     % Add in effect from BOUSSINESQ
     if boussinesq_Yes == 1
-        Fxh = Fxh + rho*fBouss_X*(C);
-        Fyh = Fyh + rho*fBouss_Y*(C);
+        Fxh = Fxh + rho*fBouss_X.*(C);
+        Fyh = Fyh + rho*fBouss_Y.*(C);
         [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
     else
         [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
