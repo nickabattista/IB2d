@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -57,10 +57,10 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Compute Where You Want to Apply Force
-xMin = 0.025;
-xMax = 0.05;
-yMin = 0.91;
-yMax = 0.99;
+xMin = 0.48;
+xMax = 0.52;
+yMin = 0.05;
+yMax = 0.45;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
 kStiff = 1e4;
@@ -165,20 +165,20 @@ function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,d
 % inds: indices on the fluid grid for where to apply the arbitrary external force
 
 
-fx = zeros(Nx,Ny);         % Initialize storage for x-force density from EXTERNAL FORCES
+fx = zeros(Ny,Nx);         % Initialize storage for x-force density from EXTERNAL FORCES
 fy = fx;                   % Initialize storage for y-force density from EXTERNAL FORCES
 
-for n=1:length(inds(:,1))
-    i = inds(n,1);
-    j = inds(n,2);
-    
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
-        
-    fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
-    fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
-    
-end
+%if t<0.01
+    for n=1:length(inds(:,1))
+        i = inds(n,1);
+        j = inds(n,2);
 
+        [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
+
+        fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
+        fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
+    end
+%end
 fx_exts = fx;
 fy_exts = fy;
 
@@ -208,10 +208,13 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 % w:     width of Channel
 % Umax:  maximum velocity
 
-%y = yGrid(j);  % y-Value considered
+y = yGrid(j);  % y-Value considered
 
-uX_Tar = Umax * (tanh(20*t));               % Only external forces in x-direction
-uY_Tar = 0;                                 % No external forces in y-direction
-
-
+if y>0.25
+    uY_Tar = 0;%Umax * (tanh(20*t));              % No external forces in y-direction
+    uX_Tar = Umax * (tanh(20*t));                 % Only external forces in x-direction
+else
+    uY_Tar = 0;%Umax * (tanh(20*t));              % No external forces in y-direction
+    uX_Tar = -1.5*Umax * (tanh(20*t));                % Only external forces in x-direction
+end
 

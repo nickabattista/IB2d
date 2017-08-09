@@ -45,9 +45,10 @@ function [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx
     %               col 2: x-component of gravity vector (normalized)
     %               col 3: y-component of gravity vector (normalized)
 
-    g = 0.981;       % gravitational constant
+    g = 9.81;       % gravitational constant
     mat = zeros(Ny,Nx);
-    
+        
+    %inds = get_HardCode_Inds_Please();
     inds = get_Inds_Please();
     for i=1:length( inds(:,1) )
         xInd = inds(i,1);
@@ -57,11 +58,46 @@ function [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx
     
     fBouss_X = exp_Coeff*g*gravity_Info(2)*mat;
     fBouss_Y = exp_Coeff*g*gravity_Info(3)*mat;
-    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in indices for where Boussinesq approximation will take
+%           effect in the domain.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function inds = get_Inds_Please()
+
+filename = 'boussinesq.mesh';  %Name of file to read in
+fileID = fopen(filename);
+
+% Read in the file, use 'CollectOutput' to gather all similar data together
+% and 'CommentStyle' to to end and be able to skip lines in file.
+C = textscan(fileID,'%f %f','CollectOutput',1);
+
+fclose(fileID);     %Close the data file.
+
+indices = C{1};    %Stores all read in data in vertices (N+1,2) array
+
+N = length(indices(:,1));  % Total # of indices to affect Boussinesq
+inds = zeros(N,2);         % Initialize storage for Lagrangian Pts.
+
+for i=1:N
+   inds(i,1) = indices(i,1); %Stores x-values of Lagrangian Mesh
+   inds(i,2) = indices(i,2); %Stores y-values of Lagrangian Mesh
+  
+end
+        
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-function inds = get_Inds_Please()
+%
+% FUNCTION: returns hard coded indices for where Boussinesq applies in
+%           domain. For a square [0,1]x[0,1] mesh with rectangle in
+%           [0.3,0.7]x[0.05,0.95].
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function inds = get_HardCode_Inds_Please()
         
         inds = [40     8
     40     9

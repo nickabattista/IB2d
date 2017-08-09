@@ -6,7 +6,7 @@
 %
 % Author: Nicholas A. Battista
 % Email:  nick.battista@unc.edu
-% Date Created: May 27th, 2015
+% Date Created: September 9th, 2016
 % Institution: UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
@@ -25,98 +25,81 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the BABY_SPIDER-EXAMPLE geometry and prints associated input files
+% FUNCTION: creates the geometry and prints associated input files
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function Baby_Spider()
+function Make_Tub_Geometry_and_Initial_Concentration()
 
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  256;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 3.0;        % Length of Eulerian Grid in x-Direction
-Ly = 3.0;        % Length of Eulerian Grid in y-Direction
-dx = Lx/Nx;      % Grid Resolution
+Nx = 512;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny = 256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 1.0;        % Length of Eulerian Grid in x-Direction
+dx = Lx/Nx;      % Grid spatial resolution
 
-
+%
 % Immersed Structure Geometric / Dynamic Parameters %
-Ls = 1.0;        % Length of baby-spider web
-ds = Lx/(2*Nx);  % Lagrangian spacing, ds
-struct_name = 'spider'; % Name for .vertex, .spring, etc files.
+%
+ds = 0.25*dx;              % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
+struct_name = 'boussinesq'; % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
 
 
-% Call function to construct geometry (spider)
-[xLagSpider,yLagSpider,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Ny,Ly,Ls);
+% Call function to construct geometry
+[xLag,yLag,Concentration,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx);
 
-% Call function to construct geometry (outer square)
-[xLagSq,yLagSq,Concentration] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Lx,dx);
-
+size(Concentration)
 
 % Plot Geometry to test
-plot(xLagSpider,yLagSpider,'r-'); hold on;
-plot(xLagSpider,yLagSpider,'*'); hold on;
-%plot(xLagSq,yLagSq,'k'); hold on;
+plot(xLag,yLag,'r-'); hold on;
+plot(xLag,yLag,'*'); hold on;
 xlabel('x'); ylabel('y');
-axis([0 Lx 0 Ly]);
+axis square;
 
+xLag = dx/2:dx/2:Lx-dx/2;
+yLag = 0.01*ones(1,length(xLag));
+yLag2 = 0.49*ones(1,length(xLag));
 
-% Print INFO to screen
-fprintf('\n\n                   INFO TO CHECK INPUT FILES!\n\n');
-%fprintf('# of Lag. Pts in WEB: %d\n',Ninfo(1));
-%fprintf('# of Lag. Pts in FLOOR: %d\n',Ninfo(2));
-%fprintf('Total # of Lag. Pts: %d\n',Ninfo(1)+Ninfo(2));
-fprintf('Index of MASSIVE Pt (last pt. of WEB): %d\n\n\n',Ninfo(1));
-
-
-% Combine Geometries
-%offset = length(xLagSpider);
-%xLag = [xLagSpider xLagSq];
-%yLag = [yLagSpider yLagSq];
-xLag = xLagSpider;
-yLag = yLagSpider;
+xLag = [xLag xLag];
+yLag = [yLag yLag2];
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
-% Prints .mass file!
-k_Mass = 6.82e4;        % 'spring' stiffness parameter for tethering
-Mass =   2.0e-3;        % "MASS" value for 'MASSIVE' nodal movement
-print_Lagrangian_Mass_Pts(xLagSpider,k_Mass,Mass,struct_name,Ninfo);
-
-
 % Prints .spring file!
-k_Spring = 6.82e4;
-print_Lagrangian_Springs(xLagSpider,yLag,k_Spring,struct_name,Ninfo,ds);
+%k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
+%ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
+%print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 
 % Prints .beam file!
-k_Beam = 1.98259e3; C = 0.0;
-print_Lagrangian_Beams(xLagSpider,yLagSpider,k_Beam,C,struct_name,Ninfo);
-
-
-% Prints .concentration file!
-kDiffusion = 1e-6;
-print_Concentration_Info(Nx,Nx,Concentration,kDiffusion,struct_name);
+% k_Beam = 0.5;                      % Beam Stiffness (does not need to be equal for all beams)
+% C = compute_Curvatures(xLag,yLag)  % Computes curvature of initial configuration
+%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name);
 
 
 % Prints .target file!
-%k_Target = 1e7;
-%print_Lagrangian_Target_Pts(xLagSq,k_Target,struct_name,offset);
+k_Target = 1e7;
+print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
+% Prints .concentration file!
+kDiffusion = 1e-6;
+print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
 
+% Print .mesh file where Boussinesq is on Eulerian Mesh
+print_Boussinesq_Mesh(inds)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints VERTEX points to a file called spider.vertex
+% FUNCTION: prints VERTEX points to a file called 'struct_name'.vertex
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
-    N = length(xLag);
+    N = length(xLag); % Total # of Lag. Pts
 
     vertex_fid = fopen([struct_name '.vertex'], 'w');
 
@@ -129,47 +112,76 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
         fprintf(vertex_fid, '%1.16e %1.16e\n', X_v, Y_v);
     end
 
-    fclose(vertex_fid); 
-    
+    fclose(vertex_fid);
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints MASS points to a file called spider.mass
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-    
-function print_Lagrangian_Mass_Pts(xLag,kMass,Mass,struct_name,Ninfo)
-
-    %LOOP OVER LAG PTS FOR MASS PTS IN LAGRANGIAN INDEXING
-
-    N = 1;  % ONLY 1 MASS PT.!
-
-    mass_fid = fopen([struct_name '.mass'], 'w');
-
-    fprintf(mass_fid, '%d\n', N );
-
-    % Single Mass Pt. (bottom point of web!)
-    fprintf(mass_fid, '%d %1.16e %1.16e\n', Ninfo(1), kMass,Mass);
-    
-    fclose(mass_fid); 
-       
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints Vertex points to a file called spider.vertex
+% FUNCTION: prints BOUSSINESQ affected EULERIAN point indices
+%           boussinesq.mesh
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo,offset)
+function print_Boussinesq_Mesh(inds)
+
+    N = length(inds(:,1)); % Total # of Affected Eulerian Pts
+
+    bouss_fid = fopen('boussinesq.mesh', 'w');
+
+    %Loops over all Lagrangian Pts.
+    for s = 1:N
+        xInd = inds(s,1);
+        yInd = inds(s,2);
+        fprintf(bouss_fid, '%d %d\n', xInd,yInd);
+    end
+
+    fclose(bouss_fid);
+   
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints SPRING points to a file called 'struct_name'.spring
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
 
     N = length(xLag);
+
+    spring_fid = fopen([struct_name '.spring'], 'w');
+
+    fprintf(spring_fid, '%d\n', N );    % Print # of springs 
+
+    %SPRINGS BETWEEN VERTICES
+    for s = 1:N
+            if s < N         
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
+            else
+                %Case s=N
+                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
+            end
+    end
+    fclose(spring_fid);     
     
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints TARGET points to a file called 'struct_name'.vertex
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
+
+    N = length(xLag);
+
     target_fid = fopen([struct_name '.target'], 'w');
 
     fprintf(target_fid, '%d\n', N );
 
-    %Loops over Lag. Pts on FLOOR ONLY
+    %Loops over all Lagrangian Pts.
     for s = 1:N
-        fprintf(target_fid, '%d %1.16e\n', s+offset, k_Target);
+        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
     end
 
     fclose(target_fid); 
@@ -177,50 +189,34 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo,offset)
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: prints BEAM (Torsional Spring) points to a file called spider.beam
+% FUNCTION: prints BEAM (Torsional Spring) points to a file called 'struct_name'.beam
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo)
+function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 
     % k_Beam: beam stiffness
     % C: beam curvature
     
-    N = Ninfo(1)-2; % NOTE: Total # of beams = % of Lag Pts. on WEB - 2
+    N = length(xLag); % NOTE: Total number of beams = Number of Total Lag Pts. - 2
 
     beam_fid = fopen([struct_name '.beam'], 'w');
 
     fprintf(beam_fid, '%d\n', N );
 
-    %BEAMS BETWEEN VERTICES
-    for s = 2:N-1
-        fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
-    end
-    fclose(beam_fid); 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints SPRING points to a file called spider.spring
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,struct_name,Ninfo,ds)
-
-    N = Ninfo(1)-1;  % # of springs (just on 'web' of geometry)
-
-    spring_fid = fopen([struct_name '.spring'], 'w');
-
-    fprintf(spring_fid, '%d\n', N );
-
     %spring_force = kappa_spring*ds/(ds^2);
 
-    %SPRINGS BETWEEN VERTICES ON WEBBING ONLY
-    for s = 1:N
-        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);  
+    %BEAMS BETWEEN VERTICES
+    for s = 2:N-1
+            if  s <= N-1         
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C(s) );  
+            else
+                %Case s=N
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, 1,   k_Beam, C(s) );  
+            end
     end
-    fclose(spring_fid); 
-    
+    fclose(beam_fid); 
+   
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -241,44 +237,52 @@ function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
         end
         fprintf(con_fid,'\n');
     end    
-        
     
     
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: creates the Lagrangian structure geometry
+% FUNCTION: computes "curvature" of starting configuration
+% 
+% NOTE: not curvature in the traditional geometric sense, in the 'discrete'
+% sense through cross product.
+%
+% NOTE: assumes a CLOSED structure
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xLag,yLag,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Ny,Ly,Ls)
+function C = compute_Curvatures(xLag,yLag)
 
-% ASSUMES Nx=Ny %
+N = length(xLag);
+C = zeros( N );
 
-%
-% Create Spider Web Geometry (springs, beams, and 1-mass pt)
-%
-yS =   2.0;                       % Highest Point of Web
-yWeb = yS:-ds:yS-Ls;                  % yPts of web
-Nweb = length(yWeb);                  % # of Lag. Pts in Web
-xWeb = (1.25)*ones(1,Nweb);           % xPts of web
+%Note: needs to be done same order as you print .beam file!
+for i=1:N
+   
+   % Pts Xp -> Xq -> Xr (same as beam force calc.)
+   
+   if ( (i > 1) && (i < N) )
+   
+        Xp = xLag(i-1); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(i-1); Yq = yLag(i); Yr = yLag(i+1);
+   
+   elseif (i==1)
+       
+        Xp = xLag(N); Xq = xLag(i); Xr = xLag(i+1);
+        Yp = yLag(N); Yq = yLag(i); Yr = yLag(i+1);
+       
+   elseif (i==N)
+       
+        Xp = xLag(N-1); Xq = xLag(N); Xr = xLag(1);
+        Yp = yLag(N-1); Yq = yLag(N); Yr = yLag(1);
+       
+   end
+       
+   C(i) = (Xr-Xq)*(Yq-Yp) - (Yr-Yq)*(Xq-Xp); %Cross product btwn vectors
+      
+end
+ 
 
-xLag = xWeb; yLag = yWeb;
-Ninfo(1) = Nweb;
 
-%
-% Create Floor (for target pts)
-% 
-% frac = 0.2;                                       % Fraction of bottom of domain, 'not floored'
-% frac2 = 0.05;                                     % Fraction of height of domain for floor to be placed
-% xFloor = (frac/2)*Ly:ds:Ly*( 1.0 - (frac/2) );    % xPts of floor
-% Nfloor = length(xFloor);                          % # of Lag. Pts in Floor
-% yFloor = frac2*Ly*ones(1,Nfloor);                 % yPts of floor
-% 
-% 
-% xLag = [xWeb xFloor];             %Vector of all x-Lag. Pts.
-% yLag = [yWeb yFloor];             %Vector of all y-Lag. Pts.
-% Ninfo= [Nweb Nfloor Nweb+Nfloor]; %Vector of # of Lag. Pts for each part of geometry
 
 
 
@@ -288,15 +292,20 @@ Ninfo(1) = Nweb;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = give_Me_Initial_Concentration(Lx,Nx,dx,buffx,buffy)
+function [C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,buffx,buffy)
 
 %WHERE OUTER TUBE LIES
+%xMin = 0.15; xMax = 0.45;
+%yMin = 0.85; yMax = 1.15;
 
-% xMin = buffx; xMax = Lx-buffx;
-% yMin = buffy; yMax = Lx-buffy;
-
+%xMin = buffx; xMax = Lx-buffx;
 xMin = 0; xMax = Lx;
-yMin = 0; yMax = Lx;
+
+%yMin = buffy; yMax = Lx/2-buffy;
+yMin = 0; yMax = Lx/2;
+
+% xMin = 0; xMax = Lx;
+% yMin = 0; yMax = Lx;
 
 xMid = (xMin+xMax)/2;
 yMid = (yMin+yMax)/2;
@@ -304,19 +313,28 @@ yMid = (yMin+yMax)/2;
 xDiff = (xMax-xMin)/2;
 yDiff = (yMax-yMin)/2;
 
-x = 0:dx:Lx;
-y = 0:dx:Lx;
+x=linspace(0,Lx,Nx);
+y=linspace(0,Lx/2,Ny);
 inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
 
-C = ones(Nx,Nx);
+%inds(1:length(inds(:,1))/2,:)
+%inds(length(inds(:,1))/2+1:end,:)
+
+C = ones(Ny,Nx);
 for i=1:length( inds(:,1) )
     xInd = inds(i,1);
     yInd = inds(i,2);
     xPt = x(xInd);
     yPt = y(yInd);
-    C(yInd,xInd) = 0.02*yPt;
     %C(xInd,yInd ) = (-0.5/yDiff^2)*( (yPt-yMid) - yDiff )*( (yPt-yMid) + yDiff ) +  (-0.5/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     %C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
+    
+    %C(yInd,xInd) = 0.5*(tanh(80.0*(yPt-0.25*Lx-0.001*cos(pi*xPt)))+1);
+    if yPt > (0.25+0.025*sin(10*pi*xPt))
+        C(yInd,xInd) = 0;
+    else
+        C(yInd,xInd) = 1;
+    end
 %     if yPt >= Lx/2+1*dx
 %         C(yInd,xInd) = 1;
 %     elseif yPt <= Lx/2-1*dx;
@@ -326,7 +344,6 @@ for i=1:length( inds(:,1) )
 %     end
 
 end
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -400,31 +417,35 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-function [xLag,yLag,C] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Lx,dx)
+function [xLag,yLag,C,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx)
  
 % ds: Lagrangian pt. spacing
 % Nx: Eulerian grid resolution
 
-Buffx = 0.025*Lx;
-Buffy = 0.025*Lx;
+Buffx = 0.05*Lx;
+Buffy = 0.05*Lx;
 
-%fprintf('\nThis is the buffer on x and y, respectively: %d and %d\n',Buffx,Buffy);
+fprintf('\nThis is the buffer on x and y, respectively: %d and %d\n',Buffx,Buffy);
 
-ySide = Buffy:ds:Lx-Buffy;
+ySide = Buffy:ds:Lx/2-Buffy;
 xLeft = Buffx*ones(1,length(ySide));
 xRight= (Lx-Buffx)*ones(1,length(ySide));
 
 xBottom = Buffx+ds:ds:Lx-Buffx-ds;
 yBottom = Buffy*ones(1,length(xBottom));
-yTop = (Lx-Buffy)*ones(1,length(xBottom));
+yTop = (Lx/2-Buffy)*ones(1,length(xBottom));
 
 xLag = [xLeft xBottom xRight xBottom];
 yLag = [ySide yBottom ySide yTop];
 
-%plot(xLeft,ySide,'b*'); hold on;
-%plot(xBottom,yBottom,'g*'); hold on;
-%plot(xRight,ySide,'r*'); hold on;
-%axis([0 Lx 0 Lx]); 
+plot(xLeft,ySide,'b*'); hold on;
+plot(xBottom,yBottom,'g*'); hold on;
+plot(xRight,ySide,'r*'); hold on;
+axis([0 Lx 0 Lx]); 
  
-C = give_Me_Initial_Concentration(Lx,Nx,dx,Buffx,Buffy);
+[C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,Buffx,Buffy);
+
+
+
+
 
