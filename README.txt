@@ -7,11 +7,14 @@ IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear
 	off of Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
 Author: Nicholas A. Battista
+Institution: The College of New Jersey (TCNJ)
 Email:  nickabattista@gmail.com
+Website: http://nickabattista.wixsite.com/home
+GitHub: http://www.github.com/nickabattista
+
+HISTORY:
 Date Created: May 27th, 2015
 Institution: University of North Carolina at Chapel Hill
-Website: http://battista.web.unc.edu
-GitHub: http://www.github.com/nickabattista
 
 If you use the code for research, please cite the following papers:
 [1] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
@@ -33,9 +36,10 @@ This code is capable of creating Lagrangian Structures using:
 	10. Non-invariant Beams
 	11. User-defined deformation laws
     12. Poroelastic Media (based on Brinkman-like forces)
+
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
-There are a number of built in Examples, mostly used for teaching purposes. 
+There are a number of built in Examples (~70), mostly used for teaching purposes. 
 
 If you would like us to add a specific muscle model, please contact Nick (nickabattista@gmail.edu) 
 
