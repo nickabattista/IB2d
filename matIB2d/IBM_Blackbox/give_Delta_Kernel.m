@@ -31,7 +31,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function delta = compute_delta_kernel(x,dx)
+function delta = give_Delta_Kernel(x,dx)
 
 % x:  Values in which the delta function will be evaulated
 % dx: Spatial step-size of grid
@@ -49,10 +49,20 @@ for i=1:row
         
         r = RMAT(i,j);
         
+        % OLD DELTA FUNCTION APPROXIMATION
+        %if r<=2
+        %    delta(i,j) = 0.25*(1+cos(pi*r/2));
+        %else
+        %    delta(i,j) = 0;
+        %end
+        
+        % PESKIN 4-PT DISCRETE DELTA FUNCTION
         if r<1
             delta(i,j) = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) );
         elseif ( (r<2) && (r>=1) )
             delta(i,j) = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) );
+        else
+            delta(i,j) = 0;
         end
         
     end
