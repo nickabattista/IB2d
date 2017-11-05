@@ -274,11 +274,19 @@ def give_Delta_Kernel(x,dx):
             
             r = RMAT[ii,jj]
             
+            # Approximate Discrete Delta Function
+            #if r <= 2:
+            #    delta[ii,jj] = 0.25*( 1 + cos(pi*r/2) )    
+            #else:
+            #    delta[ii,jj] = 0        
+
+            # PESKIN 4-Point Discrete Delta Function
             if r<1:
                 delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
             elif (r<2) and (r>=1):
                 delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
-
+            else:
+                delta[ii,jj] = 0
     return delta
 
 
