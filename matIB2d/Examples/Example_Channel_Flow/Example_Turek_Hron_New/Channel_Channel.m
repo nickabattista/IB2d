@@ -95,18 +95,23 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e5;
+k_Spring = 1e7;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds,struct_name,Nbefore,Ntot);
 
 
 % Prints .beam file!
-k_Beam = 1e-1; C = 0.0;
+k_Beam = 1e12; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Nbefore,Ntot);
 
 
 % Prints .target file!
-k_Target = 2e6;
+k_Target = 4e6;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Nbefore);
+
+% Prints .mass file!
+k_Mass = 1e5;         % 'spring' stiffness parameter for tethering
+Mass = 1e2;%[2.5e0 0.875e-1 6.5e-4];          % "MASS" value for 'ghost' nodal movement
+print_Lagrangian_Mass_Pts(xLag,k_Mass,Mass,struct_name,Nbefore,Ntot);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -131,7 +136,7 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid); 
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: prints Vertex points to a file called rubberband.vertex
 %
@@ -204,7 +209,31 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Nbefore
     end
     fclose(spring_fid); 
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints TARGET points to a file called struct_name.mass
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     
+function print_Lagrangian_Mass_Pts(xLag,kMass,Mass,struct_name,Nbefore,Ntot)
+
+    %LOOP OVER LAG PTS FOR MASS PTS IN LAGRANGIAN INDEXING
+
+    N = 1;%Nebefore-Ntot;
+
+    mass_fid = fopen([struct_name '.mass'], 'w');
+
+    fprintf(mass_fid, '%d\n', 3*N );
+
+    %Loops over all Lagrangian Pts.
+    for s = Ntot:Ntot%Nbefore:Ntot
+        fprintf(mass_fid, '%d %1.16e %1.16e\n', s, kMass, Mass );
+    end
+  
+    
+
+    fclose(mass_fid); 
+      
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
