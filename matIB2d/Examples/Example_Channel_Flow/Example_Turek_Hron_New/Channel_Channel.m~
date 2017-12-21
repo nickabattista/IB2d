@@ -100,7 +100,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds,struct_name,Nbefore,Ntot);
 
 
 % Prints .beam file!
-k_Beam = 1e12; C = 0.0;
+k_Beam = 5e11; C = 0.0;
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Nbefore,Ntot);
 
 
@@ -110,7 +110,7 @@ print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Nbefore);
 
 % Prints .mass file!
 k_Mass = 1e4;         % 'spring' stiffness parameter for tethering
-Mass = 4e2;%[2.5e0 0.875e-1 6.5e-4];          % "MASS" value for 'ghost' nodal movement
+Mass = 1e2;%[2.5e0 0.875e-1 6.5e-4];          % "MASS" value for 'ghost' nodal movement
 print_Lagrangian_Mass_Pts(xLag,k_Mass,Mass,struct_name,Nbefore,Ntot);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,7 +151,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Nbefore)
     fprintf(target_fid, '%d\n', Nbefore+20 );
 
     %Loops over all Lagrangian Pts.
-    for s = 1:Nbefore+3
+    for s = 1:Nbefore+20
         fprintf(target_fid, '%d %1.16e\n', s, k_Target);
     end
 
@@ -172,7 +172,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Nbefore,Ntot)
     % for target points on first couple
     %N = Ntot-Nbefore-1-20; % NOTE: Total number of beams 
 
-    N = Ntot-Nbefore-1-3; % NOTE: Total number of beams 
+    N = Ntot-Nbefore-1-20; % NOTE: Total number of beams 
     
     beam_fid = fopen([struct_name '.beam'], 'w');
 
@@ -181,7 +181,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Nbefore,Ntot)
     %spring_force = kappa_spring*ds/(ds^2);
 
     %BEAMS BETWEEN VERTICES
-    for s = Nbefore+1+3:Ntot-1
+    for s = Nbefore+1+20:Ntot-1
         fprintf(beam_fid, '%d %d %d %1.16e %1.16e\n',s-1, s, s+1, k_Beam, C);  
     end
     fclose(beam_fid); 
@@ -204,7 +204,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Nbefore
     %spring_force = kappa_spring*ds/(ds^2);
 
     %SPRINGS BETWEEN VERTICES
-    for s = Nbefore+3:Ntot-1
+    for s = Nbefore+20:Ntot-1
         fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds_Rest);  
     end
     fclose(spring_fid); 
