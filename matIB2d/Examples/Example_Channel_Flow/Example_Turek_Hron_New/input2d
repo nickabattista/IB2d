@@ -14,7 +14,7 @@ rho = 1                 % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 3           % Final time of simulation (s)
+Tfinal = 6           % Final time of simulation (s)
 dt = 5.0e-5             % Time-step (s)
 }
 
@@ -22,7 +22,7 @@ dt = 5.0e-5             % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx = 512                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Nx = 1024               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Ny = 128                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 2.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 0.25               % Length of Eulerian Grid in y-Direction (m)

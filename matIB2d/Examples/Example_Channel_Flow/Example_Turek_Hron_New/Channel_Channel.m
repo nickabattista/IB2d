@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -15,11 +15,11 @@
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -100,7 +100,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds,struct_name,Nbefore,Ntot);
 
 
 % Prints .beam file!
-k_Beam = 1e12; C = 0.0;
+k_Beam = 2e12; C = 0.0; %2e12 -> 4e12
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Nbefore,Ntot);
 
 
@@ -110,7 +110,7 @@ print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Nbefore);
 
 % Prints .mass file!
 k_Mass = 1e4;         % 'spring' stiffness parameter for tethering
-Mass = 4e2;%[2.5e0 0.875e-1 6.5e-4];          % "MASS" value for 'ghost' nodal movement
+Mass = 2.5e1;%[2.5e0 0.875e-1 6.5e-4];          % "MASS" value for 'ghost' nodal movement
 print_Lagrangian_Mass_Pts(xLag,k_Mass,Mass,struct_name,Nbefore,Ntot);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

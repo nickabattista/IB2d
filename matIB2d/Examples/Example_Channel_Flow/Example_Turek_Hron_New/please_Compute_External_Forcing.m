@@ -15,7 +15,7 @@
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
@@ -57,13 +57,13 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Stiffness for Arbitrary External Force to Fluid Grid
-kStiff = 1e4;
+kStiff = 1e3;
 
 % Width of Channel
 w = 0.2;
 
 % Max Velocity Desired
-uMax = 150.0;
+uMax = 4.0;
 
 if first == 1
     
@@ -211,7 +211,7 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
+uX_Tar = -Umax * (100 * tanh(2*t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 
