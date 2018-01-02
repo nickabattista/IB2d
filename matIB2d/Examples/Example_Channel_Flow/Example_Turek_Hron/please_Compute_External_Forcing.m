@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -15,11 +15,11 @@
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -57,21 +57,21 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Stiffness for Arbitrary External Force to Fluid Grid
-kStiff = 1e4;
+kStiff = 1e3;
 
 % Width of Channel
 w = 0.2;
 
 % Max Velocity Desired
-uMax = 250.0;
+uMax = 2.75;
 
 if first == 1
     
     % Compute Where You Want to Apply Force
     xMin = 0.1;
     xMax = 0.16;
-    yMin = 0.41;
-    yMax = 0.59;
+    yMin = 0.035;
+    yMax = 0.215;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -211,7 +211,7 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Lx/2+w/2) - y )*( (Lx/2-w/2) - y ); % Only external forces in x-direction
+uX_Tar = -Umax * (100 * tanh(2*t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 
