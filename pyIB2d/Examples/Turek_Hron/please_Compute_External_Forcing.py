@@ -70,10 +70,10 @@ def please_Compute_External_Forcing(dt,current_time,x,y, grid_Info, uX, uY, firs
     if first == 1:
 
         # Compute Where You Want to Apply Force
-        xMin = 0.1;
-        xMax = 0.16;
-        yMin = 0.035;
-        yMax = 0.215;
+        xMin = 0.1
+        xMax = 0.16
+        yMin = 0.035
+        yMax = 0.215
 
         inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax)
         first = 0
@@ -129,7 +129,6 @@ def give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax):
             noMinYet = 0
         
         j=j+1
-    
 
     j=y.size - 1
     noMaxYet = 1
@@ -218,7 +217,7 @@ def please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax):
     # w:     width of Channel
     # Umax:  maximum velocity
 
-    y = yGrid[j];  % y-Value considered
+    y = yGrid[j];  # y-Value considered
 
     uX_Tar = -Umax * (100 * np.tanh(2*t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); # Only external forces in x-direction
     uY_Tar = 0;                                                                            # No external forces in y-direction
