@@ -196,7 +196,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring_Adj,k_Spring_Across,ds_Adj,
     for s = 1:Ninfo(1)
         sTOP = s;
         sBOT = s+Ninfo(1);
-        ds_Across = sqrt( (xLag(sTOP)-xLag(sBOT))^2 + (yLag(sTOP)-yLag(sBOT))^2 );
+        ds_Across = sqrt( xLag(sTOP)-xLag(sBot   )
         fprintf(spring_fid, '%d %d %1.16e %1.16e\n', sTOP, sBOT, k_Spring_Across, ds_Across);  
     end
     
