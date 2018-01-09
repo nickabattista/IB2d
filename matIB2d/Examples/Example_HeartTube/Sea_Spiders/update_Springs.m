@@ -51,7 +51,7 @@ gutD = 0.05;    % diameter of gut
 L  = 0.6;    % gut length
 Lwave = L/4; % gut peristaltic wave-length 
 
-freq = 4;
+freq = 4/0.6;
 v = L*freq;
 t = rem(current_time, 1/freq);
 
@@ -72,7 +72,7 @@ t = rem(current_time, 1/freq);
 % end
 
 xM = 0.2;
-for i=1:1229
+for i=50:1229-50
     
    id = i; 
    x = xLag(id);

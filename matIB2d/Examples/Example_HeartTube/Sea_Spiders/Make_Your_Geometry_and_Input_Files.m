@@ -38,6 +38,9 @@ Nx =  1024;      % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
+Ny = 128;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Ly = 0.125;      % Length of Eulerian Grid in y-Direction
+
 %
 % Immersed Structure Geometric / Dynamic Parameters %
 %
@@ -48,6 +51,10 @@ gutD = 0.5*0.1;             % gut diameter
 
 % Call function to construct geometry
 [xLag,yLag,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Nx,Lx,legD,gutD);
+
+% Call function to construct initial background concentration
+[Concentration,~] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,legD,gutD);
+
 
 % Plot Geometry to test
 plot(xLag,yLag,'r-'); hold on;
@@ -67,15 +74,15 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring_Adj = 2.5e4;                 % Spring stiffness (adjacent lag. pts)
-k_Spring_Across = 1e2;                % Spring stiffness (across)
+k_Spring_Adj = 2e6;                 % Spring stiffness (adjacent lag. pts)
+k_Spring_Across = 2.5e2;                % Spring stiffness (across)
 ds_Adj = ds;                          % Spring resting length (adjacent)
 ds_Across = legD;                     % Spring resting length (across)
 print_Lagrangian_Springs(xLag,yLag,k_Spring_Adj,k_Spring_Across,ds_Adj,ds_Across,struct_name,Ninfo)
 
 
 % Prints .beam file!
-k_Beam = 1e3;               % Beam Stiffness (does not need to be equal for all beams)
+k_Beam = 1e7;               % Beam Stiffness (does not need to be equal for all beams)
 C = 0;                      % "Curvature" of initial configuration
 print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo);
 
@@ -85,8 +92,12 @@ k_Target = 2e5;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo);
 
 % Prints .porous file!
-alpha = 1e-4; 
+alpha = 1e-1; 
 print_Lagrangian_Porosity(xLag,alpha,struct_name,Ninfo)
+
+% Prints .concentration file!
+kDiffusion = 1e-6;
+print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,6 +140,13 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo)
 
     fprintf(target_fid, '%d\n', N );
 
+    % Hold ends of gut in place
+    fprintf(target_fid, '%d %1.16e\n', 1, k_Target);
+    fprintf(target_fid, '%d %1.16e\n', Ninfo(1), k_Target);
+    fprintf(target_fid, '%d %1.16e\n', Ninfo(1)+1, k_Target);    
+    fprintf(target_fid, '%d %1.16e\n', Ninfo(2), k_Target);
+
+    
     %Loops over all Lagrangian Pts.
     for s = Ninfo(2)+1:length(xLag)
         fprintf(target_fid, '%d %1.16e\n', s, k_Target);
@@ -176,6 +194,26 @@ function print_Lagrangian_Porosity(xLag,alpha,struct_name,Ninfo)
     end
 
     fclose(porous_fid); 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints CONCENTRATION INFO to file called
+%           'struct_name'.concentration
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+
+    con_fid = fopen([struct_name '.concentration'], 'w');
+
+    fprintf(con_fid, '%d\n', kDiffusion );
+
+    for i=1:Ny
+        for j=1:Nx
+            fprintf(con_fid, '%1.16e ', C(i,j) );
+        end
+        fprintf(con_fid,'\n');
+    end    
         
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,11 +351,27 @@ yTubeHor = 0.5*(1/8)*Lx*ones(1,length(xTubeHor));
 %
 % GUT (innter tube) Vertices
 %
-yGutTop = yTubeHor+gutD/2;
-yGutTop(1:length(xTubeHor)/4) = -0.45*gutD*sin( pi*(xTubeHor(1:length(xTubeHor)/4) - 0.8)/(0.6/4) ) + yTubeHor(1)+gutD/2;
+%yGutTop = yTubeHor+gutD/2;
+%yGutTop(1:length(xTubeHor)/4) = -0.45*gutD*sin( pi*(xTubeHor(1:length(xTubeHor)/4) - 0.8)/(0.6/4) ) + yTubeHor(1)+gutD/2;
+yGutTop = -0.45*gutD*sin( pi*(xTubeHor - 0.8)/(0.6/4) ) + yTubeHor(1)+gutD/2;
+yGutBot =  0.45*gutD*sin( pi*(xTubeHor - 0.8)/(0.6/4) ) + yTubeHor(1)-gutD/2;
 
-yGutBot = yTubeHor-gutD/2;
-yGutBot(1:length(xTubeHor)/4) = 0.45*gutD*sin( pi*(xTubeHor(1:length(xTubeHor)/4) - 0.8)/(0.6/4) ) + yTubeHor(1)-gutD/2;
+for i=1:length(yGutTop)
+   
+    if yGutTop(i)> yTubeHor(1)+gutD/2
+        yGutTop(i) =  yTubeHor(1)+gutD/2;
+    end
+    
+    if yGutBot(i) < yTubeHor(1)-gutD/2
+        yGutBot(i) =  yTubeHor(1)-gutD/2;
+    end
+    
+    
+    
+end
+
+%yGutBot = yTubeHor-gutD/2;
+%yGutBot(1:length(xTubeHor)/4) = 0.45*gutD*sin( pi*(xTubeHor(1:length(xTubeHor)/4) - 0.8)/(0.6/4) ) + yTubeHor(1)-gutD/2;
 
 xGut = [xTubeHor xTubeHor];
 yGut = [yGutTop yGutBot];
@@ -356,5 +410,50 @@ Ninfo(3) = length(xGut)+length(xLeg)/2; % # of points before bottom of leg
 %plot(xLeg,yLeg,'b*'); hold on;
 %axis([0 Lx 0 0.125*Lx]);
 %pause();
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: gives initial concentration gradient inside channel
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [C,inds] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,legD,gutD)
+
+%WHERE OUTER TUBE LIES
+%xMin = 0.15; xMax = 0.45;
+%yMin = 0.85; yMax = 1.15;
+
+xMin = 0.4; xMax = 0.6;
+
+yMid = Ly/2;
+yMax = yMid + 1.05*gutD/2;
+yMin = yMid - 1.05*gutD/2;
+
+x = 0:dx:Lx;
+y = 0:dx:Ly;
+
+% FOR BOUSSINESQ
+%inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+inds = 0;
+
+% initialize
+C = zeros(Ny,Nx);
+
+% put in higher concentration
+for i=1:length(y)
+    for j=1:length(x)
+        yVal = y(i);
+        xVal = x(j);
+        
+        if ( ( xVal >= xMin ) && ( xVal <= xMax) )
+           if ( ( yVal >= yMax ) || ( yVal <= yMin) )
+                C(i,j) = 1;
+           end
+        end
+        
+    end
+end
+
+
 
 
