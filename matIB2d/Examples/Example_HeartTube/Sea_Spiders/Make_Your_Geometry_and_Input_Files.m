@@ -74,25 +74,30 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring_Adj = 2e6;                 % Spring stiffness (adjacent lag. pts)
-k_Spring_Across = 2.5e2;                % Spring stiffness (across)
+k_Spring_Adj = 5e7;                   % Spring stiffness (adjacent lag. pts)
+k_Spring_Across = 1e3;                % Spring stiffness (across)
 ds_Adj = ds;                          % Spring resting length (adjacent)
 ds_Across = legD;                     % Spring resting length (across)
 print_Lagrangian_Springs(xLag,yLag,k_Spring_Adj,k_Spring_Across,ds_Adj,ds_Across,struct_name,Ninfo)
 
 
-% Prints .beam file!
+% Prints .beam (torsional spring) file !
+%k_Beam = 1e8;               % Beam Stiffness (does not need to be equal for all beams)
+%C = 0;                      % "Curvature" of initial configuration
+%print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo);
+
+
+% Prints .nonInv_beam (torsional spring) file !
 k_Beam = 1e7;               % Beam Stiffness (does not need to be equal for all beams)
-C = 0;                      % "Curvature" of initial configuration
-print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo);
+print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name,Ninfo)
 
 
 % Prints .target file!
-k_Target = 2e5;
+k_Target = 1e6;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo);
 
 % Prints .porous file!
-alpha = 1e-1; 
+alpha = 1e-4; 
 print_Lagrangian_Porosity(xLag,alpha,struct_name,Ninfo)
 
 % Prints .concentration file!
@@ -235,7 +240,11 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring_Adj,k_Spring_Across,ds_Adj,
         sTOP = s;
         sBOT = s+Ninfo(1);
         ds_Across = sqrt( (xLag(sTOP)-xLag(sBOT))^2 + (yLag(sTOP)-yLag(sBOT))^2 );
-        fprintf(spring_fid, '%d %d %1.16e %1.16e\n', sTOP, sBOT, k_Spring_Across, ds_Across);  
+        if ( (s < 50) || ( s > Ninfo(1)-50) )
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', sTOP, sBOT, 1e-1, ds_Across);
+        else
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', sTOP, sBOT, k_Spring_Across, ds_Across);
+        end
     end
     
     
@@ -286,7 +295,38 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,Ninfo)
    
     fclose(beam_fid); 
     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints BEAM (NON-INVARIANT) points to a file called 'struct_name'.nonInv_beam
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_nonInv_Beams(xLag,yLag,k_Beam,struct_name,Ninfo)
+
+    % k_Beam: beam stiffness
+    % C: beam curvature
     
+    N = Ninfo(2)-4; % among adjacent lag points
+
+    beam_fid = fopen([struct_name '.nonInv_beam'], 'w');
+
+    fprintf(beam_fid, '%d\n', N );
+
+    %spring_force = kappa_spring*ds/(ds^2);
+
+    %BEAMS BETWEEN VERTICES (TOP)
+    for s = 2:Ninfo(1)-1
+        fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, s+1, k_Beam, 0, 0 );  
+    end
+    
+    %BEAMS BETWEEN VERTICES (BOT)
+    for s = Ninfo(1)+2:Ninfo(2)-1
+        fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n',s-1, s, s+1, k_Beam, 0, 0 );  
+    end
+    
+    fclose(beam_fid); 
+    
+        
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -353,8 +393,8 @@ yTubeHor = 0.5*(1/8)*Lx*ones(1,length(xTubeHor));
 %
 %yGutTop = yTubeHor+gutD/2;
 %yGutTop(1:length(xTubeHor)/4) = -0.45*gutD*sin( pi*(xTubeHor(1:length(xTubeHor)/4) - 0.8)/(0.6/4) ) + yTubeHor(1)+gutD/2;
-yGutTop = -0.45*gutD*sin( pi*(xTubeHor - 0.8)/(0.6/4) ) + yTubeHor(1)+gutD/2;
-yGutBot =  0.45*gutD*sin( pi*(xTubeHor - 0.8)/(0.6/4) ) + yTubeHor(1)-gutD/2;
+yGutTop = -0.45*gutD*sin( pi*(xTubeHor - 0.2)/(0.6/4) ) + yTubeHor(1)+gutD/2;
+yGutBot =  0.45*gutD*sin( pi*(xTubeHor - 0.2)/(0.6/4) ) + yTubeHor(1)-gutD/2;
 
 for i=1:length(yGutTop)
    
@@ -423,11 +463,11 @@ function [C,inds] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,legD,gutD)
 %xMin = 0.15; xMax = 0.45;
 %yMin = 0.85; yMax = 1.15;
 
-xMin = 0.4; xMax = 0.6;
+xMin = 0.3; xMax = 0.7;
 
 yMid = Ly/2;
-yMax = yMid + 1.05*gutD/2;
-yMin = yMid - 1.05*gutD/2;
+yMax = yMid + 1.02*legD/2;
+yMin = yMid - 1.02*legD/2;
 
 x = 0:dx:Lx;
 y = 0:dx:Ly;
