@@ -6,7 +6,7 @@
 %
 % Author: Nicholas A. Battista
 % Email:  nickabattista@gmail.com
-% Date Created: September 9th, 2016
+% Date Created: January 8th, 2018
 % Institution: UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
@@ -46,7 +46,7 @@ Ly = 0.125;      % Length of Eulerian Grid in y-Direction
 %
 ds = 0.5*dx;                % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
 struct_name = 'sea_spider'; % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
-legD = 0.1;                 % leg diameter
+legD = 0.08;               % leg diameter
 gutD = 0.5*0.1;             % gut diameter
 
 % Call function to construct geometry
@@ -101,7 +101,7 @@ alpha = 1e-4;
 print_Lagrangian_Porosity(xLag,alpha,struct_name,Ninfo)
 
 % Prints .concentration file!
-kDiffusion = 1e-6;
+kDiffusion = 5e-5;
 print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
 
 
@@ -384,7 +384,7 @@ function [xLag,yLag,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Nx,Lx,legD,g
 % legD: leg (tube) diameter
 % gutD: gut diameter
 
-% GUT/LEG Useful Points
+% GUT Useful Points
 xTubeHor = 0.2*Lx:ds:0.8*Lx;
 yTubeHor = 0.5*(1/8)*Lx*ones(1,length(xTubeHor));
 
@@ -416,11 +416,19 @@ end
 xGut = [xTubeHor xTubeHor];
 yGut = [yGutTop yGutBot];
 
+
+%
+% LEG Useful Points
+%
+xTubeHor = 0.1*Lx:1*ds:0.9*Lx;
+yTubeHor = 0.5*(1/8)*Lx;
+yTubeHor = 0.5*(1/8)*Lx*ones(1,length(xTubeHor));
+
 %
 % LEG (outer tube) Vertices
 %
-yLegTop = yTubeHor+legD/2;
-yLegBot = yTubeHor-legD/2;
+yLegTop = yTubeHor+legD/2  %+ 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
+yLegBot = yTubeHor-legD/2  %- 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
 
 yTubeLeft = 0.5*(1/8)-legD/2+ds:ds:0.5*(1/8)+legD/2-ds;
 xTubeLeft = 0.2*Lx*ones(1,length(yTubeLeft));
@@ -486,9 +494,19 @@ for i=1:length(y)
         xVal = x(j);
         
         if ( ( xVal >= xMin ) && ( xVal <= xMax) )
-           if ( ( yVal >= yMax ) || ( yVal <= yMin) )
+           
+            yMax = 0.5*(1/8)*Lx + legD/2 + 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
+            yMin = 0.5*(1/8)*Lx - legD/2 - 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
+
+            if yVal >= yMax
+                C(i,j) = 1; 
+            elseif yVal <= yMin
                 C(i,j) = 1;
-           end
+            end
+            
+           %if ( ( yVal >= yMax ) || ( yVal <= yMin) )
+           %     C(i,j) = 1;
+           %end
         end
         
     end
