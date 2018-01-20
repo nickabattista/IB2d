@@ -50,11 +50,8 @@ freq = 0.875;
 % CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL
 %springs_info(319:end,4) = phase;
 
-springs_info(319:end,4) = abs( sin(0.875*current_time*2*pi) );
-
-
-% if ( mod(current_time,0.875) < 0.875/2 ) 
-%     springs_info(319:end,4) = abs( sin(0.875*current_time*2*pi) );
-% else
-%     springs_info(319:end,4) = 0;%abs( sin(0.875*current_time*2*pi) );
-% end
+if ( mod(current_time,0.875) < 0.875/2 ) 
+    springs_info(319:end,4) = abs( sin(0.875*current_time*2*pi) );
+else
+    springs_info(319:end,4) = 0;%abs( sin(0.875*current_time*2*pi) );
+end

@@ -19,7 +19,7 @@ b=.75;
 d=-0.25;
 factor_a=.8;
  
-F=1e4;
+F=1e5; %5e0
  
 theta=zeros(1000,1);
 theta_lim=asin(d/b);
@@ -30,7 +30,7 @@ z_points=zeros(1000,1);
 id_points=zeros(1000,1);
 offset = 0;
  
-kappa_spring = 5e6; %1e5                % spring constant (Newton)
+kappa_spring = 1e7; %1e5                % spring constant (Newton)
 kappa_beam = 1e5;    %5e3              % beam stiffness constant (Newton m^2)
 %kappa_beam_flexible = kappa_beam/5;               % beam stiffness constant (Newton m^2)
 kappa_target = kappa_spring;         % target point penalty spring constant (Newton)
