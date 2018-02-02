@@ -7,7 +7,7 @@
 % Author: Nicholas A. Battista
 % Email:  battistn@tcnj.edu
 % Date Created: May 27th, 2015
-% Institution: TCNJ
+% Institution: UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -60,19 +60,19 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e4;
 
 % Width of Channel
-w = 3.595500e-01-2.473750e-01;
-midPoint = (3.595500e-01+2.473750e-01)/2;
+w = 5.515000e-01-4.029000e-01;
+midPoint = (5.515e-1+4.029e-1)/2;
 
 % Max Velocity Desired
-uMax = 2.5;
+uMax = 250.0;
 
 if first == 1
     
     % Compute Where You Want to Apply Force
-    xMin = 0.252;
-    xMax = 0.364;
-    yMin = 0.3625;
-    yMax = 0.3675;
+    xMin = 0.41;
+    xMax = 0.545;
+    yMin = 0.115;
+    yMax = 0.12;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -214,10 +214,8 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 x = xGrid(i);  % x-Value considered
 %y = yGrid(j);  % y-Value considered
 
-scale = ( (MP+w/2) - ( MP ) )*( (MP-w/2) - ( MP ) );
-
-uY_Tar = Umax * (tanh(2*t)) * ( (MP+w/2) - ( x ) )*( (MP-w/2) - ( x ) ) / scale; % Only external forces in x-direction
-uX_Tar = 0;                                                                     % No external forces in y-direction
+uY_Tar = -Umax * (5*tanh(t)) * ( (MP+w/2) - ( x ) )*( (MP-w/2) - ( x ) ); % Only external forces in x-direction
+uX_Tar = 0;                                                           % No external forces in y-direction
 
 
 

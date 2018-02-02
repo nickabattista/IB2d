@@ -11,22 +11,20 @@
 function Leafitize_Me()
 
 % Note: Leaf Geometry Coming in at Resolution 256x256
-N = 1024;
-L = 2;
+N = 512;
+L = 1;
 ds = (L)/(2*N);
 struct_name = 'leaf_vein';
 
 %
-% Lagrangian Pts at 128x256 Resolution on [0,1]x[0,2]
+% Lagrangian Pts at 256x256 Resolution on [0,1]x[0,1]
 %
 [xLag,yLag] = read_Vertex_Points_and_Plot_Them('leaf_flow');
-
 
 %
 % Make higher resolution geometry (always do factor of 2...then nest, if
 % necessary)
 %
-[xLag,yLag] = make_Higher_Resolution(xLag,yLag,2*ds);
 [xLag,yLag] = make_Higher_Resolution(xLag,yLag,ds);
 
 %
@@ -132,9 +130,8 @@ end
 yAdd=0:ds:L/10;
 xAdd = ones(1,length(yAdd));
 
-% Left / Right Sides for inflow channel
-xLeft = 0.247375;
-xRight = 0.35955;
+xLeft = 0.4029;
+xRight = 0.5515;
 
 yAdds = [yAdd yAdd];
 yAdds = ( yLow-(L/10)-ds/2 )+ yAdds;
@@ -145,15 +142,12 @@ yLag = [yLagN yAdds];
 
 yLag = yLag - L/20;
 
-% Center in Window [0,1]x[0,2.5]
-yLag = yLag + L/8;
-
 figure(1)
-%plot(xLagN,yLagN,'g*'); hold on;
-%plot(xAdds,yAdds,'k*'); hold on;
+plot(xLagN,yLagN,'g*'); hold on;
+plot(xAdds,yAdds,'k*'); hold on;
 plot(xLag,yLag,'r*'); hold on;
 %plot(xLag,yLag,'bo'); hold on;
-axis([0 1 0 2.5]);
+axis([0 1 0 1]);
 
 fprintf('\n\n        FOR SETTING UP INFLOW:\n\n');
 fprintf('   (x,y)-LEFT: (%d,0.15)\n',xLeft);
