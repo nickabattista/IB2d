@@ -33,11 +33,10 @@ This code is capable of creating Lagrangian Structures using:
         7. Porous Structures (via Darcy’s Law) 
         8. Electrophysiology (FitzHugh-Nagumo coupling w/ or w/o calcium
 			dynamics and w/ or w/o muscle models)
-	9. Damped Springs
-	10. Non-invariant Beams
-	11. User-defined deformation laws
-        12. Poroelastic Media (based on Brinkman-like forces)
-        13. Coagulation / Aggregation models
+	9. Non-invariant Beams
+	10. User-defined deformation laws
+        11. Poroelastic Media (based on Brinkman-like forces)
+        12. Coagulation / Aggregation models
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
