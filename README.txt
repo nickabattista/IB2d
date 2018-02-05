@@ -13,17 +13,17 @@ Website: http://nickabattista.wixsite.com/home
 GitHub: http://www.github.com/nickabattista
 
 HISTORY:
-Date Created: May 27th, 2015
+Date Created: May 27th, 2015 by NAB
 Institution: University of North Carolina at Chapel Hill
 
 If you use the code for research, please cite the following papers:
-[1] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
-[2] N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
-[3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, arXiv:1707.06928 (2017)
+[1] N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
+[2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+[3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, Math. Meth. App. Sci., 1?26 (2017)
 
 This code is capable of creating Lagrangian Structures using:
  	1. Springs
- 	2. Beams (*torsional springs*)
+ 	2. Beams (*torsional springs or non-invariant beams *)
  	3. Target Points
 	4. Muscle-Model 1 (combined Force-Length-Velocity model with a 
                         Hill (i.e.,Length-Tension) Model )
@@ -37,6 +37,7 @@ This code is capable of creating Lagrangian Structures using:
 	10. Non-invariant Beams
 	11. User-defined deformation laws
     12. Poroelastic Media (based on Brinkman-like forces)
+    13. Coagulation / Aggregation models
 
 One is able to update those Lagrangian Structure Parameters, e.g., spring constants, resting lengths, etc
  
