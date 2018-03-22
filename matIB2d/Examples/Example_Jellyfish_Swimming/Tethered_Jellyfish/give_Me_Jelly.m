@@ -103,6 +103,7 @@ print_2_Position_Text_File(Ninfo,X1,Y1,X2,Y2,X3,Y3);
 
 function print_2_Position_Text_File(Ninfo,X1,Y1,X2,Y2,X3,Y3)
 
+
 N = Ninfo(1);    % Number of pts. in ONE arm
 NTot = Ninfo(2); % Total # of Lag Pts. on Jelly Bell
 
@@ -117,6 +118,7 @@ XY(:,3) = Y1(1:NTot); XY(:,4) = Y1(1:NTot);
 XY(2:N+1,2) = X2(2:N+1);
 XY(2:N+1,4) = Y2(2:N+1);
 
+
 % 2nd Phase Left Arm
 XY(N+2:end,2) = X3(N+2:end);
 XY(N+2:end,4) = Y3(N+2:end);
@@ -126,10 +128,18 @@ XY(N+2:end,4) = Y3(N+2:end);
 %plot(XY(:,1),XY(:,3),'k*'); hold on;
 %plot(XY(:,2),XY(:,4),'g*'); hold on;
 
+
 % PRINT x/y-Information %
-fileID_x1 = fopen('XY_2Pos.txt','w');
-fprintf(fileID_x1,'%1.16e\n',X1);
-fclose(fileID_x1);
+
+fileID_XY = fopen('XY_2Pos.txt','w');
+
+for i=1:length( XY(:,1) )
+    fprintf(fileID_XY,'%1.16e %1.16e %1.16e %1.16e\n',XY(i,1),XY(i,2),XY(i,3),XY(i,4));
+end
+
+fclose(fileID_XY);
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
