@@ -24,7 +24,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------------#
 
-from please_Read_input2d_File import *
+from please_Read_input2d_File import please_Read_input2d_File
 import numpy as np
 import sys
 
@@ -160,237 +160,44 @@ def please_Initialize_Time_Inputs(Time_Input):
 
 def please_Initialize_Output_Inputs(Output_Input):
 
-    # GIVEN IN MATLAB INDEXING NOTATION:
-    # Output_Params(1): print_dump
-    #              (2): plot_Matlab
-    #              (3): plot_LagPts
-    #              (4): plot_Velocity
-    #              (5): plot_Vorticity
-    #              (6): plot_MagVelocity
-    #              (7): plot_Pressure
-    #              (8):  save_Vorticity 
-    #              (9):  save_Pressure 
-    #              (10): save_uVec 
-    #              (11): save_uMag 
-    #              (12): save_uX 
-    #              (13): save_uY 
-    #              (14): save_fMag 
-    #              (15): save_fX 
-    #              (16): save_fY 
-    #              (17): save_hier 
+    #                                                                      #
+    # SPECIFY HERE A DICTIONARY OF ALL PARAMETERS AND THEIR DEFAULT VALUE! #
+    #                                                                      #
+    PARAMS_DEFAULT = {'print_dump': 100, 
+                      'plot_Matlab': 0,
+                      'plot_LagPts': 0,
+                      'plot_Velocity': 0,
+                      'plot_Vorticity': 0,
+                      'plot_MagVelocity': 0,
+                      'plot_Pressure': 0,
+                      'save_Vorticity': 1,
+                      'save_Pressure': 1,
+                      'save_uVec': 1,
+                      'save_uMag': 1,
+                      'save_uX': 1,
+                      'save_uY': 1,
+                      'save_fMag': 1,
+                      'save_fX': 1,
+                      'save_fY': 1,
+                      'save_hier': 1
+    }
 
     # Initialize 
-    Output_Params = np.zeros(17)
+    Output_Params = np.zeros(len(PARAMS_DEFAULT))
 
     try: 
-
-        # PRINT_DUMP
-        try:
-            ind = Output_Input[0][:].index('print_dump')
-            Output_Params[0] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'print_dump ')),2};
-        except ValueError:
+        n = 0
+        for param, default_val in PARAMS_DEFAULT.items():
             try:
-                ind = Output_Input[0][:].index('print_dum')
-                Output_Params[0] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'print_dump ')),2};
+                ind = Output_Input[0][:].index(param)
+                Output_Params[n] = Output_Input[1][ind]
             except ValueError:
-                Output_Params[0] = 100  # DEFAULT
-
-        
-        #%%%%%                                         %%%%%%
-        #%%%%% OUTPUT INFO PLOTTING DIRECTLY IN MATLAB %%%%%%
-        #%%%%%                                         %%%%%%
-
-
-        # plot_MATLAB flag
-        try:
-            ind = Output_Input[0][:].index('plot_Matlab')
-            Output_Params[1] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_Matla')
-                Output_Params[1] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[1] = 0    # DEFAULT
-    
-
-
-        # plot_LagPts flag
-        try:
-            ind = Output_Input[0][:].index('plot_LagPts')
-            Output_Params[2] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_LagPt')
-                Output_Params[2] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[2] = 0    # DEFAULT
-
-
-        # plot_Velocity flag
-        try:
-            ind = Output_Input[0][:].index('plot_Velocity')
-            Output_Params[3] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_Velocit')
-                Output_Params[3] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[3] = 0    # DEFAULT
-
-
-        # plot_Vorticity flag
-        try:
-            ind = Output_Input[0][:].index('plot_Vorticity')
-            Output_Params[4] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_Vorticit')
-                Output_Params[4] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[4] = 0    # DEFAULT
-
-
-        # plot_MagVelocity flag
-        try:
-            ind = Output_Input[0][:].index('plot_MagVelocity')
-            Output_Params[5] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_MagVelocit')
-                Output_Params[5] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[5] = 0    # DEFAULT
-
-
-        # plot_Pressure flag
-        try:
-            ind = Output_Input[0][:].index('plot_Pressure')
-            Output_Params[6] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('plot_Pressur')
-                Output_Params[6] = Output_Input[1][ind] # MATLAB: Output_Input{find(strcmp({Output_Input{:,1}},'plot_Matlab ')),2};
-            except ValueError:
-                Output_Params[6] = 0    # DEFAULT
-
-        #%%%%%                                                %%%%%%
-        #%%%%% OUTPUT INFO FOR WHAT GETS SAVED TO .VTK FORMAT %%%%%%
-        #%%%%%                                                %%%%%%
-
-        # save_Vorticity flag
-        try:
-            ind = Output_Input[0][:].index('save_Vorticity')
-            Output_Params[7] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_Vorticit')
-                Output_Params[7] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[7] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
-
-        # save_Pressure flag
-        try:
-            ind = Output_Input[0][:].index('save_Pressure')
-            Output_Params[8] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_Pressur')
-                Output_Params[8] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[8] = 1    # DEFAULTS TO ALWAYS SAVE DATA  
-
-
-        # save_uVec flag
-        try:
-            ind = Output_Input[0][:].index('save_uVec')
-            Output_Params[9] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_uVe')
-                Output_Params[9] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[9] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
-
-        # save_uMag flag
-        try:
-            ind = Output_Input[0][:].index('save_uMag')
-            Output_Params[10] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_uMa')
-                Output_Params[10] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[10] = 1    # DEFAULTS TO ALWAYS SAVE DATA                 
-
-        # save_uX flag
-        try:
-            ind = Output_Input[0][:].index('save_uX')
-            Output_Params[11] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_uX')
-                Output_Params[11] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[11] = 1    # DEFAULTS TO ALWAYS SAVE DATA        
-
-        # save_uY flag
-        try:
-            ind = Output_Input[0][:].index('save_uY')
-            Output_Params[12] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_uY')
-                Output_Params[12] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[12] = 1    # DEFAULTS TO ALWAYS SAVE DATA 
-
-
-        # save_fMag flag
-        try:
-            ind = Output_Input[0][:].index('save_fMag')
-            Output_Params[13] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_fMa')
-                Output_Params[13] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[13] = 1    # DEFAULTS TO ALWAYS SAVE DATA                 
-
-        # save_fX flag
-        try:
-            ind = Output_Input[0][:].index('save_fX')
-            Output_Params[14] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_fX')
-                Output_Params[14] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[14] = 1    # DEFAULTS TO ALWAYS SAVE DATA   
-
-         # save_fY flag
-        try:
-            ind = Output_Input[0][:].index('save_fY')
-            Output_Params[15] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_fY')
-                Output_Params[15] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[15] = 1    # DEFAULTS TO ALWAYS SAVE DATA                
-
-         # save_hier flag
-        try:
-            ind = Output_Input[0][:].index('save_hier')
-            Output_Params[16] = Output_Input[1][ind] 
-        except ValueError:
-            try:
-                ind = Output_Input[0][:].index('save_hier')
-                Output_Params[16] = Output_Input[1][ind] 
-            except ValueError:
-                Output_Params[16] = 1    # DEFAULTS TO ALWAYS SAVE DATA
-
-
-
+                try:
+                    ind = Output_Input[0][:].index(param[:-1])
+                    Output_Params[n] = Output_Input[1][ind]
+                except ValueError:
+                    Output_Params[n] = default_val
+            n += 1
 
     except ValueError:
         
@@ -420,338 +227,53 @@ def please_Initialize_Output_Inputs(Output_Input):
 
 def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
 
-# GIVEN IN MATLAB INDEXING NOTATION:
-# Lag_Struct_Params(1): springs
-#                  (2): update_springs
-#                  (3): target points
-#                  (4): update_target_points
-#                  (5): beams (torsional beams)
-#                  (6): update_beams
-#                  (7): nonInvariant_beams
-#                  (8): update_nonInv_beams
-#                  (9): FV_LT_muscle
-#                  (10): 3_element_muscle
-#                  (11): arb_ext_force
-#                  (12): tracers
-#                  (13): mass_pts
-#                  (14): gravity
-#                  (15): x_gravity_vec_comp
-#                  (16): y_gravity_vec_comp
-#                  (17): porous_media
-#                  (18): concentration
-#                  (19): electro_phys
-#                  (20): damped_springs
-#                  (21): update_damp_springs
-#                  (22): boussinesq
-#                  (23): expansion_coeff
-#                  (24): user_force_model
-#                   .         .
-#                   .         .
-#                   .         .
+    #                                                                      #
+    # SPECIFY HERE A DICTIONARY OF ALL PARAMETERS AND THEIR DEFAULT VALUE! #
+    #                                                                      #
+
+    PARAMS_DEFAULT = {'springs': 0,
+                      'update_springs': 0,
+                      'target_points': 0,
+                      'update_target_points': 0,
+                      'beams': 0,
+                      'update_beams': 0,
+                      'nonInvariant_beams': 0,
+                      'update_nonInv_beams': 0,
+                      'FV_LT_muscle': 0,
+                      '3_element_muscle': 0,
+                      'arb_ext_force': 0,
+                      'tracers': 0,
+                      'mass_pts': 0,
+                      'gravity': 0,
+                      'x_gravity_vec_comp': 0,
+                      'y_gravity_vec_comp': 0,
+                      'porous_media': 0,
+                      'concentration': 0,
+                      'electro_phys': 0,
+                      'damped_springs': 0,
+                      'update_damp_springs': 0,
+                      'boussinesq': 0,
+                      'expansion_coeff': 0,
+                      'user_force_model': 0,
+                      'poroelastic': 0
+    }
 
     # Initialize 
-    Lag_Struct_Params = np.zeros(25)
+    Lag_Struct_Params = np.zeros(len(PARAMS_DEFAULT))
 
     try: 
-
-        # SPRINGS
-        try:
-            ind = Lag_Struct_Input[0][:].index('springs')
-            Lag_Struct_Params[0] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'springs ')),2};
-        except ValueError:
+        n = 0
+        for param, default_val in PARAMS_DEFAULT.items():
             try:
-                ind = Lag_Struct_Input[0][:].index('spring')
-                Lag_Struct_Params[0] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'springs ')),2};
+                ind = Lag_Struct_Input[0][:].index(param)
+                Lag_Struct_Params[n] = Lag_Struct_Input[1][ind]
             except ValueError:
-                Lag_Struct_Params[0] = 0
-
-        # UPDATE_SPRINGS
-        try:        
-            ind = Lag_Struct_Input[0][:].index('update_springs')
-            Lag_Struct_Params[1] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_springs ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('update_spring')
-                Lag_Struct_Params[1] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_springs ')),2};
-            except ValueError:
-                Lag_Struct_Params[1] = 0
-
-       # TARGET PTS
-        try:         
-            ind = Lag_Struct_Input[0][:].index('target_pts')
-            Lag_Struct_Params[2] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'target_pts ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('target_pt')
-                Lag_Struct_Params[2] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'target_pts ')),2};
-            except ValueError:
-                Lag_Struct_Params[2] = 0
-
-
-        # UPDATE_TARGET PTS
-        try:         
-            ind = Lag_Struct_Input[0][:].index('update_target')
-            Lag_Struct_Params[3] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_target_pts ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('update_targe')
-                Lag_Struct_Params[3] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_target_pts ')),2};
-            except ValueError:
-                Lag_Struct_Params[3] = 0
-    
-
-        # BEAM (TORSIONAL SPRING)
-        try:
-            ind = Lag_Struct_Input[0][:].index('beams')
-            Lag_Struct_Params[4] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'beams ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('beam')
-                Lag_Struct_Params[4] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'beams ')),2};
-            except ValueError:
-                Lag_Struct_Params[4] = 0
-
-        # UPDATE_BEAMS (TORSIONAL SPRINGS)
-        try:
-            ind = Lag_Struct_Input[0][:].index('update_beams')
-            Lag_Struct_Params[5] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_beams ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('update_beam')
-                Lag_Struct_Params[5] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_beams ')),2};
-            except ValueError:
-                Lag_Struct_Params[5] = 0
-
-        # NON-INVARIANT BEAMS
-        try:
-            ind = Lag_Struct_Input[0][:].index('nonInvariant_beams')
-            Lag_Struct_Params[6] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'nonInvariant_beams ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('nonInvariant_beam')
-                Lag_Struct_Params[6] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'nonInvariant_beams ')),2};
-            except ValueError:
-                Lag_Struct_Params[6] = 0
-
-
-        # UPDATE_NON-INVARIANT_BEAMS
-        try:
-            ind = Lag_Struct_Input[0][:].index('update_nonInv_beams')
-            Lag_Struct_Params[7] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_nonInv_beams ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('update_nonInv_beam')
-                Lag_Struct_Params[7] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_nonInv_beams ')),2};
-            except ValueError:
-                Lag_Struct_Params[7] = 0
-    
-
-        # FV-LT MUSCLE
-        try:
-            ind = Lag_Struct_Input[0][:].index('FV_LT_muscle')
-            Lag_Struct_Params[8] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'FV_LT_muscle ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('FV_LT_muscl')
-                Lag_Struct_Params[8] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'FV_LT_muscle ')),2};
-            except ValueError:
-                Lag_Struct_Params[8] = 0
-
-
-        # 3-ELEMENT HILL MUSCLE
-        try:
-            ind = Lag_Struct_Input[0][:].index('3_element_muscle')
-            Lag_Struct_Params[9] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'3_element_muscle ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('3_element_muscl')
-                Lag_Struct_Params[9] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'3_element_muscle ')),2};
-            except ValueError:
-                Lag_Struct_Params[9] = 0
-
-
-        # ARBITRARY_EXTERNAL_FORCE
-        try:
-            ind = Lag_Struct_Input[0][:].index('arb_ext_force')
-            Lag_Struct_Params[10] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'arb_ext_force ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('arb_ext_forc')
-                Lag_Struct_Params[10] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'arb_ext_force ')),2};
-            except ValueError:
-                Lag_Struct_Params[10] = 0
-    
-
-        # TRACERS
-        try:
-            ind = Lag_Struct_Input[0][:].index('tracers')
-            Lag_Struct_Params[11] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'tracers ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('tracer')
-                Lag_Struct_Params[11] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'tracers ')),2};
-            except ValueError:
-                Lag_Struct_Params[11] = 0
-
-    
-        # MASS_POINTS
-        try:
-            ind = Lag_Struct_Input[0][:].index('mass_pts')
-            Lag_Struct_Params[12] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'mass_pts ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('mass_pt')
-                Lag_Struct_Params[12] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'mass_pts ')),2};
-            except ValueError:
-                Lag_Struct_Params[12] = 0
-
-
-        # GRAVITY
-        try:
-            ind = Lag_Struct_Input[0][:].index('gravity')
-            Lag_Struct_Params[13] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'gravity ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('gravit')
-                Lag_Struct_Params[13] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'gravity ')),2};
-            except ValueError:
-                Lag_Struct_Params[13] = 0
-
-
-         # x-GRAVITY COMPONENT
-        try:
-            ind = Lag_Struct_Input[0][:].index('x_gravity_vec_comp')
-            Lag_Struct_Params[14] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('x_gravity_vec_com')
-                Lag_Struct_Params[14] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'x_gravity_vec_comp ')),2};
-            except ValueError:
-                Lag_Struct_Params[14] = 0   
-
-
-        # y-GRAVITY COMPONENT
-        try:
-            ind = Lag_Struct_Input[0][:].index('y_gravity_vec_comp')
-            Lag_Struct_Params[15] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('y_gravity_vec_com')
-                Lag_Struct_Params[15] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'y_gravity_vec_comp ')),2};
-            except ValueError:
-                Lag_Struct_Params[15] = 0   
-
-    
-        # POROUS_MEDIA
-        try:
-            ind = Lag_Struct_Input[0][:].index('porous_media')
-            Lag_Struct_Params[16] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('porous_medi')
-                Lag_Struct_Params[16] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'porous_media ')),2};
-            except ValueError:
-                Lag_Struct_Params[16] = 0  
-
-
-        # CONCENTRATION
-        try:
-            ind = Lag_Struct_Input[0][:].index('concentration')
-            Lag_Struct_Params[17] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('concentratio')
-                Lag_Struct_Params[17] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration ')),2};
-            except ValueError:
-                Lag_Struct_Params[17] = 0 
-    
-
-        # ELECTROPHYS
-        try:
-            ind = Lag_Struct_Input[0][:].index('electro_phys')
-            Lag_Struct_Params[18] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('electro_phy')
-                Lag_Struct_Params[18] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys ')),2};
-            except ValueError:
-                Lag_Struct_Params[18] = 0 
-
-
-        # DAMPED_SPRINGS
-        try:
-            ind = Lag_Struct_Input[0][:].index('damped_springs')
-            Lag_Struct_Params[19] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('damped_spring')
-                Lag_Struct_Params[19] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs ')),2};
-            except ValueError:
-                Lag_Struct_Params[19] = 0 
-
-
-        # UPDATE_DAMPED_SPRINGS
-        try:
-            ind = Lag_Struct_Input[0][:].index('update_damp_springs')
-            Lag_Struct_Params[20] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('update_damp_spring')
-                Lag_Struct_Params[20] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs ')),2};
-            except ValueError:
-                Lag_Struct_Params[20] = 0    
-
-
-        # BOUSSINESQ
-        try:
-            ind = Lag_Struct_Input[0][:].index('boussinesq')
-            Lag_Struct_Params[21] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('boussines')
-                Lag_Struct_Params[21] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq ')),2};
-            except ValueError:
-                Lag_Struct_Params[21] = 0  
-
-
-        # EXPANSION_COEFFICIENT_FOR_BOUSSINESQ
-        try:
-            ind = Lag_Struct_Input[0][:].index('expansion_coeff')
-            Lag_Struct_Params[22] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('expansion_coef')
-                Lag_Struct_Params[22] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff ')),2};
-            except ValueError:
-                Lag_Struct_Params[22] = 0
-
-
-        # EXPANSION_COEFFICIENT_FOR_BOUSSINESQ
-        try:
-            ind = Lag_Struct_Input[0][:].index('user_force_model')
-            Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('user_force_mode')
-                Lag_Struct_Params[23] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
-            except ValueError:
-                Lag_Struct_Params[23] = 0
-
-        # POROELASTIC_MEDIA
-        try:
-            ind = Lag_Struct_Input[0][:].index('poroelastic')
-            Lag_Struct_Params[24] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
-        except ValueError:
-            try:
-                ind = Lag_Struct_Input[0][:].index('poroelasti')
-                Lag_Struct_Params[24] = Lag_Struct_Input[1][ind] # MATLAB: Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model ')),2};
-            except ValueError:
-                Lag_Struct_Params[24] = 0        
-
-    
-
-
-
+                try:
+                    ind = Lag_Struct_Input[0][:].index(param[:-1])
+                    Lag_Struct_Params[n] = Lag_Struct_Input[1][ind]
+                except ValueError:
+                    Lag_Struct_Params[n] = default_val
+            n += 1
       
     except ValueError:
         
