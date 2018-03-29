@@ -1635,7 +1635,10 @@ def savevtk_points( X, filename, vectorName):
         vtk_cells.SetCells(N, numpy_support.numpy_to_vtkIdTypeArray(cells_r))
         vtk_obj = vtk.vtkUnstructuredGrid()
         # Set cells with cell types, cell structure
-        vtk_obj.SetCells(cells[:,0], vtk_cells)
+        if cells.shape[0] > 1:
+            vtk_obj.SetCells(cells[:,0], vtk_cells)
+        else:
+            vtk_obj.SetCells(cells[0,0], vtk_cells)
         vtk_obj.SetPoints(vtk_points)
         # write out
         writer = vtk.vtkGenericDataObjectWriter()
