@@ -1,7 +1,7 @@
 function give_Me_Jelly()
 
 L = 3;           % Length of Computational Domain
-ds = L/(2*512);  % Makes Lagrangian Spaced based on 1024x1024 finest grid
+ds = L/(2*600);  % Makes Lagrangian Spaced based on 1024x1024 finest grid
 
 frac = 0.5;
 

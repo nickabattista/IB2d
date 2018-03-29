@@ -40,13 +40,13 @@ function targets = update_Target_Point_Positions(dt,current_time,targets)
 %N_target = length(targets(:,1));    % Gives total number of target pts!
 
 
-tR1 = 0.7;                          % Period A->B (and B->A) for RIGHT
-tR2 = 0.8;                          % Period B->C (abd C->B) for RIGHT
-periodR = (tR1+tR2);                % Time it takes to move to the right
+tR1 = 0.01;                          % Period A->B (and B->A) for RIGHT
+tR2 = 0.02;                          % Period B->C (abd C->B) for RIGHT
+periodR = (tR1+tR2);                 % Time it takes to move to the right
 
 off_Left = 0.10*periodR;             % OFFSET FOR LEFT ARM
-tL1 = 0.7;                          % Period A->B (and B->A) for LEFT
-tL2 = 0.8;                          % Period B->C (abd C->B) for LEFT
+tL1 = 0.01;                          % Period A->B (and B->A) for LEFT
+tL2 = 0.02;                          % Period B->C (abd C->B) for LEFT
 periodL = (tL1+tL2+off_Left);        % Time it takes to move to the LEFT
 
 tR = rem(current_time,periodR);      % "Time" (moded out) according to right arm
@@ -86,14 +86,12 @@ c3 = 9.1429;
 %
 XY = read_In_Phase_Positions('XY_2Pos.txt');
 
-% Coming from give_Me_Jelly:
-NArm = 174;
-
 % 1st and 2nd position of RIGHT arm
-xR1 = XY(2:NArm+1,1); yR1 = XY(2:NArm+1,3);
-xR2 = XY(2:NArm+1,2); yR2 = XY(2:NArm+1,4);
+xR1 = XY(2:150,1); yR1 = XY(2:150,3);
+xR2 = XY(2:150,2); yR2 = XY(2:150,4);
 
-
+% Coming from give_Me_Jelly:
+NptsArm = 149;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % START THE INTERPOLATING BETWEEN STATES!
@@ -119,10 +117,10 @@ if tR <= tR1 % STATE A -> STATE B
     end
     
     % MOVING X-POSITIONS
-    targets(2:NArm+1,2) = xR1 + gFUNC*( xR2 - xR1 );
+    targets(2:150,2) = xR1 + gFUNC*( xR2 - xR1 );
     
     % MOVING Y-POSITIONS
-    targets(2:NArm+1,3) = yR1 + gFUNC*( yR2 - yR1 );
+    targets(2:150,3) = yR1 + gFUNC*( yR2 - yR1 );
         
 elseif t <= (tR1+tR2) % STATE B -> A
     
@@ -139,54 +137,54 @@ elseif t <= (tR1+tR2) % STATE B -> A
     end
     
     % MOVING X-POSITIONS
-    targets(2:NArm+1,2) = xR2 + gFUNC*( xR1 - xR2 );
+    targets(2:150,2) = xR2 + gFUNC*( xR1 - xR2 );
     
     % MOVING Y-POSITIONS
-    targets(2:NArm+1,3) = yR2 + gFUNC*( yR1 - yR2 );
+    targets(2:150,3) = yR2 + gFUNC*( yR1 - yR2 );
     
 end
 
-% %%%%%%%%%%%%%
-% %
-% % LEFT ARM!
-% %
-% %%%%%%%%%%%%%
-% 
-% if t <= (t1+2*t2) % STATE C -> B
-%     
-%     % Scaling time for appropriate use in interp. function so tTilde\in[0,1]
-%     tTilde = (t-t1-t2)/(t2); 
-%     
-%     % Evaluate Piecewise Cubic Interpolation Poly
-%     if tTilde<=p1
-%         gFUNC = a0 + a1*tTilde + a2*tTilde^2 + a3*tTilde^3; 
-%     elseif tTilde<=p2
-%         gFUNC = b0 + b1*tTilde + b2*tTilde^2 + b3*tTilde^3; 
-%     else
-%         gFUNC = c0 + c1*tTilde + c2*tTilde^2 + c3*tTilde^3; 
-%     end
-%     
-%     targets(:,2) = C(:,1) + gFUNC * ( B(:,1) - C(:,1) );
-%     targets(:,3) = C(:,2) + gFUNC * ( B(:,2) - C(:,2) );
-%     
-% else % STATE B -> A
-%     
-%     % Scaling time for appropriate use in interp. function so tTilde\in[0,1]
-%     tTilde = (t-t1-2*t2)/(t1); 
-%     
-%     % Evaluate Piecewise Cubic Interpolation Poly
-%     if tTilde<=p1
-%         gFUNC = a0 + a1*tTilde + a2*tTilde^2 + a3*tTilde^3; 
-%     elseif tTilde<=p2
-%         gFUNC = b0 + b1*tTilde + b2*tTilde^2 + b3*tTilde^3; 
-%     else
-%         gFUNC = c0 + c1*tTilde + c2*tTilde^2 + c3*tTilde^3; 
-%     end
-%     
-%     targets(:,2) = B(:,1) + gFUNC * ( A(:,1) - B(:,1) );
-%     targets(:,3) = B(:,2) + gFUNC * ( A(:,2) - B(:,2) );
-%     
-% end
+%%%%%%%%%%%%%
+%
+% LEFT ARM!
+%
+%%%%%%%%%%%%%
+
+if t <= (t1+2*t2) % STATE C -> B
+    
+    % Scaling time for appropriate use in interp. function so tTilde\in[0,1]
+    tTilde = (t-t1-t2)/(t2); 
+    
+    % Evaluate Piecewise Cubic Interpolation Poly
+    if tTilde<=p1
+        gFUNC = a0 + a1*tTilde + a2*tTilde^2 + a3*tTilde^3; 
+    elseif tTilde<=p2
+        gFUNC = b0 + b1*tTilde + b2*tTilde^2 + b3*tTilde^3; 
+    else
+        gFUNC = c0 + c1*tTilde + c2*tTilde^2 + c3*tTilde^3; 
+    end
+    
+    targets(:,2) = C(:,1) + gFUNC * ( B(:,1) - C(:,1) );
+    targets(:,3) = C(:,2) + gFUNC * ( B(:,2) - C(:,2) );
+    
+else % STATE B -> A
+    
+    % Scaling time for appropriate use in interp. function so tTilde\in[0,1]
+    tTilde = (t-t1-2*t2)/(t1); 
+    
+    % Evaluate Piecewise Cubic Interpolation Poly
+    if tTilde<=p1
+        gFUNC = a0 + a1*tTilde + a2*tTilde^2 + a3*tTilde^3; 
+    elseif tTilde<=p2
+        gFUNC = b0 + b1*tTilde + b2*tTilde^2 + b3*tTilde^3; 
+    else
+        gFUNC = c0 + c1*tTilde + c2*tTilde^2 + c3*tTilde^3; 
+    end
+    
+    targets(:,2) = B(:,1) + gFUNC * ( A(:,1) - B(:,1) );
+    targets(:,3) = B(:,2) + gFUNC * ( A(:,2) - B(:,2) );
+    
+end
 
 
 
@@ -205,7 +203,7 @@ fileID = fopen(filename);
 
 % Read in the file, use 'CollectOutput' to gather all similar data together
 % and 'CommentStyle' to to end and be able to skip lines in file.
-C = textscan(fileID,'%f %f %f %f','CollectOutput',1);
+C = textscan(fileID,'%f %f','CollectOutput',1);
 
 fclose(fileID);     %Close the data file.
 

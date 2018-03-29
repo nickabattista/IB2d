@@ -23,10 +23,10 @@ dt = 1.0e-5          % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  600               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  400               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 3.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 3.0                % Length of Eulerian Grid in y-Direction (m)
+Ly = 2.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
@@ -34,13 +34,13 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 %
 Lag_Structure_Info {
-springs = 1             % 0 (for no) or 1 (for yes)
+springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
-target_pts = 0          % 0 (for no) or 1 (for yes)
+target_pts = 1          % 0 (for no) or 1 (for yes)
 update_target = 1       % 0 (for no) or 1 (for yes)
 beams = 0               % 0 (for no) or 1 (for yes) % "Torsional Springs"
 update_beams = 0        % 0 (for no) or 1 (for yes) % Update "Torsional Springs"
-nonInvariant_beams = 1  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
+nonInvariant_beams = 0  % 0 (for no) or 1 (for yes) % "non-Invariant Beams"
 update_nonInv_beams = 0 % 0 (for no) or 1 (for yes) % Update "non-Invariant Beams"
 FV_LT_muscle = 0        % 0 (for no) or 1 (for yes) % Force-Velocity & Length-Tension Model
 3_element_muscle = 0    % 0 (for no) or 1 (for yes) % Hill 3-Element Model w/ Force-Velocity & Length-Tension Model
@@ -64,11 +64,11 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 10000       % How often to print (PLOT) to screen
+print_dump = 5       % How often to print (PLOT) to screen
 save_Vorticity = 1       % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
-save_uVec = 1            % Save u-Vector Data to .vtk format
-save_uMag = 1            % Save uMagnitude Scalar Data to .vtk format
+save_uVec = 0            % Save u-Vector Data to .vtk format
+save_uMag = 0            % Save uMagnitude Scalar Data to .vtk format
 save_uX = 0              % Save uX Scalar Data to .vtk format
 save_uY = 0              % Save uY Scalar Data to .vtk format
 save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
@@ -87,5 +87,5 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 % LAGRANGIAN STRUCTURE NAME %
 %
 Lag_Name {
-string_name = "jelly"  % String name for simulation 
+string_name = "jellyfish"  % String name for simulation 
 }

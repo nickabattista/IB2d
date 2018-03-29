@@ -29,7 +29,7 @@ rhs = [0 0 0 0 0 0 0 0 0 1 0 0]';
 %mat = [mat1; mat2; mat3; mat4; mat5; mat6];
 %rhs = [0 0 0 1 0 0]';
 
-coeffs = mat\rhs;
+coeffs = mat\rhs
 
 
 
