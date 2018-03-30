@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 10.0               % Dynamic Viscosity (N*s/m^2) 
+mu = 1.25               % Dynamic Viscosity (N*s/m^2) 
 rho = 1000              % Density (kg/m^2)
 }
 
@@ -16,7 +16,7 @@ rho = 1000              % Density (kg/m^2)
 %
 Temporal_Information {
 Tfinal = 2.0         % Final time of simulation (s)
-dt = 1.0e-5          % Time-step (s)
+dt = 1e-4            % Time-step (s)
 }
 
 %
@@ -64,7 +64,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 5       % How often to print (PLOT) to screen
+print_dump = 100         % How often to print (PLOT) to screen
 save_Vorticity = 1       % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
 save_uVec = 0            % Save u-Vector Data to .vtk format

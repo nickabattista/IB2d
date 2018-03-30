@@ -78,7 +78,7 @@ fprintf('NL_Start (FIRST Point in LEFT Arm): %d\n\n\n',Ninfo(1)+1);
 
 % Prints INPUT files %
 print_Vertex_Pts(X1,Y1,Ninfo);
-target_force = 1e6;
+target_force = 5e6;
 print_Target_Pts(target_force,Ninfo);
 
 
@@ -120,8 +120,8 @@ XY(2:N+1,4) = Y2(2:N+1);
 
 
 % 2nd Phase Left Arm
-XY(N+2:end,2) = X3(N+2:end);
-XY(N+2:end,4) = Y3(N+2:end);
+XY(N+2:end,2) = X2(N+2:end);
+XY(N+2:end,4) = Y2(N+2:end);
 
 % PLOT TEST! %
 %figure(3)
