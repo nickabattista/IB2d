@@ -32,11 +32,11 @@
 
 function give_Me_Sawtooth_Geometry()
 
-Lx = 2.0;        % Length of Computational Domain in X (m)
-Ly = 0.5;        % Length of Computational Domain in Y (m)
+Lx = 12;        % Length of Computational Domain in X (m)
+Ly = 3.0;        % Length of Computational Domain in Y (m)
 Nx = 512;        % Grid Resolution in X
 Ny = 128;        % Grid Resolution in Y
-ds = Lx/(2*Nx);  % Makes Lagrangian Spaced based on 512x512 finest grid
+ds = Lx/(2.1*Nx);  % Makes Lagrangian Spaced based on 512x512 finest grid
 
 % Experiment: 
 % 12 teeth
@@ -52,9 +52,9 @@ ds = Lx/(2*Nx);  % Makes Lagrangian Spaced based on 512x512 finest grid
 % L(characteristic) = d
 
 % Geometric Parameters
-d = 0.063; % height of tooth
-w = 0.063; % width of tooth
-G = 0.025;  % vertical distance between teeth (gap)
+d = 0.63; % height of tooth
+w = 0.63; % width of tooth
+G = 0.25;  % vertical distance between teeth (gap)
 
 %
 % Gives Sawtooth Geometry
@@ -83,7 +83,7 @@ struct_name = 'sawtooth';
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .target file!
-k_Target = 2e11;
+k_Target = 1e11;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

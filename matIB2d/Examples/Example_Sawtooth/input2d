@@ -7,8 +7,8 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 0.05             % Dynamic Viscosity (N*s/m^2) 
-rho = 1000              % Density (kg/m^2)
+mu = 50.0               % Dynamic Viscosity (N*s/m^2) 
+rho = 1000             % Density (kg/m^2)
 }
 
 
@@ -26,11 +26,11 @@ dt = 1e-5            % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  512               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  128               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 2.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 0.5               % Length of Eulerian Grid in y-Direction (m)
-supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
+Nx =  512             % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  128              % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 12.0               % Length of Eulerian Grid in x-Direction (m)
+Ly = 3.0               % Length of Eulerian Grid in y-Direction (m)
+supp = 4               % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
 

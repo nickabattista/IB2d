@@ -43,8 +43,8 @@ yPts= targets(:,3);                  % Previous y-Values of y-Target Pts.
 % PUMPING PARAMETERS
 %
 freq = 2;     % pumping frequency
-G = 0.025;     % vertical gap between teeth
-N_top = 948;  % # of points along top
+G = 0.25;     % vertical gap between teeth
+N_top = 1644;  % # of points along top
 
 %
 % READ IN ORIGINAL yPT POSITIONS
