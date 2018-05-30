@@ -43,7 +43,9 @@ yPts= targets(:,3);                  % Previous y-Values of y-Target Pts.
 % PUMPING PARAMETERS
 %
 freq = 2;     % pumping frequency
-G = 0.25;     % vertical gap between teeth
+%G = 0.325;     % vertical gap between teeth
+%occ = 0.95;   % occlusion total
+a = 0.337;    % total vertical distance pump travels
 N_top = 1644;  % # of points along top
 
 %
@@ -54,7 +56,7 @@ yPTS = read_In_yPT_Positions('sawtooth.vertex');
 %
 % Create the pumping behavior
 %
-targets(1:N_top,3) = yPTS(1:N_top) - 0.95*(G/2)*sin( 2*pi*freq*current_time );
+targets(1:N_top,3) = yPTS(1:N_top) - (a/2)*sin( 2*pi*freq*current_time );
 %yPts(N_top+1:end) = yPts(N_top+1:end) + 0.95*(G/2)*sin( 2*pi*freq*current_time );
 
 %

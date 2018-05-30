@@ -54,7 +54,7 @@ ds = Lx/(2.1*Nx);  % Makes Lagrangian Spaced based on 512x512 finest grid
 % Geometric Parameters
 d = 0.63; % height of tooth
 w = 0.63; % width of tooth
-G = 0.25;  % vertical distance between teeth (gap)
+G = 0.325;  % vertical distance between teeth (gap)
 
 %
 % Gives Sawtooth Geometry
