@@ -34,8 +34,8 @@ function give_Me_Sawtooth_Geometry()
 
 Lx = 12;        % Length of Computational Domain in X (m)
 Ly = 3.0;        % Length of Computational Domain in Y (m)
-Nx = 512;        % Grid Resolution in X
-Ny = 128;        % Grid Resolution in Y
+Nx = 1024;        % Grid Resolution in X
+Ny = 256;        % Grid Resolution in Y
 ds = Lx/(2.1*Nx);  % Makes Lagrangian Spaced based on 512x512 finest grid
 
 % Experiment: 

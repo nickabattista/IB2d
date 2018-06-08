@@ -46,7 +46,7 @@ freq = 2;     % pumping frequency
 %G = 0.325;     % vertical gap between teeth
 %occ = 0.95;   % occlusion total
 a = 0.337;    % total vertical distance pump travels
-N_top = 1644;  % # of points along top
+N_top = 3276;  % # of points along top
 
 %
 % READ IN ORIGINAL yPT POSITIONS

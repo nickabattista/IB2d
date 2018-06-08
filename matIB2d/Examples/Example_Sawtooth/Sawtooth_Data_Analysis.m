@@ -51,7 +51,7 @@ pDump=400;       % Note: 'print_dump' should match from input2d
 
 % DATA ANALYSIS INFO %
 start=1;                             % 1ST interval # included in data analysis
-finish=999;                         % LAST interval # included in data analysis 
+finish=150;                         % LAST interval # included in data analysis 
 dump_Times = (start:1:finish)*pDump; % Time vector when data was printed in analysis
 
 % INITIALIZE STORAGE MATRICES
@@ -177,18 +177,19 @@ mean( vol_MAT(2:end,1) )
 mean( vol_MAT(2:end,2) )
 
 figure(1)
-plot(1:1:999,flow_MAT(2:end,2)); hold on;
+plot(start:1:finish,flow_MAT(2:end,2)); hold on;
 
 
 figure(2)
-plot(1:1:999,vol_MAT(2:end,2)); hold on;
+plot(start:1:finish,vol_MAT(2:end,2)); hold on;
 pause();
 
 % PRINT Information for Simulation %
 strName = ['FLOW_DATA.txt'];
 fileID = fopen(strName,'w');
+
 for i=1:finish
-    fprintf(fileID,'%1.16e %1.16e %1.16 %1.16e\n',flow_MAT(i,1),flow_MAT(i,2),vol_MAT(i,1),vol_MAT(i,2) );
+    fprintf(fileID,'\n%1.16e %1.16e %1.16 %1.16e\n',flow_MAT(i,1),flow_MAT(i,2),vol_MAT(i,1),vol_MAT(i,2) );
 end
 fclose(fileID);
 
