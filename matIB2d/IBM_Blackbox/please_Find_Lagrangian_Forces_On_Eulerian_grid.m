@@ -140,6 +140,7 @@ end
 
 
 
+
 % Compute MASS PT FORCE DENSITIES (if there are mass points!)
 if ( mass_Yes == 1)
     
@@ -306,6 +307,7 @@ for i=1:Nsprings
     L_r = RL_Vec(i);              % Resting length of i-th spring
     alpha = alpha_pow(i);         % Degree of linearity of i-th spring
  
+    
     dx = xLag(id_Slave) - xLag(id_Master); % x-Distance btwn slave and master node
     dy = yLag(id_Slave) - yLag(id_Master); % y-Distance btwn slave and master node
 
@@ -958,7 +960,7 @@ function [Xp_N,Xq_N,Xr_N] = check_If_Beam_Points_Pass_Through_Boundary(ds,Lx,Xp,
             Xq_N = Xq;
             Xr_N = Xr;
        %else
-            %% MEANS point q has moved thru; check if moved through right/left bndry
+            % MEANS point q has moved thru; check if moved through right/left bndry
             %if dX_pq > 0
             %    Xq_N = Lx + Xq;
             %else
