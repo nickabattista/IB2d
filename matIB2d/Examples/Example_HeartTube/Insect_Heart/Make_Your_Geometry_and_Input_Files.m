@@ -49,7 +49,7 @@ struct_name = 'insect_HT'; % Name for .vertex, .spring, etc files. (must match w
 a = 0.5;    % semi-major axis (horizontal)
 b = 0.25;   % semi-minor axis (vertical) 
 [xLag,yLag,Ninfo] = give_Me_Immsersed_Boundary_Geometry(ds,Nx,Lx,a,b);
-yLag = yLag - 2+0.125;
+yLag = yLag - 2.25;
 
 Ninfo
 
@@ -67,7 +67,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 2.5e4;                   % Spring stiffness (does not need to be equal for all springs)
+k_Spring = 1e7;                   % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = ds;                       % Spring resting length (does not need to be equal for all springs)
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo);
 
@@ -79,8 +79,8 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo);
 
 
 % Prints .target file!
-k_Target = 2e5;
-print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
+k_Target = 1e8;
+print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo);
 
 
 
@@ -114,16 +114,17 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
+function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo)
 
-    N = length(xLag);
-
+    N = Ninfo(7,1);
+    %N = length(xLag);
+    
     target_fid = fopen([struct_name '.target'], 'w');
 
     fprintf(target_fid, '%d\n', N );
 
     %Loops over all Lagrangian Pts.
-    for s = 1:N
+    for s = 1:Ninfo(7,1)
         fprintf(target_fid, '%d %1.16e\n', s, k_Target);
     end
 
@@ -138,7 +139,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
 function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
 
-    N = length(xLag);
+    N = 5*(Ninfo(7,2)-2);%+ 5*(Ninfo(7,2)-2)/2;
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
@@ -147,19 +148,19 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
     %
     % SPRINGS BETWEEN VERTICES ALONG CHAMBER
     %
-    for s = 1:Ninfo(7,1)
-            if s < Ninfo(7,1)/2
-                x1 = xLag(s);   y1 = yLag(s);
-                x2 = xLag(s+1); y2 = yLag(s+1);
-                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);
-            else
-                x1 = xLag(s);   y1 = yLag(s);
-                x2 = xLag(s+1); y2 = yLag(s+1);
-                ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-                fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);  
-            end
-    end
+%     for s = 1:Ninfo(7,1)
+%             if s < Ninfo(7,1)/2
+%                 x1 = xLag(s);   y1 = yLag(s);
+%                 x2 = xLag(s+1); y2 = yLag(s+1);
+%                 ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+%                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);
+%             else
+%                 x1 = xLag(s);   y1 = yLag(s);
+%                 x2 = xLag(s+1); y2 = yLag(s+1);
+%                 ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+%                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, s+1, k_Spring, ds);  
+%             end
+%     end
     
     %
     %
@@ -199,7 +200,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
                     x1 = xLag(ind_P); y1 = yLag(ind_P);
                     x2 = xLag(ind_N); y2 = yLag(ind_N);
                     ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-                    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_N, ind_P, k_Spring, ds);  
+                    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_N, ind_P, 10*k_Spring, ds);  
                 end
         end
     end
@@ -210,21 +211,21 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
     % SPRINGS BETWEEN VALVES TOP AND BOTTOM
     %
     %
-    for jj=1:5 % ALONG # OF VALVES
-        %jj
-        for ss = 0:(Ninfo(7,2)-2)/2-1
-                
-
-            ind_T = Ninfo(jj,2) + (ss);
-            ind_B = Ninfo(jj,2) + (ss) + (Ninfo(7,2)-2)/2;
-
-            x1 = xLag(ind_T); y1 = yLag(ind_T);
-            x2 = xLag(ind_B); y2 = yLag(ind_B);
-            ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, k_Spring, ds);
-
-        end
-    end
+%     for jj=1:5 % ALONG # OF VALVES
+%         %jj
+%         for ss = 0:(Ninfo(7,2)-2)/2-1
+%                 
+% 
+%             ind_T = Ninfo(jj,2) + (ss);
+%             ind_B = Ninfo(jj,2) + (ss) + (Ninfo(7,2)-2)/2;
+% 
+%             x1 = xLag(ind_T); y1 = yLag(ind_T);
+%             x2 = xLag(ind_B); y2 = yLag(ind_B);
+%             ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+%             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, 1e-10*k_Spring, ds);
+% 
+%         end
+%     end
     
     
     
@@ -429,8 +430,55 @@ function [xV,yV] = give_Valve_Geometry(d,ds)
 % CURVED VALVE GEOMETRY
 %
 A = 1.0 / ( (0.45)^2 * d );
-yV = -0:ds/2:0.9/2*d;
-xV = A*yV.^2;
+%yV = 0:ds/2:0.9/2*d;
+%xV = A*yV.^2;
+
+% Initializing
+s = 1;
+yV(s) = 0; xV(s) = A*yV(1)^2;
+yP = yV(s); xP = xV(s); y=yP; x=xP;
+
+
+while y <= 0.9/2*d
+   
+    s = s+1;
+    
+    yG = y+ds;
+    xG = A*yG^2;
+    
+    yF = y+10*s;
+    xF = A*yF^2;
+    
+    err = ( ds - sqrt( (xG-x)^2 + (yG-y)^2 ) );
+    
+    while abs(err) > 1e-4
+       
+        if err < 0
+            yF = yG; xF = xG;
+            yG = (yG + yP)/2;
+            xG = A*yG^2;
+        else
+            xP = yG; xP = xG;
+            yG = (yG + yF)/2;
+            xG = A*yG^2;
+        end
+
+        
+        err = ( ds - sqrt( (xG-x)^2 + (yG-y)^2 ) );
+        
+           
+    end
+    
+    yV(s) = yG;
+    xV(s) = xG;
+        
+    y = yV(s);
+    x = xV(s);
+    
+    xP = x;
+    yP = y;
+    
+end
 
 xV1 = xV;
 xV2 = xV;
@@ -440,6 +488,8 @@ yV2 = -yV + d;
 
 xV = [xV1 xV2];
 yV = [yV2 yV1];
+
+length(xV)
 
 %
 % STRAIGHT LINE MOCK VALVE GEOMETRY
