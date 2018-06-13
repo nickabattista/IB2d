@@ -16,7 +16,7 @@ rho = 1000            % Density (kg/m^2)
 %
 Temporal_Information {
 Tfinal = 4.00        % Final time of simulation (s)
-dt = 5e-5            % Time-step (s)
+dt = 1e-4            % Time-step (s)
 }
 
 
@@ -67,14 +67,14 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 400         % How often to print (PLOT) to screen
+print_dump = 1000         % How often to print (PLOT) to screen
 save_Vorticity = 1;      % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 1;       % Save Pressure Scalar Data to .vtk format
 save_uVec = 0;           % Save u-Vector Data to .vtk format
 save_uMag = 1;           % Save uMagnitude Scalar Data to .vtk format
 save_uX = 0;             % Save uX Scalar Data to .vtk format
 save_uY = 0;             % Save uY Scalar Data to .vtk format
-save_fMag = 1;           % Save Force Magnitude Scalar Data to .vtk format
+save_fMag = 0;           % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0;             % Save x-Force Component Scalar Data to .vtk format
 save_fY = 0;             % Save y-Force Component Scalar Data to .vtk format
 save_hier = 0;           % Save Scalar Force Data on Lag. Structure to .vtk format

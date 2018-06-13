@@ -67,7 +67,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-k_Spring = 1e7;                   % Spring stiffness (does not need to be equal for all springs)
+k_Spring = 1e8;                   % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = ds;                       % Spring resting length (does not need to be equal for all springs)
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo);
 
@@ -139,7 +139,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,Ninfo)
 
 function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
 
-    N = 5*(Ninfo(7,2)-2);%+ 5*(Ninfo(7,2)-2)/2;
+    N = 5*(Ninfo(7,2)-2) + 5*(Ninfo(7,2)-2)/2;
 
     spring_fid = fopen([struct_name '.spring'], 'w');
 
@@ -200,7 +200,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
                     x1 = xLag(ind_P); y1 = yLag(ind_P);
                     x2 = xLag(ind_N); y2 = yLag(ind_N);
                     ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-                    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_N, ind_P, 10*k_Spring, ds);  
+                    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_N, ind_P, k_Spring, ds);  
                 end
         end
     end
@@ -211,21 +211,21 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
     % SPRINGS BETWEEN VALVES TOP AND BOTTOM
     %
     %
-%     for jj=1:5 % ALONG # OF VALVES
-%         %jj
-%         for ss = 0:(Ninfo(7,2)-2)/2-1
-%                 
-% 
-%             ind_T = Ninfo(jj,2) + (ss);
-%             ind_B = Ninfo(jj,2) + (ss) + (Ninfo(7,2)-2)/2;
-% 
-%             x1 = xLag(ind_T); y1 = yLag(ind_T);
-%             x2 = xLag(ind_B); y2 = yLag(ind_B);
-%             ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-%             fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, 1e-10*k_Spring, ds);
-% 
-%         end
-%     end
+    for jj=1:5 % ALONG # OF VALVES
+        %jj
+        for ss = 0:(Ninfo(7,2)-2)/2-1
+                
+
+            ind_T = Ninfo(jj,2) + (ss);
+            ind_B = Ninfo(jj,2) + (ss) + (Ninfo(7,2)-2)/2;
+
+            x1 = xLag(ind_T); y1 = yLag(ind_T);
+            x2 = xLag(ind_B); y2 = yLag(ind_B);
+            ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, 1e-6*k_Spring, ds);
+
+        end
+    end
     
     
     

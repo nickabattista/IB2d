@@ -60,8 +60,8 @@ dy =    grid_Info(6); % Spatial-size in y
 kStiff = 1e4;
 
 % Width of Channel
-w = 0.8475-0.6525;
-midPoint = (0.8475+0.6525)/2;
+w = 0.84875-0.65125;
+midPoint = (0.84875+0.65125)/2;
 
 % Max Velocity Desired
 uMax = 5.0;
@@ -70,9 +70,9 @@ if first == 1
     
     % Compute Where You Want to Apply Force
     xMin = 0.29;
-    xMax = 0.31;
-    yMin = 0.6525;
-    yMax = 0.8475;
+    xMax = 0.315;
+    yMin = 0.65125;
+    yMax = 0.84875;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -211,7 +211,12 @@ y = yGrid(j);  % y-Value considered
 
 scale = ( (MP+w/2) - ( MP ) )*( (MP-w/2) - ( MP ) );
 
-uX_Tar = Umax * (tanh(5*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+% Steady Inflow
+%uX_Tar = Umax * 5*(tanh(2*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+
+% Pulsatile Inflow
+uX_Tar = Umax * 5*abs( sin(2*pi*t) ) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+
 
 %uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ) / scale; % Only external forces in x-direction
 uY_Tar = 0;                                                           % No external forces in y-direction
