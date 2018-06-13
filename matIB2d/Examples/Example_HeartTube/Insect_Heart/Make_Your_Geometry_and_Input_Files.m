@@ -222,7 +222,7 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name,Ninfo)
             x1 = xLag(ind_T); y1 = yLag(ind_T);
             x2 = xLag(ind_B); y2 = yLag(ind_B);
             ds = sqrt( (x1-x2)^2 + (y1-y2)^2 );
-            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, 1e-6*k_Spring, ds);
+            fprintf(spring_fid, '%d %d %1.16e %1.16e\n', ind_T, ind_B, 1e-5*k_Spring, ds);
 
         end
     end

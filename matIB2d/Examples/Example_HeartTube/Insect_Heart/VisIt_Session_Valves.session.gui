@@ -10,7 +10,7 @@
             <Field name="smartFileGrouping" type="bool">true</Field>
             <Field name="showDotFiles" type="bool">false</Field>
             <Object name="recentpaths">
-                <Field name="localhost" type="stringVector">"/Users/battistn" "/Users/battistn/Desktop/IB2d" "/Users/battistn/Desktop/IB2d/matIB2d" "/Users/battistn/Desktop/IB2d/matIB2d/Examples" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d" "/Users/battistn/Desktop" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_Insect_Flight" </Field>
+                <Field name="localhost" type="stringVector">"/Users/battistn" "/Users/battistn/Desktop" "/Users/battistn/Desktop/IB2d" "/Users/battistn/Desktop/IB2d/matIB2d" "/Users/battistn/Desktop/IB2d/matIB2d/Examples" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart" "/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d" </Field>
             </Object>
         </Object>
         <Object name="AppearanceAttributes">
@@ -36,26 +36,11 @@
             <Field name="activeTab" type="int">0</Field>
         </Object>
         <Field name="postWhenShown" type="bool">false</Field>
-        <Object name="Database correlation list">
-            <Field name="x" type="int">0</Field>
-            <Field name="y" type="int">311</Field>
-            <Field name="width" type="int">407</Field>
-            <Field name="height" type="int">440</Field>
-            <Field name="visible" type="bool">false</Field>
-            <Field name="posted" type="bool">false</Field>
-        </Object>
         <Object name="File open">
             <Field name="x" type="int">0</Field>
             <Field name="y" type="int">292</Field>
             <Field name="width" type="int">640</Field>
             <Field name="height" type="int">479</Field>
-            <Field name="visible" type="bool">false</Field>
-        </Object>
-        <Object name="Information">
-            <Field name="x" type="int">0</Field>
-            <Field name="y" type="int">379</Field>
-            <Field name="width" type="int">483</Field>
-            <Field name="height" type="int">304</Field>
             <Field name="visible" type="bool">false</Field>
         </Object>
         <Object name="View">
@@ -72,7 +57,7 @@
             <Field name="y" type="int">0</Field>
             <Field name="width" type="int">391</Field>
             <Field name="height" type="int">1043</Field>
-            <Field name="SPLITTER_VALUES_V2" type="floatVector">0 0.7880133 0.2042175 </Field>
+            <Field name="SPLITTER_VALUES_V2" type="floatVector">0 0.690344 0.3018868 </Field>
         </Object>
         <Object name="Mesh plot attributes">
             <Field name="x" type="int">0</Field>
@@ -90,15 +75,7 @@
             <Field name="visible" type="bool">false</Field>
             <Field name="posted" type="bool">false</Field>
         </Object>
-        <Object name="Vector plot attributes">
-            <Field name="x" type="int">0</Field>
-            <Field name="y" type="int">336</Field>
-            <Field name="width" type="int">647</Field>
-            <Field name="height" type="int">391</Field>
-            <Field name="visible" type="bool">false</Field>
-            <Field name="posted" type="bool">false</Field>
-        </Object>
-        <Field name="plotDatabases" type="stringVector">"localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/uMag.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/lagsPts.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/fMag.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/P.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/Omega.*.vtk database" </Field>
+        <Field name="plotDatabases" type="stringVector">"localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/lagsPts.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/uMag.*.vtk database" "localhost:/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_HeartTube/Insect_Heart/viz_IB2d/Omega.*.vtk database" </Field>
         <Object name="TimeFormat">
             <Field name="displayMode" type="string">Cycles</Field>
             <Field name="precision" type="int">5</Field>
