@@ -7,7 +7,7 @@
 %
 Fluid_Parameters {
 mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
-rho = 1                 % Density (kg/m^2)
+rho = 1            % Density (kg/m^2)
 }
 
 
@@ -54,7 +54,7 @@ x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
 poroelastic = 0         % 0 (for no) or 1 (for yes)
-concentration = 0       % 0 (for no) or 1 (for yes)
+concentration = 1       % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
@@ -69,9 +69,9 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 %
 Output_Info {
 print_dump = 200         % How often to print (PLOT) to screen
-save_Vorticity = 0;      % Save Vorticity Scalar Data to .vtk format
-save_Pressure = 0;       % Save Pressure Scalar Data to .vtk format
-save_uVec = 0;           % Save u-Vector Data to .vtk format
+save_Vorticity = 1;      % Save Vorticity Scalar Data to .vtk format
+save_Pressure = 1;       % Save Pressure Scalar Data to .vtk format
+save_uVec = 1;           % Save u-Vector Data to .vtk format
 save_uMag = 1;           % Save uMagnitude Scalar Data to .vtk format
 save_uX = 0;             % Save uX Scalar Data to .vtk format
 save_uY = 0;             % Save uY Scalar Data to .vtk format
