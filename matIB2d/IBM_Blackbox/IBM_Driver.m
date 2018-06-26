@@ -933,6 +933,8 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     if concentration_Yes == 1
         confName = ['concentration.' strNUM '.vtk'];
+        inds=C<1e-15; % Gives logical matrix
+        C(inds) = 0;  % Zeros out values of matrix, C
         savevtk_scalar(C', confName, 'Concentration',dx,dy);
     end
 
