@@ -46,7 +46,7 @@ Ly = 0.125;      % Length of Eulerian Grid in y-Direction
 %
 ds = 0.5*dx;                % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
 struct_name = 'sea_spider'; % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
-legD = 0.08;               % leg diameter
+legD = 0.08;                % leg diameter
 gutD = 0.5*0.1;             % gut diameter
 
 % Call function to construct geometry
@@ -420,18 +420,17 @@ yGut = [yGutTop yGutBot];
 %
 % LEG Useful Points
 %
-xTubeHor = 0.1*Lx:1*ds:0.9*Lx;
-yTubeHor = 0.5*(1/8)*Lx;
+xTubeHor = 0.1*Lx:8*ds:0.9*Lx;
 yTubeHor = 0.5*(1/8)*Lx*ones(1,length(xTubeHor));
 
 %
 % LEG (outer tube) Vertices
 %
-yLegTop = yTubeHor+legD/2  %+ 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
-yLegBot = yTubeHor-legD/2  %- 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
+yLegTop = yTubeHor+legD/2;  %+ 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
+yLegBot = yTubeHor-legD/2;  %- 0.0025*sin( pi*(xTubeHor - 0.8)/(0.8/16) );
 
-yTubeLeft = 0.5*(1/8)-legD/2+ds:ds:0.5*(1/8)+legD/2-ds;
-xTubeLeft = 0.2*Lx*ones(1,length(yTubeLeft));
+%yTubeLeft = 0.5*(1/8)-legD/2+ds:ds:0.5*(1/8)+legD/2-ds;
+%xTubeLeft = 0.2*Lx*ones(1,length(yTubeLeft));
 
 % INCLUDING FOOT (left side)
 %xLeg = [xTubeHor xTubeHor xTubeLeft];
@@ -471,7 +470,7 @@ function [C,inds] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,legD,gutD)
 %xMin = 0.15; xMax = 0.45;
 %yMin = 0.85; yMax = 1.15;
 
-xMin = 0.3; xMax = 0.7;
+xMin = 0.2; xMax = 0.8;
 
 yMid = Ly/2;
 yMax = yMid + 1.02*legD/2;
@@ -495,8 +494,8 @@ for i=1:length(y)
         
         if ( ( xVal >= xMin ) && ( xVal <= xMax) )
            
-            yMax = 0.5*(1/8)*Lx + legD/2 + 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
-            yMin = 0.5*(1/8)*Lx - legD/2 - 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
+            yMax = 0.5*(1/8)*Lx + legD/2; %+ 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
+            yMin = 0.5*(1/8)*Lx - legD/2; %- 0.0025*sin( pi*(xVal - 0.8)/(0.8/16) );
 
             if yVal >= yMax
                 C(i,j) = 1; 

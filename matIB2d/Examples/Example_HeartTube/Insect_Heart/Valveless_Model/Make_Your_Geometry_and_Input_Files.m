@@ -34,26 +34,26 @@ function Make_Your_Geometry_and_Input_Files()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx =  32;        % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Lx = 1.0;        % Length of Eulerian Grid in x-Direction
+Nx =  1024;      % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Lx = 5.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
 %
 % Immersed Structure Geometric / Dynamic Parameters %
 %
-ds = 0.5*dx;                  % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
-struct_name = 'insect_heart'; % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
+ds = 0.45*dx;               % Lagrangian Pt. Spacing (2x resolution of Eulerian grid)
+struct_name = 'insect_HT'; % Name for .vertex, .spring, etc files. (must match what's in 'input2d')
 
 
 % Call function to construct geometry
 [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx,Lx);
-
+yLag = yLag - 2+0.125;
 
 % Plot Geometry to test
 plot(xLag,yLag,'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
 xlabel('x'); ylabel('y');
-axis square;
+axis([0 Lx 0 Lx]);
 
 
 
@@ -74,8 +74,8 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .target file!
-%k_Target = 1e7;
-%print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
+k_Target = 2e5;
+print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 
 
@@ -102,7 +102,28 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid);
 
-   
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints TARGET points to a file called 'struct_name'.target
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
+
+    N = length(xLag);
+
+    target_fid = fopen([struct_name '.target'], 'w');
+
+    fprintf(target_fid, '%d\n', N );
+
+    %Loops over all Lagrangian Pts.
+    for s = 1:N
+        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
+    end
+
+    fclose(target_fid);   
+    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -127,30 +148,8 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name)
                 fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s, 1,   k_Spring, ds_Rest);  
             end
     end
-    fclose(spring_fid);     
-    
-    
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: prints TARGET points to a file called 'struct_name'.vertex
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    fclose(spring_fid);      
 
-function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
-
-    N = length(xLag);
-
-    target_fid = fopen([struct_name '.target'], 'w');
-
-    fprintf(target_fid, '%d\n', N );
-
-    %Loops over all Lagrangian Pts.
-    for s = 1:N
-        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
-    end
-
-    fclose(target_fid); 
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,27 +243,39 @@ a = 0.5;    % semi-major axis (horizontal)
 b = 0.45;   % semi-minor axis (vertical) 
 ang = pi/6; % angle start/cuttoff for ellipse
 [xE,yE] = give_Me_Elliptical_Geometry(ds,a,b,ang);
-xOff = xE(
+xOff = 2*xE(1);
 
 % Gives top and bottom portion of one section of tube
 d = 0.2;                  % separation distance
-xTube = [xE xE xE+0.5 xE+0.5];          % top first, then bottom
+xTube = [xE+3*xOff xE+3*xOff xE+2*xOff xE+2*xOff xE+xOff xE+xOff xE xE];          % top first, then bottom
+xTube = xTube + 1;
 xTube = xTube(end:-1:1);  % reverse it!
-yTube = [yE+d/2 -yE-d/2 yE+d/2 -yE-d/2]; % top first, then bottom 
+yTube = [yE+d/2 -yE-d/2 yE+d/2 -yE-d/2 yE+d/2 -yE-d/2 yE+d/2 -yE-d/2]; % top first, then bottom 
+yTube = yTube + Lx/2;
 
 % Give indices for to attach valves
 ind_Top = 1;                 % node index for first point on top (on RHS)
-ind_Bot = length(xTube)/2+1; % node index for first point on bottom (on RHS)
+ind_Bot = length(xTube)/8+1; % node index for first point on bottom (on RHS)
+
+xFlat = xTube(ind_Top)-Lx/20:ds:xTube(ind_Top); 
+yFlatTop = yTube(ind_Top)*ones(1,length(xFlat));
+yFlatBot = yTube(ind_Bot)*ones(1,length(xFlat)); 
+
+xLag = [xTube xFlat xFlat];
+yLag = [yTube yFlatTop yFlatBot];
 
 % Gives valve geometry
-[xV,yV] = give_Valve_Geometry(d,ds)
+[xV,yV] = give_Valve_Geometry(d,ds);
 
 % TESTING (i.e., PLOT IT, yo!)
-plot(xTube,yTube,'r*'); hold on
-len = length(xTube);
-plot(xTube(len/2+1),yTube(len/2+1),'g*'); hold on
-plot(xTube(1),yTube(1),'k*'); hold on;
-pause();
+%plot(xTube,yTube,'b*'); hold on
+%len = length(xTube);
+%plot(xTube(len/8+1),yTube(len/8+1),'r*'); hold on
+%plot(xTube(1),yTube(1),'k*'); hold on;
+%axis([0 5 0 5]);
+%pause();
+
+%plot(xV,yV,'g*'); hold on;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -286,8 +297,10 @@ A = 1.0 / ( (0.45)^2 * d );
 yV = -0:ds/2:0.9/2*d;
 xV = -A*yV.^2;
 
-%plot(xV,yV,'b*'); hold on;
 
+%figure(2)
+%plot(xV,yV,'b*'); hold on;
+%pause();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

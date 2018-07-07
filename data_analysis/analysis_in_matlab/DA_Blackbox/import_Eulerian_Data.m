@@ -44,6 +44,9 @@ function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim,E
     %Eulerian_Flags(8):   Fy (y-component of force)
     %
 
+    
+analysis_path = pwd;
+    
 % read in Vorticity %
 if Eulerian_Flags(1)
     strChoice = 'Omega'; first = 1;
@@ -115,6 +118,10 @@ if max(Eulerian_Flags([1:5,7,8]))==0
     x=[];
     y=[];
 end
+
+cd(analysis_path);
+
+clear analysis_path;
 
 clear strChoice first;
 

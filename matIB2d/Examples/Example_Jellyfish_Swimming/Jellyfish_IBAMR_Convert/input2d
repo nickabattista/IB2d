@@ -15,7 +15,7 @@ rho = 1000              % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 24.0        % Final time of simulation (s)
+Tfinal = 12.0        % Final time of simulation (s)
 dt = 1.0e-5          % Time-step (s)
 }
 
@@ -24,9 +24,9 @@ dt = 1.0e-5          % Time-step (s)
 %
 Grid_Parameters {
 Nx =  128               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Ny =  1024              % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 2.0                % Length of Eulerian Grid in x-Direction (m)
-Ly = 8.0                % Length of Eulerian Grid in y-Direction (m)
+Ly = 16.0               % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
@@ -64,17 +64,17 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 10000       % How often to print (PLOT) to screen
+print_dump = 5000       % How often to print (PLOT) to screen
 save_Vorticity = 1       % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
-save_uVec = 0            % Save u-Vector Data to .vtk format
+save_uVec = 1            % Save u-Vector Data to .vtk format
 save_uMag = 1            % Save uMagnitude Scalar Data to .vtk format
 save_uX = 0              % Save uX Scalar Data to .vtk format
 save_uY = 0              % Save uY Scalar Data to .vtk format
 save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
 save_fY = 0              % Save y-Force Component Scalar Data to .vtk format
-save_hier = 0            % Save Scalar Force Data on Lag. Structure to .vtk format
+save_hier = 1            % Save Scalar Force Data on Lag. Structure to .vtk format
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab

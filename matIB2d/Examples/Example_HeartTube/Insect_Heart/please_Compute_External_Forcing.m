@@ -51,34 +51,35 @@ Lx =    grid_Info(3); % Length of Eulerian grid in x-coordinate
 Ly =    grid_Info(4); % Length of Eulerian grid in y-coordinate
 dx =    grid_Info(5); % Spatial-size in x
 dy =    grid_Info(6); % Spatial-size in y
-supp =  grid_Info(7); % Delta-function support
-Nb =    grid_Info(8); % # of Lagrangian pts. 
-ds =    grid_Info(9); % Lagrangian spacing
+%supp =  grid_Info(7); % Delta-function support
+%Nb =    grid_Info(8); % # of Lagrangian pts. 
+%ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Stiffness for Arbitrary External Force to Fluid Grid
 kStiff = 1e4;
 
 % Width of Channel
-w = 0.2;
+w = 0.84875-0.65125;
+midPoint = (0.84875+0.65125)/2;
 
 % Max Velocity Desired
-uMax = 250.0;
+uMax = 5.0;
 
 if first == 1
     
     % Compute Where You Want to Apply Force
-    xMin = 0.4;
-    xMax = 0.41;
-    yMin = 0.41+0.125;
-    yMax = 0.59+0.125;
+    xMin = 0.29;
+    xMax = 0.315;
+    yMin = 0.65125;
+    yMax = 0.84875;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
 end
 
 % Compute External Forces from Desired Target Velocity
-[fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds);
+[fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds,midPoint);
     
 % Compute Total External Forces
 Fx = fx;
@@ -155,7 +156,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds)
+function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds,MP)
 
 % t:  current time in simulation
 % Nx: # of nodes in x-direction on Eulerian grid
@@ -173,7 +174,7 @@ for n=1:length(inds(:,1))
     i = inds(n,1);
     j = inds(n,2);
     
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
+    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax,MP);    
         
     fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
     fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
@@ -183,9 +184,6 @@ end
 fx_exts = fx;
 fy_exts = fy;
 
-% MIGHT NOT NEED THESE!
-%fx_exts = fx/ds^2;
-%fy_exts = fy/ds^2;
 
 
 
@@ -195,7 +193,7 @@ fy_exts = fy;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax)
+function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax,MP)
 
 % t:     current time in simulation
 % dx:    x-Grid spacing
@@ -211,7 +209,16 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
+scale = ( (MP+w/2) - ( MP ) )*( (MP-w/2) - ( MP ) );
+
+% Steady Inflow
+%uX_Tar = Umax * 5*(tanh(2*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+
+% Pulsatile Inflow
+uX_Tar = Umax * 5*abs( sin(2*pi*t) ) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+
+
+%uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ) / scale; % Only external forces in x-direction
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 

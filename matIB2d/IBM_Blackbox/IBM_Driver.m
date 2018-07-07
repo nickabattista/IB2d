@@ -53,7 +53,8 @@ fprintf('\n---------------->>                 IB2d                      <<------
 fprintf('\n________________________________________________________________________________\n\n');
 fprintf('If using the code for research purposes please cite the following two papers: \n');
 fprintf('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n');
-fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)');
+fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)\n');
+fprintf('     [3] N.A. Battista ,W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method. Math Meth Appl Sci. 1?26 (2017).');
 fprintf('\n________________________________________________________________________________');
 
 fprintf('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
@@ -932,6 +933,8 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
     if concentration_Yes == 1
         confName = ['concentration.' strNUM '.vtk'];
+        inds=C<1e-15; % Gives logical matrix
+        C(inds) = 0;  % Zeros out values of matrix, C
         savevtk_scalar(C', confName, 'Concentration',dx,dy);
     end
 
