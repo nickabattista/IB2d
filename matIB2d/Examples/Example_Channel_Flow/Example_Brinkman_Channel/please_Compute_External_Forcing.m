@@ -60,10 +60,11 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e4;
 
 % Width of Channel
-w = 0.2;
+w = 0.215-0.035;
+midPoint = (0.035+0.215)/2;
 
 % Max Velocity Desired
-uMax = 250.0;
+uMax = 2.5;
 
 if first == 1
     
@@ -78,7 +79,7 @@ if first == 1
 end
 
 % Compute External Forces from Desired Target Velocity
-[fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds);
+[fx, fy] = give_Me_Velocity_Target_External_Force_Density(current_time,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,uMax,inds,midPoint);
     
 % Compute Total External Forces
 Fx = fx;
@@ -155,7 +156,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds)
+function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,dx,dy,x,y,Nx,Ny,Lx,Ly,uX,uY,kStiff,w,Umax,inds,MP)
 
 % t:  current time in simulation
 % Nx: # of nodes in x-direction on Eulerian grid
@@ -173,7 +174,7 @@ for n=1:length(inds(:,1))
     i = inds(n,1);
     j = inds(n,2);
     
-    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax);    
+    [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,x,y,Lx,Ly,i,j,w,Umax,MP);    
         
     fx(j,i) = fx(j,i) - kStiff*( uX(j,i) - uX_Tar );
     fy(j,i) = fy(j,i) - kStiff*( uY(j,i) - uY_Tar );
@@ -195,7 +196,7 @@ fy_exts = fy;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax)
+function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly,i,j,w,Umax,MP)
 
 % t:     current time in simulation
 % dx:    x-Grid spacing
@@ -211,9 +212,13 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
-uY_Tar = 0;                                                           % No external forces in y-direction
+%uX_Tar = -Umax * (5*tanh(t)) * ( (Ly/2+w/2) - ( y ) )*( (Ly/2-w/2) - ( y ) ); % Only external forces in x-direction
+%uY_Tar = 0;                                                           % No external forces in y-direction
 
+scale = ( (MP+w/2) - ( MP ) )*( (MP-w/2) - ( MP ) );
 
+uX_Tar = Umax * (tanh(2*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+
+uY_Tar = 0;             
 
 

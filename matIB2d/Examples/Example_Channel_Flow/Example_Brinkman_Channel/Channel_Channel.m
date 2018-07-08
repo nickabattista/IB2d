@@ -58,7 +58,7 @@ struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 %[xLag_C,yLag_C] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r,x0,y0);
 
 % Call function to construct initial background concentration
-kBrinkman = 1000; % Brinkman permeability coefficient (F = -mu/k*U)
+kBrinkman = 100; % Brinkman permeability coefficient (F = -mu/k*U)
 wBrink = w/6;     % width of Brinkman permeable membrane
 [Brinkman,~] = give_Me_Initial_Brinkman(Lx,Ly,Nx,Ny,dx,kBrinkman,wBrink);
 
@@ -283,7 +283,7 @@ yMin_Top = yMin + wBrink;
 yMax = 0.225;
 yMax_Bot = yMax - wBrink;
 
-xMin = 0.15; xMax = 0.9;
+xMin = 0.25; xMax = 0.9;
 
 % Make meshes 
 x = 0:dx:Lx;
