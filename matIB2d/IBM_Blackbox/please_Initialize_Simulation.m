@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -334,13 +334,19 @@ try
         Lag_Struct_Params(25) = 0;
     end
     
-    % PORO-ELASTIC MEDIA %
+    % COAGULATION %
     if find(strcmp({Lag_Struct_Input{:,1}},'coagulation')) > 0
         Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
     else
         Lag_Struct_Params(26) = 0;
     end
     
+    % BRINKMAN %
+    if find(strcmp({Lag_Struct_Input{:,1}},'brinkman')) > 0
+        Lag_Struct_Params(27) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'brinkman')),2};
+    else
+        Lag_Struct_Params(27) = 0;
+    end
 
 catch
     fprintf('\n \n');

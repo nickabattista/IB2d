@@ -5,7 +5,7 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
 %
@@ -165,6 +165,7 @@ exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., the
 general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
 poroelastic_Yes = Lag_Struct_Params(25);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
 coagulation_Yes = Lag_Struct_Params(26);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(27);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -559,6 +560,17 @@ end
 
 
 
+% READ IN BRINKMAN PERMEABILITY (IF THERE IS A BRINKMAN TERM) %
+if ( brinkman_Yes == 1 )
+    fprintf('  -Brinkman Term included\n');
+    [Brink,kDiffusion] = read_In_Brinkman_Info(struct_name,Nx);
+        %Brink:   Initial brinkman permeability matrix
+        %kBrink:  Permeability for brinkman model
+else
+    Brink = 0; % placeholder for plotting 
+end
+
+
 
 
 % CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
@@ -580,10 +592,10 @@ if boussinesq_Yes == 1
     [fBouss_X,fBouss_Y] = please_Form_Boussinesq_Forcing_Terms(exp_Coeff,Nx,Ny,gravity_Info);
     
     % Finds initial concentration Laplacian
-    Cxx = DD(C,dx,'x');
-    Cyy = DD(C,dy,'y');
-    laplacian_C = Cxx+Cyy;
-    C_0 = zeros(size(C)); % Define background concentration
+    %Cxx = DD(C,dx,'x');
+    %Cyy = DD(C,dy,'y');
+    %laplacian_C = Cxx+Cyy;
+    %C_0 = zeros(size(C)); % Define background concentration
 end
 
 
@@ -611,6 +623,16 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 mkdir('viz_IB2d');
 if Output_Params(17) == 1
     mkdir('hier_IB2d_data'); 
+end
+
+% PRINT BRINKMAN PERMEABILITY TO MATRIX (*if BRINKMAN TERM*) %
+if brinkman_Yes == 1
+    cd('viz_IB2d');
+    strNUM = give_String_Number_For_VTK(ctsave);
+    brinkName = ['Brink.' strNUM '.vtk'];
+    savevtk_scalar(Brink', brinkName, 'Brink',dx,dy);
+    clear brinkName strNUM;
+    cd ..;
 end
 
 %Initialize Vorticity, uMagnitude, and Pressure for initial colormap
@@ -710,14 +732,23 @@ while current_time < T_FINAL
     %***************** STEP 3: Solve for Fluid motion ******************************************
     %
     %
+    
     % Add in effect from BOUSSINESQ
     if boussinesq_Yes == 1
         Fxh = Fxh + rho*fBouss_X.*(C);
         Fyh = Fyh + rho*fBouss_Y.*(C);
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
-    else
-        [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
     end
+    
+    
+    % Add in effect from BRINKMAN 
+    if brinkman_Yes == 1
+        Fxh = Fxh - mu*Brink.*U; % ADD BRINKMAN TERM!!!
+        Fyh = Fyh - mu*Brink.*V; % ADD BRINKMAN TERM!!!
+    end
+
+    % Update fluid motion
+    [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
+    
     
     %
     %
@@ -1506,6 +1537,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: Reads in the diffusion coefficient and initial concentration, C
+%           (also used to read in permeability matrix for Brinkman &
+%           permeability Brinkman constant, k.)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1532,6 +1565,37 @@ con_info = C{1};    %Stores all read in data
 kDiff = con_info(1,1);     %coefficient of diffusion
 C = con_info(2:end,1:end); %initial concentration
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in the Brinkman permeability and initial permeability,
+% Brinkman
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function [Brinkman,kBrink] = read_In_Brinkman_Info(struct_name,N)
+
+filename = [struct_name '.brinkman'];  %Name of file to read in
+
+strstr = '%f';
+for i=1:N-1
+   strstr = [strstr ' %f'];
+end
+
+fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,strstr,'CollectOutput',1);
+
+fclose(fileID);        %Close the data file.
+
+con_info = C{1};    %Stores all read in data 
+
+%Store all elements on .concentration file 
+kBrink = con_info(1,1);     %coefficient of diffusion
+Brinkman = con_info(2:end,1:end); %initial concentration
 
 
 
