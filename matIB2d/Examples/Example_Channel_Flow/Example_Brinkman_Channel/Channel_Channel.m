@@ -58,7 +58,7 @@ struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 %[xLag_C,yLag_C] = give_Me_Cylinder_Immsersed_Boundary_Geometry(ds,r,x0,y0);
 
 % Call function to construct initial background concentration
-kBrinkman = 100; % Brinkman permeability coefficient (F = -mu/k*U)
+kBrinkman = 0.00001; % Brinkman permeability coefficient (F = -mu/k*U)
 wBrink = w/6;     % width of Brinkman permeable membrane
 [Brinkman,~] = give_Me_Initial_Brinkman(Lx,Ly,Nx,Ny,dx,kBrinkman,wBrink);
 
@@ -96,7 +96,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e5;
+k_Target = 5e6;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 
@@ -306,9 +306,9 @@ for i=1:length(y)
         if ( ( xVal >= xMin ) && ( xVal <= xMax) )
 
             if ( (yVal >= yMax_Bot ) && ( yVal <= yMax ) )
-                Brink(i,j) = kBrink; 
+                Brink(i,j) = 1/kBrink; 
             elseif (( yVal <= yMin_Top ) && ( yVal >= yMin ) )
-                Brink(i,j) = kBrink;
+                Brink(i,j) = 1/kBrink;
             end
             
         end

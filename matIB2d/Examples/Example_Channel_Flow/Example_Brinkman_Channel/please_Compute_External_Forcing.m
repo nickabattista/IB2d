@@ -60,7 +60,7 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e4;
 
 % Width of Channel
-w = 0.215-0.035;
+w = 0.2;
 midPoint = (0.035+0.215)/2;
 
 % Max Velocity Desired
@@ -71,8 +71,8 @@ if first == 1
     % Compute Where You Want to Apply Force
     xMin = 0.1;
     xMax = 0.16;
-    yMin = 0.035;
-    yMax = 0.215;
+    yMin = 0.030;
+    yMax = 0.220;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -217,7 +217,7 @@ y = yGrid(j);  % y-Value considered
 
 scale = ( (MP+w/2) - ( MP ) )*( (MP-w/2) - ( MP ) );
 
-uX_Tar = Umax * (tanh(2*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
+uX_Tar = Umax * (tanh(4*t)) * ( (MP+w/2) - ( y ) )*( (MP-w/2) - ( y ) ) / scale; % Only external forces in x-direction
 
 uY_Tar = 0;             
 
