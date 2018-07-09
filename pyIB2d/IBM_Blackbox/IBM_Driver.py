@@ -111,7 +111,8 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     print('\n________________________________________________________________________________\n\n')
     print('If using the code for research purposes please cite the following two papers: \n')
     print('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-11 (2015)\n')
-    print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)')
+    print('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)\n')
+    print('     [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method. Math Meth Appl Sci. 1?26 (2017).')
     print('\n________________________________________________________________________________')
     print('\n\nNOTE: If running pyIB2d with Anaconda, please note that it will run faster with vtk installed.\n')
     print('          To install, type the following line into your terminal: <conda install -c menpo vtk> in your terminal')
@@ -225,6 +226,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     exp_Coeff = Lag_Struct_Params[22]            # Expansion Coefficient [e.g., thermal, etc] for Boussinesq approx.
     general_force_Yes = Lag_Struct_Params[23]    # General User-Defined Force Term: 0 [for no] or 1 [for yes]
     poroelastic_Yes = Lag_Struct_Params[24]      # Poroelastic media 0 [for no] or 1 [for yes]
+    brinkman_Yes = Lag_Name_Params[25]           # Brinkman term in Momentum equation 0 [for no] or 1 [for yes]
 
     # CLEAR INPUT DATA #
 
@@ -576,6 +578,16 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
 
 
 
+    # READ IN BRINKMAN TERM (IF THERE IS A BRINKMAN TERM) #
+    if brinkman_Yes:
+        print('  -Brinkman term included\n')
+        Brink,kBrink = read_In_Brinkman_Info(struct_name)
+            #Brink:   Initial brinkman permeability matrix
+            #kBrink:  Permeability for brinkman model
+    else:
+        Brink = 0 # placeholder for plotting 
+
+
     # CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) #
     if boussinesq_Yes:
         print('  -Boussinesq Approximation included\n')
@@ -638,7 +650,14 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             pass
     os.chdir('viz_IB2d')
 
-
+    # PRINT BRINKMAN PERMEABILITY TO MATRIX (*if BRINKMAN TERM*) %
+    if brinkman_Yes:
+        os.chdir('viz_IB2d')
+        strNUM = give_String_Number_For_VTK(ctsave)
+        brinkName = 'Brink.' + strNUM + '.vtk'
+        savevtk_scalar(Brink.T, brinkName, 'Brinkman',dx,dy)
+        #clear brinkName strNUM
+        os.chdir('..')
 
     #Save grid_Info and model_Info in human readable format
     #with open('_grid_Info.txt','w') as fobj:
@@ -758,15 +777,21 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         #******************* STEP 3: Solve for Fluid motion ************************
         #
         #
+
         # Add in effect from BOUSSINESQ
         if boussinesq_Yes:
             #Fxh = Fxh + rho*np.dot(fBouss_X,C)
             #Fyh = Fyh + rho*np.dot(fBouss_Y,C)
             Fxh = Fxh + rho*fBouss_X*C #np.dot(fBouss_X,C)
             Fyh = Fyh + rho*fBouss_Y*C #rho*np.dot(fBouss_Y,C)
-            Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
-        else:
-            Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
+
+        # Add in effect from BRINKMAN 
+        if brinkman_Yes:
+            Fxh = Fxh - mu*Brink*U; # ADD BRINKMAN TERM!
+            Fyh = Fyh - mu*Brink*V; # ADD BRINKMAN TERM!
+        
+        # Update fluid motion
+        Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
 
 
         
@@ -925,6 +950,33 @@ def read_In_Concentration_Info(struct_name):
         C = np.loadtxt(f)
 
     return (C,kDiff)
+
+
+###########################################################################
+#
+# FUNCTION: Reads in the Brinkman permeability, k and initial Brinkman term, Brink
+#
+###########################################################################
+
+def read_In_Brinkman_Info(struct_name):
+    ''' Reads in the diffusion coefficient and initial concentration, C
+    
+    Args:
+        struct_name: structure name
+        
+    Returns:
+        Brink:  initial Brinkman region (1/kBrink)
+        kBrink: coefficient of permeability'''
+
+    filename = struct_name+'.brinkman'  #Name of file to read in
+    
+    with open(filename) as f:
+        kBrink = float(f.readline().strip()) #first line contains coeff of diff
+        C = np.loadtxt(f)
+
+    return (Brink,kBrink)
+
+
     
 ###########################################################################
 #

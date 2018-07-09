@@ -255,7 +255,8 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
                       'boussinesq': 0,
                       'expansion_coeff': 0,
                       'user_force_model': 0,
-                      'poroelastic': 0
+                      'poroelastic': 0,
+                      'brinkman': 0
     }
 
     # Initialize 
@@ -306,6 +307,7 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
         print('      expansion_coeff = <# (EXPANSION COEFFICIENT FOR BOUSSINESQ) >\n')
         print('      user_force_model = <0 or 1>\n')
         print('      poroelastic = <0 or 1>\n')
+        print('      brinkman = <0 or 1>\n')
         print('      }\n')
         print('ERROR ERROR ERROR\n\n')
         sys.exit(0)
