@@ -120,8 +120,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     print('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n')
     print('\n\n--> Reading input data for simulation...\n\n')
     
-
-        #
+    #
     # ** IBM_DRIVER INPUT DEFINITIONS ** :
     #
     #               Fluid_Params[1]: mu
@@ -193,7 +192,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
 
     # PRINTING/PLOTTING INFO #
     pDump = Output_Params[0]          # Print [Plot] Dump interval
-    pMatplotlib = Output_Params[1]        # Plot in Matlab? [1=YES,0=NO]
+    pMatplotlib = Output_Params[1]    # Plot in Matlab? [1=YES,0=NO]
     lagPlot = Output_Params[2]        # Plot LAGRANGIAN PTs ONLY in Matlab
     velPlot = Output_Params[3]        # Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
     vortPlot = Output_Params[4]       # Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
@@ -226,7 +225,9 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     exp_Coeff = Lag_Struct_Params[22]            # Expansion Coefficient [e.g., thermal, etc] for Boussinesq approx.
     general_force_Yes = Lag_Struct_Params[23]    # General User-Defined Force Term: 0 [for no] or 1 [for yes]
     poroelastic_Yes = Lag_Struct_Params[24]      # Poroelastic media 0 [for no] or 1 [for yes]
-    brinkman_Yes = Lag_Name_Params[25]           # Brinkman term in Momentum equation 0 [for no] or 1 [for yes]
+    brinkman_Yes = Lag_Struct_Params[25]         # Brinkman term in Momentum equation 0 [for no] or 1 [for yes]
+
+    print(Lag_Struct_Params)
 
     # CLEAR INPUT DATA #
 

@@ -5,7 +5,7 @@
 #	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 #
 # Author: Nicholas A. Battista
-# Email:  nick.battista@unc.edu
+# Email:  nickabattista@gmail.com
 # Date Created: May 27th, 2015
 # Institution: UNC-CH
 #
@@ -27,6 +27,7 @@
 from please_Read_input2d_File import please_Read_input2d_File
 import numpy as np
 import sys
+from collections import OrderedDict
 
 ##################################################################################
 #
@@ -163,24 +164,26 @@ def please_Initialize_Output_Inputs(Output_Input):
     #                                                                      #
     # SPECIFY HERE A DICTIONARY OF ALL PARAMETERS AND THEIR DEFAULT VALUE! #
     #                                                                      #
-    PARAMS_DEFAULT = {'print_dump': 100, 
-                      'plot_Matlab': 0,
-                      'plot_LagPts': 0,
-                      'plot_Velocity': 0,
-                      'plot_Vorticity': 0,
-                      'plot_MagVelocity': 0,
-                      'plot_Pressure': 0,
-                      'save_Vorticity': 1,
-                      'save_Pressure': 1,
-                      'save_uVec': 1,
-                      'save_uMag': 1,
-                      'save_uX': 1,
-                      'save_uY': 1,
-                      'save_fMag': 1,
-                      'save_fX': 1,
-                      'save_fY': 1,
-                      'save_hier': 1
-    }
+    PARAMS_DEFAULT = (('print_dump', 100), 
+                      ('plot_Matlab', 0),
+                      ('plot_LagPts', 0),
+                      ('plot_Velocity', 0),
+                      ('plot_Vorticity', 0),
+                      ('plot_MagVelocity', 0),
+                      ('plot_Pressure', 0),
+                      ('save_Vorticity', 1),
+                      ('save_Pressure', 1),
+                      ('save_uVec', 1),
+                      ('save_uMag', 1),
+                      ('save_uX', 1),
+                      ('save_uY', 1),
+                      ('save_fMag', 1),
+                      ('save_fX', 1),
+                      ('save_fY', 1),
+                      ('save_hier', 1)
+    )
+
+    PARAMS_DEFAULT = OrderedDict(PARAMS_DEFAULT)
 
     # Initialize 
     Output_Params = np.zeros(len(PARAMS_DEFAULT))
@@ -231,33 +234,35 @@ def please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input):
     # SPECIFY HERE A DICTIONARY OF ALL PARAMETERS AND THEIR DEFAULT VALUE! #
     #                                                                      #
 
-    PARAMS_DEFAULT = {'springs': 0,
-                      'update_springs': 0,
-                      'target_points': 0,
-                      'update_target_points': 0,
-                      'beams': 0,
-                      'update_beams': 0,
-                      'nonInvariant_beams': 0,
-                      'update_nonInv_beams': 0,
-                      'FV_LT_muscle': 0,
-                      '3_element_muscle': 0,
-                      'arb_ext_force': 0,
-                      'tracers': 0,
-                      'mass_pts': 0,
-                      'gravity': 0,
-                      'x_gravity_vec_comp': 0,
-                      'y_gravity_vec_comp': 0,
-                      'porous_media': 0,
-                      'concentration': 0,
-                      'electro_phys': 0,
-                      'damped_springs': 0,
-                      'update_damp_springs': 0,
-                      'boussinesq': 0,
-                      'expansion_coeff': 0,
-                      'user_force_model': 0,
-                      'poroelastic': 0,
-                      'brinkman': 0
-    }
+    PARAMS_DEFAULT = (('springs', 0),
+                      ('update_springs', 0),
+                      ('target_pts', 0),
+                      ('update_target', 0),
+                      ('beams', 0),
+                      ('update_beams', 0),
+                      ('nonInvariant_beams', 0),
+                      ('update_nonInv_beams', 0),
+                      ('FV_LT_muscle', 0),
+                      ('3_element_muscle', 0),
+                      ('arb_ext_force', 0),
+                      ('tracers', 0),
+                      ('mass_pts', 0),
+                      ('gravity', 0),
+                      ('x_gravity_vec_comp', 0),
+                      ('y_gravity_vec_comp', 0),
+                      ('porous_media', 0),
+                      ('concentration', 0),
+                      ('electro_phys', 0),
+                      ('damped_springs', 0),
+                      ('update_damp_springs', 0),
+                      ('boussinesq', 0),
+                      ('expansion_coeff', 0),
+                      ('user_force_model', 0),
+                      ('poroelastic', 0),
+                      ('brinkman', 0)
+                      )
+
+    PARAMS_DEFAULT = OrderedDict(PARAMS_DEFAULT)
 
     # Initialize 
     Lag_Struct_Params = np.zeros(len(PARAMS_DEFAULT))
@@ -401,7 +406,6 @@ def please_Initialize_Simulation():
     Output_Params = please_Initialize_Output_Inputs(Output_Input)
     Lag_Name_Params = please_Initialize_Lag_Name_Inputs(Lag_Name_Input)
     
-
     #
     # TESTING READ INPUTS STORAGE VALUES
     #
