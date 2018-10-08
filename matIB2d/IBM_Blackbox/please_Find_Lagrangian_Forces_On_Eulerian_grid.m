@@ -242,9 +242,9 @@ fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscl
 
 
 % Save Poro-Elastic Forces, if poroelastic elements %
-if poroelastic_Yes
-    F_Poro(:,1) = fx_springs(poroelastic_info(:,1));
-    F_Poro(:,2) = fy_springs(poroelastic_info(:,1));
+if poroelastic_Yes  
+    F_Poro(:,1) = fx_springs(poroelastic_info(:,1)) + fx_nonInv_beams(poroelastic_info(:,1));
+    F_Poro(:,2) = fy_springs(poroelastic_info(:,1)) + fy_nonInv_beams(poroelastic_info(:,1));
 else
     F_Poro = 0;
 end
@@ -256,7 +256,7 @@ F_Lag(:,2) = fy;
     
 
 % Give me delta-function approximations!
-[delta_X delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
+[delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
 
 
 % Transform the force density vectors into diagonal matrices

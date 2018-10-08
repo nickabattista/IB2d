@@ -125,11 +125,19 @@ end
 function Time_Params = please_Initialize_Time_Inputs(Time_Input)
 
 % Time_Params(1): Tfinal (end time of simulation)
-%             (2): dt (time-step)
+%            (2): dt (time-step)
 
 try
     Time_Params(1) = Time_Input{find(strcmp({Time_Input{:,1}},'Tfinal')),2};
     Time_Params(2) = Time_Input{find(strcmp({Time_Input{:,1}},'dt')),2};
+    
+    % RESTART FLAG %
+    if find(strcmp({Time_Input{:,1}},'Restart_Flag')) > 0
+        Time_Params(3) = Time_Input{find(strcmp({Time_Input{:,1}},'Restart_Flag')),2};
+    else
+        Time_Params(3) = 0;
+    end
+    
 catch
    fprintf('\n \n');
    error('TEMPORAL Information Improperly Declared in input2d file'); 

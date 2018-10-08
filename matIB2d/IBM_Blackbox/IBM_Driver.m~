@@ -112,12 +112,11 @@ mu = Fluid_Params(1);      % Dynamic Viscosity
 rho = Fluid_Params(2);     % Density
 
 % TEMPORAL INFORMATION VALUES STORED %
-T_FINAL = Time_Params(1);      % Final simulation time
-dt = Time_Params(2);           % Time-step
-restart_Flag = Time_Params(3); % Restart Flag (1=YES, RESTART FROM PREVIOUS DATA, 0=No)
-%NTime = floor(T_FINAL/dt)+1;  % # of total time-steps (floor'd so exact number of time-steps)
-%dt = T_FINAL/NTime;           % revised time-step (slightly perturbed dt, so exact # of time-steps are used)
-current_time = 0.0;            % initialize start of simulation to time, 0 
+T_FINAL = Time_Params(1);     % Final simulation time
+dt = Time_Params(2);          % Time-step
+%NTime = floor(T_FINAL/dt)+1; % # of total time-steps (floor'd so exact number of time-steps)
+%dt = T_FINAL/NTime;          % revised time-step (slightly perturbed dt, so exact # of time-steps are used)
+current_time = 0.0;           % initialize start of simulation to time, 0 
 
 % GRID INFO %
 Nx =   Grid_Params(1);                % # of Eulerian pts. in x-direction
@@ -633,11 +632,8 @@ if brinkman_Yes == 1
     cd ..;
 end
 
-%
-% INITIALIZES SIMULATION -> if RESTARTing simulation, reads in previous
-%                           data. Needs script to do so in Example/ folder
-%
-if restart_Flag == 0
+restart = 1;
+if restart == 0
 
     % Initialize the initial velocities to zero.
     U = zeros(Ny,Nx);                                % x-Eulerian grid velocity
@@ -664,7 +660,6 @@ else
     %                       4. sets counters, current_time, saving counters
     %
     [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P] = help_Me_Restart(dt);
-    clear restart_Flag;
     
     %
     % RESTART MASS * STILL NEEDS IMPLEMENTATION <-> default set *
@@ -676,16 +671,8 @@ else
     %
     F_Poro = 0;
     
-    %
-    % INITIALIZATION
-    %
-    vort=zeros(Nx,Ny); uMag=vort; p = vort;  lagPts = [xLag yLag zeros(Nb,1)]; 
-    [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
-    [dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
-    Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-    
     fprintf('\n |****** RESTARTED IMMERSED BOUNDARY SIMULATION! ******| \n\n');
-    fprintf('Start Time(s): %6.6f\n\n',current_time-dt); % - dt just to keep with previous printing convention
+    fprintf('Start Time(s): %6.6f\n\n',current_time-dt); % Minus dt just to keep with previo
     
 end
 
