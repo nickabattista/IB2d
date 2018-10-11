@@ -28,9 +28,13 @@
 % FUNCTION: helps input previous .vtk information for restarting a
 %           simulation that has ended because of power failure, etc.
 %
+%      NOTE: for restart protocol, need to have .vtk data for:
+%                       1. lagPts (Lagrangian positions)
+%                       2. u (velocity field)
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P] = help_Me_Restart(dt)
+function [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P,path_to_data] = help_Me_Restart(dt)
 
 % 
 % NEEDS TO BE HARDCODED PER SIMULATION BASIS
@@ -39,7 +43,7 @@ ctsave = 3;               % Last time-step of data saved (# at end of .vtk file)
 print_dump = 40;           % Print_dump interval as given in input2d
 
 % Path to Simulation Data (e.g., including viz_IB2d folder)
-path_to_data = '/Users/battistn/Desktop/IB2d/matIB2d/Examples/Examples_Test_Restart_Protocol/viz_IB2d/';
+path_to_data = '/Users/battistn/Desktop/IB2d/matIB2d/Examples/Example_Test_Restart_Protocol/Standard_Rubberband_Restart/viz_IB2d/';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
