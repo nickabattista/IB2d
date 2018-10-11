@@ -8,6 +8,7 @@
 % Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
+% Current Institution: The College of New Jersey (TCNJ)
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -650,7 +651,7 @@ if restart_Flag == 0
     [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
     [dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
     Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-    print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat);
+    print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
     fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
     fprintf('Current Time(s): %6.6f\n\n',current_time);
     ctsave = ctsave+1;
@@ -663,7 +664,7 @@ else
     %                       3. 2nd to last xLag and yLag
     %                       4. sets counters, current_time, saving counters
     %
-    [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P] = help_Me_Restart(dt);
+    [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P,path_to_Viz] = help_Me_Restart(dt);
     clear restart_Flag;
     
     %
@@ -674,7 +675,14 @@ else
     %
     % RESTART POROELASTIC * STILL NEEDS IMPLEMENTATION <-> default set *
     %
-    F_Poro = 0;
+    if poroelastic_Yes == 1
+        F_Poro = pass_Back_Data_To_Restart(path_to_Viz,'poroelastic',ctsave-1);
+    else 
+        F_Poro = 0;
+    end
+    
+    %[~, ~, ~, ~, F_Poro, ~] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
+
     
     %
     % INITIALIZATION
@@ -846,7 +854,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat);
+        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -872,7 +880,6 @@ while current_time < T_FINAL
     current_time = current_time+dt;
     cter = cter + 1;
     
-    
 end %ENDS TIME-STEPPING LOOP
 
 
@@ -891,7 +898,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat)
+function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro)
 
     %
     %  Output_Params(1):  print_dump
@@ -1002,8 +1009,24 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
     end
     
-
-
+    %
+    % FOR RESTARTING SIMULATION 
+    %
+    % If POROELASTIC Structure (saves last F_Poro for restart functionality) %
+    if poroelastic_Yes == 1
+    
+        if ctsave == 0
+            mkdir('Data_For_Restart');
+        end
+        
+        cd('Data_For_Restart');
+        print_Matrix_to_TXT_for_Restart(['poroelastic_Restart_' num2str(ctsave) '.txt'],F_Poro);
+        cd ../; % Return to viz_IB2d folder
+        
+    end
+    
+    
+    % If Background Concentration Gradient %
     if concentration_Yes == 1
         confName = ['concentration.' strNUM '.vtk'];
         inds=C<1e-15; % Gives logical matrix
@@ -1069,6 +1092,22 @@ if Output_Params(17) == 1
     end
 end % ENDS IF-STATEMENT FOR IF SAVE_HIER
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: returns appropriate (x,y) values to analyze inside the
+% ventricle
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Matrix_to_TXT_for_Restart(strTitle,matrix)
+
+fid = fopen(strTitle, 'wt'); % Open for writing
+fprintf(fid, 'poroelastic\n');
+for i=1:size(matrix,1)
+   fprintf(fid, '%d ', matrix(i,:));
+   fprintf(fid, '\n');
+end
+fclose(fid);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -2021,6 +2060,27 @@ gen_force_info = importdata(filename,' ',1);
 
 % Save data to new variable, force_general
 force_general = gen_force_info.data;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: returns matrix of data for restart of fiber model (e.g.,
+%           poroelastic or mass, etc.)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function MAT = pass_Back_Data_To_Restart(path_to_Viz,strName,ctsave)
+
+% Grab correct data
+filename = [strName '_Restart_' num2str(ctsave) '.txt'];
+
+% Add path to viz_IB2d folder desired
+addpath([path_to_Viz '/Data_For_Restart/']);
+
+% Imports all the data into a data structure
+matrix_info = importdata(filename,' ',1);
+
+% Save data to new variable, MAT
+MAT = matrix_info.data;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
