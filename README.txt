@@ -21,6 +21,8 @@ If you use the code for research, please cite the following papers:
 [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
 [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, Math. Meth. App. Sci., 1-26 (2017)
 
+%%%%% FOR PYTHON SPECIFIC INSTRUCTIONS, PLEASE SEE README IN pyIB2d %%%%%
+
 This code is capable of creating Lagrangian Structures using:
  	1. Springs (* linear, non-linear, damped *)
  	2. Beams (*torsional springs or non-invariant beams *)

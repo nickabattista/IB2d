@@ -7,15 +7,16 @@ IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear
 	off of Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
 Author: Nicholas A. Battista
-Email:  nick.battista@unc.edu
-Date Created: May 27th, 2015
-Institution: University of North Carolina at Chapel Hill
-Website: http://battista.web.unc.edu
+Email:  nickabattista@gmail.com
+Date Created: May 27th, 2015 (at UNC Chapel Hill)
+Institution: The College of New Jersey (TCNJ)
+Website: http://battistn.pages.tcnj.edu
 GitHub: http://www.github.com/nickabattista
 
-Python 3.5 port by: Christopher Strickland
-Date Created: March 3rd, 2016
-Institution: University of North Carolina at Chapel Hill
+Python 3.5+ port by: Christopher Strickland
+Email: cstric12@utk.edu
+Date Created: March 3rd, 2016 (at UNC Chapel Hill)
+Institution: University of Tennessee, Knoxville
 Website: http://www.christopherstrickland.info
 GitHub: http://www.github.com/mountaindust
 
@@ -24,7 +25,7 @@ Dependencies:
     - Matplotlib
     - Numba (available via Anaconda. not optional b/c the code crawls without it: 600% speedup)
     - pyFFTW (optional. if not already installed, "pip install pyfftw")
-    - vtk (optional. if not already installed, "conda install -c menpo vtk")
+    - vtk (optional. if not already installed, "pip install vtk")
 
 The optional libraries, while not necessary, will speed up the simulations 
 significantly (e.g. in the case of pyFFTW, approximately 20%). Additionally, an
@@ -47,7 +48,9 @@ One is able to update those Lagrangian Structure Parameters, e.g., spring consta
  
 There are a number of ported Examples, mostly used for testing and teaching purposes. Many more are available in the Matlab code - if you port another example, please send us a pull request!
 
-If you would like us to add a specific muscle model, please contact Nick (nick.battista@unc.edu) 
+If you would like us to add a specific muscle model, please contact Nick (nickabattista@gmail.com) 
+
+If you have Python specific questions, please contact Christopher (cstric12@utk.edu)
 
 If you use this code for the purposes of teaching, research, or recreation please let Nick know as well :)
 
