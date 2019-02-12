@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''To compile: python setup.py build_ext --inplace'''
 
@@ -13,4 +13,5 @@ setup(
     ext_modules = [Extension("write",
                              sources=["wrtFile.pyx", "c_write.c"],
                              include_dirs=[numpy.get_include()])],
+    python_requires='>=3.5',
     )
