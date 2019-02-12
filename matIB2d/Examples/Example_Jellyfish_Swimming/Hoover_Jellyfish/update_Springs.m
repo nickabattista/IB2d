@@ -38,23 +38,13 @@ function springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
 
 %RL = springs_info(:,4); % resting-length vector
 
-freq = 0.5;
-%theta=freq*current_time*2*pi;
-%phase = sin(theta);
-
-%size(springs_info)
-
-%springs_info(1:3,:)
-%pause();
+% Contraction Frequency
+freq = 1.0;
 
 % CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL
-%springs_info(319:end,4) = phase;
+springs_info(319:end,4) = abs( cos(freq*current_time*pi) );
 
-springs_info(319:end,4) = abs( sin(freq*current_time*2*pi) );
+%NOTE: not 2*pi*ft b/c of abs()
 
 
-% if ( mod(current_time,0.875) < 0.875/2 ) 
-%     springs_info(319:end,4) = abs( sin(0.875*current_time*2*pi) );
-% else
-%     springs_info(319:end,4) = 0;%abs( sin(0.875*current_time*2*pi) );
-% end
+

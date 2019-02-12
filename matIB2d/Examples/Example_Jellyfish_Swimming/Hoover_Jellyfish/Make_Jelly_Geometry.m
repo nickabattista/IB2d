@@ -6,16 +6,19 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+function Make_Jelly_Geometry()
 
 close all;
 clear all;
-L = 8;                              % length of computational domain (m)
+L = 8;                              % height of computational domain (m) for keeping desired resolution
+Lh = 10;                            % actual height of computational domain (m) (MATCHES INPUT2D)
+Lw = 3;                             % width of computational domain (m) (MATCHES INPUT2D)
 N = 512;                            % number of Cartesian grid meshwidths at the finest level of the AMR grid
 dx = L/N;                           % Cartesian mesh width (m)
 ds = dx/2;
  
-a=.5;
-b=.75;
+a=.5;                               % bell radius (semi-minor axis, horizontal axis, note width=2a)
+b=.75;                              % bell semi-major axis 
 d=-0.25;
 factor_a=.8;
  
@@ -30,10 +33,10 @@ z_points=zeros(1000,1);
 id_points=zeros(1000,1);
 offset = 0;
  
-kappa_spring = 1e7; %1e5                % spring constant (Newton)
-kappa_beam = 1e5;    %5e3              % beam stiffness constant (Newton m^2)
-%kappa_beam_flexible = kappa_beam/5;               % beam stiffness constant (Newton m^2)
-kappa_target = kappa_spring;         % target point penalty spring constant (Newton)
+kappa_spring = 1e7; %1e5               % spring constant (Newton)
+kappa_beam = 2.5e5; %1e5    %5e3              % beam stiffness constant (Newton m^2)
+%kappa_beam_flexible = kappa_beam/5;   % beam stiffness constant (Newton m^2)
+kappa_target = kappa_spring;           % target point penalty spring constant (Newton)
  
 c=0;
 while(theta_test<(pi-theta_lim))
@@ -73,6 +76,13 @@ it_points=id_points(1:npts);
 plot(x_points(:),z_points(:),'*'); hold on;
 axis([0 8 0 8])
 
+% Lag Pts to Mess up Flow At Edge
+xBlock = ds:4*ds:Lw-ds;
+yBlock = (Lh-5*ds)*ones(1,length(xBlock))+ds;
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Print .vertex information
@@ -81,13 +91,15 @@ axis([0 8 0 8])
 
 vertex_fid = fopen([mesh_name num2str(N) '.vertex'], 'w');
  
-    fprintf(vertex_fid, '%d\n', npts + npts_musc*2);
-
+    fprintf(vertex_fid, '%d\n', npts + npts_musc*2 + length(xBlock));
+    lag_ct = 0;
+    
     %
     % bell
     %
     for j=1:npts
         fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(j), z_points(j));
+        lag_ct = lag_ct + 1;
     end
  
     %
@@ -96,14 +108,22 @@ vertex_fid = fopen([mesh_name num2str(N) '.vertex'], 'w');
     for s = 1:npts_musc
         fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(npts_wing+1-npts_musc+s), z_points(npts_wing+1-npts_musc+s));
         plot(x_points(npts_wing+1-npts_musc+s),z_points(npts_wing+1-npts_musc+s),'r*'); hold on;
+        lag_ct = lag_ct + 1;
     end
     for s = 1:npts_musc
         fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(npts-npts_musc+s), z_points(npts-npts_musc+s));
         plot(x_points(npts-npts_musc+s),z_points(npts-npts_musc+s),'r*'); hold on;
+        lag_ct = lag_ct + 1;
+    end
+    
+    for ii=1:length(xBlock)
+        fprintf(vertex_fid, '%1.16e %1.16e\n', xBlock(ii), yBlock(ii));
     end
 
 fclose(vertex_fid);
- 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Print .spring information
@@ -180,3 +200,38 @@ beam_fid = fopen([mesh_name num2str(N) '.nonInv_beam'], 'w');
  
     fclose(beam_fid);
  
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
+%
+% PRINT TARGET POINTS!!!
+%
+% print target points (flow blocker along edge)
+k_Target = 2.5e6;
+nBefore = lag_ct; % Counts pts in jellyfish for bookkeeping for .target file
+struct_name = 'jelly512';
+print_Lagrangian_Target_Pts(xBlock,k_Target,struct_name,nBefore)    
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints TARGET points to a file called 'struct_name'.target
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,nBefore)
+
+    N = length(xLag);
+    Nstart = nBefore+1;
+    Nend = nBefore+N;
+
+    target_fid = fopen([struct_name '.target'], 'w');
+
+    fprintf(target_fid, '%d\n', N );
+
+    %Loops over all Lagrangian Pts.
+    for s = Nstart:Nend
+        fprintf(target_fid, '%d %1.16e\n', s, k_Target);
+    end
+
+    fclose(target_fid); 
