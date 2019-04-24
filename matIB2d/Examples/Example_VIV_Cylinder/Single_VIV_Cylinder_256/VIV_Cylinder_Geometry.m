@@ -5,9 +5,10 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
-% Institution: UNC-CH
+% Institution: UNC-CH (created)
+% Current Institution: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -15,11 +16,11 @@
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -85,9 +86,10 @@ print_Lagrangian_Vertices([xLag xLag_Cy],[yLag yLag_Cy],struct_name);
 
 
 % Prints .spring file!
+k_Spring_Tether = 1e4;
 k_Spring = 2.0e7; resting_length_tether = 2*r;
 offset = length(xLag);
-print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,struct_name);
+print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,k_Spring_Tether,struct_name);
 
 
 % Prints .beam file!
@@ -183,7 +185,7 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name,offset)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether,resting_length_tether,struct_name)
+function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether,resting_length_tether,k_Spring_Tether,struct_name)
 
     % offset = # of lag pts in channel (ordering lag pts, channel -> cylinder)
 
@@ -213,8 +215,8 @@ function print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,r,offset,indsTether
     end
     
     s=1; % Reset
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), 1e4, resting_length_tether);
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), 1e4, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+offset,     indsTether(2), k_Spring_Tether, resting_length_tether);
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', s+N/2+1+offset, indsTether(1), k_Spring_Tether, resting_length_tether);
     
     fclose(spring_fid); 
     
