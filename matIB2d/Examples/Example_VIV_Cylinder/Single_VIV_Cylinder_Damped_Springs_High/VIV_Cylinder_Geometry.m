@@ -114,9 +114,10 @@ print_Lagrangian_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting
 
 
 % Prints .d_spring file! (FOR DAMPED SPRINGS)
-k_Spring = 1.5e4; resting_length_tether = 2*r; offset = length(xLag); 
+k_DSpring_Tether = 1.5e4; 
+resting_length_tether = 2*r; offset = length(xLag); 
 b_damp = 50.0;
-print_Lagrangian_Damped_Springs(xLag_Cy,yLag_Cy,k_Spring,ds,r,offset,indsTether,resting_length_tether,b_damp,struct_name)
+print_Lagrangian_Damped_Springs(xLag_Cy,yLag_Cy,k_DSpring_Tether,ds,r,offset,indsTether,resting_length_tether,b_damp,struct_name)
 
 
 % Prints .beam file!
