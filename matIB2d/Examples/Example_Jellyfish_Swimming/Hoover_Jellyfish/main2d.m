@@ -46,7 +46,7 @@ function main2d()
 % Path Reference to where Driving code is found %
 %
 warning('off','all');
-addpath('/Users/battistn/Desktop/IB2d/matIB2d/IBM_Blackbox','/home/hpc/battistn/IB2d/matIB2d/IBM_Blackbox');
+addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
 
 
 %
