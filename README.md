@@ -12,7 +12,6 @@ Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.ed
 <h3 style="color:red;"> If you use this software for research, educational, or recreational purpose, please let Nick Battista (<a href="mailto:battistn[at]tcnj.edu">battistn[at]tcnj.edu</a>) know </h3>
 
 <br />
-<br />
 
 %*********************************************************************************************************************%
 
