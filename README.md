@@ -3,7 +3,7 @@
 
 Author: Nicholas A. Battista <br>
 Email: <a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> <br>
-Department: <a href="https://mathstat.tcnj.edu/"> Mathematics and Statistics  </a> <br>
+Department: Mathematics and Statistics (<a href="https://mathstat.tcnj.edu/"> TCNJ MATH  </a>) <br>
 Institution: The College of New Jersey (<a href="https://tcnj.edu/"> TCNJ </a>) <br> 
 Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.edu </a> <br>
 
