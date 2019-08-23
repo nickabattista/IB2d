@@ -2,10 +2,8 @@
 <H1> IB2d </H1>
 <H3 >An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including with multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H3>
 
-<H3>If you use this software for research, educational, or recreational purposed, please let Nick Battista know (<a href="battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> ) </H3>
+<H3>If you use this software for research, educational, or recreational purposed, please let Nick Battista (<a href="battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> ) know </H3>
 
-<br />
-<br />
 <br />
 <br />
 <br />
