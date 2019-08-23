@@ -2,10 +2,10 @@
 <H1> IB2d </H1>
 
 Author: Nicholas A. Battista <br>
-Email: <a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a>
-Department: <a href="https://mathstat.tcnj.edu/"> Mathematics and Statistics  </a> 
+Email: <a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> <br>
+Department: <a href="https://mathstat.tcnj.edu/"> Mathematics and Statistics  </a> <br>
 Institution: The College of New Jersey (<a href="https://tcnj.edu/"> TCNJ </a>) <br> 
-Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.edu </a> 
+Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.edu </a> <br>
 
 <H2>An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including with multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H2>
 
