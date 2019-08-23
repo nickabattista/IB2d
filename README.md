@@ -11,8 +11,6 @@ Institution: The College of New Jersey (<a href="https://tcnj.edu/">TCNJ</a>) <b
 
 <H4>An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H4>
 
-<font size="5" color="red">If you use this software for research, educational, or recreational purposes, please let Nick Battista (<a href="mailto:battistn[at]tcnj.edu">battistn[at]tcnj.edu</a>) know!</font>
-
 <h3 style="color:red;"> If you use this software for research, educational, or recreational purposes, please let Nick Battista (<a href="mailto:battistn[at]tcnj.edu">battistn[at]tcnj.edu</a>) know! </h3>
 
 
