@@ -8,7 +8,7 @@ IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear
 
 Author: Nicholas A. Battista
 Institution: The College of New Jersey (TCNJ)
-Email:  nickabattista@gmail.com
+Email:  battistn[at]tcnj.edu
 Website: http://battistn.pages.tcnj.edu
 GitHub: http://www.github.com/nickabattista
 
@@ -16,10 +16,32 @@ HISTORY:
 Date Created: May 27th, 2015 by NAB
 Institution: University of North Carolina at Chapel Hill
 
+%*****************************************************************************%
+
+If you use this software for research, educational, or recreational purposed, please let Nick Battista know (battistn@tcnj.edu)
+
 If you use the code for research, please cite the following papers:
 [1] N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
 [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
 [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, Math. Meth. App. Sci., 1-26 (2017)
+
+%*****************************************************************************%
+
+IB2d Video Tutorials:
+
+Tutorial 1: https://youtu.be/PJyQA0vwbgU
+An introduction to the immersed boundary method, fiber models, open source IB software, IB2d​, and some FSI examples!
+
+Tutorial 2: https://youtu.be/jSwCKq0v84s
+A tour of what comes with the IB2d software, how to download it, what Example subfolders contain and what input files are necessary to run a simulation
+
+Tutorial 3: https://youtu.be/I3TLpyEBXfE
+An overview of how to construct immersed boundary geometries and create the input files (.vertex, .spring, etc.) for an IB2d simulation to run using the oscillating rubberband example from Tutorial 2 as a guide.
+
+Tutorial 4: https://youtu.be/4D4ruXbeCiQ
+The basics of visualizing data using open source visualization software called VisIt (by Lawrence Livermore National Labs), visualizing the Lagrangian Points and Eulerian Data (colormaps for scalar data and vector fields for fluid velocity vectors)
+
+%*****************************************************************************%
 
 %%%%% FOR PYTHON SPECIFIC INSTRUCTIONS, PLEASE SEE README IN pyIB2d %%%%%
 
