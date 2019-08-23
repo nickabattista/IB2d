@@ -23,7 +23,7 @@ If you use this software for research, educational, or recreational purposed, pl
 If you use the code for research, please cite the following papers:
 [1] N.A. Battista, A.J. Baird, L.A. Miller, A Mathematical Model and MATLAB Code for Muscle-Fluid-Structure Simulations, Integr. Comp. Biol. 55 (2015), 901-911.
 [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
-[3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, Math. Meth. App. Sci., 1-26 (2017)
+[3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, Math. Meth. App. Sci. 41(18):8455-8480 (2018)
 
 %*****************************************************************************%
 
