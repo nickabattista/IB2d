@@ -1,7 +1,7 @@
 <a href="https://github.com/nickabattista/IB2d"><img src="https://static.wixstatic.com/media/50968c_6e90280106f24ba3ada127d6e1620ea5~mv2.png/v1/fill/w_443,h_319,al_c,q_80,usm_0.66_1.00_0.01/50968c_6e90280106f24ba3ada127d6e1620ea5~mv2.webp" align="right" height="450" width="450" ></a>
 <H1> IB2d </H1>
 
-Author: Nicholas A. Battista <br>
+Author: Nicholas A. Battista, Ph.D. <br>
 Email: <a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> <br>
 Department: Mathematics & Statistics (<a href="https://mathstat.tcnj.edu/"> TCNJ MATH  </a>) <br>
 Institution: The College of New Jersey (<a href="https://tcnj.edu/"> TCNJ </a>) <br> 
