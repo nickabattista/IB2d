@@ -1,10 +1,9 @@
 <a href="https://github.com/nickabattista/IB2d"><img src="https://static.wixstatic.com/media/50968c_6e90280106f24ba3ada127d6e1620ea5~mv2.png/v1/fill/w_443,h_319,al_c,q_80,usm_0.66_1.00_0.01/50968c_6e90280106f24ba3ada127d6e1620ea5~mv2.webp" align="right" height="450" width="450" ></a>
 <H1> IB2d </H1>
-<H3 >An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including with multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H3>
+<H3>An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including with multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H3>
 
-<H3>If you use this software for research, educational, or recreational purposed, please let Nick Battista (<a href="battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> ) know </H3>
+<H3>If you use this software for research, educational, or recreational purposed, please let Nick Battista (<a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> ) know </H3>
 
-<br />
 <br />
 <br />
 <br />
@@ -12,7 +11,7 @@
 
 %**************************************************************************************************************%
 
-If you use the code for research, please cite the following papers:
+<H3>If you use the code for research, please cite the following papers:</H3>
 
 N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-911 (2015), <a href="http://www.ncbi.nlm.nih.gov/pubmed/26337187"> LINK </a>
 
@@ -23,7 +22,7 @@ N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more p
 
 %**************************************************************************************************************%
 
-IB2d Video Tutorials:
+<H3>IB2d Video Tutorials:</H3>
 
 Tutorial 1: <a href="https://youtu.be/PJyQA0vwbgU"> https://youtu.be/PJyQA0vwbgU </a>    
 An introduction to the immersed boundary method, fiber models, open source IB software, IB2d​, and some FSI examples!
