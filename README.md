@@ -4,6 +4,11 @@ An easy to use immersed boundary method in 2D, with full implementations in MATL
 
 If you use this software for research, educational, or recreational purposed, please let Nick Battista know (battistn[at]tcnj.edu)
 
+
+
+
+
+
 %**************************************************************************************************************%
 
 If you use the code for research, please cite the following papers:
