@@ -13,6 +13,16 @@ Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.ed
 
 <br />
 
+hr { 
+    display: block;
+    margin-before: 0.5em;
+    margin-after: 0.5em;
+    margin-start: auto;
+    margin-end: auto;
+    overflow: hidden;
+    border-style: inset;
+    border-width: 1px;
+}
 %******************************************************************************************************************%
 
 <H3>If you use the code for research, please cite the following papers:</H3>
