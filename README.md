@@ -13,7 +13,7 @@ Website: <a href="http://battistn.pages.tcnj.edu"> http://battistn.pages.tcnj.ed
 
 <br />
 
-hr { 
+<hr> { 
     display: block;
     margin-before: 0.5em;
     margin-after: 0.5em;
@@ -22,7 +22,8 @@ hr {
     overflow: hidden;
     border-style: inset;
     border-width: 1px;
-}
+} </hr>
+
 %******************************************************************************************************************%
 
 <H3>If you use the code for research, please cite the following papers:</H3>
