@@ -2,14 +2,15 @@
 <H1> IB2d </H1>
 <H3>An easy to use immersed boundary method in 2D, with full implementations in MATLAB and Python that contains over 60 built-in examples, including with multiple options for fiber-structure models and advection-diffusion, Boussinesq approximations, and/or artificial forcing. </H3>
 
+<H3> Author: Nicholas A. Battista </H3>
+<H3>Institution: The College of New Jersey (TCNJ) </H3>
+
 <H3>If you use this software for research, educational, or recreational purposed, please let Nick Battista (<a href="mailto:battistn[at]tcnj.edu"> battistn[at]tcnj.edu </a> ) know </H3>
 
 <br />
 <br />
-<br />
-<br />
 
-%**************************************************************************************************************%
+%*****************************************************************************************************************************%
 
 <H3>If you use the code for research, please cite the following papers:</H3>
 
@@ -20,7 +21,7 @@ boundary method,, Bioinspiration and Biomemetics 12(3): 036003 (2017), <a href="
 
 N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: a more powerful Python and MATLAB implementation of the immersed boundary method, in press Math. Method. Appl. Sci. 41:8455-8480 (2018) <a href="http://onlinelibrary.wiley.com/doi/10.1002/mma.4708/epdf?author_access_token=HKAwHFmV1yKY6_lY4_I0dU4keas67K9QMdWULTWMo8P3KIzKeMHgO9D_yBVf1ZxhuLjZr3RgM74HKTOZj3MqwU9I9Skl8KVs-2ruPFMgjIXF0QlZful2HU6NM7TQ0wkl"> LINK </a>
 
-%**************************************************************************************************************%
+%*****************************************************************************************************************************%
 
 <H3>IB2d Video Tutorials:</H3>
 
@@ -36,6 +37,6 @@ An overview of how to construct immersed boundary geometries and create the inpu
 Tutorial 4: <a href="https://youtu.be/4D4ruXbeCiQ"> https://youtu.be/4D4ruXbeCiQ </a>  
 The basics of visualizing data using open source visualization software called VisIt (by Lawrence Livermore National Labs), visualizing the Lagrangian Points and Eulerian Data (colormaps for scalar data and vector fields for fluid velocity vectors)
 
-%**************************************************************************************************************%
+%*****************************************************************************************************************************%
 
 
