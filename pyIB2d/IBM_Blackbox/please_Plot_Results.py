@@ -27,6 +27,11 @@
 ----------------------------------------------------------------------------'''
 
 import numpy as np
+import sys
+from sys import platform
+if platform == 'darwin': # OSX backend does not support blitting
+    import matplotlib
+    matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 plt.rcParams['image.cmap'] = 'viridis'
 from math import sqrt
