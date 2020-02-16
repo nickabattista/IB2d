@@ -393,6 +393,8 @@ try
     % PRINT DUMP INTERVAL %
     if find(strcmp({Output_Input{:,1}},'print_dump')) > 0
         Output_Params(1) = Output_Input{find(strcmp({Output_Input{:,1}},'print_dump')),2};
+    elseif find(strcmp({Output_Input{:,1}},'print_Dump')) > 0
+        Output_Params(1) = Output_Input{find(strcmp({Output_Input{:,1}},'print_Dump')),2};
     else
         Output_Params(1) = 0;
     end
