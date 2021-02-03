@@ -1,0 +1,131 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2016 The MathWorks, Inc.
+                   R2016b (9.1.0.441655) 64-bit (glnxa64)
+                             September 7, 2016
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+s =
+
+  Columns 1 through 7
+
+         0    0.0156    0.0312    0.0469    0.0625    0.0781    0.0938
+
+  Columns 8 through 14
+
+    0.1094    0.1250    0.1406    0.1562    0.1719    0.1875    0.2031
+
+  Columns 15 through 21
+
+    0.2188    0.2344    0.2500    0.2656    0.2812    0.2969    0.3125
+
+  Columns 22 through 28
+
+    0.3281    0.3438    0.3594    0.3750    0.3906    0.4062    0.4219
+
+  Columns 29 through 35
+
+    0.4375    0.4531    0.4688    0.4844    0.5000    0.5156    0.5312
+
+  Columns 36 through 42
+
+    0.5469    0.5625    0.5781    0.5938    0.6094    0.6250    0.6406
+
+  Columns 43 through 49
+
+    0.6562    0.6719    0.6875    0.7031    0.7188    0.7344    0.7500
+
+  Columns 50 through 56
+
+    0.7656    0.7812    0.7969    0.8125    0.8281    0.8438    0.8594
+
+  Columns 57 through 63
+
+    0.8750    0.8906    0.9062    0.9219    0.9375    0.9531    0.9688
+
+  Columns 64 through 70
+
+    0.9844    1.0000    1.0156    1.0312    1.0469    1.0625    1.0781
+
+  Columns 71 through 77
+
+    1.0938    1.1094    1.1250    1.1406    1.1562    1.1719    1.1875
+
+  Columns 78 through 84
+
+    1.2031    1.2188    1.2344    1.2500    1.2656    1.2812    1.2969
+
+  Columns 85 through 91
+
+    1.3125    1.3281    1.3438    1.3594    1.3750    1.3906    1.4062
+
+  Columns 92 through 98
+
+    1.4219    1.4375    1.4531    1.4688    1.4844    1.5000    1.5156
+
+  Columns 99 through 105
+
+    1.5312    1.5469    1.5625    1.5781    1.5938    1.6094    1.6250
+
+  Columns 106 through 112
+
+    1.6406    1.6562    1.6719    1.6875    1.7031    1.7188    1.7344
+
+  Columns 113 through 119
+
+    1.7500    1.7656    1.7812    1.7969    1.8125    1.8281    1.8438
+
+  Columns 120 through 125
+
+    1.8594    1.8750    1.8906    1.9062    1.9219    1.9375
+
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2016 The MathWorks, Inc.
+                   R2016b (9.1.0.441655) 64-bit (glnxa64)
+                             September 7, 2016
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+________________________________________________________________________________
+
+
+---------------->>                 IB2d                      <<----------------
+
+________________________________________________________________________________
+
+If using the code for research purposes please cite the following two papers: 
+     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-911 (2015)
+     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+     [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method, Math. Method. Appl. Sci. 41(18):8455-8480 (2018).
+________________________________________________________________________________
+
+
+ |****** Prepping Immersed Boundary Simulation ******|
+
+
+--> Reading input data for simulation...
+
+
+--> FIBER MODEL INCLUDES: 
+  -Springs and NOT dynamically updating spring properties
+
+
+--> Background Flow Items
+  -Background concentration included
+
+ |****** Begin IMMERSED BOUNDARY SIMULATION! ******| 
+
+Current Time(s): 0.000000
+
+
+
+ |****** IMMERSED BOUNDARY SIMULATION HAS FINISHED! ******|
+
