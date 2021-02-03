@@ -291,7 +291,7 @@ try
         Lag_Struct_Params(18) = 0;
     end
 
-    % CONCENTRATION GRADIENT %
+    % ADVECTION SCHEME %
     if find(strcmp({Lag_Struct_Input{:,1}},'advection')) > 0
         Lag_Struct_Params(19) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'advection')),2};
     else
@@ -313,69 +313,76 @@ try
         Lag_Struct_Params(21) = 0;
     end
 
+    % CONCENTRATION SOURCE TERM %
+    if find(strcmp({Lag_Struct_Input{:,1}},'c_inf')) > 0
+        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'c_inf')),2};
+    else
+        Lag_Struct_Params(22) = 1;
+    end
+
 
     % ELECTROPHYSIOLOGY %
     if find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')) > 0
-        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')),2};
+        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')),2};
     else
-        Lag_Struct_Params(22) = 0;
+        Lag_Struct_Params(23) = 0;
     end
 
     % DAMPED SPRINGS %
     if find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')) > 0
-        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')),2};
+        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')),2};
     else
-        Lag_Struct_Params(23) = 0;
+        Lag_Struct_Params(24) = 0;
     end
 
 
     % UPDATE DAMPED SPRINGS %
     if find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')) > 0
-        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')),2};
-    else
-        Lag_Struct_Params(24) = 0;
-    end
-
-    % BOUSSINESQ %
-    if find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')) > 0
-        Lag_Struct_Params(25) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')),2};
+        Lag_Struct_Params(25) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')),2};
     else
         Lag_Struct_Params(25) = 0;
     end
 
-    % EXPANSION COEFFICIENT (BOUSSINESQ) %
-    if find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')) > 0
-        Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')),2};
+    % BOUSSINESQ %
+    if find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')) > 0
+        Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')),2};
     else
         Lag_Struct_Params(26) = 0;
     end
 
-    % USER-FORCE MODEL %
-    if find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')) > 0
-        Lag_Struct_Params(27) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')),2};
+    % EXPANSION COEFFICIENT (BOUSSINESQ) %
+    if find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')) > 0
+        Lag_Struct_Params(27) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')),2};
     else
         Lag_Struct_Params(27) = 0;
     end
-    
-    % PORO-ELASTIC MEDIA %
-    if find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')) > 0
-        Lag_Struct_Params(28) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')),2};
+
+    % USER-FORCE MODEL %
+    if find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')) > 0
+        Lag_Struct_Params(28) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')),2};
     else
         Lag_Struct_Params(28) = 0;
     end
     
-    % COAGULATION %
-    if find(strcmp({Lag_Struct_Input{:,1}},'coagulation')) > 0
-        Lag_Struct_Params(29) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
+    % PORO-ELASTIC MEDIA %
+    if find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')) > 0
+        Lag_Struct_Params(29) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')),2};
     else
         Lag_Struct_Params(29) = 0;
     end
     
-    % BRINKMAN %
-    if find(strcmp({Lag_Struct_Input{:,1}},'brinkman')) > 0
-        Lag_Struct_Params(30) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'brinkman')),2};
+    % COAGULATION %
+    if find(strcmp({Lag_Struct_Input{:,1}},'coagulation')) > 0
+        Lag_Struct_Params(30) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
     else
         Lag_Struct_Params(30) = 0;
+    end
+    
+    % BRINKMAN %
+    if find(strcmp({Lag_Struct_Input{:,1}},'brinkman')) > 0
+        Lag_Struct_Params(31) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'brinkman')),2};
+    else
+        Lag_Struct_Params(31) = 0;
     end
 
 catch
@@ -579,14 +586,15 @@ Lag_Struct_Params(18)= 0;         % Background Concentration Gradient: 0 (for no
 Lag_Struct_Params(19)= 0;         % Advection scheme: 0 (for 1st O Upwind) or 1 (for 3rd O WENO))
 Lag_Struct_Params(20)= 0;         % Concentration source: 0 (for no) or 1 (for constant) or 2 (for limited))
 Lag_Struct_Params(21)= 0;         % Concentration source rate
-Lag_Struct_Params(22)= 0;         % Electrophysiology Model (FitzHugh-Nagumo)
-Lag_Struct_Params(23)= 0;         % Damped Springs: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(24)= 0;         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(25)= 0;         % Boussinesq: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(26)= 0;         % expansion coefficient for Boussinesq approx.
-Lag_Struct_Params(27)= 0;         % user-defined general force model: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(28)= 0;         % poroelastic media: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(29)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(22)= 1;         % Concentration saturation limit
+Lag_Struct_Params(23)= 0;         % Electrophysiology Model (FitzHugh-Nagumo)
+Lag_Struct_Params(24)= 0;         % Damped Springs: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(25)= 0;         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(26)= 0;         % Boussinesq: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(27)= 0;         % expansion coefficient for Boussinesq approx.
+Lag_Struct_Params(28)= 0;         % user-defined general force model: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(29)= 0;         % poroelastic media: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(30)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
 
 
 Output_Params(1) = 1000;          % Print Dump (How often to plot)

@@ -162,15 +162,16 @@ concentration_Yes = Lag_Struct_Params(18);    % Background Concentration Gradien
 adv_scheme = Lag_Struct_Params(19);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
 source_Yes = Lag_Struct_Params(20);           % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
 ksource = Lag_Struct_Params(21);              % Concentration Source Rate
-electro_phys_Yes = Lag_Struct_Params(22);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = Lag_Struct_Params(23);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = Lag_Struct_Params(24);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = Lag_Struct_Params(25);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = Lag_Struct_Params(26);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = Lag_Struct_Params(27);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
-poroelastic_Yes = Lag_Struct_Params(28);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
-coagulation_Yes = Lag_Struct_Params(29);      % Coagulation Model: 0 (for no) or 1 (for yes)
-brinkman_Yes= Lag_Struct_Params(30);          % Brinkman fluid: 0 (for no) or 1 (for yes)
+c_inf = Lag_Struct_Params(22);                % Concentration saturation limit
+electro_phys_Yes = Lag_Struct_Params(23);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = Lag_Struct_Params(24);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = Lag_Struct_Params(25);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = Lag_Struct_Params(26);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = Lag_Struct_Params(27);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = Lag_Struct_Params(28);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(29);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(30);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(31);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -854,9 +855,9 @@ while current_time < T_FINAL
 
     elseif concentration_Yes == 1 && source_Yes>0
     % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C);
+     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,c_inf);
    % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,adv_scheme);
+      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,Ly,adv_scheme);
 
    end
         
