@@ -34,14 +34,14 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [X,Y,U,V,xLag,yLag] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
+function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
 
 
 %
 %    2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 %    
 %    x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + F_x
-%    y-Momentum Convervation: rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) - p_y + F_y
+%    y-Momentum 
 %
 %    Incompressibility: u_x + v_y = 0
 %
@@ -159,15 +159,18 @@ gravity_Yes = Lag_Struct_Params(14);          % Gravity: 0 (for no) or 1 (for ye
 %NOTE: Lag_Struct_Params(15),(16):            <- components of gravity vector (if gravity, initialize them below)
 porous_Yes = Lag_Struct_Params(17);           % Porous Media: 0 (for no) or 1 (for yes)
 concentration_Yes = Lag_Struct_Params(18);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-electro_phys_Yes = Lag_Struct_Params(19);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = Lag_Struct_Params(20);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = Lag_Struct_Params(21);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = Lag_Struct_Params(22);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
-poroelastic_Yes = Lag_Struct_Params(25);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
-coagulation_Yes = Lag_Struct_Params(26);      % Coagulation Model: 0 (for no) or 1 (for yes)
-brinkman_Yes= Lag_Struct_Params(27);          % Brinkman fluid: 0 (for no) or 1 (for yes)
+adv_scheme = Lag_Struct_Params(19);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
+source_Yes = Lag_Struct_Params(20);           % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
+ksource = Lag_Struct_Params(21);              % Concentration Source Rate
+electro_phys_Yes = Lag_Struct_Params(22);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = Lag_Struct_Params(23);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = Lag_Struct_Params(24);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = Lag_Struct_Params(25);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = Lag_Struct_Params(26);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = Lag_Struct_Params(27);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(28);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(29);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(30);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -716,6 +719,11 @@ while current_time < T_FINAL
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
     %
+    xLag_prev=xLag;
+    yLag_prev=yLag;
+    U_prev=U;
+    V_prev=V;
+
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
     
     
@@ -754,7 +762,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
+   [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -833,12 +841,24 @@ while current_time < T_FINAL
         tracers(:,3) = yT;
     end
     
-    
+    % if there are sources and sinks at the moving lagangian points
+
+ 
     % If there is a background concentration, update concentration-gradient %
-    if concentration_Yes == 1
-       %[C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
-       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
-    end
+    if concentration_Yes == 1 && source_Yes==0
+      fs=zeros(Nx,Ny);
+      % Advection-diffusion without a source term
+
+%    [C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
+       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiffusion,adv_scheme);
+
+    elseif concentration_Yes == 1 && source_Yes>0
+    % Advection-diffusion with a source term
+     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C);
+   % update advection-diffusion equation
+      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,adv_scheme);
+
+   end
         
     % Plot Lagrangian/Eulerian Dynamics! %
     if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )

@@ -82,11 +82,11 @@ nonInv_beams_Yes = model_Info(7);
 muscle_LT_FV_Yes = model_Info(9);   % Length-Tension/Force-Velocity Muscle: 0 (for no) or 1 (for yes) (Length/Tension - Hill Model)
 muscle_3_Hill_Yes = model_Info(10); % 3-Element Hill Model: 0 (for no) or 1 (for yes) (3 Element Hill + Length-Tension/Force-Velocity)
 mass_Yes = model_Info(13);          % Mass Pts: 0 (for no) or 1 (for yes)
-electro_phys_Yes = model_Info(19);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = model_Info(20);     % Damped Springs: 0 (for no) or 1 (for yes)
-gen_force_Yes = model_Info(24);     % General User-Defined Force: 0 (for no) or 1 (for yes)
-poroelastic_Yes = model_Info(25);   % Poroelastic Media: 0 (for no) or 1 (for yes)
-coagulation_Yes = model_Info(26);   % Coagulation Model: 0 (for no) or 1 (for yes)
+electro_phys_Yes = model_Info(22);  % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = model_Info(23);     % Damped Springs: 0 (for no) or 1 (for yes)
+gen_force_Yes = model_Info(27);     % General User-Defined Force: 0 (for no) or 1 (for yes)
+poroelastic_Yes = model_Info(28);   % Poroelastic Media: 0 (for no) or 1 (for yes)
+coagulation_Yes = model_Info(29);   % Coagulation Model: 0 (for no) or 1 (for yes)
 
 
 %
