@@ -1,8 +1,0 @@
-#! /bin/bash -l
-#SBATCH -J IB2D
-#SBATCH -o IB2D.output
-#SBATCH -e IB2D.output
-#SBATCH --mail-user malvarado27@ucmerced.edu
-#SBATCH --mail-type=ALL
-#SBATCH -p skhatri3.q
-./job.sh
