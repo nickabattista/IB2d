@@ -52,6 +52,7 @@ y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
 poroelastic = 0         % 0 (for no) or 1 (for yes)
 concentration = 1       % 0 (for no) or 1 (for yes)
+kDiff =1e-2             % Diffusion coefficient
 advection = 1           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
 source = 2              % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for sink)
 k_source = 0.1          % rate of source term for concentration

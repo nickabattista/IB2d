@@ -139,6 +139,7 @@ velPlot = Output_Params(4);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Mat
 vortPlot = Output_Params(5);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
 uMagPlot = Output_Params(6);       % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
 pressPlot = Output_Params(7);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+conPlot = Output_Params(8);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -159,19 +160,20 @@ gravity_Yes = Lag_Struct_Params(14);          % Gravity: 0 (for no) or 1 (for ye
 %NOTE: Lag_Struct_Params(15),(16):            <- components of gravity vector (if gravity, initialize them below)
 porous_Yes = Lag_Struct_Params(17);           % Porous Media: 0 (for no) or 1 (for yes)
 concentration_Yes = Lag_Struct_Params(18);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-adv_scheme = Lag_Struct_Params(19);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
-source_Yes = Lag_Struct_Params(20);           % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
-ksource = Lag_Struct_Params(21);              % Concentration Source Rate
-c_inf = Lag_Struct_Params(22);                % Concentration saturation limit
-electro_phys_Yes = Lag_Struct_Params(23);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = Lag_Struct_Params(24);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = Lag_Struct_Params(25);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = Lag_Struct_Params(26);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = Lag_Struct_Params(27);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = Lag_Struct_Params(28);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
-poroelastic_Yes = Lag_Struct_Params(29);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
-coagulation_Yes = Lag_Struct_Params(30);      % Coagulation Model: 0 (for no) or 1 (for yes)
-brinkman_Yes= Lag_Struct_Params(31);          % Brinkman fluid: 0 (for no) or 1 (for yes)
+kDiffusion=Lag_Struct_Params(19);             % Diffusion Coefficient 
+adv_scheme = Lag_Struct_Params(20);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
+source_Yes = Lag_Struct_Params(21);           % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
+ksource = Lag_Struct_Params(22);              % Concentration Source Rate
+c_inf = Lag_Struct_Params(23);                % Concentration saturation limit
+electro_phys_Yes = Lag_Struct_Params(24);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = Lag_Struct_Params(25);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = Lag_Struct_Params(26);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = Lag_Struct_Params(27);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = Lag_Struct_Params(28);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = Lag_Struct_Params(29);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(30);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(31);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(32);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
@@ -557,7 +559,7 @@ end
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
-    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
+    [C] = read_In_Concentration_Info(struct_name,Nx);
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
@@ -870,7 +872,7 @@ while current_time < T_FINAL
         
         %Plot in Matlab
         if pMatlab == 1
-            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy,spacing);
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,conPlot,firstPrint,loc,diffy,spacing);
         end
         
         %Print .vtk files!
@@ -1644,7 +1646,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,kDiff] = read_In_Concentration_Info(struct_name,N)
+function [C] = read_In_Concentration_Info(struct_name,N)
 
 filename = [struct_name '.concentration'];  %Name of file to read in
 
@@ -1664,8 +1666,8 @@ fclose(fileID);        %Close the data file.
 con_info = C{1};    %Stores all read in data 
 
 %Store all elements on .concentration file 
-kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info(2:end,1:end); %initial concentration
+%kDiff = con_info(1,1);     %coefficient of diffusion
+C = con_info;%(2:end,1:end); %initial concentration
 
 
 

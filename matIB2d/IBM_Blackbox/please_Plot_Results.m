@@ -32,7 +32,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [loc, diffy] =  please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy,spacing)
+function [loc, diffy] =  please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,chiX,chiY,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,conPlot,firstPrint,loc,diffy,spacing)
 
 %X,Y:  (x,y) values
 %U,V:  x-directed, y-directed velocities respectively
@@ -46,7 +46,7 @@ function [loc, diffy] =  please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,chiX,chiY,la
 %vortPlot  - if you want vorticity plot = 1
 %velPlot   - if you want velocity plot = 1
 %lagPlot   - if you want lag. point ONLY plot = 1
-
+%conPlot   - if you want concentration plot =1
 %
 % Assumption: Assuming chiX and chiY are column vectors
 % Assumption: Assuming chiX(i+1)-chiX(i) < .5 and chiY(i+1)-chiY(i) < .5, for all points that don't cross the boundary
@@ -225,6 +225,36 @@ if velPlot == 1
     axis square;
     
     %ct=ct+1;
+end
+
+if conPlot == 1
+    
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('Concentration');
+    xlabel('x'); ylabel('y'); 
+    hold all;
+
+    %Compute Vorticity and Plot It against Lagrangian Grid!
+    x = X(1,:); y = Y(:,1);
+    %contourf(x,y,flipud(rot90(vort)),10); hold on;
+    pcolor(X,Y,C);
+    shading interp;
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
+        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+    end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
+    end
+    
+    axis square;
+
+    ct=ct+1;
 end
 
 drawnow;
