@@ -1,7 +1,4 @@
 function[Cx,Cy]=WENO_3O(C,Uavg,Vavg,dx,dy,dt,Lx,Ly)
-size(C)
-size(Uavg)
-
 C=C';
 Cex=[C(end-2,:); C(end-1,:); C(end,:); C; C(1,:); C(2,:); C(3,:)];
 Cex=[Cex(:,end-2) Cex(:,end-1) Cex(:,end) Cex Cex(:,1) Cex(:,2) Cex(:,3)];

@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info,k,C,ci)
+function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info,k,C)
 
 %
 % dt:             time step
@@ -41,12 +41,10 @@ function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLa
 % x:              x positions on Eulerian grid
 % y:              y positions on Eulerian grid
 % grid_Info:      holds lots of geometric pieces about grid / simulations
-% model_Info:     1 if constant model (int k delta(x-xLag)delta*(y-yLag)ds)
-%                 2 if limited model (int k(ci-C) delta(x-xLag)delta*(y-yLag)ds)  
-%                 3 if sink model (int kC delta(x-xLag)delta*(y-yLag)ds)  
+% model_Info:     1 if constant model (int k delta(x-xLag)delta*(y-yLag)ds) or 2 if nonconstant
+%                 model (int k(1-C) delta(x-xLag)delta*(y-yLag)ds)  
 % k:              Rate of concentration creation
-% C:              Concentration
-% ci:             Concentration saturation limit for model_Info = 2
+% C:              Concentration 
        
 % Grid Info %
 Nx =    grid_Info(1); % # of Eulerian pts. in x-direction
@@ -119,9 +117,8 @@ CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
 % Perform Integral
 %CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
 
-    fs=k*(ci-CL);         % limited
-     ci
-    max(fs)
+    fs=k*(1-CL);         % limited
+
     elseif model_Info ==3
 
     fs=k*CL;
