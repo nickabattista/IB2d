@@ -557,7 +557,7 @@ end
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
-    [C] = read_In_Concentration_Info(struct_name,Nx);
+    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
@@ -857,8 +857,7 @@ while current_time < T_FINAL
     % Advection-diffusion with a source term
      fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C);
    % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,adv_scheme);
-
+      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,Ly,adv_scheme);
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
@@ -1644,7 +1643,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C] = read_In_Concentration_Info(struct_name,N)
+function [C,kDiff] = read_In_Concentration_Info(struct_name,N)
 
 filename = [struct_name '.concentration'];  %Name of file to read in
 
@@ -1664,8 +1663,8 @@ fclose(fileID);        %Close the data file.
 con_info = C{1};    %Stores all read in data 
 
 %Store all elements on .concentration file 
-%kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info;%(2:end,1:end); %initial concentration
+kDiff = con_info(1,1);     %coefficient of diffusion
+C = con_info(2:end,1:end); %initial concentration
 
 
 

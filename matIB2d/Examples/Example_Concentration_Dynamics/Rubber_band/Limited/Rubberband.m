@@ -50,7 +50,7 @@ ds_Rest = 0;     % Resting length of springs
 
 L=1.93768964;
 ds=1/(2*Nx);
-s=0:ds:L
+s = 0:ds:L; 
 N=length(s);
 
 struct_name = 'rubberband'; % Name for .vertex, .spring, etc files.
@@ -76,11 +76,11 @@ k_Spring = 4e5;
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 
 % Call function for initial concentration
-[Concentration,X,Y]= give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,x,y);
+[Concentration,X,Y]= give_Me_Initial_Concentration(Lx,Nx,dx,x,y);
 
 % Prints .concentration file!
-%kDiffusion = 1e-2;
-print_Concentration_Info(Nx,Nx,Concentration,struct_name);
+kDiffusion = 1e-2;
+print_Concentration_Info(Nx,Nx,Concentration,kDiffusion,struct_name);
 
 % Prints .beam file!
 %k_Beam = 0.5; C = 0.0;
@@ -212,11 +212,11 @@ for i=1:N
     
 end
 
-function print_Concentration_Info(Nx,Ny,C,struct_name)
+function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
 
-%    fprintf(con_fid, '%d\n', kDiffusion );
+    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx
@@ -235,7 +235,7 @@ function print_Concentration_Info(Nx,Ny,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,X,Y] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,xLag,yLag)
+function [C,X,Y] = give_Me_Initial_Concentration(Lx,Nx,dx,xLag,yLag)
 %X_lag(:,1)=xLag(1:ceil(length(xLag)/2));
 %X_lag(:,2)=xLag(ceil(length(xLag)/2)+1:end);
 
@@ -244,12 +244,10 @@ function [C,X,Y] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,xLag,yLag)
 
 
 x = 0:dx:Lx-dx;
-y = 0:dx:Ly-dx;
+y = 0:dx:Lx-dx;
 
 [X,Y]=meshgrid(x,y);
 
-C=0*X;
-
-
+C=zeros(Nx,Nx);
 
 

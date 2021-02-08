@@ -69,7 +69,7 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 8000          % How often to print (PLOT) to screen
+print_dump = 20          % How often to print (PLOT) to screen
 save_Vorticity = 1;      % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 1;       % Save Pressure Scalar Data to .vtk format
 save_uVec = 1;           % Save u-Vector Data to .vtk format
