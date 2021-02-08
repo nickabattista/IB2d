@@ -120,8 +120,6 @@ CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
 %CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
 
     fs=k*(ci-CL);         % limited
-     ci
-    max(fs)
     elseif model_Info ==3
 
     fs=k*CL;

@@ -872,7 +872,7 @@ while current_time < T_FINAL
         
         %Plot in Matlab
         if pMatlab == 1
-            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,conPlot,firstPrint,loc,diffy,spacing);
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,concentration_Yes,firstPrint,loc,diffy,spacing);
         end
         
         %Print .vtk files!

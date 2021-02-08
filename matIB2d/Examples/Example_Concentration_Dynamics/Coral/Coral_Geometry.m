@@ -190,7 +190,7 @@ function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
 
-    fprintf(con_fid, '%d\n', kDiffusion );
+%    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx

@@ -244,13 +244,13 @@ if conPlot == 1
 
     loc = [0;loc;length(chiX)];
     for i=2:length(loc)
-        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-    end
-    if diffy < 5*ds
-        xTemp = [chiX(1) chiX(end)];
-        yTemp = [chiY(1) chiY(end)];
-        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
-    end
+       plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
+  end
+  if diffy < 5*ds
+      xTemp = [chiX(1) chiX(end)];
+      yTemp = [chiY(1) chiY(end)];
+      plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
+  end
     
     axis square;
 
