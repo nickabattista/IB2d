@@ -1,10 +1,10 @@
 function Coral_Geometry()
 
-L = 3;
-Nx = 128;
-Ny = 128;
+L = 2;
+Nx = 64;
+Ny = 64;
 
-dt=1e-6;
+dt=1e-5;
 tf=10;
 t=dt:dt:tf;
 dx=L/Nx;
@@ -21,7 +21,7 @@ fprintf('\n\nNumber of Pts. in ONE tentacle: %d\n\n',N);
 print_Lagrangian_Vertices(x,y,struct_name);
 
 % Prints .target file!
-k_Target = 1e5;
+k_Target = 1e6;
 print_Lagrangian_Target_Pts(x,k_Target,struct_name);
 
 % Call function for initial concentration
@@ -89,7 +89,7 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name)
 
 function [x,y,N] = please_Give_Single_Polyp_Geometry(h,dt,t)
 
-xoffset = 1.5; % To put geometry into QUADRANT-1
+xoffset = 1; % To put geometry into QUADRANT-1
 yoffset = 0.5; % To put geometry into QUADRANT-1
 
 % Note: (1) ds for stored data is 0.6/(2*1024)
@@ -116,7 +116,6 @@ for indx1=1:4
 c1vals(:,indx1)=ppval(cs1(:,indx1),tavg);
 c2vals(:,indx1)=ppval(cs2(:,indx1),tavg);
 end
-save('cval.mat','c1vals','c2vals')
 
 C1=c1vals(1,:);
 C2=c2vals(1,:);
@@ -130,8 +129,11 @@ C2=c2vals(1,:);
     YbR=YbL;
 
 
-XbStem=(XbR(1)+ds):ds:(XbL(1)-ds);
+XbStem=(XbR(1)+ds*3/2):ds:(XbL(1)-ds);
 YbStem=(YbL(1))+0*XbStem;
+
+save('cval.mat','c1vals','c2vals','XbStem','YbStem')
+
 
 x1=[flip(XbR) XbStem XbL];
 y1=[flip(YbR) YbStem YbL];
@@ -140,7 +142,7 @@ y1=[flip(YbR) YbStem YbL];
 x = x1+xoffset;
 y = y1+yoffset;
 plot(x,y)
-axis([1 2 0.5 1.5])
+axis([0 2 0 2])
 drawnow
 %NOTE: (1) N here is the # of pts. on one arm (NOT ENTIRE POLYP)!!
 %      (2) The geometry here is listed for 1024x1024 meshes -> will need

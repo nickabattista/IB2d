@@ -32,9 +32,9 @@
 
 function targets = update_Target_Point_Positions(dt,current_time,targets)
 
-dx=3/128;
+dx=2/64;
 
-xoffset = 1.5; % To put geometry into QUADRANT-1
+xoffset = 1; % To put geometry into QUADRANT-1
 yoffset = 0.5; % To put geometry into QUADRANT-1
 
 % Note: (1) ds for stored data is 0.6/(2*1024)
@@ -67,8 +67,8 @@ C2=c2vals(indx,:);
     YbR=YbL;
 
 
-XbStem=(XbR(1)+ds):ds:(XbL(1)-ds);
-YbStem=(YbL(1))+0*XbStem;
+%XbStem=(XbR(1)+ds):ds:(XbL(1)-ds);
+%YbStem=(YbL(1))+0*XbStem;
 
 x1=[flip(XbR) XbStem XbL];
 y1=[flip(YbR) YbStem YbL];
