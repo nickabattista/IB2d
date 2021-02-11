@@ -414,16 +414,17 @@ function Output_Params = please_Initialize_Output_Inputs(Output_Input)
 %              (5):  plot_Vorticity
 %              (6):  plot_MagVelocity
 %              (7):  plot_Pressure
-%              (8):  save_Vorticity 
-%              (9):  save_Pressure 
-%              (10): save_uVec 
-%              (11): save_uMag 
-%              (12): save_uX 
-%              (13): save_uY 
-%              (14): save_fMag 
-%              (15): save_fX 
-%              (16): save_fY 
-%              (17): save_hier 
+%              (8):  plot_Concentration 
+%              (9):  save_Vorticity 
+%              (10):  save_Pressure 
+%              (11): save_uVec 
+%              (12): save_uMag 
+%              (13): save_uX 
+%              (14): save_uY 
+%              (15): save_fMag 
+%              (16): save_fX 
+%              (17): save_fY 
+%              (18): save_hier 
 
 try
     
@@ -482,6 +483,14 @@ try
     else
         Output_Params(7) = 0;
     end
+
+    % PLOT PRESSURE IN MATLAB %
+    if find(strcmp({Output_Input{:,1}},'plot_Concentration')) > 0
+        Output_Params(8) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Concentration')),2};
+    else
+        Output_Params(8) = 0;
+    end
+
     
     %%%%%%                                                %%%%%%
     %%%%%% OUTPUT INFO FOR WHAT GETS SAVED TO .VTK FORMAT %%%%%%
@@ -489,73 +498,73 @@ try
     
     % SAVE VORTICITY TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_Vorticity')) >= 0
-        Output_Params(8) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Vorticity')),2};
-    else
-        Output_Params(8) = 1;
-    end
-    
-    % SAVE PRESSURE TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_Pressure')) >= 0
-        Output_Params(9) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Pressure')),2};
+        Output_Params(9) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Vorticity')),2};
     else
         Output_Params(9) = 1;
     end
     
-    % SAVE uVECTOR DATA TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_uVec')) >= 0
-        Output_Params(10) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uVec')),2};
+    % SAVE PRESSURE TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_Pressure')) >= 0
+        Output_Params(10) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Pressure')),2};
     else
         Output_Params(10) = 1;
     end
     
-    % SAVE uMAG TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_uMag')) >= 0
-        Output_Params(11) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uMag')),2};
+    % SAVE uVECTOR DATA TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_uVec')) >= 0
+        Output_Params(11) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uVec')),2};
     else
         Output_Params(11) = 1;
+    end
+    
+    % SAVE uMAG TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_uMag')) >= 0
+        Output_Params(12) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uMag')),2};
+    else
+        Output_Params(12) = 1;
     end
 
     % SAVE uX SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_uX')) >= 0
-        Output_Params(12) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uX')),2};
+        Output_Params(13) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uX')),2};
     else
-        Output_Params(12) = 1;
+        Output_Params(13) = 1;
     end
     
     % SAVE uY SCALAR TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_uY')) >= 0
-        Output_Params(13) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uY')),2};
+        Output_Params(14) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uY')),2};
     else
-        Output_Params(13) = 1;
+        Output_Params(14) = 1;
     end
     
     
     % SAVE fMAG TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fMag')) >= 0
-        Output_Params(14) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fMag')),2};
+        Output_Params(15) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fMag')),2};
     else
-        Output_Params(14) = 1;
+        Output_Params(15) = 1;
     end
 
     % SAVE fX SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fX')) >= 0
-        Output_Params(15) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fX')),2};
+        Output_Params(16) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fX')),2};
     else
-        Output_Params(15) = 1;
+        Output_Params(16) = 1;
     end
     
     % SAVE fY SCALAR TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fY')) >= 0
-        Output_Params(16) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fY')),2};
+        Output_Params(17) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fY')),2};
     else
-        Output_Params(16) = 1;
+        Output_Params(17) = 1;
     end 
     
     % SAVE LAG STRUCTURE SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_hier')) >= 0
-        Output_Params(17) = Output_Input{find(strcmp({Output_Input{:,1}},'save_hier')),2};
+        Output_Params(18) = Output_Input{find(strcmp({Output_Input{:,1}},'save_hier')),2};
     else
-        Output_Params(17) = 1;
+        Output_Params(18) = 1;
     end  
     
     
@@ -613,6 +622,7 @@ Output_Params(4) = 0;             % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matl
 Output_Params(5) = 0;             % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
 Output_Params(6) = 0;             % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
 Output_Params(7) = 0;             % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+Output_Params(8) = 0;             % Plot LAGRANGIAN PTs + Concentration colormap in Matlab
 
 
 

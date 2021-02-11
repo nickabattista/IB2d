@@ -232,7 +232,7 @@ if conPlot == 1
     subplot(1,numPlots,ct)
     %
     axis([0 Lx 0 Ly]);
-    title('Concentration');
+    title('CONCENTRATION');
     xlabel('x'); ylabel('y'); 
     hold all;
 

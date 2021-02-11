@@ -93,16 +93,17 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                            (5):  plot_Vorticity
 %                            (6):  plot_MagVelocity
 %                            (7):  plot_Pressure
-%                            (8):  save_Vorticity 
-%                            (9):  save_Pressure 
-%                            (10): save_uVec 
-%                            (11): save_uMag 
-%                            (12): save_uX 
-%                            (13): save_uY 
-%                            (14): save_fMag 
-%                            (15): save_fX 
-%                            (16): save_fY 
-%                            (17): save_hier 
+%                            (8):  plot_Concentration 
+%                            (9):  save_Vorticity 
+%                            (10): save_Pressure 
+%                            (11): save_uVec 
+%                            (12): save_uMag 
+%                            (13): save_uX 
+%                            (14): save_uY 
+%                            (15): save_fMag 
+%                            (16): save_fX 
+%                            (17): save_fY 
+%                            (18): save_hier 
 
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
@@ -626,7 +627,7 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D/HIER_IB2d_DATA FOLDER for .VTK FILES
 mkdir('viz_IB2d');
-if Output_Params(17) == 1
+if Output_Params(18) == 1
     mkdir('hier_IB2d_data'); 
 end
 
@@ -872,7 +873,7 @@ while current_time < T_FINAL
         
         %Plot in Matlab
         if pMatlab == 1
-            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,concentration_Yes,firstPrint,loc,diffy,spacing);
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,conPlot,firstPrint,loc,diffy,spacing);
         end
         
         %Print .vtk files!
@@ -931,15 +932,16 @@ function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts
     %               (5):  plot_Vorticity
     %               (6):  plot_MagVelocity
     %               (7):  plot_Pressure
-    %               (8):  save_Vorticity 
-    %               (9):  save_Pressure 
-    %               (10): save_uVec 
-    %               (11): save_uMag 
-    %               (12): save_uX 
-    %               (13): save_uY 
-    %               (14): save_fMag 
-    %               (15): save_fX 
-    %               (16): save_fY 
+    %               (8):  plot_Concentration 
+    %               (9):  save_Vorticity 
+    %               (10):  save_Pressure 
+    %               (11): save_uVec 
+    %               (12): save_uMag 
+    %               (13): save_uX 
+    %               (14): save_uY 
+    %               (15): save_fMag 
+    %               (16): save_fX 
+    %               (17): save_fY 
     %               (17): save_hier 
 
     
@@ -999,35 +1001,35 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
-    if Output_Params(8) == 1
+    if Output_Params(9) == 1
         vortfName = ['Omega.' strNUM '.vtk'];
         savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
     end
-    if Output_Params(9) == 1
+    if Output_Params(10) == 1
         pfName = ['P.' strNUM '.vtk'];
         savevtk_scalar(p, pfName, 'P',dx,dy);
     end
-    if Output_Params(11) == 1
+    if Output_Params(12) == 1
         uMagfName = ['uMag.' strNUM '.vtk'];
         savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
     end
-    if Output_Params(12) == 1
+    if Output_Params(13) == 1
         uXName = ['uX.' strNUM '.vtk'];
         savevtk_scalar(U, uXName, 'uX',dx,dy);
     end
-    if Output_Params(13) == 1
+    if Output_Params(14) == 1
         uYName = ['uY.' strNUM '.vtk'];
         savevtk_scalar(V, uYName, 'uY',dx,dy);
     end
-    if Output_Params(15) == 1
+    if Output_Params(16) == 1
         fXName = ['fX.' strNUM '.vtk'];
         savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
     end
-    if Output_Params(16) == 1
+    if Output_Params(17) == 1
         fYName = ['fY.' strNUM '.vtk'];
         savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
     end
-    if Output_Params(14) == 1
+    if Output_Params(15) == 1
         fMagName = ['fMag.' strNUM '.vtk'];
         savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
     end
@@ -1059,7 +1061,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
-    if Output_Params(10) == 1
+    if Output_Params(11) == 1
         velocityName = ['u.' strNUM '.vtk'];
         savevtk_vector(U, V, velocityName, 'u',dx,dy);
     end
@@ -1067,7 +1069,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 %Get out of viz_IB2d folder
 cd ..
 
-if Output_Params(17) == 1
+if Output_Params(18) == 1
     if length( lagPts ) <= 5
         %
         % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
