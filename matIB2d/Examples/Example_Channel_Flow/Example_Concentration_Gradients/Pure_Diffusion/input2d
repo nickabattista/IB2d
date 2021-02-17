@@ -79,6 +79,7 @@ plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 1     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
 plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_Concentration = 1   % Plot Lagrangian Points + CONCENTRATION colormap in Matlab
 }
 
 
