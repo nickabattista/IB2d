@@ -62,6 +62,15 @@ expansion_coeff = 10.0  % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
 }
 
+
+% CONCENTRATION MODEL INFORMATION %
+%
+Concentration_Info {
+concentration = 1       % 0 (for no) or 1 (for yes)
+kDiff =1e-6             % Diffusion coefficient
+}
+
+
 %
 % PRINTING INFORMATION
 %

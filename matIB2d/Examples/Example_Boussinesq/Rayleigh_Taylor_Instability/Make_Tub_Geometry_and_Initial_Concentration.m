@@ -81,8 +81,7 @@ k_Target = 1e7;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 % Prints .concentration file!
-kDiffusion = 1e-6;
-print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Ny,Concentration,struct_name);
 
 % Print .mesh file where Boussinesq is on Eulerian Mesh
 print_Boussinesq_Mesh(inds)
@@ -221,11 +220,9 @@ function print_Lagrangian_Beams(xLag,yLag,k_Beam,C,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
-
-    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx
