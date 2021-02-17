@@ -79,8 +79,7 @@ print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 [Concentration,X,Y]= give_Me_Initial_Concentration(Lx,Nx,dx,x,y);
 
 % Prints .concentration file!
-kDiffusion = 1e-2;
-print_Concentration_Info(Nx,Nx,Concentration,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Nx,Concentration,struct_name);
 
 % Prints .beam file!
 %k_Beam = 0.5; C = 0.0;
@@ -212,11 +211,10 @@ for i=1:N
     
 end
 
-function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
 
-    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx

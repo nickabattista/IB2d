@@ -79,7 +79,7 @@ clf; %Clear previous plots :)
 
 
 figure(1) 
-numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot;
+numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot+conPlot;
 
 ct = 1;
 
@@ -224,7 +224,7 @@ if velPlot == 1
 
     axis square;
     
-    %ct=ct+1;
+    ct=ct+1;
 end
 
 if conPlot == 1

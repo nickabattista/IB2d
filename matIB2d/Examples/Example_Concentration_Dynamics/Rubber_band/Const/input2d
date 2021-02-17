@@ -51,18 +51,25 @@ x_gravity_vec_comp = 0  % x-Component of Gravity Vector
 y_gravity_vec_comp = -1 % y-Component of Gravity Vector
 porous_media = 0        % 0 (for no) or 1 (for yes)
 poroelastic = 0         % 0 (for no) or 1 (for yes)
-concentration = 1       % 0 (for no) or 1 (for yes)
-kDiff =1e-2             % Diffusion coefficient
-advection = 1           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
-source = 1              % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for sink)
-k_source = 0.1          % rate of source term for concentration
-c_inf = 0.1              % saturation limit for concentration, for k_source = 2
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
 expansion_coeff = 1.0   % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
+}
+
+
+%
+% CONCENTRATION MODEL INFORMATION %
+%
+Concentration_Info {
+concentration = 1       % 0 (for no) or 1 (for yes)
+kDiff =1e-2             % Diffusion coefficient
+advection = 1           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
+source = 1              % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for reaction)
+k_source = 0.1          % rate of source term for concentration
+c_inf = 0.1             % saturation limit for concentration, for k_source = 2
 }
 
 
@@ -86,6 +93,7 @@ plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
 plot_MagVelocity = 0     % Plot Lagrangian Points + MAGNITUDE OF VELOCITY colormap in Matlab
 plot_Pressure = 0        % Plot Lagrangian Points + PRESSURE colormap in Matlab
+plot_Concentration = 0   % Plot Lagrangian Points + CONCENTRATION colormap in Matlab
 }
 
 %

@@ -34,7 +34,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
+function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,Con_Params)
 
 
 %
@@ -103,7 +103,13 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                            (15): save_fX 
 %                            (16): save_fY 
 %                            (17): save_hier 
-
+%
+%               Con_Params(1): concentration
+%                         (2): kDiff
+%                         (3): advection
+%                         (4): source
+%                         (5): k_source
+%                         (6): c_inf
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
 struct_name = char(Lag_Name_Params);
@@ -159,22 +165,26 @@ mass_Yes = Lag_Struct_Params(13);             % Mass Points: 0 (for no) or 1 (fo
 gravity_Yes = Lag_Struct_Params(14);          % Gravity: 0 (for no) or 1 (for yes)
 %NOTE: Lag_Struct_Params(15),(16):            <- components of gravity vector (if gravity, initialize them below)
 porous_Yes = Lag_Struct_Params(17);           % Porous Media: 0 (for no) or 1 (for yes)
-concentration_Yes = Lag_Struct_Params(18);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-adv_scheme = Lag_Struct_Params(19);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
-source_Yes = Lag_Struct_Params(20);           % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
-ksource = Lag_Struct_Params(21);              % Concentration Source Rate
-electro_phys_Yes = Lag_Struct_Params(22);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = Lag_Struct_Params(23);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = Lag_Struct_Params(24);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = Lag_Struct_Params(25);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = Lag_Struct_Params(26);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = Lag_Struct_Params(27);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
-poroelastic_Yes = Lag_Struct_Params(28);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
-coagulation_Yes = Lag_Struct_Params(29);      % Coagulation Model: 0 (for no) or 1 (for yes)
-brinkman_Yes= Lag_Struct_Params(30);          % Brinkman fluid: 0 (for no) or 1 (for yes)
+electro_phys_Yes = Lag_Struct_Params(18);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = Lag_Struct_Params(19);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = Lag_Struct_Params(20);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = Lag_Struct_Params(21);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = Lag_Struct_Params(22);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = Lag_Struct_Params(23);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(24);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(25);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 (for yes)
+
+concentration_Yes = Con_Params(1);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+kDiff = Con_Params(2);                % Diffusion Coefficient
+adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
+source_Yes = Con_Params(4);    % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
+ksource = Con_Params(5);       % Concentration Source Rate
+Cinf = Con_Params(6);          % Concentration Saturation Limit
+
 
 % CLEAR INPUT DATA %
-clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
+clear Fluid_Params Grid_Params Time_Params Lag_Name_Params Con_Params;
 
 
 %Lagrangian Structure Data
@@ -557,7 +567,7 @@ end
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
-    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
+    [C] = read_In_Concentration_Info(struct_name,Nx);
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
@@ -842,22 +852,19 @@ while current_time < T_FINAL
         tracers(:,3) = yT;
     end
     
-    % if there are sources and sinks at the moving lagangian points
-
- 
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1 && source_Yes==0
       fs=zeros(Nx,Ny);
       % Advection-diffusion without a source term
 
 %    [C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
-       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiffusion,adv_scheme);
+       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiff,adv_scheme);
 
     elseif concentration_Yes == 1 && source_Yes>0
     % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C);
+     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,Cinf);
    % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiffusion,fs,Lx,Ly,adv_scheme);
+      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
@@ -1643,7 +1650,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,kDiff] = read_In_Concentration_Info(struct_name,N)
+function [C] = read_In_Concentration_Info(struct_name,N)
 
 filename = [struct_name '.concentration'];  %Name of file to read in
 
@@ -1663,8 +1670,8 @@ fclose(fileID);        %Close the data file.
 con_info = C{1};    %Stores all read in data 
 
 %Store all elements on .concentration file 
-kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info(2:end,1:end); %initial concentration
+%kDiff = con_info(1,1);     %coefficient of diffusion
+C = con_info;%(2:end,1:end); %initial concentration
 
 
 
