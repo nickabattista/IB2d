@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,laplacian_C] = please_Update_Adv_Diff_Concentration_Source(Cp,C,dt,dx,dy,uX,uY,k,f,Lx,Ly,Adv_flag)
+function [C,laplacian_C] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,uX,uY,k,f,Lx,Ly,Adv_flag)
 
 % C:        concentration 
 % dt:       time-step
@@ -18,12 +18,12 @@ function [C,laplacian_C] = please_Update_Adv_Diff_Concentration_Source(Cp,C,dt,d
 
 if Adv_flag == 0
 % Performs Upwind Advection
-C = perform_Upwind_source(Cp,C,dt,dx,dy,uX,uY,k,f);
+C = perform_Upwind_source(C,dt,dx,dy,uX,uY,k,f);
 
 
 elseif Adv_flag == 1
 % Performs WENO Advection
-C = perform_WENO_source(Cp,C,dt,dx,dy,uX,uY,k,f,Lx,Ly);
+C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,f,Lx,Ly);
 else
 'UNRECOGNIZED ADVECTION SCHEME'
 end
@@ -39,7 +39,7 @@ laplacian_C=1; % DUMMY VARIABLE (laplacian not used anywhere else in code.)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = perform_WENO_source(Cp,C,dt,dx,dy,uX,uY,k,f,Lx,Ly)
+function C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,f,Lx,Ly)
 
 % Compute Necessary Derivatives using WENO
 [Cx,Cy]=WENO_3O(C,uX,uY,dx,dy,dt,Lx,Ly);
@@ -52,7 +52,7 @@ Cyy = DD(C,dy,'y');
 laplacian_C = Cxx+Cyy;
     
 % Update
-C=Cp+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
+C=C+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -60,7 +60,7 @@ C=Cp+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = perform_Upwind_source(Cp,C,dt,dx,dy,uX,uY,k,f)
+function C = perform_Upwind_source(C,dt,dx,dy,uX,uY,k,f)
 
 % Compute Necessary Derivatives for x-Advection 
 Cx = give_Necessary_Derivative(C,dx,uX,'x');
@@ -74,7 +74,7 @@ Cyy = DD(C,dy,'y');
 laplacian_C = Cxx+Cyy;
     
 % UPWIND
-C=Cp+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
+C=C+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

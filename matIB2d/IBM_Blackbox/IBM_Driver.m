@@ -864,7 +864,7 @@ while current_time < T_FINAL
     % Advection-diffusion with a source term
      fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,Cinf);
    % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
+      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
