@@ -46,7 +46,7 @@ The basics of visualizing data using open source visualization software called <
 
 <H3> IB2d News</H3>
 
---> Matea Santiago has updated the advection-diffusion solver to a third-order WENO scheme.
+-->  <a href="https://www.mateasantiago.com"> Matea Santiago </a>  has updated the advection-diffusion solver to a third-order WENO scheme.
 
 --> We have released a semi-automatic meshing tool, <a href="https://github.com/dmsenter89/MeshmerizeMe"> MeshmerizeMe </a>, to help discretize Lagrangian geometries. More information can be found in our software release paper: 
 
