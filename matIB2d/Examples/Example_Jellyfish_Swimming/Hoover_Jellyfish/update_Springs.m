@@ -39,12 +39,14 @@ function springs_info = update_Springs(dt,current_time,xLag,yLag,springs_info)
 %RL = springs_info(:,4); % resting-length vector
 
 % Contraction Frequency
-freq = 1.0;
+freq = 2.0;
 
-% CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL
-springs_info(319:end,4) = abs( cos(freq*current_time*pi) );
+% CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL 1
+springs_info(319:357,4) = abs( cos(freq*current_time*pi) );
 
-%NOTE: not 2*pi*ft b/c of abs()
+% CHANGE RESTING LENGTH BTWN SIDES OF JELLYFISH BELL 2
+%springs_info(676:714,4) = abs( cos(freq*current_time*pi) );
+
 
 
 

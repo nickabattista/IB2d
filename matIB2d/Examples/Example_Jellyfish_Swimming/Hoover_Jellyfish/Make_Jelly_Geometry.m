@@ -1,86 +1,128 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Jellyfish Example Courtesy of Alexander P. Hoover, PhD
+% Jellyfish Example Courtesy of Alexander P. Hoover, PhD and 
+%                                           Laura A. Miller, PhD
 %
-% Converted from IBAMR: 1/16/2018 by NAB.
+%       -> Converted from IBAMR: 1/16/2018 by NAB.
+%
+%       -> Modified from original on 3/5/2021 by NAB.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function Make_Jelly_Geometry()
 
+
 close all;
-clear all;
-L = 8;                              % height of computational domain (m) for keeping desired resolution
-Lh = 10;                            % actual height of computational domain (m) (MATCHES INPUT2D)
-Lw = 3;                             % width of computational domain (m) (MATCHES INPUT2D)
-N = 512;                            % number of Cartesian grid meshwidths at the finest level of the AMR grid
-dx = L/N;                           % Cartesian mesh width (m)
-ds = dx/2;
+
+%-----------------------------------------------
+% Grid Parameters
+%-----------------------------------------------
+Ly = 8;                  % height of computational domain (m) (MATCHES INPUT2D)
+Lx = 3;                  % width of computational domain (m) (MATCHES INPUT2D)
+Ny = 512;                % number of Cartesian grid meshwidths 
+dx = Ly/Ny;              % Cartesian mesh resolution (width(m))
+ds = dx/2;               % Lagrangian Pt Spacing
+
+
+
+%-----------------------------------------------
+% Jellyfish Geometric Parameters (ellipse)
+%-----------------------------------------------
+a=.5;                     % bell radius (semi-minor axis, horizontal axis, note width=2a)
+b=.75;                    % bell semi-major axis 
+d=-0.25;                  % lowest point along bell
  
-a=.5;                               % bell radius (semi-minor axis, horizontal axis, note width=2a)
-b=.75;                              % bell semi-major axis 
-d=-0.25;
-factor_a=.8;
  
-F=1e5; %5e0
+
+%-----------------------------------------------
+% Set up theta values for creating jellyfish
+%-----------------------------------------------
+theta_lim=asin(d/b);  % last theta value for jellyfish (on left side)
+theta_test=pi/2;      % starting theta value (top of jellyfish)
  
-theta=zeros(1000,1);
-theta_lim=asin(d/b);
-theta_test=pi/2;
- 
-x_points=zeros(1000,1);
-z_points=zeros(1000,1);
-id_points=zeros(1000,1);
-offset = 0;
- 
-kappa_spring = 1e7; %1e5               % spring constant (Newton)
-kappa_beam = 2.5e5; %1e5    %5e3              % beam stiffness constant (Newton m^2)
-%kappa_beam_flexible = kappa_beam/5;   % beam stiffness constant (Newton m^2)
-kappa_target = kappa_spring;           % target point penalty spring constant (Newton)
- 
+
+%-----------------------------------------------
+% Spring and Beam Stiffness Coefficients; 
+%                       Jellyfish Muscle Force
+%-----------------------------------------------
+kappa_spring = 1e7;       % spring constant (Newton)
+kappa_beam = 2.5e5;       % beam stiffness constant (Newton m^2)
+F=1e5;                    % JELLYFISH CONTRACTION FORCE
+
+
+%-----------------------------------------------
+% CREATE **LEFT** SIDE JELLYFISH GEOMETRY!
+%-----------------------------------------------
 c=0;
 while(theta_test<(pi-theta_lim))
     c=c+1;
     theta(c)=theta_test;
      
-    x_points(c)=a*cos(theta(c));
-    z_points(c)=b*sin(theta(c));
+    xL(c)=a*cos(theta(c));
+    yL(c)=b*sin(theta(c));
     id_points(c)=c-1;
      
     theta_test=ds/((a*sin(theta(c)))^(2)+(b*cos(theta(c)))^(2))^(.5)+theta(c);
      
 end
- 
-c_stiff=c;
- 
- 
-npts=2*c-1;
-npts_wing=floor(npts/2);
-npts_musc=floor(npts_wing/4);
- 
-for j=(c+1):(npts)
-    x_points(j)=-1*x_points(j-c+1);
-    z_points(j)=z_points(j-c+1);
-    id_points(j)=j-1;
-end
+
+
+%-----------------------------------------------
+% NUMBER OF PTS ALONG JELLYFISH AND MUSCLES
+%-----------------------------------------------
+npts= 2*length(xL)-1;        % # OF POINTS ALONG ENTIRE JELLYFISH
+npts_wing=length(xL)-1;      % # OF PTS ALONG ONE SIDE OF JELLYFISH (NOT INCLUDING CENTER PT)   
+npts_musc=floor(npts_wing/4);% # OF MUSCLES TO CONTRACT BELL
  
 
-mesh_name = 'jelly';
+%-----------------------------------------------
+% CREATE RIGHT SIDE JELLYFISH GEOMETRY!
+%-----------------------------------------------
+xR = -xL(2:end);  % So not to include the CENTER point
+yR = yL(2:end);   % So not to include the CENTER point
+
+
+%-----------------------------------------------
+% TRANSLATE JELLYFISH
+%-----------------------------------------------
 xShift = 1.5;
-yShift = 2;
- 
-x_points=x_points(1:npts)+xShift;
-z_points=z_points(1:npts)+yShift;
-it_points=id_points(1:npts);
- 
-plot(x_points(:),z_points(:),'*'); hold on;
+yShift = 2.0; 
+xLag=[xL xR]+xShift;
+yLag=[yL yR]+yShift;
+
+  
+
+%-----------------------------------------------
+% STARTING INDEX FOR MUSCLES ON LEFT AND RIGHT
+%-----------------------------------------------
+ind_Musc_L = 1 + npts_wing - npts_musc + 1;
+ind_Musc_R = 1 + 2*npts_wing - npts_musc + 1;
+
+
+
+
+
+%-----------------------------------------------
+% STORE NAME
+%-----------------------------------------------
+mesh_name = 'jelly';
+
+
+
+
+
+%-----------------------------------------------
+% PLOT/TEST GEOMETRY
+%-----------------------------------------------
+plot(xLag,yLag,'*'); hold on;
 axis([0 8 0 8])
 
-% Lag Pts to Mess up Flow At Edge
-xBlock = ds:4*ds:Lw-ds;
-yBlock = (Lh-5*ds)*ones(1,length(xBlock))+ds;
 
-
+%-----------------------------------------------
+% Lag Pts to Occlude Flow At Edge
+%-----------------------------------------------
+xBlock = ds:4*ds:Lx-ds;
+yBlock = (Ly-5*ds)*ones(1,length(xBlock))+ds;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,38 +131,29 @@ yBlock = (Lh-5*ds)*ones(1,length(xBlock))+ds;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-vertex_fid = fopen([mesh_name num2str(N) '.vertex'], 'w');
+vertex_fid = fopen([mesh_name num2str(Ny) '.vertex'], 'w');
  
-    fprintf(vertex_fid, '%d\n', npts + npts_musc*2 + length(xBlock));
+    fprintf(vertex_fid, '%d\n', npts + length(xBlock) );
     lag_ct = 0;
     
     %
-    % bell
+    % JELLYFISH 1'S BELL
     %
     for j=1:npts
-        fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(j), z_points(j));
-        lag_ct = lag_ct + 1;
-    end
- 
-    %
-    % muscles
-    %
-    for s = 1:npts_musc
-        fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(npts_wing+1-npts_musc+s), z_points(npts_wing+1-npts_musc+s));
-        plot(x_points(npts_wing+1-npts_musc+s),z_points(npts_wing+1-npts_musc+s),'r*'); hold on;
-        lag_ct = lag_ct + 1;
-    end
-    for s = 1:npts_musc
-        fprintf(vertex_fid, '%1.16e %1.16e\n', x_points(npts-npts_musc+s), z_points(npts-npts_musc+s));
-        plot(x_points(npts-npts_musc+s),z_points(npts-npts_musc+s),'r*'); hold on;
+        fprintf(vertex_fid, '%1.16e %1.16e\n', xLag(j), yLag(j));
         lag_ct = lag_ct + 1;
     end
     
+    
+    %
+    % flow blocker across top edge
+    %
     for ii=1:length(xBlock)
         fprintf(vertex_fid, '%1.16e %1.16e\n', xBlock(ii), yBlock(ii));
     end
 
 fclose(vertex_fid);
+
 
 
 
@@ -130,38 +163,62 @@ fclose(vertex_fid);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-spring_fid = fopen([mesh_name num2str(N) '.spring'], 'w');
+spring_fid = fopen([mesh_name num2str(Ny) '.spring'], 'w');
     
-    npts_spring_type1=npts-1;
  
     fprintf(spring_fid, '%d\n', npts-1 + npts_musc);
  
-    fprintf('\nNumber of springs before muscles: %d \n\n',npts-1)
-    
-    factor = 1;%ds^2/ds;
-    
-    %
-    % bell
-    %
-    for s = 1:c-1
-        resting=sqrt((x_points(s)-x_points(s+1))^(2)+(z_points(s)-z_points(s+1))^(2));
-        fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_points(s)+1, id_points(s+1)+1, kappa_spring*ds/(ds^2)*factor, resting, 1);
-    end
-    for s = c+1:npts-1
-        resting=sqrt((x_points(s)-x_points(s+1))^(2)+(z_points(s)-z_points(s+1))^(2));
-        fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_points(s)+1, id_points(s+1)+1, kappa_spring*ds/(ds^2)*factor, resting, 1);
-    end
-    resting=sqrt((x_points(1)-x_points(c+1))^(2)+(z_points(1)-z_points(c+1))^(2));
-    fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_points(1)+1, id_points(c+1)+1, kappa_spring*ds/(ds^2)*factor, resting, 1);
+    fprintf('\n         ***** For update_Springs.m file ***** \n\n');
+    %fprintf('  -> Number of springs BEFORE muscles on Jelly-1: %d \n',npts-1)
+    fprintf('  -> Spring-IDs:\n');
+    fprintf('                 Jelly-1 Muscles: %d to %d \n\n',npts,npts+npts_musc-1)
 
+        
+    factor = 1;%ds^2/ds;
+ 
+    
     %
-    % muscles
+    % ----------------- JELLYFISH 1 --------------------
     %
-    for s = 1:npts_musc
-        fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n',npts+s-1+1, npts+s+npts_musc-1+1, F, 0, 1);
+    
+    %
+    % JELLYFISH 1: LEFT SIDE OF BELL
+    %
+    for s = 1:npts_wing % NOTE: attaches spring along each point on left side
+        id_1 = s;
+        id_2 = s+1;
+        dsRest = sqrt( ( xLag(id_1)-xLag(id_2) )^2 + ( yLag(id_1)-yLag(id_2) )^2 );
+        fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_1, id_2, kappa_spring*ds/(ds^2)*factor, dsRest, 1);
     end
- 
- 
+    
+    %
+    % JELLYFISH 1: RIGHT SIDE OF BELL
+    %
+    for s = 1:npts_wing
+        if s==1
+            id_1 = 1;
+            id_2 = (1+npts_wing)+1; % Note: (1+npts_wing) gives total # of pts on left side)
+            dsRest = sqrt( ( xLag(id_1)-xLag(id_2) )^2 + ( yLag(id_1)-yLag(id_2) )^2 );
+            fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_1, id_2, kappa_spring*ds/(ds^2)*factor, dsRest, 1);    
+        else
+            id_1 = (s-1) + (npts_wing+1);
+            id_2 = s + (npts_wing+1);
+            dsRest = sqrt( ( xLag(id_1)-xLag(id_2) )^2 + ( yLag(id_1)-yLag(id_2) )^2 );
+            fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n', id_1, id_2, kappa_spring*ds/(ds^2)*factor, dsRest, 1);
+        end
+    end
+    
+    %
+    % JELLYFISH 1: MUSCLES between ends of bell
+    %
+    for s = 0:npts_musc-1
+        id_1 = ind_Musc_L+s;
+        id_2 = ind_Musc_R+s;
+        dsRest = sqrt( ( xLag(id_1)-xLag(id_2) )^2 + ( yLag(id_1)-yLag(id_2) )^2 );
+        fprintf(spring_fid, '%d %d %1.16e %1.16e %d\n',id_1, id_2, F, dsRest, 1);
+    end
+
+
     fclose(spring_fid);
  
  
@@ -172,34 +229,70 @@ spring_fid = fopen([mesh_name num2str(N) '.spring'], 'w');
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-beam_fid = fopen([mesh_name num2str(N) '.nonInv_beam'], 'w');
+beam_fid = fopen([mesh_name num2str(Ny) '.nonInv_beam'], 'w');
  
     fprintf(beam_fid, '%d\n', npts-2);
 
     factor=1;% = (ds^4)/ds;
     
-    for s = 2:c-1
-        C1 = x_points(s-1)+x_points(s+1)-2*x_points(s);
-        C2 = z_points(s-1)+z_points(s+1)-2*z_points(s);
-        fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_points(s-1)+1, id_points(s)+1, id_points(s+1)+1, kappa_beam*ds/(ds^4)*factor, C1, C2);
+    %
+    % ----------------- JELLYFISH 1 --------------------
+    %
+    
+    %
+    % JELLYFISH 1: BEAM BTWN MIDDLE THREE PTS AT TOP OF BELL
+    %
+    id_L = 2;                  % First point on left sides
+    id_M = 1;                  % Middlemost point of bell
+    id_R = (1+npts_wing) + 1;  % First point on right side
+    C1 = xLag(id_L)+xLag(id_R)-2*xLag(id_M);
+    C2 = yLag(id_L)+yLag(id_R)-2*yLag(id_M);  
+    fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_L, id_M, id_R, kappa_beam*ds/(ds^4)*factor, C1, C2);
+
+    %
+    % JELLYFISH 1: BEAMS ALONG LEFT SIDE OF BELL
+    %
+    for s = 2:npts_wing
+            id_L = s+1;      % Left Point ID
+            id_M = s;        % Middle Point ID
+            id_R = s-1;      % Right Point ID
+            C1 = xLag(id_L)+xLag(id_R)-2*xLag(id_M);
+            C2 = yLag(id_L)+yLag(id_R)-2*yLag(id_M);  
+            fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_L, id_M, id_R, kappa_beam*ds/(ds^4)*factor, C1, C2);
     end
-    for s = c+2:npts-1
-        C1 = x_points(s-1)+x_points(s+1)-2*x_points(s);
-        C2 = z_points(s-1)+z_points(s+1)-2*z_points(s);
-        fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_points(s-1)+1, id_points(s)+1, id_points(s+1)+1, kappa_beam*ds/(ds^4)*factor, C1, C2);
+    
+    
+    %
+    % JELLYFISH 1: BEAMS ALONG RIGHT SIDE OF BELL
+    %
+    for s = 2:npts_wing
+        
+            % auxiliary index for consistency with *LEFT* side
+            ss = s + (npts_wing);
+        
+            if s==2
+                id_L = 1;      % MIDDLE POINT
+                id_M = ss;     % FIRST POINT ON RIGHT SIDE AFTER MIDDLE PTs
+                id_R = ss+1;   % 2ND POINT ON RIGHT SIDE AFTER MIDDLE PT
+                C1 = xLag(id_L)+xLag(id_R)-2*xLag(id_M);
+                C2 = yLag(id_L)+yLag(id_R)-2*yLag(id_M);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_L, id_M, id_R, kappa_beam*ds/(ds^4)*factor, C1, C2);
+            else
+                id_L = ss-1;      % Left Point ID
+                id_M = ss;        % Middle Point ID
+                id_R = ss+1;      % Right Point ID
+                C1 = xLag(id_L)+xLag(id_R)-2*xLag(id_M);
+                C2 = yLag(id_L)+yLag(id_R)-2*yLag(id_M);  
+                fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_L, id_M, id_R, kappa_beam*ds/(ds^4)*factor, C1, C2);    
+            end
+                    
     end
-
-    C1 = x_points(c+2)+x_points(1)-2*x_points(c+1);
-    C2 = z_points(c+2)+z_points(1)-2*z_points(c+1);
-    fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_points(c+2)+1, id_points(c+1)+1, id_points(1)+1, kappa_beam*ds/(ds^4)*factor, C1, C2);
-
-    C1 = x_points(c+1)+x_points(2)-2*x_points(1);
-    C2 = z_points(c+1)+z_points(2)-2*z_points(1);
-    fprintf(beam_fid, '%d %d %d %1.16e %1.16e %1.16e\n', id_points(c+1)+1, id_points(1)+1, id_points(2)+1, kappa_beam*ds/(ds^4)*factor, C1, C2);
-
+  
  
     fclose(beam_fid);
  
+
+    
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
@@ -208,7 +301,7 @@ beam_fid = fopen([mesh_name num2str(N) '.nonInv_beam'], 'w');
 %
 % print target points (flow blocker along edge)
 k_Target = 2.5e6;
-nBefore = lag_ct; % Counts pts in jellyfish for bookkeeping for .target file
+nBefore = length(xLag); % Counts pts in jellyfish for bookkeeping for .target file
 struct_name = 'jelly512';
 print_Lagrangian_Target_Pts(xBlock,k_Target,struct_name,nBefore)    
     
@@ -219,9 +312,9 @@ print_Lagrangian_Target_Pts(xBlock,k_Target,struct_name,nBefore)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,nBefore)
+function print_Lagrangian_Target_Pts(xBlock,k_Target,struct_name,nBefore)
 
-    N = length(xLag);
+    N = length(xBlock);
     Nstart = nBefore+1;
     Nend = nBefore+N;
 
@@ -235,3 +328,4 @@ function print_Lagrangian_Target_Pts(xLag,k_Target,struct_name,nBefore)
     end
 
     fclose(target_fid); 
+    
