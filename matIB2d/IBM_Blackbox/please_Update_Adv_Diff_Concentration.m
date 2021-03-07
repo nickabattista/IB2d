@@ -4,7 +4,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k)
+function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k,Adv_flag)
 
 % C:     concentration 
 % dt:    time-step
@@ -16,9 +16,20 @@ function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY
 
 % Performs Upwind Advection WITHOUT Time-Splitting
 %C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
-
+if Adv_flag == 0
 % Performs Upwind Advection w/ Time-Splitting
 C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k);
+%C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
+
+
+elseif Adv_flag == 1
+% Performs Upwind Advection WITHOUT Time-Splitting
+C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,Lx);
+else
+'UNRECOGNIZED ADVECTION SCHEME'
+end
+
+% Performs Upwind Advection w/ Time-Splitting
 
 laplacian_C=1; % DUMMY VARIABLE (laplacian not used anywhere else in code.)
 
@@ -58,7 +69,7 @@ Cx = give_Necessary_Derivative(C,dx,uX,'x');
 Cxx = DD(C,dx,'x');
 
 % Time-step #1 (give auxillary)
-C = C + dt * ( k*(Cxx) - uX.*Cx );
+C = C + dt * ( k*(Cxx) - uX.*Cx  );
 
 % Compute Necessary Derivatives for y-Advection 
 Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
@@ -68,6 +79,22 @@ Cyy = DD(C,dy,'y');
 C = C + dt * ( k*(Cyy) - uY.*Cy );
 
 
+function C = perform_Time_WENO_source(C,dt,dx,dy,uX,uY,k,f,Lx)
+
+% Compute Necessary Derivatives (Note: these calculations could be parallalized)
+%Cx = give_Necessary_Derivative(C,dx,uX,'x');
+%Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
+[Cx,Cy]=WENO_3O(C,uX,uY,dx,dy,dt,Lx);
+
+
+Cxx = DD(C,dx,'x');
+Cyy = DD(C,dy,'y');
+
+% Forms Laplacian
+laplacian_C = Cxx+Cyy;
+    
+% UPWIND
+C=C+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

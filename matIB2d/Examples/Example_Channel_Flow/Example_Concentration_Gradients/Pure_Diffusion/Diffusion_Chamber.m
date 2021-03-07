@@ -70,8 +70,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .concentration file!
-kDiffusion = 0.025;
-print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Ny,C,struct_name);
 
 
 % Prints .spring file!
@@ -119,11 +118,9 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
-
-    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx

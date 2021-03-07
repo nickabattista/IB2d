@@ -160,8 +160,7 @@ C = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy);
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 % Prints .concentration file!
-kDiffusion = 5e-5;
-print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Ny,C,struct_name);
 
 % Prints .tracer file!
 % print_Lagrangian_Tracers(xT,yT,struct_name)
@@ -211,11 +210,9 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
-
-    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx

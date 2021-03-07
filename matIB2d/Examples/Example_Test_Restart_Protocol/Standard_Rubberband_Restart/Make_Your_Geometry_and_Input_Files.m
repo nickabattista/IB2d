@@ -61,7 +61,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .spring file!
-dk_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
+k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
 print_Lagrangian_Springs(xLag,yLag,k_Spring,ds_Rest,struct_name);
 

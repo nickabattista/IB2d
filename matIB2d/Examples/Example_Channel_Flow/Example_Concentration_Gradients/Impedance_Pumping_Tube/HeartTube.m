@@ -89,8 +89,7 @@ k_Target = 1e6;
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 % Prints .concentration file!
-kDiffusion = 5e-5;
-print_Concentration_Info(Nx,Ny,Concentration,kDiffusion,struct_name);
+print_Concentration_Info(Nx,Ny,Concentration,struct_name);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -293,11 +292,9 @@ yLag = [y1 y2];
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-function print_Concentration_Info(Nx,Ny,C,kDiffusion,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name)
 
     con_fid = fopen([struct_name '.concentration'], 'w');
-
-    fprintf(con_fid, '%d\n', kDiffusion );
 
     for i=1:Ny
         for j=1:Nx

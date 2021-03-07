@@ -30,7 +30,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params] = please_Initialize_Simulation()
+function [Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Params, Lag_Name_Params,Con_Params] = please_Initialize_Simulation()
 
 % Please initialize all parameters to off (as a cautionary check) %
 % [Lag_Struct_Params,Output_Params] = please_Initialize_Off();
@@ -46,12 +46,18 @@ Lag_Struct_Input = params{find(strcmp({params{:,1}},'Lag_Structure_Info')),2};
 Output_Input = params{find(strcmp({params{:,1}},'Output_Info')),2};
 Lag_Name_Input = params{find(strcmp({params{:,1}},'Lag_Name')),2};
 
-
+try
+Con_Input = params{find(strcmp({params{:,1}},'Concentration_Info')),2};
+catch
+'No Concentration'
+Con_Input=cell(2,6);
+end
 % INITIALIZE PARAMETERS FOR IBM_DRIVER FILE %
 Fluid_Params = please_Initialize_Fluid_Inputs(Fluid_Input);
 Grid_Params = please_Initialize_Grid_Inputs(Grid_Input);
 Time_Params = please_Initialize_Time_Inputs(Time_Input);
 Lag_Struct_Params = please_Initialize_Lag_Structure_Inputs(Lag_Struct_Input);
+Con_Params = please_Initialize_Con_Inputs(Con_Input);
 Output_Params = please_Initialize_Output_Inputs(Output_Input);
 Lag_Name_Params = please_Initialize_Lag_Name_Inputs(Lag_Name_Input);
 
@@ -142,7 +148,6 @@ catch
    fprintf('\n \n');
    error('TEMPORAL Information Improperly Declared in input2d file'); 
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: initializes LAGRANGIAN STRUCTURE parameters for IBM_Driver file
@@ -284,81 +289,139 @@ try
         Lag_Struct_Params(17) = 0;
     end
 
-    % CONCENTRATION GRADIENT %
-    if find(strcmp({Lag_Struct_Input{:,1}},'concentration')) > 0
-        Lag_Struct_Params(18) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'concentration')),2};
+    % ELECTROPHYSIOLOGY %
+    if find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')) > 0
+        Lag_Struct_Params(18) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')),2};
     else
         Lag_Struct_Params(18) = 0;
     end
 
-
-    % ELECTROPHYSIOLOGY %
-    if find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')) > 0
-        Lag_Struct_Params(19) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'electro_phys')),2};
-    else
-        Lag_Struct_Params(19) = 0;
-    end
-
     % DAMPED SPRINGS %
     if find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')) > 0
-        Lag_Struct_Params(20) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')),2};
+        Lag_Struct_Params(19) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'damped_springs')),2};
     else
-        Lag_Struct_Params(20) = 0;
+        Lag_Struct_Params(19) = 0;
     end
 
 
     % UPDATE DAMPED SPRINGS %
     if find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')) > 0
-        Lag_Struct_Params(21) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')),2};
+        Lag_Struct_Params(20) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'update_damp_springs')),2};
     else
-        Lag_Struct_Params(21) = 0;
+        Lag_Struct_Params(20) = 0;
     end
 
     % BOUSSINESQ %
     if find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')) > 0
-        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')),2};
+        Lag_Struct_Params(21) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'boussinesq')),2};
     else
-        Lag_Struct_Params(22) = 0;
+        Lag_Struct_Params(21) = 0;
     end
 
     % EXPANSION COEFFICIENT (BOUSSINESQ) %
     if find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')) > 0
-        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')),2};
+        Lag_Struct_Params(22) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'expansion_coeff')),2};
     else
-        Lag_Struct_Params(23) = 0;
+        Lag_Struct_Params(22) = 0;
     end
 
     % USER-FORCE MODEL %
     if find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')) > 0
-        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')),2};
+        Lag_Struct_Params(23) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'user_force_model')),2};
     else
-        Lag_Struct_Params(24) = 0;
+        Lag_Struct_Params(23) = 0;
     end
     
     % PORO-ELASTIC MEDIA %
     if find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')) > 0
-        Lag_Struct_Params(25) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')),2};
+        Lag_Struct_Params(24) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'poroelastic')),2};
     else
-        Lag_Struct_Params(25) = 0;
+        Lag_Struct_Params(24) = 0;
     end
     
     % COAGULATION %
     if find(strcmp({Lag_Struct_Input{:,1}},'coagulation')) > 0
-        Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
+        Lag_Struct_Params(25) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'coagulation')),2};
     else
-        Lag_Struct_Params(26) = 0;
+        Lag_Struct_Params(25) = 0;
     end
     
     % BRINKMAN %
     if find(strcmp({Lag_Struct_Input{:,1}},'brinkman')) > 0
-        Lag_Struct_Params(27) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'brinkman')),2};
+        Lag_Struct_Params(26) = Lag_Struct_Input{find(strcmp({Lag_Struct_Input{:,1}},'brinkman')),2};
     else
-        Lag_Struct_Params(27) = 0;
+        Lag_Struct_Params(26) = 0;
     end
 
 catch
     fprintf('\n \n');
     error('LAGRANGIAN STRUCTURE INFO Improperly Declared in input2d file');     
+end
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: initializes CONCENTRATION parameters for IBM_Driver file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function Con_Params = please_Initialize_Con_Inputs(Con_Input)
+
+% Con_Params(1): concentration
+%           (2): kDiff
+%           (3): advection
+%           (4): source
+%           (5): k_source
+%           (6): c_inf
+
+try
+
+    % CONCENTRATION GRADIENT %
+    if find(strcmp({Con_Input{:,1}},'concentration')) > 0
+        Con_Params(1) = Con_Input{find(strcmp({Con_Input{:,1}},'concentration')),2};
+    else
+        Lag_Struct_Params(1) = 0;
+    end
+
+    % DIFFUSION COEFFICIENT %
+    if find(strcmp({Con_Input{:,1}},'kDiff')) > 0
+        Con_Params(2) = Con_Input{find(strcmp({Con_Input{:,1}},'kDiff')),2};
+    else
+        Con_Params(2) = 0;
+    end
+    % CONCENTRATION GRADIENT %
+    if find(strcmp({Con_Input{:,1}},'advection')) > 0
+        Con_Params(3) = Con_Input{find(strcmp({Con_Input{:,1}},'advection')),2};
+    else
+        Con_Params(3) = 0;
+    end
+
+
+    % CONCENTRATION SOURCE TERM %
+    if find(strcmp({Con_Input{:,1}},'source')) > 0
+        Con_Params(4) = Con_Input{find(strcmp({Con_Input{:,1}},'source')),2};
+    else
+        Con_Params(4) = 0;
+    end
+
+    % CONCENTRATION SOURCE TERM %
+    if find(strcmp({Con_Input{:,1}},'k_source')) > 0
+        Con_Params(5) = Con_Input{find(strcmp({Con_Input{:,1}},'k_source')),2};
+    else
+        Con_Params(5) = 0;
+    end
+
+    % CONCENTRATION SATURATION LIMIT %
+    if find(strcmp({Con_Input{:,1}},'c_inf')) > 0
+        Con_Params(6) = Con_Input{find(strcmp({Con_Input{:,1}},'c_inf')),2};
+    else
+        Con_Params(6) = 0;
+    end
+
+catch
+    fprintf('\n \n');
+    error('CONCENTRATION INFO Improperly Declared in input2d file');     
 end
 
 
@@ -377,16 +440,17 @@ function Output_Params = please_Initialize_Output_Inputs(Output_Input)
 %              (5):  plot_Vorticity
 %              (6):  plot_MagVelocity
 %              (7):  plot_Pressure
-%              (8):  save_Vorticity 
-%              (9):  save_Pressure 
-%              (10): save_uVec 
-%              (11): save_uMag 
-%              (12): save_uX 
-%              (13): save_uY 
-%              (14): save_fMag 
-%              (15): save_fX 
-%              (16): save_fY 
-%              (17): save_hier 
+%              (8):  plot_Concentration
+%              (9):  save_Vorticity 
+%              (10):  save_Pressure 
+%              (11): save_uVec 
+%              (12): save_uMag 
+%              (13): save_uX 
+%              (14): save_uY 
+%              (15): save_fMag 
+%              (16): save_fX 
+%              (17): save_fY 
+%              (18): save_hier 
 
 try
     
@@ -445,6 +509,13 @@ try
     else
         Output_Params(7) = 0;
     end
+
+    % PLOT CONCENTRATION IN MATLAB %
+    if find(strcmp({Output_Input{:,1}},'plot_Concentration')) > 0
+        Output_Params(8) = Output_Input{find(strcmp({Output_Input{:,1}},'plot_Concentration')),2};
+    else
+        Output_Params(8) = 0;
+    end
     
     %%%%%%                                                %%%%%%
     %%%%%% OUTPUT INFO FOR WHAT GETS SAVED TO .VTK FORMAT %%%%%%
@@ -452,73 +523,73 @@ try
     
     % SAVE VORTICITY TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_Vorticity')) >= 0
-        Output_Params(8) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Vorticity')),2};
-    else
-        Output_Params(8) = 1;
-    end
-    
-    % SAVE PRESSURE TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_Pressure')) >= 0
-        Output_Params(9) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Pressure')),2};
+        Output_Params(9) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Vorticity')),2};
     else
         Output_Params(9) = 1;
     end
     
-    % SAVE uVECTOR DATA TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_uVec')) >= 0
-        Output_Params(10) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uVec')),2};
+    % SAVE PRESSURE TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_Pressure')) >= 0
+        Output_Params(10) = Output_Input{find(strcmp({Output_Input{:,1}},'save_Pressure')),2};
     else
         Output_Params(10) = 1;
     end
     
-    % SAVE uMAG TO .VTK FORMAT %
-    if find(strcmp({Output_Input{:,1}},'save_uMag')) >= 0
-        Output_Params(11) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uMag')),2};
+    % SAVE uVECTOR DATA TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_uVec')) >= 0
+        Output_Params(11) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uVec')),2};
     else
         Output_Params(11) = 1;
+    end
+    
+    % SAVE uMAG TO .VTK FORMAT %
+    if find(strcmp({Output_Input{:,1}},'save_uMag')) >= 0
+        Output_Params(12) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uMag')),2};
+    else
+        Output_Params(12) = 1;
     end
 
     % SAVE uX SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_uX')) >= 0
-        Output_Params(12) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uX')),2};
+        Output_Params(13) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uX')),2};
     else
-        Output_Params(12) = 1;
+        Output_Params(13) = 1;
     end
     
     % SAVE uY SCALAR TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_uY')) >= 0
-        Output_Params(13) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uY')),2};
+        Output_Params(14) = Output_Input{find(strcmp({Output_Input{:,1}},'save_uY')),2};
     else
-        Output_Params(13) = 1;
+        Output_Params(14) = 1;
     end
     
     
     % SAVE fMAG TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fMag')) >= 0
-        Output_Params(14) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fMag')),2};
+        Output_Params(15) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fMag')),2};
     else
-        Output_Params(14) = 1;
+        Output_Params(15) = 1;
     end
 
     % SAVE fX SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fX')) >= 0
-        Output_Params(15) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fX')),2};
+        Output_Params(16) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fX')),2};
     else
-        Output_Params(15) = 1;
+        Output_Params(16) = 1;
     end
     
     % SAVE fY SCALAR TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_fY')) >= 0
-        Output_Params(16) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fY')),2};
+        Output_Params(17) = Output_Input{find(strcmp({Output_Input{:,1}},'save_fY')),2};
     else
-        Output_Params(16) = 1;
+        Output_Params(17) = 1;
     end 
     
     % SAVE LAG STRUCTURE SCALAR DATA TO .VTK FORMAT %
     if find(strcmp({Output_Input{:,1}},'save_hier')) >= 0
-        Output_Params(17) = Output_Input{find(strcmp({Output_Input{:,1}},'save_hier')),2};
+        Output_Params(18) = Output_Input{find(strcmp({Output_Input{:,1}},'save_hier')),2};
     else
-        Output_Params(17) = 1;
+        Output_Params(18) = 1;
     end  
     
     
@@ -534,7 +605,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [Lag_Struct_Params,Output_Params] = please_Initialize_Off()
+function [Lag_Struct_Params,Output_Params,Con_Params] = please_Initialize_Off()
 
 Lag_Struct_Params(1) = 0;         % Springs: 0 (for no) or 1 (for yes) 
 Lag_Struct_Params(2) = 0;         % Update_Springs: 0 (for no) or 1 (for yes)
@@ -553,15 +624,21 @@ Lag_Struct_Params(14)= 0;         % Gravity: 0 (for no) or 1 (for yes)
 Lag_Struct_Params(15)= 0;         % x-Component of Gravity vector
 Lag_Struct_Params(16)= 0;         % y-Component of Gravity Vector
 Lag_Struct_Params(17)= 0;         % Porous Media: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(18)= 0;         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(19)= 0;         % Electrophysiology Model (FitzHugh-Nagumo)
-Lag_Struct_Params(20)= 0;         % Damped Springs: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(21)= 0;         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(22)= 0;         % Boussinesq: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(23)= 0;         % expansion coefficient for Boussinesq approx.
-Lag_Struct_Params(24)= 0;         % user-defined general force model: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(25)= 0;         % poroelastic media: 0 (for no) or 1 (for yes)
-Lag_Struct_Params(26)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(18)= 0;         % Electrophysiology Model (FitzHugh-Nagumo)
+Lag_Struct_Params(19)= 0;         % Damped Springs: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(20)= 0;         % Update_Damped_Springs: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(21)= 0;         % Boussinesq: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(22)= 0;         % expansion coefficient for Boussinesq approx.
+Lag_Struct_Params(23)= 0;         % user-defined general force model: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(24)= 0;         % poroelastic media: 0 (for no) or 1 (for yes)
+Lag_Struct_Params(25)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
+
+Con_Params(1)= 0;         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+Con_Params(2)= 0;         % Diffusion Coefficient
+Con_Params(3)= 0;         % Advection scheme: 0 (for 1st O Upwind) or 1 (for 3rd O WENO))
+Con_Params(4)= 0;         % Concentration source: 0 (for no) or 1 (for constant) or 2 (for limited))
+Con_Params(5)= 0;         % Concentration source rate
+Con_Params(6)= 0;         % Concentration saturation limit
 
 
 Output_Params(1) = 1000;          % Print Dump (How often to plot)
@@ -571,6 +648,7 @@ Output_Params(4) = 0;             % Plot LAGRANGIAN PTs + VELOCITY FIELD in Matl
 Output_Params(5) = 0;             % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
 Output_Params(6) = 0;             % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
 Output_Params(7) = 0;             % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+Output_Params(8) = 0;             % Plot LAGRANGIAN PTs + CONCENTRATION colormap in Matlab
 
 
 
