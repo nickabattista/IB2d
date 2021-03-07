@@ -50,7 +50,7 @@ The basics of visualizing data using open source visualization software called <
 
 --> We have released a semi-automatic meshing tool, <a href="https://github.com/dmsenter89/MeshmerizeMe"> MeshmerizeMe </a>, to help discretize Lagrangian geometries. More information can be found in our software release paper: 
 
-<p style="margin-left:10%; margin-right:10%;"> D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR, Bioinspiration and Biomimetics 16(1): 016008 (2021) </p>
+<p style="margin-left:50px; margin-right:50px;">D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR, Bioinspiration and Biomimetics 16(1): 016008 (2021)</p>
 
 --> The MATLAB plotting routine is incompatible with MATLAB R2020a and R2020b. If you run into this issue, please consider visualizing the .vtk data with VisIt or ParaView instead.   
 
