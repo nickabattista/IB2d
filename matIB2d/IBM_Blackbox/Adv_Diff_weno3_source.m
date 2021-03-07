@@ -1,5 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
+%
+% FUNCTION: Updates the concentration via a WENO Advection/Diffusion Scheme
+%
+%   Author: Matea Santiago
+%   Date: February 2021
+%   Institution (when created): UC Merced
+%
+%       Returns: Concentration on Eulerian Grid
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function[C]=Adv_Diff_source(C,U,V,XEx,YEx,dt,D,LC2c1,LC2c2,permLC2,Nx,Ny,dx,dy,f)
 

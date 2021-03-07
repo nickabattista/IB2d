@@ -1,3 +1,15 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Performs Half step of third order WENO scheme to solve advection eqn
+%
+%   Author: Matea Santiago
+%   Date: February 2021
+%   Institution (when created): UC Merced
+%
+%   Returns: spatial derivatives in x and y of concentration
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 function[Cx,Cy]=WENO_3O(C,Uavg,Vavg,dx,dy,dt,Lx,Ly)
 C=C';
 Cex=[C(end-2,:); C(end-1,:); C(end,:); C; C(1,:); C(2,:); C(3,:)];
