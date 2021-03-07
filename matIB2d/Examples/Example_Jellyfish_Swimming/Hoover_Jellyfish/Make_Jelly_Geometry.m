@@ -17,9 +17,9 @@ close all;
 %-----------------------------------------------
 % Grid Parameters
 %-----------------------------------------------
-Ly = 8;                  % height of computational domain (m) (MATCHES INPUT2D)
+Ly = 10;                  % height of computational domain (m) (MATCHES INPUT2D)
 Lx = 3;                  % width of computational domain (m) (MATCHES INPUT2D)
-Ny = 512;                % number of Cartesian grid meshwidths 
+Ny = 640;                % number of Cartesian grid meshwidths 
 dx = Ly/Ny;              % Cartesian mesh resolution (width(m))
 ds = dx/2;               % Lagrangian Pt Spacing
 
@@ -131,7 +131,7 @@ yBlock = (Ly-5*ds)*ones(1,length(xBlock))+ds;
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-vertex_fid = fopen([mesh_name num2str(Ny) '.vertex'], 'w');
+vertex_fid = fopen([mesh_name '.vertex'], 'w');
  
     fprintf(vertex_fid, '%d\n', npts + length(xBlock) );
     lag_ct = 0;
@@ -163,7 +163,7 @@ fclose(vertex_fid);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-spring_fid = fopen([mesh_name num2str(Ny) '.spring'], 'w');
+spring_fid = fopen([mesh_name '.spring'], 'w');
     
  
     fprintf(spring_fid, '%d\n', npts-1 + npts_musc);
@@ -229,7 +229,7 @@ spring_fid = fopen([mesh_name num2str(Ny) '.spring'], 'w');
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-beam_fid = fopen([mesh_name num2str(Ny) '.nonInv_beam'], 'w');
+beam_fid = fopen([mesh_name '.nonInv_beam'], 'w');
  
     fprintf(beam_fid, '%d\n', npts-2);
 
@@ -302,8 +302,7 @@ beam_fid = fopen([mesh_name num2str(Ny) '.nonInv_beam'], 'w');
 % print target points (flow blocker along edge)
 k_Target = 2.5e6;
 nBefore = length(xLag); % Counts pts in jellyfish for bookkeeping for .target file
-struct_name = 'jelly512';
-print_Lagrangian_Target_Pts(xBlock,k_Target,struct_name,nBefore)    
+print_Lagrangian_Target_Pts(xBlock,k_Target,mesh_name,nBefore)    
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
