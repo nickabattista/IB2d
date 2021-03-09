@@ -46,7 +46,7 @@ struct_name = 'practice'; % Name for .vertex, .spring, etc files. (must match wh
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx);
+[xLag,yLag] = give_Me_Immersed_Boundary_Geometry(ds,Nx);
 
 
 % Plot Geometry to test
@@ -234,7 +234,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx)
+function [xLag,yLag] = give_Me_Immersed_Boundary_Geometry(ds,Nx)
  
 % ds: Lagrangian pt. spacing
 % Eulerian grid resolution
