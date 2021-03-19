@@ -110,6 +110,7 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                         (4): source
 %                         (5): k_source
 %                         (6): c_inf
+%                         (7): periodic_boundary 
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
 struct_name = char(Lag_Name_Params);
@@ -181,6 +182,7 @@ adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1s
 source_Yes = Con_Params(4);    % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
 ksource = Con_Params(5);       % Concentration Source Rate
 Cinf = Con_Params(6);          % Concentration Saturation Limit
+concentration_Per = Con_Params(7);     % Concentration Periodic Boundary 0 (for no) or 1 (for yes) 
 
 
 % CLEAR INPUT DATA %
@@ -862,7 +864,7 @@ while current_time < T_FINAL
 
     elseif concentration_Yes == 1 && source_Yes>0
     % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,Cinf);
+     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,Cinf,concentration_Per);
    % update advection-diffusion equation
       [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
    end

@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info,k,C,ci)
+function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info,k,C,ci,c_Per)
 
 %
 % dt:             time step
@@ -46,6 +46,7 @@ function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLa
 % k:              Rate of concentration creation
 % C:              Concentration 
 % ci:             Concentration saturation limit
+% c_Per:          Concentration periodic boundary 
        
 % Grid Info %
 Nx =    grid_Info(1); % # of Eulerian pts. in x-direction
@@ -127,21 +128,43 @@ CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
   
     'Invalid source model!' 
     end 
-
-% these are for debugging
-%save(sprintf('source/CL_%f.mat',current_time),'CL')
-%save(sprintf('source/CL_%f.mat',current_time),'CL')
-
-
+    
 % Give me delta-function approximations!
 [delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
 
+% % Transform the force density vectors into diagonal matrices - including
+% % varying ds in time and in space 
+% fsds = zeros(Nb,Nb);
+% %Assumes xLag and yLag are in order 
+if (c_Per == 1) 
+    
+    dstilde = sqrt((xLag(2:end)-xLag(1:end-1)).^2 + (yLag(2:end)-yLag(1:end-1)).^2);   
+    dstilde(Nb) = sqrt((xLag(1)-xLag(end)).^2 + (yLag(1)-yLag(end)).^2);        %size Nb
+
+    fsds(1,1) = fs(1,1)*(dstilde(end)+dstilde(1))/2;
+    for i=2:Nb
+        fsds(i,i) = fs(i,1)*(dstilde(i-1)+dstilde(i))/2; 
+    end
+    
+elseif (c_Per == 0) %if not periodic boundary
+    
+    dstilde = sqrt((xLag(2:end)-xLag(1:end-1)).^2 + (yLag(2:end)-yLag(1:end-1)).^2);   %size Nb-1
+    
+    fsds(1,1) = fs(1,1)*dstilde(1)/2;
+    for i=2:Nb-1
+        fsds(i,i) = fs(i,1)*(dstilde(i-1)+dstilde(i))/2; 
+    end
+    fsds(Nb,Nb) = fs(Nb,1)*dstilde(Nb-1)/2;
+    
+else 
+    error('c_Per input is wrong') 
+end
 
 % Transform the force density vectors into diagonal matrices
-fsds = zeros(Nb,Nb);
-for i=1:Nb
-   fsds(i,i) = fs(i,1)*ds; 
-end
+% fsds = zeros(Nb,Nb);
+% for i=1:Nb
+%   fsds(i,i) = fs(i,1)*ds; 
+% end
 
 
 % Find source term on grids by approximating the line integral, 
