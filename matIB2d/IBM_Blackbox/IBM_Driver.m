@@ -213,18 +213,45 @@ y = (0:dy:Ly-dy)';
 
 
 
-
+%--------------------------------------------------
 % READ IN LAGRANGIAN POINTS %
+%--------------------------------------------------
 [Nb,xLag,yLag] = read_Vertex_Points(struct_name);
 grid_Info(8) = Nb;          % # Total Number of Lagrangian Pts.
 xLag_P = xLag;              % Initialize previous Lagrangian x-Values (for use in muscle-model)
 yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use in muscle-model)
 
+
 fprintf('\n--> FIBER MODEL INCLUDES: \n');
 
 
+%--------------------------------------------------
+% READ IN GEOMETRY CONNECTIONS (*if file exists*)
+%--------------------------------------------------
+test_ver = ver('MATLAB');
+year_ver = test_ver.Release;
+year = str2num(year_ver(3:6));
+lett = year_ver(7);
+if ( year<=2017 ) && ( strcmp(lett,'a') && ( exist([struct_name '.geo_connect'])== 2 ) )
+    fprintf('  -Specified Geometric Connections\n');
+    geo_Connect_MAT = read_Geometry_Connections(struct_name);
+    flag_Geo_Connect = 1;
+elseif isfile([struct_name '.geo_connect'])
+    fprintf('  -Specified Geometric Connections\n');
+    geo_Connect_MAT = read_Geometry_Connections(struct_name);
+    flag_Geo_Connect = 1;
+else
+    geo_Connect_MAT = 0;
+    flag_Geo_Connect = 0;
+end
+clear test_ver year_ver year lett;
 
+
+
+
+%--------------------------------------------------
 % READ IN SPRINGS (IF THERE ARE SPRINGS) %
+%--------------------------------------------------
 if ( springs_Yes == 1 )
     fprintf('  -Springs and ');
     if update_Springs_Flag == 0
@@ -246,8 +273,9 @@ end
 
 
 
-
+%-------------------------------------------------------------
 % READ IN BEAMS (IF THERE ARE BEAMS aka TORSIONAL SPRINGS) %
+%-------------------------------------------------------------
 if ( beams_Yes == 1)
     fprintf('  -Beams ("Torsional Springs") and ');
     if update_Beams_Flag == 0
@@ -270,8 +298,9 @@ end
 
 
 
-
+%----------------------------------------------------------------
 % READ IN NON-INVARIANT BEAMS (IF THERE ARE NONINVARIANT BEAMS) %
+%----------------------------------------------------------------
 if ( nonInv_beams_Yes == 1)
     fprintf('  -Beams ("non-Invariant") and ');
     if update_nonInv_Beams_Flag == 0
@@ -298,8 +327,9 @@ end
 
 
 
-
+%---------------------------------------------------
 % READ IN TARGET POINTS (IF THERE ARE TARGET PTS) %
+%---------------------------------------------------
 if ( target_pts_Yes == 1)
     fprintf('  -Target Pts. and ');
     if update_Target_Pts == 0
@@ -325,8 +355,9 @@ end
 
 
 
-
+%--------------------------------------------------
 % READ IN MASS POINTS (IF THERE ARE MASS PTS) %
+%--------------------------------------------------
 if ( mass_Yes == 1)
     fprintf('  -Mass Pts. with ');
     if gravity_Yes == 0
@@ -351,8 +382,9 @@ else
     mass_info = 0;
 end
 
-
+%-------------------------------------------------------
 % CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) %
+%-------------------------------------------------------
 if gravity_Yes == 1
     %gravity_Vec(1) = Lag_Struct_Params(12);     % x-Component of Gravity Vector
     %gravity_Vec(2) = Lag_Struct_Params(13);     % y-Component of Gravity Vector
@@ -370,8 +402,9 @@ else
     gravity_Info = 0;
 end
 
-
+%----------------------------------------------------
 % READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
+%----------------------------------------------------
 if ( porous_Yes == 1)
     fprintf('  -Porous Points\n');
     porous_aux = read_Porous_Points(struct_name);
@@ -394,8 +427,9 @@ end
 
 
 
-
+%----------------------------------------------------------------
 % READ IN PORO-ELASTIC MEDIA INFO (IF THERE IS PORO-ELASTICITY) %
+%----------------------------------------------------------------
 if ( poroelastic_Yes == 1)
     fprintf('  -Poroelastic media\n');
     poroelastic_info = read_PoroElastic_Points(struct_name);
@@ -411,8 +445,9 @@ end
 
 
 
-
+%--------------------------------------------------
 % READ IN DAMPED SPRINGS (IF THERE ARE SPRINGS) %
+%--------------------------------------------------
 if ( d_Springs_Yes == 1 )
     fprintf('  -Damped Springs and ');
     if update_D_Springs_Flag == 0
@@ -436,8 +471,9 @@ end
 
 
 
-
+%--------------------------------------------------
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
+%--------------------------------------------------
 if ( muscles_Yes == 1 )
     fprintf('  -MUSCLE MODEL (Force-Velocity / Length-Tension Model)\n');
     muscles_info = read_Muscle_Points(struct_name);
@@ -462,8 +498,9 @@ end
 
 
 
-
+%--------------------------------------------------
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
+%--------------------------------------------------
 if ( hill_3_muscles_Yes == 1 )
     fprintf('  -MUSCLE MODEL (3 Element Hill Model)\n');
     muscles3_info = read_Hill_3Muscle_Points(struct_name);
@@ -485,8 +522,9 @@ end
 
 
 
-
+%----------------------------------------------------------------------
 % READ IN GENERAL FORCE PARAMETERS (IF THERE IS A USER-DEFINED FORCE) %
+%----------------------------------------------------------------------
 if ( general_force_Yes == 1 )
     fprintf('  -GENERAL FORCE MODEL (user-defined force term)\n');
     gen_force_info = read_General_Forcing_Function(struct_name);
@@ -503,8 +541,9 @@ end
 
 
 
-
+%-----------------------------------------------------------
 % READ IN COAGULATION PARAMETERS (IF THERE IS COAGULATION) %
+%-----------------------------------------------------------
 if ( coagulation_Yes == 1 )
     fprintf('  -COAGULATION MODEL included\n');
     coagulation_info = read_Coagulation_Input_File(struct_name);
@@ -523,8 +562,9 @@ end
 
 
 
-
+%--------------------------------------------------
 % SOLVE ELECTROPHYSIOLOGY MODEL FOR PUMPING %
+%--------------------------------------------------
 if electro_phys_Yes == 1
     fprintf('  -Electrophysiology model via FitzHugh-Nagumo\n');
     fprintf('\n\n--> Solving Electrophysiology Model...\n');
@@ -563,8 +603,9 @@ else
    tracers = 0; 
 end
 
-
+%------------------------------------------------------------------
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
+%------------------------------------------------------------------
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
     [C] = read_In_Concentration_Info(struct_name,Nx);
@@ -575,8 +616,9 @@ else
 end
 
 
-
+%--------------------------------------------------------------
 % READ IN BRINKMAN PERMEABILITY (IF THERE IS A BRINKMAN TERM) %
+%--------------------------------------------------------------
 if ( brinkman_Yes == 1 )
     fprintf('  -Brinkman Term included\n');
     [Brink,kDiffusion] = read_In_Brinkman_Info(struct_name,Nx);
@@ -588,8 +630,9 @@ end
 
 
 
-
+%---------------------------------------------------------
 % CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
+%---------------------------------------------------------
 if boussinesq_Yes == 1
     fprintf('  -Boussinesq Approximation included\n');
     if exp_Coeff == 0
@@ -773,7 +816,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-   [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
+   [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list, flag_Geo_Connect, geo_Connect_MAT);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -1604,6 +1647,28 @@ for i=1:N
    yLag(i,1) = vertices(i+1,2); %Stores y-values of Lagrangian Mesh
    
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Reads in Geometry Connections Between Lag IDs
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function geo_MAT = read_Geometry_Connections(struct_name)
+
+filename = [struct_name '.geo_connect'];  %Name of file to read in
+fileID = fopen(filename);
+
+% Read in the file, use 'CollectOutput' to gather all similar data together
+% and 'CommentStyle' to to end and be able to skip lines in file.
+C = textscan(fileID,'%f %f','CollectOutput',1);
+
+fclose(fileID);     %Close the data file.
+
+geo_MAT = C{1};    % Stores all read in data
+
+
 
 
 
