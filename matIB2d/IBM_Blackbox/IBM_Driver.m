@@ -93,16 +93,17 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                            (5):  plot_Vorticity
 %                            (6):  plot_MagVelocity
 %                            (7):  plot_Pressure
-%                            (8):  save_Vorticity 
-%                            (9):  save_Pressure 
-%                            (10): save_uVec 
-%                            (11): save_uMag 
-%                            (12): save_uX 
-%                            (13): save_uY 
-%                            (14): save_fMag 
-%                            (15): save_fX 
-%                            (16): save_fY 
-%                            (17): save_hier 
+%                            (8):  plot_Concentration
+%                            (9):  save_Vorticity 
+%                            (10):  save_Pressure 
+%                            (11): save_uVec 
+%                            (12): save_uMag 
+%                            (13): save_uX 
+%                            (14): save_uY 
+%                            (15): save_fMag 
+%                            (16): save_fX 
+%                            (17): save_fY 
+%                            (18): save_hier 
 %
 %               Con_Params(1): concentration
 %                         (2): kDiff
@@ -677,7 +678,7 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D/HIER_IB2d_DATA FOLDER for .VTK FILES
 mkdir('viz_IB2d');
-if Output_Params(17) == 1
+if Output_Params(18) == 1
     mkdir('hier_IB2d_data'); 
 end
 
