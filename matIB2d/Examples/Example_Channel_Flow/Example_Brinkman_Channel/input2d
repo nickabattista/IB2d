@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 1.0              % Dynamic Viscosity (N*s/m^2) 
+mu = 2.0              % Dynamic Viscosity (N*s/m^2) 
 rho = 1000            % Density (kg/m^2)
 }
 
@@ -70,9 +70,9 @@ save_uVec = 1;           % Save u-Vector Data to .vtk format
 save_uMag = 1;           % Save uMagnitude Scalar Data to .vtk format
 save_uX = 1;             % Save uX Scalar Data to .vtk format
 save_uY = 0;             % Save uY Scalar Data to .vtk format
-save_fMag = 0;           % Save Force Magnitude Scalar Data to .vtk format
+save_fMag = 1;           % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 1;             % Save x-Force Component Scalar Data to .vtk format
-save_fY = 0;             % Save y-Force Component Scalar Data to .vtk format
+save_fY = 1;             % Save y-Force Component Scalar Data to .vtk format
 save_hier = 0;           % Save Scalar Force Data on Lag. Structure to .vtk format
 plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab

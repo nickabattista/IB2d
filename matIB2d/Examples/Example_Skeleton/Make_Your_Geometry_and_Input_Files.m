@@ -46,7 +46,7 @@ struct_name = 'practice'; % Name for .vertex, .spring, etc files. (must match wh
 
 
 % Call function to construct geometry
-[xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx);
+[xLag,yLag] = give_Me_Immersed_Boundary_Geometry(ds,Nx);
 
 
 % Plot Geometry to test
@@ -59,6 +59,10 @@ axis square;
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
+
+
+% Prints .geo_connect file!
+print_Geometry_Connections(xLag,struct_name);
 
 
 % Prints .spring file!
@@ -102,7 +106,42 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid);
 
-   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints GEOMETRY CONNECTIONS to a file called 
+%                               'struct_name'.geo_connect
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Geometry_Connections(xLag,struct_name)
+
+
+    N = length(xLag); % Total # of Lag. Pts
+
+    geo_fid = fopen([struct_name '.geo_connect'], 'w');
+
+    % Loops over all Lagrangian Pts.
+    for i = 1:N
+        
+        if i<N
+            
+            s1 = i;   
+            s2 = i+1;
+            fprintf(geo_fid, '%d %d\n', s1, s2);
+            fprintf(geo_fid, '%d %d\n', s2, s1);
+            
+        elseif i==N
+            
+            s1 = N;
+            s2 = 1;
+            fprintf(geo_fid, '%d %d\n', s1, s2);
+            fprintf(geo_fid, '%d %d\n', s2, s1);
+            
+        end
+        
+    end
+
+    fclose(geo_fid);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -234,7 +273,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-function [xLag,yLag] = give_Me_Immsersed_Boundary_Geometry(ds,Nx)
+function [xLag,yLag] = give_Me_Immersed_Boundary_Geometry(ds,Nx)
  
 % ds: Lagrangian pt. spacing
 % Eulerian grid resolution

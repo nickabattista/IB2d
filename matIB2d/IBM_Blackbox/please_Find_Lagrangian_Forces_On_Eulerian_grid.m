@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info, coagulation, aggregate_list)
+function [Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info, coagulation, aggregate_list, flag_Geo_Connect, geo_Connect_MAT)
 
 
 %
@@ -54,6 +54,8 @@ function [Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangia
 %    .
 % coagulation:    Stores coagulation data: first index of lag pt. of cell, threshold radii, fracture force, # of pts in each cell
 % aggregate_list: Stores list of bonds between Lag. Pt. Indices (INDICES OF CELLS AS A WHOLE)
+% flag_Geo_Connect: If User provides geometrical details about neighboring pts
+% geo_Connect_MAT: Gives which LAG IDs are geometrical neighbors
 % current_time:   Current time of simulation (in seconds)
 
 
@@ -89,8 +91,9 @@ poroelastic_Yes = model_Info(24);   % Poroelastic Media: 0 (for no) or 1 (for ye
 coagulation_Yes = model_Info(25);   % Coagulation Model: 0 (for no) or 1 (for yes)
 
 
-%
+%----------------------------------------------------------------------------------------------
 % Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY (if using combined length/tension-Hill model) %
+%----------------------------------------------------------------------------------------------
 %
 if ( ( muscle_LT_FV_Yes == 1 ) && ( electro_phys_Yes == 0 ) )
     [fx_muscles, fy_muscles] = give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,dt);
@@ -103,8 +106,9 @@ end
 
 
 
-%
+%-----------------------------------------------------------------------------------------
 % Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) %
+%-----------------------------------------------------------------------------------------
 %
 if ( muscle_3_Hill_Yes == 1)
     [fx_muscles3, fy_muscles3] = give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt);
@@ -115,8 +119,9 @@ end
 
 
 
-
+%----------------------------------------------------------------------
 % Compute SPRING FORCE DENSITIES (if there are springs!)
+%----------------------------------------------------------------------
 if ( springs_Yes == 1 )
     
     % Compute "Connections Matrix" for what springs are attached to whom     %
@@ -140,8 +145,9 @@ end
 
 
 
-
+%----------------------------------------------------------------------
 % Compute MASS PT FORCE DENSITIES (if there are mass points!)
+%----------------------------------------------------------------------
 if ( mass_Yes == 1)
     
     % Compute the Lagrangian MASSIVE PT force densities!
@@ -153,8 +159,9 @@ else
 end
 
 
-
+%--------------------------------------------------------------------
 % Compute TARGET FORCE DENSITIES (if there are target points!)
+%--------------------------------------------------------------------
 if ( target_pts_Yes == 1)
     
     % Compute the Lagrangian TARGET force densities!
@@ -167,8 +174,9 @@ end
 
 
 
-
+%------------------------------------------------------------------------
 % Compute BEAM (TORSIONAL SPRINGS) FORCE DENSITIES (if there are beams!)
+%------------------------------------------------------------------------
 if ( beams_Yes == 1 )
 
     % Compute the Lagrangian BEAM (TORSIONAL SPRINGS) force densities!
@@ -181,8 +189,9 @@ end
 
 
 
-
+%---------------------------------------------------------------------------------
 % Compute BEAM (NON-INVARIANT) FORCE DENSITIES (if there are non-invariant beams!)
+%---------------------------------------------------------------------------------
 if ( nonInv_beams_Yes == 1 )
 
     % Compute the Lagrangian NON-INVARIANT BEAM force densities!
@@ -195,8 +204,9 @@ end
 
 
 
-
+%----------------------------------------------------------------------
 % Compute DAMPED SPRING FORCE DENSITIES (if there are damped springs!)
+%----------------------------------------------------------------------
 if ( d_Springs_Yes == 1 )
 
     % Compute the Lagrangian DAMPED SPRING force densities!
@@ -208,8 +218,9 @@ else
 end
 
 
-
+%---------------------------------------------------------------------------------
 % Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
+%---------------------------------------------------------------------------------
 if ( gen_force_Yes == 1 )
 
     % Compute the Lagrangian GENERAL USER force densities!
@@ -220,8 +231,9 @@ else
     fy_genForce = fx_genForce;    %No y-forces coming from general force model
 end
 
-
+%--------------------------------------------------------------------------
 % Compute COAGULATION MODEL AND FORCE DENSITIES (if there is coagulation!)
+%--------------------------------------------------------------------------
 if ( coagulation_Yes == 1 )
 
     % Compute the Lagrangian COAGULATION force densities!
@@ -234,14 +246,16 @@ end
 
 
 
-
+%-----------------------------------------------------
 % SUM TOTAL FORCE DENSITY! %
+%-----------------------------------------------------
 fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce + fx_coag;
 fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce + fy_coag;
 
 
-
+%-----------------------------------------------------
 % Save Poro-Elastic Forces, if poroelastic elements %
+%-----------------------------------------------------
 if poroelastic_Yes  
     F_Poro(:,1) = fx_springs(poroelastic_info(:,1)) + fx_nonInv_beams(poroelastic_info(:,1));
     F_Poro(:,2) = fy_springs(poroelastic_info(:,1)) + fy_nonInv_beams(poroelastic_info(:,1));
@@ -250,25 +264,63 @@ else
 end
 
 
+%----------------------------------
 % SAVE LAGRANGIAN FORCES
+%----------------------------------
 F_Lag(:,1) = fx;
 F_Lag(:,2) = fy;
     
 
+%-----------------------------------------
 % Give me delta-function approximations!
+%-----------------------------------------
 [delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
 
 
+%------------------------------------------------------------
 % Transform the force density vectors into diagonal matrices
+%------------------------------------------------------------
 fxds = zeros(Nb,Nb); fyds = zeros(Nb,Nb);
-for i=1:Nb
-   fxds(i,i) = fx(i,1)*ds; 
-   fyds(i,i) = fy(i,1)*ds;
+%
+if flag_Geo_Connect % Compute -actual- distances between 
+                    % neighboring Lagrangian pts in geometry
+    
+    for i=1:Nb
+        
+        % compute real distances btwn LAG_i and Attached Points
+        %                           and sum distances together
+        
+        % find all Lag Pts that are Lag_i's geometric neighbors
+        indsVec = find(geo_Connect_MAT(:,1)==i);
+    
+        % loop to (1) distances between Lag_i and each neighbor
+        %         (2) sum all such distances together
+        ds_sum = 0;
+        for j=1:length(indsVec)
+            id1 = geo_Connect_MAT( indsVec(j),1);
+            id2 = geo_Connect_MAT( indsVec(j),2);
+            ds_sum = ds_sum + sqrt( ( xLag(id1,1)-xLag(id2,1) )^2 + ( yLag(id1,1)-yLag(id2,1) )^2 );     
+        end
+        
+        % Note: (1) 0.5 coming from Trapezoid Rule
+        %       (2) ds_sum is sum of distances to neighboring pts
+        fxds(i,i) = 0.5*fx(i,1)*ds_sum; 
+        fyds(i,i) = 0.5*fy(i,1)*ds_sum;
+        
+    end
+    
+else % Use Peskin's Constant 'ds' assumption
+    for i=1:Nb
+       fxds(i,i) = fx(i,1)*ds; 
+       fyds(i,i) = fy(i,1)*ds;
+    end
 end
 
 
+%-----------------------------------------------------------------------
 % Find Eulerian forces on grids by approximating the line integral, 
 %       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
+%-----------------------------------------------------------------------
 Fx = delta_Y * fxds * delta_X;
 Fy = delta_Y * fyds * delta_X;
 

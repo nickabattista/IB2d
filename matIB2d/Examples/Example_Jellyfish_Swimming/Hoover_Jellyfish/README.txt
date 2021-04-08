@@ -1,8 +1,9 @@
 IB2d Simulation of Jellyfish Locomotion
 
-Created: Nick A Battista
+Author: Nick A Battista
 Email: battistn@tcnj.edu
-Date: Feb. 2018
+Date Created: Feb. 2018
+Date Modifed: March 2021
 Institution: TCNJ
 
 This model is based upon the jellyfish locomotion model by A. Hoover and L. Miller 2015.

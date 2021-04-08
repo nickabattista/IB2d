@@ -1,8 +1,22 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: Setting up advection-diffusion solver
+% FUNCTION: Sets up the advection/diffusion solver for a background
+%           concentration 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   Upwind w/ Time Splitting
+%   Author: Nick Battista
+%   Date: June 2016
+%   Institution (when created):  UNC-CH
+%   Current Instituteion: TCNJ
+%
+%   WENO SCHEMES
+%   Author: Matea Santiago
+%   Date: February 2021
+%   Institution (when created): UC Merced
+%
+%   Returns: spatial derivatives in x and y of concentration
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k,Adv_flag)
 
@@ -17,16 +31,14 @@ function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY
 % Performs Upwind Advection WITHOUT Time-Splitting
 %C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
 if Adv_flag == 0
-% Performs Upwind Advection w/ Time-Splitting
-C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k);
-%C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
-
-
+    % Performs Upwind Advection w/ Time-Splitting
+    C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k);
+    %C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
 elseif Adv_flag == 1
-% Performs Upwind Advection WITHOUT Time-Splitting
-C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,Lx);
+    % Performs Upwind Advection WITHOUT Time-Splitting
+    C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,Lx);
 else
-'UNRECOGNIZED ADVECTION SCHEME'
+    'UNRECOGNIZED ADVECTION SCHEME'
 end
 
 % Performs Upwind Advection w/ Time-Splitting

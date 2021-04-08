@@ -59,7 +59,7 @@ struct_name = 'channel'; % Name for .vertex, .spring, etc files.
 
 % Call function to construct initial background concentration
 kBrinkman = 0.00001; % Brinkman permeability coefficient (F = -mu/k*U)
-wBrink = w/6;     % width of Brinkman permeable membrane
+wBrink = w/6;        % width of Brinkman permeable membrane
 [Brinkman,~] = give_Me_Initial_Brinkman(Lx,Ly,Nx,Ny,dx,kBrinkman,wBrink);
 
 % Translate down for rectangular domain

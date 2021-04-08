@@ -86,5 +86,5 @@ plot_Pressure = 1        % Plot Lagrangian Points + PRESSURE colormap in Matlab
 % LAGRANGIAN STRUCTURE NAME %
 %
 Lag_Name {
-string_name = "jelly512"  % String name for simulation 
+string_name = "jelly"  % String name for simulation 
 }
