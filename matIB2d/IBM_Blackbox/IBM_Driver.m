@@ -181,7 +181,7 @@ kDiff = Con_Params(2);                % Diffusion Coefficient
 adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
 source_Yes = Con_Params(4);    % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
 ksource = Con_Params(5);       % Concentration Source Rate
-Cinf = Con_Params(6);          % Concentration Saturation Limit
+Cinf = Con_Params(6);          % Concentration Saturation Limit 
 
 
 % CLEAR INPUT DATA %
@@ -906,7 +906,7 @@ while current_time < T_FINAL
 
     elseif concentration_Yes == 1 && source_Yes>0
     % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes,ksource,C,Cinf);
+     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes, ksource, C, Cinf, flag_Geo_Connect, geo_Connect_MAT);
    % update advection-diffusion equation
       [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
    end

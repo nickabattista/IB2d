@@ -418,6 +418,13 @@ try
     else
         Con_Params(6) = 0;
     end
+    
+    % CONCENTRATION PERIODIC BOUNDARY % 
+    if find(strcmp({Con_Input{:,1}},'periodic_boundary')) > 0
+        Con_Params(7) = Con_Input{find(strcmp({Con_Input{:,1}},'periodic_boundary')),2};
+    else
+        Con_Params(7) = 0;
+    end
 
 catch
     fprintf('\n \n');
@@ -639,6 +646,7 @@ Con_Params(3)= 0;         % Advection scheme: 0 (for 1st O Upwind) or 1 (for 3rd
 Con_Params(4)= 0;         % Concentration source: 0 (for no) or 1 (for constant) or 2 (for limited))
 Con_Params(5)= 0;         % Concentration source rate
 Con_Params(6)= 0;         % Concentration saturation limit
+Con_Params(7)= 0;         % Concentration periodic boundary: 0 (for no) or 1 (for yes) 
 
 
 Output_Params(1) = 1000;          % Print Dump (How often to plot)
