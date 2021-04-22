@@ -100,8 +100,9 @@ for i=start:1:finish
         Eulerian_Flags(6) = 0;   % uVEC (vector components of velocity: U,V)
         Eulerian_Flags(7) = 0;   % Fx (x-component of force )
         Eulerian_Flags(8) = 0;   % Fy (y-component of force)
+        Eulerian_Flags(9) = 0;   % C (concentration)
         %
-        [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(pathViz,numSim,Eulerian_Flags);
+        [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy,C] = import_Eulerian_Data(pathViz,numSim,Eulerian_Flags);
 
 
         % Imports Lagrangian Pt. FORCE (magnitude) DATA %
