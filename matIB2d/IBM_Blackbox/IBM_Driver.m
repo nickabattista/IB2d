@@ -34,14 +34,14 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,Con_Params)
+function [X,Y,U,V,xLag,yLag] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params)
 
 
 %
 %    2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 %    
 %    x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + F_x
-%    y-Momentum 
+%    y-Momentum Convervation: rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) - p_y + F_y
 %
 %    Incompressibility: u_x + v_y = 0
 %
@@ -52,7 +52,7 @@ function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params
 fprintf('\n________________________________________________________________________________\n\n');
 fprintf('\n---------------->>                 IB2d                      <<----------------\n');
 fprintf('\n________________________________________________________________________________\n\n');
-fprintf('If using the code for research purposes please cite the following two papers: \n');
+fprintf('If using the code for research purposes please cite the following three papers: \n');
 fprintf('     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-911 (2015)\n');
 fprintf('     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)\n');
 fprintf('     [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method, Math. Method. Appl. Sci. 41(18):8455-8480 (2018).');
@@ -93,24 +93,17 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                            (5):  plot_Vorticity
 %                            (6):  plot_MagVelocity
 %                            (7):  plot_Pressure
-%                            (8):  plot_Concentration
-%                            (9):  save_Vorticity 
-%                            (10):  save_Pressure 
-%                            (11): save_uVec 
-%                            (12): save_uMag 
-%                            (13): save_uX 
-%                            (14): save_uY 
-%                            (15): save_fMag 
-%                            (16): save_fX 
-%                            (17): save_fY 
-%                            (18): save_hier 
-%
-%               Con_Params(1): concentration
-%                         (2): kDiff
-%                         (3): advection
-%                         (4): source
-%                         (5): k_source
-%                         (6): c_inf
+%                            (8):  save_Vorticity 
+%                            (9):  save_Pressure 
+%                            (10): save_uVec 
+%                            (11): save_uMag 
+%                            (12): save_uX 
+%                            (13): save_uY 
+%                            (14): save_fMag 
+%                            (15): save_fX 
+%                            (16): save_fY 
+%                            (17): save_hier 
+
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
 struct_name = char(Lag_Name_Params);
@@ -146,7 +139,6 @@ velPlot = Output_Params(4);        % Plot LAGRANGIAN PTs + VELOCITY FIELD in Mat
 vortPlot = Output_Params(5);       % Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
 uMagPlot = Output_Params(6);       % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
 pressPlot = Output_Params(7);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
-conPlot = Output_Params(8);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
 % MODEL STRUCTURE DATA STORED %
@@ -166,26 +158,19 @@ mass_Yes = Lag_Struct_Params(13);             % Mass Points: 0 (for no) or 1 (fo
 gravity_Yes = Lag_Struct_Params(14);          % Gravity: 0 (for no) or 1 (for yes)
 %NOTE: Lag_Struct_Params(15),(16):            <- components of gravity vector (if gravity, initialize them below)
 porous_Yes = Lag_Struct_Params(17);           % Porous Media: 0 (for no) or 1 (for yes)
-electro_phys_Yes = Lag_Struct_Params(18);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
-d_Springs_Yes = Lag_Struct_Params(19);        % Damped Springs: 0 (for no) or 1 (for yes)
-update_D_Springs_Flag = Lag_Struct_Params(20);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
-boussinesq_Yes = Lag_Struct_Params(21);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
-exp_Coeff = Lag_Struct_Params(22);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
-general_force_Yes = Lag_Struct_Params(23);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
-poroelastic_Yes = Lag_Struct_Params(24);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
-coagulation_Yes = Lag_Struct_Params(25);      % Coagulation Model: 0 (for no) or 1 (for yes)
-brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 (for yes)
-
-concentration_Yes = Con_Params(1);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-kDiff = Con_Params(2);                % Diffusion Coefficient
-adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
-source_Yes = Con_Params(4);    % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
-ksource = Con_Params(5);       % Concentration Source Rate
-Cinf = Con_Params(6);          % Concentration Saturation Limit 
-
+concentration_Yes = Lag_Struct_Params(18);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+electro_phys_Yes = Lag_Struct_Params(19);     % Electrophysiology (FitzHugh-Nagumo): 0 (for no) or 1 (for yes)
+d_Springs_Yes = Lag_Struct_Params(20);        % Damped Springs: 0 (for no) or 1 (for yes)
+update_D_Springs_Flag = Lag_Struct_Params(21);% Update_Damped_Springs: % 0 (for no) or 1 (for yes)
+boussinesq_Yes = Lag_Struct_Params(22);       % Boussinesq Approx.: 0 (for no) or 1 (for yes)
+exp_Coeff = Lag_Struct_Params(23);            % Expansion Coefficient (e.g., thermal, etc) for Boussinesq approx.
+general_force_Yes = Lag_Struct_Params(24);    % General User-Defined Force Term: 0 (for no) or 1 (for yes)
+poroelastic_Yes = Lag_Struct_Params(25);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
+coagulation_Yes = Lag_Struct_Params(26);      % Coagulation Model: 0 (for no) or 1 (for yes)
+brinkman_Yes= Lag_Struct_Params(27);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
 % CLEAR INPUT DATA %
-clear Fluid_Params Grid_Params Time_Params Lag_Name_Params Con_Params;
+clear Fluid_Params Grid_Params Time_Params Lag_Name_Params;
 
 
 %Lagrangian Structure Data
@@ -214,45 +199,18 @@ y = (0:dy:Ly-dy)';
 
 
 
-%--------------------------------------------------
+
 % READ IN LAGRANGIAN POINTS %
-%--------------------------------------------------
 [Nb,xLag,yLag] = read_Vertex_Points(struct_name);
 grid_Info(8) = Nb;          % # Total Number of Lagrangian Pts.
 xLag_P = xLag;              % Initialize previous Lagrangian x-Values (for use in muscle-model)
 yLag_P = yLag;              % Initialize previous Lagrangian y-Values (for use in muscle-model)
 
-
 fprintf('\n--> FIBER MODEL INCLUDES: \n');
 
 
-%--------------------------------------------------
-% READ IN GEOMETRY CONNECTIONS (*if file exists*)
-%--------------------------------------------------
-test_ver = ver('MATLAB');
-year_ver = test_ver.Release;
-year = str2num(year_ver(3:6));
-lett = year_ver(7);
-if ( year<=2017 ) && ( strcmp(lett,'a') && ( exist([struct_name '.geo_connect'])== 2 ) )
-    fprintf('  -Specified Geometric Connections\n');
-    geo_Connect_MAT = read_Geometry_Connections(struct_name);
-    flag_Geo_Connect = 1;
-elseif isfile([struct_name '.geo_connect'])
-    fprintf('  -Specified Geometric Connections\n');
-    geo_Connect_MAT = read_Geometry_Connections(struct_name);
-    flag_Geo_Connect = 1;
-else
-    geo_Connect_MAT = 0;
-    flag_Geo_Connect = 0;
-end
-clear test_ver year_ver year lett;
 
-
-
-
-%--------------------------------------------------
 % READ IN SPRINGS (IF THERE ARE SPRINGS) %
-%--------------------------------------------------
 if ( springs_Yes == 1 )
     fprintf('  -Springs and ');
     if update_Springs_Flag == 0
@@ -274,9 +232,8 @@ end
 
 
 
-%-------------------------------------------------------------
+
 % READ IN BEAMS (IF THERE ARE BEAMS aka TORSIONAL SPRINGS) %
-%-------------------------------------------------------------
 if ( beams_Yes == 1)
     fprintf('  -Beams ("Torsional Springs") and ');
     if update_Beams_Flag == 0
@@ -299,9 +256,8 @@ end
 
 
 
-%----------------------------------------------------------------
+
 % READ IN NON-INVARIANT BEAMS (IF THERE ARE NONINVARIANT BEAMS) %
-%----------------------------------------------------------------
 if ( nonInv_beams_Yes == 1)
     fprintf('  -Beams ("non-Invariant") and ');
     if update_nonInv_Beams_Flag == 0
@@ -328,9 +284,8 @@ end
 
 
 
-%---------------------------------------------------
+
 % READ IN TARGET POINTS (IF THERE ARE TARGET PTS) %
-%---------------------------------------------------
 if ( target_pts_Yes == 1)
     fprintf('  -Target Pts. and ');
     if update_Target_Pts == 0
@@ -356,9 +311,8 @@ end
 
 
 
-%--------------------------------------------------
+
 % READ IN MASS POINTS (IF THERE ARE MASS PTS) %
-%--------------------------------------------------
 if ( mass_Yes == 1)
     fprintf('  -Mass Pts. with ');
     if gravity_Yes == 0
@@ -383,9 +337,8 @@ else
     mass_info = 0;
 end
 
-%-------------------------------------------------------
+
 % CONSTRUCT GRAVITY INFORMATION (IF THERE IS GRAVITY) %
-%-------------------------------------------------------
 if gravity_Yes == 1
     %gravity_Vec(1) = Lag_Struct_Params(12);     % x-Component of Gravity Vector
     %gravity_Vec(2) = Lag_Struct_Params(13);     % y-Component of Gravity Vector
@@ -403,9 +356,8 @@ else
     gravity_Info = 0;
 end
 
-%----------------------------------------------------
+
 % READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
-%----------------------------------------------------
 if ( porous_Yes == 1)
     fprintf('  -Porous Points\n');
     porous_aux = read_Porous_Points(struct_name);
@@ -428,9 +380,8 @@ end
 
 
 
-%----------------------------------------------------------------
+
 % READ IN PORO-ELASTIC MEDIA INFO (IF THERE IS PORO-ELASTICITY) %
-%----------------------------------------------------------------
 if ( poroelastic_Yes == 1)
     fprintf('  -Poroelastic media\n');
     poroelastic_info = read_PoroElastic_Points(struct_name);
@@ -446,9 +397,8 @@ end
 
 
 
-%--------------------------------------------------
+
 % READ IN DAMPED SPRINGS (IF THERE ARE SPRINGS) %
-%--------------------------------------------------
 if ( d_Springs_Yes == 1 )
     fprintf('  -Damped Springs and ');
     if update_D_Springs_Flag == 0
@@ -472,9 +422,8 @@ end
 
 
 
-%--------------------------------------------------
+
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
-%--------------------------------------------------
 if ( muscles_Yes == 1 )
     fprintf('  -MUSCLE MODEL (Force-Velocity / Length-Tension Model)\n');
     muscles_info = read_Muscle_Points(struct_name);
@@ -499,9 +448,8 @@ end
 
 
 
-%--------------------------------------------------
+
 % READ IN MUSCLES (IF THERE ARE MUSCLES) %
-%--------------------------------------------------
 if ( hill_3_muscles_Yes == 1 )
     fprintf('  -MUSCLE MODEL (3 Element Hill Model)\n');
     muscles3_info = read_Hill_3Muscle_Points(struct_name);
@@ -523,9 +471,8 @@ end
 
 
 
-%----------------------------------------------------------------------
+
 % READ IN GENERAL FORCE PARAMETERS (IF THERE IS A USER-DEFINED FORCE) %
-%----------------------------------------------------------------------
 if ( general_force_Yes == 1 )
     fprintf('  -GENERAL FORCE MODEL (user-defined force term)\n');
     gen_force_info = read_General_Forcing_Function(struct_name);
@@ -542,9 +489,8 @@ end
 
 
 
-%-----------------------------------------------------------
+
 % READ IN COAGULATION PARAMETERS (IF THERE IS COAGULATION) %
-%-----------------------------------------------------------
 if ( coagulation_Yes == 1 )
     fprintf('  -COAGULATION MODEL included\n');
     coagulation_info = read_Coagulation_Input_File(struct_name);
@@ -563,9 +509,8 @@ end
 
 
 
-%--------------------------------------------------
+
 % SOLVE ELECTROPHYSIOLOGY MODEL FOR PUMPING %
-%--------------------------------------------------
 if electro_phys_Yes == 1
     fprintf('  -Electrophysiology model via FitzHugh-Nagumo\n');
     fprintf('\n\n--> Solving Electrophysiology Model...\n');
@@ -604,12 +549,11 @@ else
    tracers = 0; 
 end
 
-%------------------------------------------------------------------
+
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
-%------------------------------------------------------------------
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
-    [C] = read_In_Concentration_Info(struct_name,Nx);
+    [C,kDiffusion] = read_In_Concentration_Info(struct_name,Nx);
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
@@ -617,9 +561,8 @@ else
 end
 
 
-%--------------------------------------------------------------
+
 % READ IN BRINKMAN PERMEABILITY (IF THERE IS A BRINKMAN TERM) %
-%--------------------------------------------------------------
 if ( brinkman_Yes == 1 )
     fprintf('  -Brinkman Term included\n');
     [Brink,kDiffusion] = read_In_Brinkman_Info(struct_name,Nx);
@@ -631,9 +574,8 @@ end
 
 
 
-%---------------------------------------------------------
+
 % CONSTRUCT BOUSSINESQ INFORMATION (IF USING BOUSSINESQ) %
-%---------------------------------------------------------
 if boussinesq_Yes == 1
     fprintf('  -Boussinesq Approximation included\n');
     if exp_Coeff == 0
@@ -678,7 +620,7 @@ cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 % CREATE VIZ_IB2D/HIER_IB2d_DATA FOLDER for .VTK FILES
 mkdir('viz_IB2d');
-if Output_Params(18) == 1
+if Output_Params(17) == 1
     mkdir('hier_IB2d_data'); 
 end
 
@@ -709,7 +651,7 @@ if restart_Flag == 0
     [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
     [dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
     Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-    print_vtk_files(Output_Params,ctsave,vort,uMag,p,U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
+    print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
     fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
     fprintf('Current Time(s): %6.6f\n\n',current_time);
     ctsave = ctsave+1;
@@ -721,9 +663,21 @@ else
     %                       2. last xLag and yLag 
     %                       3. 2nd to last xLag and yLag
     %                       4. sets counters, current_time, saving counters
+    %                       5. if concentration, gets previous concentration
     %
     [current_time,cter,ctsave,U,V,xLag,yLag,xLag_P,yLag_P,path_to_Viz] = help_Me_Restart(dt);
     clear restart_Flag;
+
+    %
+    % RESTART CONCENTRATION 
+    %       
+    %       note: need ctsave - 1, b/c it was incremented in help_Me_Restart()
+    %
+    if concentration_Yes == 1
+        C = pass_Back_Concentration_Data_For_Restart(ctsave-1,path_to_Viz);
+    else 
+        C = 0;
+    end
     
     %
     % RESTART MASS * STILL NEEDS IMPLEMENTATION <-> default set *
@@ -739,6 +693,7 @@ else
         F_Poro = 0;
     end
     
+ 
     %[~, ~, ~, ~, F_Poro, ~] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
 
     
@@ -774,11 +729,6 @@ while current_time < T_FINAL
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
     %
-    xLag_prev=xLag;
-    yLag_prev=yLag;
-    U_prev=U;
-    V_prev=V;
-
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
     
     
@@ -817,7 +767,7 @@ while current_time < T_FINAL
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
     %
-   [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list, flag_Geo_Connect, geo_Connect_MAT);
+    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list);
     
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -896,20 +846,12 @@ while current_time < T_FINAL
         tracers(:,3) = yT;
     end
     
+    
     % If there is a background concentration, update concentration-gradient %
-    if concentration_Yes == 1 && source_Yes==0
-      fs=zeros(Nx,Ny);
-      % Advection-diffusion without a source term
-
-%    [C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
-       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiff,adv_scheme);
-
-    elseif concentration_Yes == 1 && source_Yes>0
-    % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes, ksource, C, Cinf, flag_Geo_Connect, geo_Connect_MAT);
-   % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
-   end
+    if concentration_Yes == 1
+       %[C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
+       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion); 
+    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
     if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )
@@ -920,7 +862,7 @@ while current_time < T_FINAL
         
         %Plot in Matlab
         if pMatlab == 1
-            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,C,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,conPlot,firstPrint,loc,diffy,spacing);
+            [loc, diffy] = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,loc,diffy,spacing);
         end
         
         %Print .vtk files!
@@ -1047,35 +989,35 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
-    if Output_Params(9) == 1
+    if Output_Params(8) == 1
         vortfName = ['Omega.' strNUM '.vtk'];
         savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
     end
-    if Output_Params(10) == 1
+    if Output_Params(9) == 1
         pfName = ['P.' strNUM '.vtk'];
         savevtk_scalar(p, pfName, 'P',dx,dy);
     end
-    if Output_Params(12) == 1
+    if Output_Params(11) == 1
         uMagfName = ['uMag.' strNUM '.vtk'];
         savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
     end
-    if Output_Params(13) == 1
+    if Output_Params(12) == 1
         uXName = ['uX.' strNUM '.vtk'];
         savevtk_scalar(U, uXName, 'uX',dx,dy);
     end
-    if Output_Params(14) == 1
+    if Output_Params(13) == 1
         uYName = ['uY.' strNUM '.vtk'];
         savevtk_scalar(V, uYName, 'uY',dx,dy);
     end
-    if Output_Params(16) == 1
+    if Output_Params(15) == 1
         fXName = ['fX.' strNUM '.vtk'];
         savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
     end
-    if Output_Params(17) == 1
+    if Output_Params(16) == 1
         fYName = ['fY.' strNUM '.vtk'];
         savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
     end
-    if Output_Params(15) == 1
+    if Output_Params(14) == 1
         fMagName = ['fMag.' strNUM '.vtk'];
         savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
     end
@@ -1107,7 +1049,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
-    if Output_Params(11) == 1
+    if Output_Params(10) == 1
         velocityName = ['u.' strNUM '.vtk'];
         savevtk_vector(U, V, velocityName, 'u',dx,dy);
     end
@@ -1115,7 +1057,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
 %Get out of viz_IB2d folder
 cd ..
 
-if Output_Params(18) == 1
+if Output_Params(17) == 1
     if length( lagPts ) <= 5
         %
         % Print Lagrangian Force Data to hier_IB2d_data folder (if <= 5 lag pts)
@@ -1650,28 +1592,6 @@ for i=1:N
 end
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% FUNCTION: Reads in Geometry Connections Between Lag IDs
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function geo_MAT = read_Geometry_Connections(struct_name)
-
-filename = [struct_name '.geo_connect'];  %Name of file to read in
-fileID = fopen(filename);
-
-% Read in the file, use 'CollectOutput' to gather all similar data together
-% and 'CommentStyle' to to end and be able to skip lines in file.
-C = textscan(fileID,'%f %f','CollectOutput',1);
-
-fclose(fileID);     %Close the data file.
-
-geo_MAT = C{1};    % Stores all read in data
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1716,7 +1636,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C] = read_In_Concentration_Info(struct_name,N)
+function [C,kDiff] = read_In_Concentration_Info(struct_name,N)
 
 filename = [struct_name '.concentration'];  %Name of file to read in
 
@@ -1736,8 +1656,8 @@ fclose(fileID);        %Close the data file.
 con_info = C{1};    %Stores all read in data 
 
 %Store all elements on .concentration file 
-%kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info;%(2:end,1:end); %initial concentration
+kDiff = con_info(1,1);     %coefficient of diffusion
+C = con_info(2:end,1:end); %initial concentration
 
 
 
