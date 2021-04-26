@@ -1,9 +1,9 @@
 function Coral_Geometry()
 
 Lx = 2;
-Ly = 4;
+Ly = 5;
 Nx = 256;
-Ny = 512;
+Ny = 640;
 
 dt=2.5e-4;
 tf=18.9;

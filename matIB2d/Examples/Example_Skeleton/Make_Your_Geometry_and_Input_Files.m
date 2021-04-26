@@ -61,6 +61,10 @@ axis square;
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
+% Prints .geo_connect file!
+print_Geometry_Connections(xLag,struct_name);
+
+
 % Prints .spring file!
 k_Spring = 2.5e4;                    % Spring stiffness (does not need to be equal for all springs)
 ds_Rest = 0.0;                       % Spring resting length (does not need to be equal for all springs)
@@ -102,7 +106,42 @@ function print_Lagrangian_Vertices(xLag,yLag,struct_name)
 
     fclose(vertex_fid);
 
-   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: prints GEOMETRY CONNECTIONS to a file called 
+%                               'struct_name'.geo_connect
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function print_Geometry_Connections(xLag,struct_name)
+
+
+    N = length(xLag); % Total # of Lag. Pts
+
+    geo_fid = fopen([struct_name '.geo_connect'], 'w');
+
+    % Loops over all Lagrangian Pts.
+    for i = 1:N
+        
+        if i<N
+            
+            s1 = i;   
+            s2 = i+1;
+            fprintf(geo_fid, '%d %d\n', s1, s2);
+            fprintf(geo_fid, '%d %d\n', s2, s1);
+            
+        elseif i==N
+            
+            s1 = N;
+            s2 = 1;
+            fprintf(geo_fid, '%d %d\n', s1, s2);
+            fprintf(geo_fid, '%d %d\n', s2, s1);
+            
+        end
+        
+    end
+
+    fclose(geo_fid);
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

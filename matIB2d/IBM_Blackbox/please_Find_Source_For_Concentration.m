@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info,k,C,ci)
+function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info, k, C, ci, flag_Geo_Connect, geo_Connect_MAT)
 
 %
 % dt:             time step
@@ -46,6 +46,7 @@ function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLa
 % k:              Rate of concentration creation
 % C:              Concentration 
 % ci:             Concentration saturation limit
+% c_Per:          Concentration periodic boundary 
        
 % Grid Info %
 Nx =    grid_Info(1); % # of Eulerian pts. in x-direction
@@ -127,22 +128,45 @@ CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
   
     'Invalid source model!' 
     end 
-
-% these are for debugging
-%save(sprintf('source/CL_%f.mat',current_time),'CL')
-%save(sprintf('source/CL_%f.mat',current_time),'CL')
-
-
+    
 % Give me delta-function approximations!
 [delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
 
-
+%------------------------------------------------------------
 % Transform the force density vectors into diagonal matrices
+%------------------------------------------------------------
 fsds = zeros(Nb,Nb);
-for i=1:Nb
-   fsds(i,i) = fs(i,1)*ds; 
-end
 
+if flag_Geo_Connect % Compute -actual- distances between 
+                    % neighboring Lagrangian pts in geometry
+                    
+    for i=1:Nb
+        
+        % compute real distances btwn LAG_i and Attached Points
+        %                           and sum distances together
+        
+        % find all Lag Pts that are Lag_i's geometric neighbors
+        indsVec = find(geo_Connect_MAT(:,1)==i);
+    
+        % loop to (1) distances between Lag_i and each neighbor
+        %         (2) sum all such distances together
+        ds_sum = 0;
+        for j=1:length(indsVec)
+            id1 = geo_Connect_MAT( indsVec(j),1);
+            id2 = geo_Connect_MAT( indsVec(j),2);
+            ds_sum = ds_sum + sqrt( ( xLag(id1,1)-xLag(id2,1) )^2 + ( yLag(id1,1)-yLag(id2,1) )^2 );     
+        end
+        
+        % Note: (1) 0.5 coming from Trapezoid Rule
+        %       (2) ds_sum is sum of distances to neighboring pts
+        fsds(i,i) = 0.5*fs(i,1)*ds_sum; 
+    end
+        
+else % Use Peskin's Constant 'ds' assumption
+    for i=1:Nb
+       fsds(i,i) = fs(i,1)*ds; 
+    end
+end
 
 % Find source term on grids by approximating the line integral, 
 %       F(x,y) = int{ CL(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
