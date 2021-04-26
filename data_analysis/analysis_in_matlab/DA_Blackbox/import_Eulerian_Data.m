@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy,C] = import_Eulerian_Data_2(path,numSim,Eulerian_Flags)
+function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy,C] = import_Eulerian_Data(path,numSim,Eulerian_Flags)
 
     %
     % EULERIAN FLAGS FOR WHAT GETS SPIT OUT %
@@ -42,6 +42,7 @@ function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy,C] = import_Eulerian_Data_2(path,numS
     %Eulerian_Flags(6):   uVEC (x,y-components of velocity: U,V)
     %Eulerian_Flags(7):   Fx (x-component of force )
     %Eulerian_Flags(8):   Fy (y-component of force)
+    %Eulerian_Flags(9):   Concentration
     %
 
     
@@ -132,4 +133,6 @@ cd(analysis_path);
 clear analysis_path;
 
 clear strChoice first;
+
+
 
