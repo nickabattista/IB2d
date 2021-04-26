@@ -29,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim,Eulerian_Flags)
+function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy,C] = import_Eulerian_Data(path,numSim,Eulerian_Flags)
 
     %
     % EULERIAN FLAGS FOR WHAT GETS SPIT OUT %
@@ -42,6 +42,7 @@ function [x,y,Omega,P,uMag,uX,uY,U,V,Fx,Fy] = import_Eulerian_Data(path,numSim,E
     %Eulerian_Flags(6):   uVEC (x,y-components of velocity: U,V)
     %Eulerian_Flags(7):   Fx (x-component of force )
     %Eulerian_Flags(8):   Fy (y-component of force)
+    %Eulerian_Flags(9):   Concentration
     %
 
     
@@ -105,6 +106,14 @@ else
     Fy=[];
 end
 
+% read in Concentration %
+if Eulerian_Flags(9)
+    strChoice = 'concentration'; first = 1;
+    [C,x,y] = read_Eulerian_Data_From_vtk(path,numSim,strChoice,first);
+else
+    C=[];
+end
+
 % read in Velocity Field %
 if Eulerian_Flags(6)
     [U,V] = read_Eulerian_Velocity_Field_vtk(path,numSim);
@@ -114,7 +123,7 @@ else
 end
 
 % Default for x,y values
-if max(Eulerian_Flags([1:5,7,8]))==0
+if max(Eulerian_Flags([1:5,7:9]))==0
     x=[];
     y=[];
 end
@@ -124,4 +133,6 @@ cd(analysis_path);
 clear analysis_path;
 
 clear strChoice first;
+
+
 
