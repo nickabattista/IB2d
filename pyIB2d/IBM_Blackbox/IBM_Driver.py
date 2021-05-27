@@ -1011,7 +1011,7 @@ def read_Spring_Points(struct_name):
     if (m<5):
         springs2 = np.ones([n,1])                           # DEFAULT DEG. NL if nothing inputted
 
-    springs = np.concatenate( (springs,springs2), axis=1 )  # Combine springs w/ DEG. NONLINEARITY if not there before
+        springs = np.concatenate( (springs,springs2), axis=1 )  # Combine springs w/ DEG. NONLINEARITY if not there before
 
     #springs: col 1: starting spring pt (by lag. discretization)
     #         col 2: ending spring pt. (by lag. discretization)
