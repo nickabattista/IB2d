@@ -709,7 +709,7 @@ if restart_Flag == 0
     [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
     [dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
     Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-    print_vtk_files(Output_Params,ctsave,vort,uMag,p,U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
+    print_vtk_files(Output_Params,0,ctsave,vort,uMag,p,U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
     fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
     fprintf('Current Time(s): %6.6f\n\n',current_time);
     ctsave = ctsave+1;
@@ -937,7 +937,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(Output_Params,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
+        print_vtk_files(Output_Params,current_time,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -981,7 +981,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro)
+function print_vtk_files(Output_Params,current_time,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro)
 
     %
     %  Output_Params(1):  print_dump
@@ -1017,7 +1017,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     lagPtsName = ['lagsPts.' strNUM '.vtk'];
 
     %Print Lagrangian Pts to .vtk format
-    savevtk_points(lagPts, lagPtsName, 'lagPts');
+    savevtk_points(lagPts, lagPtsName, 'lagPts', current_time);
 
     % Print Spring Connections (* if springs *)
     if springs_Yes == 1
@@ -1025,7 +1025,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         lagPtsConName=['lagPtsConnect.' strNUM '.vtk'];
         %connectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),connectsMat);
         connectsMat2 = connectsMat;
-        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat2);
+        savevtk_points_connects(lagPts, lagPtsConName, 'lagPtsConnected',connectsMat2, current_time);
     end
     
     % Print DAMP Spring Connections (* if damped springs *)
@@ -1034,7 +1034,7 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         dlagPtsConName=['damp_Connect.' strNUM '.vtk'];
         %dconnectsMat2 = test_Connects_Distances(lagPts(:,1),lagPts(:,2),dconnectsMat);
         dconnectsMat2 = dconnectsMat;
-        savevtk_points_connects(lagPts, dlagPtsConName, 'dampConnected',dconnectsMat2);
+        savevtk_points_connects(lagPts, dlagPtsConName, 'dampConnected',dconnectsMat2, current_time);
     end
     
     %if (  ( coag_Yes == 1 ) && ( aggregate_list(1) > 0 ) )
@@ -1043,9 +1043,9 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         CoagConName=['Coag_Connect.' strNUM '.vtk'];
         if aggregate_list(1) > 0
             agg_list_aux = test_Connects_Distances(lagPts(:,1),lagPts(:,2),aggregate_list(:,3:4));
-            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',[connectsMat2; agg_list_aux]);
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',[connectsMat2; agg_list_aux], current_time);
         else
-            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',connectsMat2);
+            savevtk_points_connects(lagPts, CoagConName, 'CoagConnected',connectsMat2, current_time);
         end
     end
     
@@ -1054,42 +1054,42 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     %Print Tracer Pts (*if tracers*)
     if tracers(1,1) == 1
         tracersPtsName = ['tracer.' strNUM '.vtk'];
-        savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers'); 
+        savevtk_points(tracers(:,2:4),tracersPtsName, 'tracers', current_time); 
     end
 
 
     %Print SCALAR DATA (i.e., colormap data) to .vtk file
     if Output_Params(9) == 1
         vortfName = ['Omega.' strNUM '.vtk'];
-        savevtk_scalar(vort, vortfName, 'Omega',dx,dy);
+        savevtk_scalar(vort, vortfName, 'Omega',dx,dy, current_time);
     end
     if Output_Params(10) == 1
         pfName = ['P.' strNUM '.vtk'];
-        savevtk_scalar(p, pfName, 'P',dx,dy);
+        savevtk_scalar(p, pfName, 'P',dx,dy, current_time);
     end
     if Output_Params(12) == 1
         uMagfName = ['uMag.' strNUM '.vtk'];
-        savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy);
+        savevtk_scalar(uMag, uMagfName, 'uMag',dx,dy, current_time);
     end
     if Output_Params(13) == 1
         uXName = ['uX.' strNUM '.vtk'];
-        savevtk_scalar(U, uXName, 'uX',dx,dy);
+        savevtk_scalar(U, uXName, 'uX',dx,dy, current_time);
     end
     if Output_Params(14) == 1
         uYName = ['uY.' strNUM '.vtk'];
-        savevtk_scalar(V, uYName, 'uY',dx,dy);
+        savevtk_scalar(V, uYName, 'uY',dx,dy, current_time);
     end
     if Output_Params(16) == 1
         fXName = ['fX.' strNUM '.vtk'];
-        savevtk_scalar(fXGrid, fXName, 'fX',dx,dy);
+        savevtk_scalar(fXGrid, fXName, 'fX',dx,dy, current_time);
     end
     if Output_Params(17) == 1
         fYName = ['fY.' strNUM '.vtk'];
-        savevtk_scalar(fYGrid, fYName, 'fY',dx,dy);
+        savevtk_scalar(fYGrid, fYName, 'fY',dx,dy, current_time);
     end
     if Output_Params(15) == 1
         fMagName = ['fMag.' strNUM '.vtk'];
-        savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy);
+        savevtk_scalar(sqrt( fXGrid.^2 + fYGrid.^2 ), fMagName, 'fMag',dx,dy, current_time);
     end
     
     %
@@ -1114,14 +1114,14 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
         confName = ['concentration.' strNUM '.vtk'];
         inds=C<1e-15; % Gives logical matrix
         C(inds) = 0;  % Zeros out values of matrix, C
-        savevtk_scalar(C', confName, 'Concentration',dx,dy);
+        savevtk_scalar(C', confName, 'Concentration',dx,dy, current_time);
     end
 
 
     %Print VECTOR DATA (i.e., velocity data) to .vtk file
     if Output_Params(11) == 1
         velocityName = ['u.' strNUM '.vtk'];
-        savevtk_vector(U, V, velocityName, 'u',dx,dy);
+        savevtk_vector(U, V, velocityName, 'u',dx,dy, current_time);
     end
 
 %Get out of viz_IB2d folder
@@ -1137,13 +1137,13 @@ if Output_Params(18) == 1
             % Save x-y force data!
             fLag_XName = ['fX_Lag.' strNUM '.vtk'];
             fLag_YName = ['fY_Lag.' strNUM '.vtk'];
-            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
-            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag', current_time);
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag', current_time);
 
             % Save force Magnitude (no normal/tangential -> not enough points)
             fMagName = ['fMag.' strNUM '.vtk'];
             fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
-            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
+            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag', current_time);
         cd ..
     else
 
@@ -1157,8 +1157,8 @@ if Output_Params(18) == 1
             % Save x-y force data!
             fLag_XName = ['fX_Lag.' strNUM '.vtk'];
             fLag_YName = ['fY_Lag.' strNUM '.vtk'];
-            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag');
-            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag');
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,1), fLag_XName, 'fX_Lag', current_time);
+            savevtk_points_with_scalar_data( lagPts, F_Lag(:,2), fLag_YName, 'fY_Lag', current_time);
 
             % Save force Magnitude, Mag. Normal, Mag. Tangential
             fMagName = ['fMag.' strNUM '.vtk'];
@@ -1167,9 +1167,9 @@ if Output_Params(18) == 1
 
             fLagMag = sqrt( F_Lag(:,1).^2 + F_Lag(:,2).^2 ); % Compute magnitude of forces on boundary
 
-            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag');
-            savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm');
-            savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan');
+            savevtk_points_with_scalar_data( lagPts, fLagMag, fMagName, 'fMag', current_time);
+            savevtk_points_with_scalar_data( lagPts, F_Normal_Mag, fNormalName, 'fNorm', current_time);
+            savevtk_points_with_scalar_data( lagPts, F_Tan_Mag, fTangentName, 'fTan', current_time);
 
         cd .. % Get out of hier_IB2d_data folder
     end
@@ -1358,7 +1358,7 @@ uMag = ( U.^2 + V.^2 ).^(1/2);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_points_connects( X, filename, vectorName,connectsMat)
+function savevtk_points_connects( X, filename, vectorName,connectsMat, time)
 
 %X is matrix of size Nx3
 
@@ -1371,6 +1371,10 @@ fprintf(file, '# vtk DataFile Version 2.0\n');
 fprintf(file, [vectorName '\n']);
 fprintf(file, 'ASCII\n');
 fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+%
+fprintf(file, 'FIELD FieldData 1\n');
+fprintf(file, 'TIME 1 1 double\n');
+fprintf(file, '%.8f\n',time);
 %
 fprintf(file, 'POINTS %i float\n', N);
 for i=1:N
@@ -1401,7 +1405,7 @@ fclose(file);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_points( X, filename, vectorName)
+function savevtk_points( X, filename, vectorName, time)
 
 %X is matrix of size Nx3
 
@@ -1414,6 +1418,10 @@ fprintf(file, '# vtk DataFile Version 2.0\n');
 fprintf(file, [vectorName '\n']);
 fprintf(file, 'ASCII\n');
 fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+%
+fprintf(file, 'FIELD FieldData 1\n');
+fprintf(file, 'TIME 1 1 double\n');
+fprintf(file, '%.8f\n',time);
 %
 fprintf(file, 'POINTS %i float\n', N);
 for i=1:N
@@ -1481,7 +1489,7 @@ fclose(file);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_vector(X, Y, filename, vectorName,dx,dy)
+function savevtk_vector(X, Y, filename, vectorName,dx,dy, time)
 %  savevtkvector Save a 3-D vector array in VTK format
 %  savevtkvector(X,Y,Z,filename) saves a 3-D vector of any size to
 %  filename in VTK format. X, Y and Z should be arrays of the same
@@ -1496,6 +1504,11 @@ function savevtk_vector(X, Y, filename, vectorName,dx,dy)
     fprintf(fid, 'ASCII\n');
     fprintf(fid, '\n');
     fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
+    %
+    fprintf(fid, 'FIELD FieldData 1\n');
+    fprintf(fid, 'TIME 1 1 double\n');
+    fprintf(fid, '%.8f\n',time);
+    %
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', nx, ny, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
@@ -1525,7 +1538,7 @@ return
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_scalar(array, filename, colorMap,dx,dy)
+function savevtk_scalar(array, filename, colorMap,dx,dy, time)
 %  savevtk Save a 3-D scalar array in VTK format.
 %  savevtk(array, filename) saves a 3-D array of any size to
 %  filename in VTK format.
@@ -1536,6 +1549,11 @@ function savevtk_scalar(array, filename, colorMap,dx,dy)
     fprintf(fid, 'ASCII\n');
     fprintf(fid, '\n');
     fprintf(fid, 'DATASET STRUCTURED_POINTS\n');
+    %
+    fprintf(fid, 'FIELD FieldData 1\n');
+    fprintf(fid, 'TIME 1 1 double\n');
+    fprintf(fid, '%.8f\n',time);
+    %
     fprintf(fid, 'DIMENSIONS    %d   %d   %d\n', ny, nx, nz);
     fprintf(fid, '\n');
     fprintf(fid, 'ORIGIN    0.000   0.000   0.000\n');
@@ -1566,7 +1584,7 @@ return
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function savevtk_points_with_scalar_data( X, scalarArray, filename, vectorName)
+function savevtk_points_with_scalar_data( X, scalarArray, filename, vectorName, time)
 
 %X is matrix of size Nx3
 
@@ -1579,6 +1597,10 @@ fprintf(file, '# vtk DataFile Version 2.0\n');
 fprintf(file, [vectorName '\n']);
 fprintf(file, 'ASCII\n');
 fprintf(file, 'DATASET UNSTRUCTURED_GRID\n\n');
+%
+fprintf(file, 'FIELD FieldData 1\n');
+fprintf(file, 'TIME 1 1 double\n');
+fprintf(file, '%.8f\n',time);
 %
 fprintf(file, 'POINTS %i float\n', N);
 for i=1:N
