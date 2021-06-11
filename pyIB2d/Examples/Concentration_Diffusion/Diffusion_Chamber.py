@@ -60,7 +60,6 @@ def Diffusion_Chamber():
 
     # Plot Geometry to test
     plt.plot(xLag,yLag,'r-')
-    plt.hold(True)
     plt.plot(xLag,yLag,'*')
     plt.xlabel('x')
     plt.ylabel('y')
