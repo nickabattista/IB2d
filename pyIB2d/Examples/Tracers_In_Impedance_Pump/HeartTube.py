@@ -60,7 +60,6 @@ def HeartTube():
 
     # Plot Geometry to test
     plt.plot(xLag[0:int(xLag.size/2)],yLag[0:int(yLag.size/2)],'r-')
-    plt.hold(True)
     plt.plot(xLag[int(xLag.size/2):],yLag[int(yLag.size/2):],'r-')
     plt.plot(xLag,yLag,'*')
     plt.plot(xT,yT,'m*')

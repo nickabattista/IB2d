@@ -39,7 +39,6 @@ def test_Activation_Wave():
             
         
         plt.plot(xLag,af_Val,'r-')
-        plt.hold(True)
         plt.plot(xLag,af_Val,'*')
         strTitle = 'Time(s) = {}'.format(round(t,3))
         plt.title(strTitle)
