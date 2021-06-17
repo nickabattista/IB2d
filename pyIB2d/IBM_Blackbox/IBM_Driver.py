@@ -1618,7 +1618,7 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
         vtk_cells.SetCells(Nc, numpy_support.numpy_to_vtkIdTypeArray(cells))
         vtk_obj = vtk.vtkUnstructuredGrid()
         # Set cells with cell types, cell structure
-        vtk_obj.SetCells(np.ones(Nc, dtype=np.int64)*3, vtk_cells)
+        vtk_obj.SetCells(list(np.ones(Nc, dtype=np.int64)*3), vtk_cells)
         vtk_obj.SetPoints(vtk_points)
         # write out
         writer = vtk.vtkGenericDataObjectWriter()
