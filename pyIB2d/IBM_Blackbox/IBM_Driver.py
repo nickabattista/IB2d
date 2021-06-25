@@ -1011,7 +1011,7 @@ def read_Spring_Points(struct_name):
     if (m<5):
         springs2 = np.ones([n,1])                           # DEFAULT DEG. NL if nothing inputted
 
-    springs = np.concatenate( (springs,springs2), axis=1 )  # Combine springs w/ DEG. NONLINEARITY if not there before
+        springs = np.concatenate( (springs,springs2), axis=1 )  # Combine springs w/ DEG. NONLINEARITY if not there before
 
     #springs: col 1: starting spring pt (by lag. discretization)
     #         col 2: ending spring pt. (by lag. discretization)
@@ -1618,7 +1618,7 @@ def savevtk_points_connects( X, filename, vectorName,connectsMat):
         vtk_cells.SetCells(Nc, numpy_support.numpy_to_vtkIdTypeArray(cells))
         vtk_obj = vtk.vtkUnstructuredGrid()
         # Set cells with cell types, cell structure
-        vtk_obj.SetCells(np.ones(Nc, dtype=np.int64)*3, vtk_cells)
+        vtk_obj.SetCells(list(np.ones(Nc, dtype=np.int64)*3), vtk_cells)
         vtk_obj.SetPoints(vtk_points)
         # write out
         writer = vtk.vtkGenericDataObjectWriter()
@@ -1689,7 +1689,7 @@ def savevtk_points( X, filename, vectorName):
         vtk_obj = vtk.vtkUnstructuredGrid()
         # Set cells with cell types, cell structure
         if cells.shape[0] > 1:
-            vtk_obj.SetCells(cells[:,0], vtk_cells)
+            vtk_obj.SetCells(list(cells[:,0]), vtk_cells)
         else:
             vtk_obj.SetCells(cells[0,0], vtk_cells)
         vtk_obj.SetPoints(vtk_points)

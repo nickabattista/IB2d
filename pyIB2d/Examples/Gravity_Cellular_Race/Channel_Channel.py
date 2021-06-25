@@ -70,7 +70,6 @@ def Channel_Channel():
 
     # Plot Geometry to test
     plt.plot(xLag_C1,yLag_C1,'r-')
-    plt.hold(True)
     plt.plot(xLag_C2,yLag_C2,'r-')
     plt.plot(xLag_C3,yLag_C3,'r-')
     #
