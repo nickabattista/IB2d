@@ -39,16 +39,16 @@ function springs = update_Springs(dt,current_time,xLag,yLag,springs)
 %          col 3: spring stiffness
 %          col 4: spring resting lengths
 
-s_1 = springs(:,1);    % MASTER Node Indices
-s_2 = springs(:,2);    % SLAVE Node Indices
+%s_1 = springs(:,1);    % LEADER Node Indices
+%s_2 = springs(:,2);    % FOLLOWER Node Indices
 k_Vec = springs(:,3);  % Springs Stiffnesses Vector
-RL_Vec= springs(:,4);  % Resting Lengths Vectors
+%RL_Vec= springs(:,4);  % Resting Lengths Vectors
 
-N = length(xLag);            % Gives total number of Lagrangian pts!
+%N = length(xLag);            % Gives total number of Lagrangian pts!
 Ns = length( springs(:,1) ); % Gives total number of springs!
 Ly = 1.0;
-Ny = 32;
-ds = Ly/Ny;
+Ny = 128;
+ds = 0.5*Ly/Ny;
 
 distVec = abs( sqrt( ( xLag(2:Ns+1)-xLag(1:Ns) ).^2 + ( yLag(2:Ns+1)-yLag(1:Ns) ).^2 ) );
 

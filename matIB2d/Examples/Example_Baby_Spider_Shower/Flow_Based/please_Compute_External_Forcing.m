@@ -5,9 +5,12 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  battistn@tcnj.edu
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
+%
+% Date Modified: 06/24/2021
+% Institution Modified: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -19,7 +22,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -60,15 +63,15 @@ ds =    grid_Info(9); % Lagrangian spacing
 kStiff = 1e4;
 
 % Max Velocity Desired
-uMax = 1.0;
+uMax = 0.2;
 
 if first == 1
     
     % Compute Where You Want to Apply Force
     xMin = 0.05;
     xMax = 0.09;
-    yMin = 0.10;
-    yMax = 0.98;
+    yMin = 0;%0.035;
+    yMax = Ly;%0.975;
     
     inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
     first = 0;
@@ -163,7 +166,7 @@ function [fx_exts, fy_exts] = give_Me_Velocity_Target_External_Force_Density(t,d
 % inds: indices on the fluid grid for where to apply the arbitrary external force
 
 
-fx = zeros(Nx,Ny);         % Initialize storage for x-force density from EXTERNAL FORCES
+fx = zeros(Ny,Nx);         % Initialize storage for x-force density from EXTERNAL FORCES
 fy = fx;                   % Initialize storage for y-force density from EXTERNAL FORCES
 
 for n=1:length(inds(:,1))
@@ -206,9 +209,9 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 % w:     width of Channel
 % Umax:  maximum velocity
 
-y = yGrid(j);  % y-Value considered
+%y = yGrid(j);  % y-Value considered
 
-uX_Tar = Umax * (5*tanh(2*t)); % Only external forces in x-direction
+uX_Tar = Umax * (tanh(5*t)); % Only external forces in x-direction
 uY_Tar = 0;                                                           % No external forces in y-direction
 
 
