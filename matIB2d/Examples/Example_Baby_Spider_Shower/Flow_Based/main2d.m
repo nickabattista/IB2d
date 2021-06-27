@@ -5,24 +5,24 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  battistn@tcnj.edu
 % Date Created: May 27th, 2015
 % Institution: UNC-CH
+%
+% Date Modified: 06/24/2021
+% Institution Modified: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-%   .
-%   .
-%   .
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us to add a specific fiber model or example, please let Nick (nickabattista@gmail.com) know.
+% If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 

@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu =  18e-6                % Dynamic Viscosity of 18 (N*s/m^2) 
+mu =  18e-6                % Dynamic Viscosity of Air (N*s/m^2) 
 rho = 1.225                % Density of Air (kg/m^2)
 }
 
@@ -15,8 +15,8 @@ rho = 1.225                % Density of Air (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 0.475           % Final time of simulation (s)
-dt = 1e-4               % Time-step (s)
+Tfinal = 5.0           % Final time of simulation (s)
+dt = 5e-5               % Time-step (s)
 }
 
 
@@ -24,9 +24,9 @@ dt = 1e-4               % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  64                % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  64                % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
-Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
+Nx =  384               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Lx = 1.5                % Length of Eulerian Grid in x-Direction (m)
 Ly = 1.0                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
@@ -37,8 +37,8 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 %
 Lag_Structure_Info {
 springs = 1             % 0 (for no) or 1 (for yes)
-update_springs = 1      % 0 (for no) or 1 (for yes)
-target_pts = 1          % 0 (for no) or 1 (for yes)
+update_springs = 0      % 0 (for no) or 1 (for yes)
+target_pts = 0          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 1               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
@@ -65,8 +65,18 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 100           % How often to print (PLOT) to screen
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+print_dump = 1000        % How often to print (PLOT) to screen
+save_Vorticity = 1       % Save Vorticity Scalar Data to .vtk format
+save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
+save_uVec = 1            % Save u-Vector Data to .vtk format
+save_uMag = 1            % Save uMagnitude Scalar Data to .vtk format
+save_uX = 0              % Save uX Scalar Data to .vtk format
+save_uY = 0              % Save uY Scalar Data to .vtk format
+save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
+save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
+save_fY = 0              % Save y-Force Component Scalar Data to .vtk format
+save_hier = 0            % Save Scalar Force Data on Lag. Structure to .vtk format
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 0          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 0       % Plot Lagrangian Points + VORTICITY colormap in Matlab
