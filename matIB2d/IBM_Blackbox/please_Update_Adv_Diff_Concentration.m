@@ -5,7 +5,7 @@
 %
 %   Upwind w/ Time Splitting
 %   Author: Nick Battista
-%   Date: June 2016
+%   Date: June 2016 (created); June 2021 (modified)
 %   Institution (when created):  UNC-CH
 %   Current Instituteion: TCNJ
 %
@@ -18,7 +18,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k,Adv_flag)
+function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY,k,Adv_flag,Lx,Ly)
 
 % C:     concentration 
 % dt:    time-step
@@ -28,15 +28,22 @@ function [C,laplacian_C] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,uX,uY
 % k:     diffusion coefficient
 
 
-% Performs Upwind Advection WITHOUT Time-Splitting
-%C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
+%
+% Choose whether UPWIND or WENO advection is used:
+%
 if Adv_flag == 0
-    % Performs Upwind Advection w/ Time-Splitting
+    
+    % Performs Upwind Advection WITH Time-Splitting
     C = perform_Time_Split_Upwind(C,dt,dx,dy,uX,uY,k);
-    %C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
-elseif Adv_flag == 1
+        
     % Performs Upwind Advection WITHOUT Time-Splitting
-    C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,Lx);
+    %C = perform_Time_noSplit_Upwind(C,dt,dx,dy,uX,uY,k);
+
+elseif Adv_flag == 1
+
+    % Performs WENO Advection WITHOUT Time-Splitting
+    C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,0,Lx,Ly);
+
 else
     'UNRECOGNIZED ADVECTION SCHEME'
 end
@@ -90,13 +97,16 @@ Cyy = DD(C,dy,'y');
 % Time-step #2 (give next iteration)
 C = C + dt * ( k*(Cyy) - uY.*Cy );
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FUNCTION: Advection-Diffusion w/ 3RD-order WENO Scheme for advection
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function C = perform_Time_WENO_source(C,dt,dx,dy,uX,uY,k,f,Lx)
+function C = perform_WENO_source(C,dt,dx,dy,uX,uY,k,f,Lx,Ly)
 
-% Compute Necessary Derivatives (Note: these calculations could be parallalized)
-%Cx = give_Necessary_Derivative(C,dx,uX,'x');
-%Cy = give_Necessary_Derivative(C,dy,uY,'y'); 
-[Cx,Cy]=WENO_3O(C,uX,uY,dx,dy,dt,Lx);
+% Compute Necessary Derivatives using WENO
+[Cx,Cy]=WENO_3O(C,uX,uY,dx,dy,dt,Lx,Ly);
 
 
 Cxx = DD(C,dx,'x');
@@ -105,8 +115,10 @@ Cyy = DD(C,dy,'y');
 % Forms Laplacian
 laplacian_C = Cxx+Cyy;
     
-% UPWIND
+% Update
 C=C+dt*(k*laplacian_C-(uX.*Cx+uY.*Cy)+f);
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
