@@ -57,10 +57,17 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Compute Where You Want to Apply Force
-xMin = 0.48;
-xMax = 0.52;
-yMin = 0.05;
-yMax = 0.45;
+xMin1 = 0.155;
+xMax1 = 0.195;
+%
+xMin2 = 0.48;
+xMax2 = 0.52;
+%
+xMin3 = 0.78;
+xMax3 = 0.82;
+%
+yMin = 0.0;
+yMax = 0.5;
 
 % Stiffness for Arbitrary External Force to Fluid Grid
 kStiff = 1e4;
@@ -69,10 +76,13 @@ kStiff = 1e4;
 w = 0.3;
 
 % Max Velocity Desired
-uMax = 10.0;
+uMax = 2.5;
 
 if first == 1
-    inds = give_Me_Indices_To_Apply_Force(x,y,xMin,xMax,yMin,yMax);
+    inds1 = give_Me_Indices_To_Apply_Force(x,y,xMin1,xMax1,yMin,yMax);
+    inds2 = give_Me_Indices_To_Apply_Force(x,y,xMin2,xMax2,yMin,yMax);
+    inds3 = give_Me_Indices_To_Apply_Force(x,y,xMin3,xMax3,yMin,yMax);
+    inds = [inds1; inds2; inds3];
     first = 0;
 end
 
@@ -215,6 +225,6 @@ if y>0.25
     uX_Tar = Umax * (tanh(20*t));                 % Only external forces in x-direction
 else
     uY_Tar = 0;%Umax * (tanh(20*t));              % No external forces in y-direction
-    uX_Tar = -1.5*Umax * (tanh(20*t));                % Only external forces in x-direction
+    uX_Tar = -1.0*Umax * (tanh(20*t));            % Only external forces in x-direction
 end
 

@@ -51,11 +51,6 @@ struct_name = 'boussinesq'; % Name for .vertex, .spring, etc files. (must match 
 
 size(Concentration)
 
-% Plot Geometry to test
-plot(xLag,yLag,'r-'); hold on;
-plot(xLag,yLag,'*'); hold on;
-xlabel('x'); ylabel('y');
-axis square;
 
 xLag = dx/2:dx/2:Lx-dx/2;
 yLag = 0.01*ones(1,length(xLag));
@@ -63,6 +58,16 @@ yLag2 = 0.49*ones(1,length(xLag));
 
 xLag = [xLag xLag];
 yLag = [yLag yLag2];
+
+xLag = 0:2*ds:Lx;
+yLag = 0.25*ones( size( xLag ) );
+
+% Plot Geometry to test
+plot(xLag,yLag,'r-'); hold on;
+plot(xLag,yLag,'*'); hold on;
+xlabel('x'); ylabel('y');
+axis square;
+
 
 % Prints .vertex file!
 print_Lagrangian_Vertices(xLag,yLag,struct_name);
@@ -420,8 +425,8 @@ function [xLag,yLag,C,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentrat
 % ds: Lagrangian pt. spacing
 % Nx: Eulerian grid resolution
 
-Buffx = 0.05*Lx;
-Buffy = 0.05*Lx;
+Buffx = 0;%0.05*Lx;
+Buffy = 0;%0.05*Lx;
 
 fprintf('\nThis is the buffer on x and y, respectively: %d and %d\n',Buffx,Buffy);
 

@@ -6,7 +6,7 @@
 % FLUID PARAMETER VALUES %
 %
 Fluid_Parameters {
-mu = 0.01               % Dynamic Viscosity (N*s/m^2) 
+mu = 0.002              % Dynamic Viscosity (N*s/m^2) 
 rho = 1                 % Density (kg/m^2)
 }
 
@@ -15,7 +15,7 @@ rho = 1                 % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 2.0            % Final time of simulation (s)
+Tfinal = 0.5            % Final time of simulation (s)
 dt = 2.5e-5               % Time-step (s)
 }
 
@@ -32,13 +32,27 @@ supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
 }
 
 
+
+%
+% CONCENTRATION MODEL INFORMATION %
+%
+Concentration_Info {
+concentration = 1       % 0 (for no) or 1 (for yes)
+kDiff = 1e-5            % Diffusion coefficient
+advection = 1           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
+source = 0              % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for reaction)
+k_source = 0.1          % rate of source term for concentration
+c_inf = 0.1             % saturation limit for concentration, for k_source = 2
+}
+
+
 %
 % LAGRANGIAN STRUCTURE MODEL INFORMATION %
 %
 Lag_Structure_Info {
 springs = 0             % 0 (for no) or 1 (for yes)
 update_springs = 0      % 0 (for no) or 1 (for yes)
-target_pts = 1          % 0 (for no) or 1 (for yes)
+target_pts = 0          % 0 (for no) or 1 (for yes)
 update_target = 0       % 0 (for no) or 1 (for yes)
 beams = 0               % 0 (for no) or 1 (for yes)
 update_beams = 0        % 0 (for no) or 1 (for yes)
@@ -56,29 +70,24 @@ porous_media = 0        % 0 (for no) or 1 (for yes)
 electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
-boussinesq = 1          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
-expansion_coeff = 10.0  % expansion coefficient for Boussinesq approx.
+boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
+expansion_coeff = 0.25  % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
 }
 
-% CONCENTRATION MODEL INFORMATION %
-%
-Concentration_Info {
-concentration = 1       % 0 (for no) or 1 (for yes)
-kDiff =1e-6             % Diffusion coefficient
-}
+
 
 
 %
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 200          % How often to print (PLOT) to screen
+print_dump = 400         % How often to print (PLOT) to screen
 save_Vorticity = 0       % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
-save_uVec = 1            % Save u-Vector Data to .vtk format
+save_uVec = 0            % Save u-Vector Data to .vtk format
 save_uMag = 0            % Save uMagnitude Scalar Data to .vtk format
-save_uX = 0              % Save uX Scalar Data to .vtk format
+save_uX = 1              % Save uX Scalar Data to .vtk format
 save_uY = 0              % Save uY Scalar Data to .vtk format
 save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
