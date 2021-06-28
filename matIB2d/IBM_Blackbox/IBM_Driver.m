@@ -692,6 +692,7 @@ if brinkman_Yes == 1
     cd ..;
 end
 
+
 %
 % INITIALIZES SIMULATION -> if RESTARTing simulation, reads in previous
 %                           data. Needs script to do so in Example/ folder
@@ -768,7 +769,6 @@ else
 end
 
 
-
 %
 %
 %
@@ -792,7 +792,6 @@ while current_time < T_FINAL
     V_prev=V;
 
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
-    
     
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
@@ -910,17 +909,25 @@ while current_time < T_FINAL
     
     % If there is a background concentration, update concentration-gradient %
     if concentration_Yes == 1 && source_Yes==0
-      fs=zeros(Nx,Ny);
-      % Advection-diffusion without a source term
+      
+        % ** Advection-diffusion WITHOUT a source term **
 
-%    [C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
-       [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiff,adv_scheme);
+        % Not fully integrated nor tested.
+        %[C,~] = please_Update_Adv_Diff_Concentration_Flux_Limiter_FV(C,dt,dx,dy,U,V,kDiffusion); 
+        
+        % Update concentration (solve advection-diffusion eq) w/ either UPWIND
+        %   or WENO advection scheme
+        [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiff,adv_scheme,Lx,Ly);
 
     elseif concentration_Yes == 1 && source_Yes>0
-    % Advection-diffusion with a source term
-     fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes, ksource, C, Cinf, flag_Geo_Connect, geo_Connect_MAT);
-   % update advection-diffusion equation
-      [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
+    
+        % Compute force term for advection-diffusion with a source term
+        fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes, ksource, C, Cinf, flag_Geo_Connect, geo_Connect_MAT);
+   
+        % Update concentration (solver advection-diffusion eq) w/ either UPWIND
+        %   or WENO advection scheme
+        [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
+        
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
