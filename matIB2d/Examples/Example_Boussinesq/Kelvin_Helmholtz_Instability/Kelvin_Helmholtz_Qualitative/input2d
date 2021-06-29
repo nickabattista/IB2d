@@ -15,8 +15,8 @@ rho = 1                 % Density (kg/m^2)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 0.5            % Final time of simulation (s)
-dt = 2.5e-5               % Time-step (s)
+Tfinal = 1.0          % Final time of simulation (s)
+dt = 1e-4             % Time-step (s)
 }
 
 
@@ -24,8 +24,8 @@ dt = 2.5e-5               % Time-step (s)
 % GRID PARAMETERS %
 %
 Grid_Parameters {
-Nx =  512               % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny =  256               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx =  1024              % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny =  512               % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0                % Length of Eulerian Grid in x-Direction (m)
 Ly = 0.5                % Length of Eulerian Grid in y-Direction (m)
 supp = 4                % Choose dirac-delta support (KEEP IT EVEN!!!)
@@ -71,7 +71,7 @@ electro_phys = 0        % 0 (for no) or 1 (for yes)
 damped_springs = 0      % 0 (for no) or 1 (for yes)
 update_damp_springs = 0 % 0 (for no) or 1 (for yes)
 boussinesq = 0          % 0 (for no) or 1 (for yes)  % FOR BOUSSINESQ APPROXIMATION!
-expansion_coeff = 0.25  % expansion coefficient for Boussinesq approx.
+expansion_coeff = 250.0 % expansion coefficient for Boussinesq approx.
 user_force_model = 0    % 0 (for no) or 1 (for yes)
 }
 
@@ -82,13 +82,13 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 % PRINTING INFORMATION
 %
 Output_Info {
-print_dump = 400         % How often to print (PLOT) to screen
+print_dump = 100         % How often to print (PLOT) to screen
 save_Vorticity = 0       % Save Vorticity Scalar Data to .vtk format
 save_Pressure = 0        % Save Pressure Scalar Data to .vtk format
-save_uVec = 0            % Save u-Vector Data to .vtk format
+save_uVec = 1            % Save u-Vector Data to .vtk format
 save_uMag = 0            % Save uMagnitude Scalar Data to .vtk format
 save_uX = 1              % Save uX Scalar Data to .vtk format
-save_uY = 0              % Save uY Scalar Data to .vtk format
+save_uY = 1              % Save uY Scalar Data to .vtk format
 save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
 save_fY = 0              % Save y-Force Component Scalar Data to .vtk format

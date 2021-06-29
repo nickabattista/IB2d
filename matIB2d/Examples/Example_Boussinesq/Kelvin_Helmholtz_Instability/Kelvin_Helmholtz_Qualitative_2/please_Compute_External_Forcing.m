@@ -5,21 +5,25 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nickabattista@gmail.com
-% Date Created: May 27th, 2015
-% Institution: UNC-CH
+% Email:  battistn@tcnj.edu
+% Date Created: September 9th, 2016
+% Institution Created: UNC-CH
+% Date Modified: June 26, 2021
+% Institution: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
-% 	2. Beams (*torsional springs)
+% 	2. Beams (*torsional springs*)
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
+% If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
+%
+% If you use this code for the purposes of teaching, research, or recreation please let Nick know as well :)
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -57,14 +61,21 @@ ds =    grid_Info(9); % Lagrangian spacing
 
 
 % Compute Where You Want to Apply Force
-xMin1 = 0.155;
-xMax1 = 0.195;
 %
-xMin2 = 0.48;
-xMax2 = 0.52;
+xMin1 = 0.0;
+xMax1 = 0.02;
 %
-xMin3 = 0.78;
-xMax3 = 0.82;
+xMin2 = 0.23;
+xMax2 = 0.27;
+%
+xMin3 = 0.48;
+xMax3 = 0.52;
+%
+xMin4 = 0.73;
+xMax4 = 0.77;
+%
+xMin5 = 0.98;
+xMax5 = 1.0;
 %
 yMin = 0.0;
 yMax = 0.5;
@@ -82,7 +93,9 @@ if first == 1
     inds1 = give_Me_Indices_To_Apply_Force(x,y,xMin1,xMax1,yMin,yMax);
     inds2 = give_Me_Indices_To_Apply_Force(x,y,xMin2,xMax2,yMin,yMax);
     inds3 = give_Me_Indices_To_Apply_Force(x,y,xMin3,xMax3,yMin,yMax);
-    inds = [inds1; inds2; inds3];
+    inds4 = give_Me_Indices_To_Apply_Force(x,y,xMin4,xMax4,yMin,yMax);
+    inds5 = give_Me_Indices_To_Apply_Force(x,y,xMin5,xMax5,yMin,yMax);
+    inds = [inds1; inds2; inds3; inds4; inds5];
     first = 0;
 end
 
@@ -220,11 +233,16 @@ function [uX_Tar,uY_Tar] = please_Give_Target_Velocity(t,dx,dy,xGrid,yGrid,Lx,Ly
 
 y = yGrid(j);  % y-Value considered
 
-if y>0.25
-    uY_Tar = 0;%Umax * (tanh(20*t));              % No external forces in y-direction
-    uX_Tar = Umax * (tanh(20*t));                 % Only external forces in x-direction
+if y<0.125
+    uY_Tar = 0;                      % No external forces in y-direction
+    uX_Tar = - Umax * (tanh(20*t));  % Only external forces in x-direction
+elseif y<0.25
+    uY_Tar = 0;                      % No external forces in y-direction
+    uX_Tar = Umax * (tanh(20*t));    % Only external forces in x-direction
+elseif y<0.375
+    uY_Tar = 0;                      % No external forces in y-direction
+    uX_Tar = - Umax * (tanh(20*t));  % Only external forces in x-direction
 else
-    uY_Tar = 0;%Umax * (tanh(20*t));              % No external forces in y-direction
-    uX_Tar = -1.0*Umax * (tanh(20*t));            % Only external forces in x-direction
+    uY_Tar = 0;                      % No external forces in y-direction
+    uX_Tar = Umax * (tanh(20*t));    % Only external forces in x-direction
 end
-

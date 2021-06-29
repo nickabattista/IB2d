@@ -5,21 +5,25 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
+% Email:  battistn@tcnj.edu
 % Date Created: September 9th, 2016
-% Institution: UNC-CH
+% Institution Created: UNC-CH
+% Date Modified: June 26, 2021
+% Institution: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
-% 	2. Beams (*torsional springs)
+% 	2. Beams (*torsional springs*)
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
 %
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
+% If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
+%
+% If you use this code for the purposes of teaching, research, or recreation please let Nick know as well :)
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -34,8 +38,8 @@ function Make_Tub_Geometry_and_Initial_Concentration()
 %
 % Grid Parameters (MAKE SURE MATCHES IN input2d !!!)
 %
-Nx = 512;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
-Ny = 256;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
+Nx = 1024;       % # of Eulerian Grid Pts. in x-Direction (MUST BE EVEN!!!)
+Ny = 512;        % # of Eulerian Grid Pts. in y-Direction (MUST BE EVEN!!!)
 Lx = 1.0;        % Length of Eulerian Grid in x-Direction
 dx = Lx/Nx;      % Grid spatial resolution
 
@@ -47,7 +51,7 @@ struct_name = 'boussinesq'; % Name for .vertex, .spring, etc files. (must match 
 
 
 % Call function to construct geometry
-[xLag,yLag,Concentration,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx);
+[xLag,yLag,Concentration,inds,OffY] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx);
 
 size(Concentration)
 
@@ -59,14 +63,39 @@ yLag2 = 0.49*ones(1,length(xLag));
 xLag = [xLag xLag];
 yLag = [yLag yLag2];
 
-xLag = 0:2*ds:Lx;
-yLag = 0.25*ones( size( xLag ) );
+%--------------------------------------
+% Lines of Tracer Particles
+%--------------------------------------
+OffY=0;
+xLagT = 0:2*ds:Lx;
+yLag1 = (0.15+OffY)*ones( size( xLagT ) );
+yLag2 = (0.25+OffY)*ones( size( xLagT ) );
+yLag3 = (0.35+OffY)*ones( size( xLagT ) );
+%
+
+%--------------------------------------
+% Line at Bottom of Domain
+%--------------------------------------
+xLagB = 0:0.75*ds:Lx;
+yLagB1 = 1/3*ds*ones( size( xLagB ) );
+yLagB2 = 2/3*ds*ones( size( xLagB ) );
+yLagB3 = ds*ones( size( xLagB ) );
+
+%--------------------------------------
+% Combine Geometries
+%--------------------------------------
+%xLag = [xLagB xLagB xLagB];
+%yLag = [yLagB1 yLagB2 yLagB3];
+%
+xLag = [xLagT xLagT xLagT];
+yLag = [yLag1 yLag2 yLag3];
 
 % Plot Geometry to test
 plot(xLag,yLag,'r-'); hold on;
 plot(xLag,yLag,'*'); hold on;
 xlabel('x'); ylabel('y');
-axis square;
+axis([0 Lx 0 Lx]); 
+
 
 
 % Prints .vertex file!
@@ -86,7 +115,7 @@ print_Lagrangian_Vertices(xLag,yLag,struct_name);
 
 
 % Prints .target file!
-k_Target = 1e7;
+k_Target = 1e6; %1e7
 print_Lagrangian_Target_Pts(xLag,k_Target,struct_name);
 
 % Prints .concentration file!
@@ -136,7 +165,10 @@ function print_Boussinesq_Mesh(inds)
     for s = 1:N
         xInd = inds(s,1);
         yInd = inds(s,2);
-        fprintf(bouss_fid, '%d %d\n', xInd,yInd);
+        
+        if ( ( yInd < 0.425 ) || ( yInd > 0.025 ) )
+            fprintf(bouss_fid, '%d %d\n', xInd,yInd);
+        end
     end
 
     fclose(bouss_fid);
@@ -295,26 +327,15 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,buffx,buffy)
+function [C,inds,OffY] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,buffx,buffy)
 
-%WHERE OUTER TUBE LIES
-%xMin = 0.15; xMax = 0.45;
-%yMin = 0.85; yMax = 1.15;
 
 %xMin = buffx; xMax = Lx-buffx;
 xMin = 0; xMax = Lx;
 
-%yMin = buffy; yMax = Lx/2-buffy;
 yMin = 0; yMax = Lx/2;
 
-% xMin = 0; xMax = Lx;
-% yMin = 0; yMax = Lx;
 
-xMid = (xMin+xMax)/2;
-yMid = (yMin+yMax)/2;
-
-xDiff = (xMax-xMin)/2;
-yDiff = (yMax-yMin)/2;
 
 x=linspace(0,Lx,Nx);
 y=linspace(0,Lx/2,Ny);
@@ -333,18 +354,65 @@ for i=1:length( inds(:,1) )
     %C(yInd,xInd ) = (-1.0/xDiff^2)*( (xPt-xMid) - xDiff )*( (xPt-xMid) + xDiff ); %1.0;
     
     %C(yInd,xInd) = 0.5*(tanh(80.0*(yPt-0.25*Lx-0.001*cos(pi*xPt)))+1);
-    if yPt > (0.25+0.025*sin(10*pi*xPt))
-        C(yInd,xInd) = 0;
-    else
-        C(yInd,xInd) = 1;
-    end
-%     if yPt >= Lx/2+1*dx
-%         C(yInd,xInd) = 1;
-%     elseif yPt <= Lx/2-1*dx;
+%     if yPt > (0.25+0.025*sin(20*pi*xPt))
 %         C(yInd,xInd) = 0;
 %     else
-%         C(yInd,xInd) = 0.5;
+%         C(yInd,xInd) = 1;
 %     end
+
+    %-----------------------------------------
+    % Makes 4 equal-width horizontal strips
+    %-----------------------------------------
+    Scale = 1;
+    Amp = 0.025;
+    OffY = Amp;
+    lambda = 0.2;
+    %
+    if yPt < ( 0.125+Amp*sin(2*pi*xPt/lambda) + OffY ) 
+        C(yInd,xInd) = 0;
+    elseif yPt < ( 0.25+Amp*sin(2*pi*xPt/lambda) + 0 )
+        C(yInd,xInd) = 1*Scale;
+    elseif yPt < ( 0.375+Amp*sin(2*pi*xPt/lambda) - OffY )
+        C(yInd,xInd) = 2.0*Scale;
+    else
+        C(yInd,xInd) = 3.0*Scale;
+    end
+    
+
+    %-----------------------------------------
+    % Makes 4 Diagonally-aligned strips
+    %-----------------------------------------
+%     % Define Max Vertical Values on interval
+%     y0 = 0;
+%     y1 = 0.125;
+%     y2 = 0.25;
+%     y3 = 0.375;
+%     y4 = 0.5;
+%     
+%     % Define Slopes
+%     m4 = (y3-y4);
+%     m3 = (y2-y3);
+%     m2 = (y1-y2);
+%     m1 = (y0-y1);
+%     
+%     % Define y value along lines at specific xPt
+%     yL_1 = m1*( xPt ) + y1;
+%     yL_2 = m2*( xPt ) + y2;
+%     yL_3 = m3*( xPt ) + y3;
+%     yL_4 = m4*( xPt ) + y4;
+%     
+%     if yPt < yL_1
+%         C(yInd,xInd) = 0;
+%     elseif yPt < yL_2
+%         C(yInd,xInd) = 1;
+%     elseif yPt < yL_3
+%         C(yInd,xInd) = 2;
+%     elseif yPt < yL_4
+%         C(yInd,xInd) = 3;
+%     else
+%         C(yInd,xInd) = 4;
+%     end
+
 
 end
 
@@ -420,7 +488,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
-function [xLag,yLag,C,inds] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx)
+function [xLag,yLag,C,inds,OffY] = give_Me_Immsersed_Boundary_Geometry_and_Concentration(ds,Nx,Ny,Lx,dx)
  
 % ds: Lagrangian pt. spacing
 % Nx: Eulerian grid resolution
@@ -441,12 +509,12 @@ yTop = (Lx/2-Buffy)*ones(1,length(xBottom));
 xLag = [xLeft xBottom xRight xBottom];
 yLag = [ySide yBottom ySide yTop];
 
-plot(xLeft,ySide,'b*'); hold on;
-plot(xBottom,yBottom,'g*'); hold on;
-plot(xRight,ySide,'r*'); hold on;
-axis([0 Lx 0 Lx]); 
+% plot(xLeft,ySide,'b*'); hold on;
+% plot(xBottom,yBottom,'g*'); hold on;
+% plot(xRight,ySide,'r*'); hold on;
+% axis([0 Lx 0 Lx]); 
  
-[C,inds] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,Buffx,Buffy);
+[C,inds,OffY] = give_Me_Initial_Concentration(Lx,Nx,Ny,dx,Buffx,Buffy);
 
 
 
