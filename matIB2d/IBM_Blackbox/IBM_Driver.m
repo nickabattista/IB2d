@@ -860,8 +860,8 @@ while current_time < T_FINAL
     
     % Add in effect from BOUSSINESQ
     if boussinesq_Yes == 1
-        Fxh = Fxh + rho*fBouss_X.*(C);
-        Fyh = Fyh + rho*fBouss_Y.*(C);
+        Fxh = Fxh + rho*fBouss_X.*(C)*(tanh(20*current_time));
+        Fyh = Fyh + rho*fBouss_Y.*(C)*(tanh(20*current_time));
     end
     
     
