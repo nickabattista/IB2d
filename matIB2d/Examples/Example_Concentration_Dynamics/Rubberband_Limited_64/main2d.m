@@ -8,7 +8,7 @@
 % Email:  battistn@tcnj.edu
 % Date Modified: April 2021
 % Current Institution: TCNJ
-% Date Created: May 27th, 2015
+% IB2d Date Created: May 27th, 2015
 % Institution Created: UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
@@ -24,6 +24,7 @@
 % If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -44,11 +45,8 @@ function main2d()
 % Path Reference to where Driving code is found %
 %
 warning('off','all');
-%addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/','../../../../../IBM_Blackbox/');
+addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
 
-%addpath('/Users/nickbattista/Desktop/Test_IB2d/IB2d/matIB2d/IBM_Blackbox');
-
-addpath('/home/hpc/battistn/IB2d/matIB2d/IBM_Blackbox');
 
 %
 % THROW ERROR TO CORRECT PATH IF DRIVER IS NOT FOUND
@@ -65,7 +63,7 @@ assert( exist( 'IBM_Driver.m', 'file' ) == 2, 'IBM_Driver.m not found -> Please 
 %
 %-%-%-% DO THE IMMERSED BOUNDARY SOLVE!!!!!!!! %-%-%-%
 %
-[X, Y, U, V, xLags, yLags,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,Con_Params);
+[X, Y, U, V, xLags, yLags] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,Con_Params);
 
 
 %

@@ -5,24 +5,23 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
-% Date Created: May 27th, 2015
-% Institution: UNC-CH
+% Email:  battistn@tcnj.edu
+% Date Modified: April 2021
+% Current Institution: TCNJ
+% IB2d Date Created: May 27th, 2015
+% Institution Created: UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
-% 	2. Beams (*torsional springs)
+% 	2. Beams (torsional springs or non-invariant beams)
 % 	3. Target Points
 %	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-%   .
-%   .
-%   .
 %
 % One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting lengths, etc
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us to add a specific fiber model or example, please let Nick (nickabattista@gmail.com) know.
+% If you would like us to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -46,7 +45,7 @@ function main2d()
 % Path Reference to where Driving code is found %
 %
 warning('off','all');
-%addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
+addpath('../IBM_Blackbox/','../../IBM_Blackbox/','../../../IBM_Blackbox/','../../../../IBM_Blackbox/');
 
 
 %
