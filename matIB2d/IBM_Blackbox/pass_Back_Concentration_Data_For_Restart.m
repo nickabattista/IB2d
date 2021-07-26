@@ -7,7 +7,7 @@
 % Author: Nicholas A. Battista
 % Email:  nickabattista@gmail.com
 % Date Created: April 26, 2021
-% Institution: UNC-CH
+% Institution: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -211,7 +211,7 @@ analysis_path = pwd; % Store path to analysis folder!
 
 cd(path);
 
-filename = [strChoice '.' num2str(simNums) '.vtk'];  % desired lagPts.xxxx.vtk file
+filename = [strChoice '.' num2str(simNums) '.vtk'];  % desired EULERIAN-DATA.xxxx.vtk file
 
 fileID = fopen(filename);
 if ( fileID== -1 )
@@ -219,7 +219,7 @@ if ( fileID== -1 )
 end
 
 str = fgets(fileID); %-1 if eof
-if ~strcmp( str(3:5),'vtk');
+if ~strcmp( str(3:5),'vtk')
     error('\nNot in proper VTK format');
 end
 
@@ -230,8 +230,17 @@ str = fgets(fileID);
 str = fgets(fileID);
 str = fgets(fileID);
 
+% Check whether VTK file has time info. This is a VTK file with time, 
+%       need to read the next 3 lines to have read in appropriate
+%       number of header lines.
+if ~strcmp( str(1:3), 'DIM')
+	str = fgets(fileID);
+    str = fgets(fileID);
+    str = fgets(fileID);
+end
+
  % Store grid info
-N = sscanf(str,'%*s %f %f %*s',2); 
+N = sscanf(str,'%*s %f %f %*s',2);
 Nx = N(1); Ny = N(2);
 
 % bypass lines in header %

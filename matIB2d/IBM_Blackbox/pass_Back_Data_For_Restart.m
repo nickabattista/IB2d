@@ -5,9 +5,9 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nickabattista@gmail.com
+% Email:  battistn@tcnj.edu
 % Date Created: October 8th, 2018
-% Institution: UNC-CH
+% Institution: TCNJ
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 % 
-% If you would like us %to add a specific muscle model, please let Nick (nickabattista@gmail.com) know.
+% If you would like us %to add a specific muscle model, please let Nick (battistn@tcnj.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -164,16 +164,16 @@ function [xLag,yLag] = read_Lagrangian_Data_From_vtk(path,simNums)
 
 cd(path);
 
-filename = ['lagsPts.' num2str(simNums) '.vtk'];  % desired lagPts.xxxx.vtk file
+filename = ['lagsPts.' num2str(simNums) '.vtk'];  % desired lagsPts.xxxx.vtk file
 
 fileID = fopen(filename);
 if ( fileID== -1 )
-    error('CANNOT OPEN THE FILE -> CHECK IF VIZ_IB2d DATA IS THERE!');
+    error('\nCANNOT OPEN THE FILE!');
 end
 
 str = fgets(fileID); %-1 if eof
 if ~strcmp( str(3:5),'vtk');
-    error('Not in proper VTK format');
+    error('\nNot in proper VTK format');
 end
 
 % read in the header info %
@@ -181,15 +181,25 @@ str = fgets(fileID);
 str = fgets(fileID);
 str = fgets(fileID);
 str = fgets(fileID);
-str = fgets(fileID);
+str = fgets(fileID); % Up to white space in previous lagsPts.X files (pre June 2021)
 
+% Check whether VTK file has time info. This is a VTK file with time, 
+%       need to read the next 3 lines to have read in appropriate
+%       number of header lines.
+if ~strcmp( str(1), 'P')
+	str = fgets(fileID);
+    str = fgets(fileID);
+    str = fgets(fileID);
+end
+
+    
 % stores # of Lagrangian Pts. as stated in .vtk file
 numLagPts = sscanf(str,'%*s %f %*s',1); 
 
 % read in the vertices %
 [mat,count] = fscanf(fileID,'%f %f %f',3*numLagPts);
 if count ~= 3*numLagPts
-   error('\nProblem reading in Lagrangian Pts -> Try earlier timepoint!'); 
+   error('\nProblem reading in Lagrangian Pts.'); 
 end
 
 mat = reshape(mat, 3, count/3); % Reshape vector -> matrix (every 3 entries in vector make into matrix row)
@@ -200,6 +210,10 @@ fclose(fileID);               % Closes the data file.
 xLag = vertices(:,1);         % x-Lagrangian Pts.
 yLag = vertices(:,2);         % y-Lagrangian Pts.
 
+%---------------------------------------------------------------
+% NEEDS TO BE COMMENTED OUT!
+% (when compared to other file in data analysis toolbox)
+%---------------------------------------------------------------
 %cd ..;                        % Change directory back to ../viz_IB2d/ directory
 
 clear mat str filename fileID count;
@@ -309,7 +323,7 @@ clear strChoice first;
 %
 % FUNCTION: Reads in the velocity data field from .vtk format
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%s
 
 function [U,V] = read_Eulerian_Velocity_Field_vtk(path,simNums)
 
@@ -317,7 +331,7 @@ analysis_path = pwd; % Store path to analysis folder!
 
 cd(path);
 
-filename = ['u.' num2str(simNums) '.vtk']; % desired u.xxxx.vtk file
+filename = ['u.' num2str(simNums) '.vtk'];  % desired EULERIAN-DATA.xxxx.vtk file
 
 fileID = fopen(filename);
 if ( fileID== -1 )
@@ -335,6 +349,15 @@ str = fgets(fileID);
 str = fgets(fileID);
 str = fgets(fileID);
 str = fgets(fileID);
+
+% Check whether VTK file has time info. This is a VTK file with time, 
+%       need to read the next 3 lines to have read in appropriate
+%       number of header lines.
+if ~strcmp( str(1:3), 'DIM')
+	str = fgets(fileID);
+    str = fgets(fileID);
+    str = fgets(fileID);
+end
 
 % Store grid info
 Nx = sscanf(str,'%*s %f %*f %*s',1);
@@ -360,7 +383,7 @@ end
 % read in the vertices %
 [e_Data,count] = fscanf(fileID,strVec,3*Nx*Ny);
 if count ~= 3*Nx*Ny
-   error('Problem reading in Eulerian Data -> Try earlier timepoint!'); 
+   error('Problem reading in Eulerian Data.'); 
 end
 
 % reshape the matrix into desired data type %
@@ -380,3 +403,6 @@ cd ..;                  % Change directory back to ../viz_IB2d/ directory
 cd(analysis_path);      % Change directory back to Data Analysis Folder
 
 clear filename fileID str strVec count analysis_path e_Data Nx;
+
+
+
