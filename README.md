@@ -67,7 +67,7 @@ The basics of visualizing data using open source visualization software called <
 
 <ol type="1">
   <li> In your terminal, change directory until you're in the directory you want to open (eg - the viz_IB2d folder) </li>
-  <li> In the terminal, type: /Applications/VisIt.app/Contents/Resources/bin/visit -gui  (or the correct path based to where you installed VisIt) </li>
+  <li> In your terminal, type: /Applications/VisIt.app/Contents/Resources/bin/visit -gui  (or the correct path based to where you installed VisIt) </li>
 </ol>  
 
 <hr> </hr>
