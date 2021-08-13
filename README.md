@@ -59,11 +59,11 @@ The basics of visualizing data using open source visualization software called <
 
 <H4> VisIt Workaround for macOS 11 (Big Sur) </H4>
 
--->  Many VisIt users have gotten the following error when trying to open visualization files: 
+-->  Many VisIt users have gotten the following error when trying to open visualization files:\ 
 
-<center> "The MetaData server running on localhost could not get the file list for the current directory" </center>
+<p align="center"> "The MetaData server running on localhost could not get the file list for the current directory" </p>
 
---> To circumvent this error, try opening VisIt from the command line. Try the following:
+--> To circumvent this error, try opening VisIt from the command line. Try the following:\
 
 <ol type="1">
   <li> In your terminal, change directory until you're in the directory you want to open (eg - the viz_IB2d folder) </li>
