@@ -111,6 +111,7 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                         (4): source
 %                         (5): k_source
 %                         (6): c_inf
+%                         (7): num_con
 
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
 struct_name = char(Lag_Name_Params);
@@ -176,13 +177,11 @@ poroelastic_Yes = Lag_Struct_Params(24);      % Poro-elastic Boundary: 0 (for no
 coagulation_Yes = Lag_Struct_Params(25);      % Coagulation Model: 0 (for no) or 1 (for yes)
 brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
-concentration_Yes = Con_Params(1);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
-kDiff = Con_Params(2);                % Diffusion Coefficient
-adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
-source_Yes = Con_Params(4);    % Which source model to use: 0 (for no) or 1 (for cons) or 2 (for limited)
-ksource = Con_Params(5);       % Concentration Source Rate
-Cinf = Con_Params(6);          % Concentration Saturation Limit 
-
+concentration_Yes = Con_Params{1};    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
+kDiff = Con_Params{2};                % Diffusion Coefficient
+adv_scheme = Con_Params{3};           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
+source_Yes = Con_Params{4};    % Do we have source model to use: 0 (for no) or 1 (for yes)
+C_num = Con_Params{5};         % Number of Concentrations 
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params Con_Params;
@@ -233,7 +232,7 @@ test_ver = ver('MATLAB');
 year_ver = test_ver.Release;
 year = str2num(year_ver(3:6));
 lett = year_ver(7);
-if ( year<=2017 ) && ( strcmp(lett,'a') && ( exist([struct_name '.geo_connect'])== 2 ) )
+if ((year<=2016 && strcmp(lett,'b'))||(( year<=2017 ) && ( strcmp(lett,'a')))) && ( exist([struct_name '.geo_connect'])== 2 ) 
     fprintf('  -Specified Geometric Connections\n');
     geo_Connect_MAT = read_Geometry_Connections(struct_name);
     flag_Geo_Connect = 1;
@@ -605,11 +604,18 @@ else
 end
 
 %------------------------------------------------------------------
-% READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
+% READ IN CONCENTRATIONS (IF THERE IS A(RE) BACKGROUND CONCENTRATION(S)) %
 %------------------------------------------------------------------
 if ( concentration_Yes == 1 )
     fprintf('  -Background concentration included\n');
-    [C] = read_In_Concentration_Info(struct_name,Nx);
+    if C_num<2
+    [C] = read_In_Concentration_Info(struct_name,Nx,0);
+    else
+        for ic=1:C_num
+            [C1] = read_In_Concentration_Info(struct_name,Nx,ic);
+            C(:,:,ic)=C1;
+        end
+    end
         %C:           Initial background concentration
         %kDiffusion:  Diffusion constant for Advection-Diffusion
 else
@@ -710,7 +716,7 @@ if restart_Flag == 0
     [connectsMat,spacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,springs_Yes,springs_info);
     [dconnectsMat,dspacing] = give_Me_Lag_Pt_Connects(ds,xLag,yLag,Nx,d_Springs_Yes,d_springs_info);
     Fxh = vort; Fyh = vort; F_Lag = zeros( Nb, 2); 
-    print_vtk_files(Output_Params,0,ctsave,vort,uMag,p,U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
+    print_vtk_files(Output_Params,0,ctsave,vort,uMag,p,U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro,C_num);
     fprintf('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n');
     fprintf('Current Time(s): %6.6f\n\n',current_time);
     ctsave = ctsave+1;
@@ -908,7 +914,7 @@ while current_time < T_FINAL
     end
     
     % If there is a background concentration, update concentration-gradient %
-    if concentration_Yes == 1 && source_Yes==0
+    if concentration_Yes == 1 && source_Yes(1)==0
       
         % ** Advection-diffusion WITHOUT a source term **
 
@@ -917,17 +923,27 @@ while current_time < T_FINAL
         
         % Update concentration (solve advection-diffusion eq) w/ either UPWIND
         %   or WENO advection scheme
-        [C,~] = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U_prev,V_prev,kDiff,adv_scheme,Lx,Ly);
-
-    elseif concentration_Yes == 1 && source_Yes>0
-    
+        
+        
+        [N1,N2,num_con]=size(C);
+        % iterate over concentrations
+        for ic=1:num_con
+            [C1,~] = please_Update_Adv_Diff_Concentration(C(:,:,ic),dt,dx,dy,U_prev,V_prev,kDiff(ic),adv_scheme,Lx,Ly);
+            C(:,:,ic)=C1;
+        end
+    elseif concentration_Yes == 1 && source_Yes(1)>0
+        [N1,N2,num_con]=size(C);
+        % interate over concentrations
+        for ic=1:num_con
         % Compute force term for advection-diffusion with a source term
-        fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, source_Yes, ksource, C, Cinf, flag_Geo_Connect, geo_Connect_MAT);
-   
+        
+            fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, C, flag_Geo_Connect, geo_Connect_MAT,ic);
+
         % Update concentration (solver advection-diffusion eq) w/ either UPWIND
         %   or WENO advection scheme
-        [C,~] = please_Update_Adv_Diff_Concentration_Source(C,dt,dx,dy,U_prev,V_prev,kDiff,fs,Lx,Ly,adv_scheme);
-        
+            [C1,~] = please_Update_Adv_Diff_Concentration_Source(C(:,:,ic),dt,dx,dy,U_prev,V_prev,kDiff(ic),fs,Lx,Ly,adv_scheme);
+            C(:,:,ic)=C1;
+        end
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
@@ -944,7 +960,7 @@ while current_time < T_FINAL
         
         %Print .vtk files!
         lagPts = [xLag yLag zeros(length(xLag),1)];
-        print_vtk_files(Output_Params,current_time,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro);
+        print_vtk_files(Output_Params,current_time,ctsave,vort,uMag',p',U',V',Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh',Fyh',F_Lag,coagulation_Yes,aggregate_list,d_Springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro,C_num);
         
         %Print Current Time
         fprintf('Current Time(s): %6.6f\n',current_time);
@@ -959,7 +975,7 @@ while current_time < T_FINAL
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
-        %electro_potential(ePhys_Ct,:)'
+        %electro_potent?ial(ePhys_Ct,:)'
         %springs_info(ePhys_Start:ePhys_End,3)
         %springs_info(:,3)
         
@@ -988,7 +1004,7 @@ end %ENDS TIME-STEPPING LOOP
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function print_vtk_files(Output_Params,current_time,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro)
+function print_vtk_files(Output_Params,current_time,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,fXGrid,fYGrid,F_Lag,coag_Yes,aggregate_list,d_springs_Yes,dconnectsMat,poroelastic_Yes,F_Poro,C_n)
 
     %
     %  Output_Params(1):  print_dump
@@ -1118,10 +1134,21 @@ cd('viz_IB2d'); %Go into viz_IB2d directory
     
     % If Background Concentration Gradient %
     if concentration_Yes == 1
-        confName = ['concentration.' strNUM '.vtk'];
-        inds=C<1e-15; % Gives logical matrix
-        C(inds) = 0;  % Zeros out values of matrix, C
-        savevtk_scalar(C', confName, 'Concentration',dx,dy, current_time);
+        %interate over concentrations
+        
+        if C_n==0               
+            confName = [sprintf('concentration.') strNUM '.vtk'];
+            inds=C<1e-15; % Gives logical matrix
+            C(inds) = 0;  % Zeros out values of matrix, C
+            savevtk_scalar(C', confName, 'Concentration',dx,dy, current_time);
+        else
+            for ic=1:C_n
+                confName = [sprintf('concentration%g.',ic) strNUM '.vtk'];
+                inds=C<1e-15; % Gives logical matrix
+                C(inds) = 0;  % Zeros out values of matrix, C
+                savevtk_scalar(C(:,:,ic)', confName, 'Concentration',dx,dy, current_time);
+            end
+        end
     end
 
 
@@ -1757,29 +1784,52 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C] = read_In_Concentration_Info(struct_name,N)
+function [C] = read_In_Concentration_Info(struct_name,N,nc)
+if nc==0
+    filename = [struct_name '.concentration'];  %Name of file to read in
 
-filename = [struct_name '.concentration'];  %Name of file to read in
+    strstr = '%f';
+    for i=1:N-1
+        strstr = [strstr ' %f'];
+    end
 
-strstr = '%f';
-for i=1:N-1
-   strstr = [strstr ' %f'];
-end
-
-fileID = fopen(filename);
+    fileID = fopen(filename);
 
     % Read in the file, use 'CollectOutput' to gather all similar data together
     % and 'CommentStyle' to to end and be able to skip lines in file.
     C = textscan(fileID,strstr,'CollectOutput',1);
 
-fclose(fileID);        %Close the data file.
+    fclose(fileID);        %Close the data file.
 
-con_info = C{1};    %Stores all read in data 
+    con_info = C{1};    %Stores all read in data 
 
-%Store all elements on .concentration file 
-%kDiff = con_info(1,1);     %coefficient of diffusion
-C = con_info;%(2:end,1:end); %initial concentration
+    %Store all elements on .concentration file 
+    %kDiff = con_info(1,1);     %coefficient of diffusion
+    C = con_info;%(2:end,1:end); %initial concentration
+else
+    % reads in multiple concentrations
+    filename = [struct_name sprintf('.concentration_%g',nc)];  %Name of file to read in
 
+    strstr = '%f';
+    for i=1:N-1
+        strstr = [strstr ' %f'];
+    end
+
+    fileID = fopen(filename);
+
+    % Read in the file, use 'CollectOutput' to gather all similar data together
+    % and 'CommentStyle' to to end and be able to skip lines in file.
+    C = textscan(fileID,strstr,'CollectOutput',1);
+
+    fclose(fileID);        %Close the data file.
+
+    con_info = C{1};    %Stores all read in data 
+   
+    %Store all elements on .concentration file 
+    %kDiff = con_info(1,1);     %coefficient of diffusion
+    C = con_info;%(2:end,1:end); %initial concentration
+
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
