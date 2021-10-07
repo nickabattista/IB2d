@@ -67,9 +67,7 @@ Concentration_Info {
 concentration = 1       % 0 (for no) or 1 (for yes)
 kDiff = 0.01            % Diffusion coefficient
 advection = 0         %  0 (1st order upwind) or 1 (3rd order WENO)
-source = 1        % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for reaction)
-k_source = 0.1          % rate of source term for concentration
-c_inf = 1.0             % saturation limit for concentration, for k_source = 2
+source = 1        % 0 (for no) or 1 (for yes)
 }
 
 

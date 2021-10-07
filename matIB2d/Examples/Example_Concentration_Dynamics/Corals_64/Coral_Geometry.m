@@ -79,12 +79,20 @@ print_Lagrangian_Target_Pts(x,k_Target,struct_name);
 % Prints Geometry Connections!
 print_Geometry_Connections(x,struct_name);
 
-% Call function for initial concentration
-[Concentration,X,Y]= give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy,x,y);
+% Call function for initial concentration (oxygen)
+[Concentration,X,Y]= give_Me_Initial_Concentration1(Lx,Ly,Nx,Ny,dx,dy,x,y);
 
 % Prints .concentration file!
 %kDiffusion = 1e-2;
-print_Concentration_Info(Nx,Ny,Concentration,struct_name);
+print_Concentration_Info(Nx,Ny,Concentration,struct_name,1);
+
+% Call function for initial concentration (carbon-dioxide)
+[Concentration,X,Y]= give_Me_Initial_Concentration2(Lx,Ly,Nx,Ny,dx,dy,x,y);
+
+% Prints .concentration file!
+%kDiffusion = 1e-2;
+print_Concentration_Info(Nx,Ny,Concentration,struct_name,2);
+
 
 
 
@@ -281,9 +289,9 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-function print_Concentration_Info(Nx,Ny,C,struct_name)
+function print_Concentration_Info(Nx,Ny,C,struct_name,n)
 
-    con_fid = fopen([struct_name '.concentration'], 'w');
+    con_fid = fopen([struct_name sprintf('.concentration_%g',n)], 'w');
 
 %    fprintf(con_fid, '%d\n', kDiffusion );
 
@@ -332,11 +340,21 @@ function print_Geometry_Connections(xLag,struct_name)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [C,X,Y] = give_Me_Initial_Concentration(Lx,Ly,Nx,Ny,dx,dy,xLag,yLag)
-
+function [C,X,Y] = give_Me_Initial_Concentration1(Lx,Ly,Nx,Ny,dx,dy,xLag,yLag)
+% inital concentration for oxygen
 x = 0:dx:Lx-dx;
 y = 0:dy:Ly-dy;
 
 [X,Y]=meshgrid(x,y);
 
 C=zeros(Ny,Nx);
+
+
+function [C,X,Y] = give_Me_Initial_Concentration2(Lx,Ly,Nx,Ny,dx,dy,xLag,yLag)
+% initial concentration for carbon-dioxide
+x = 0:dx:Lx-dx;
+y = 0:dy:Ly-dy;
+
+[X,Y]=meshgrid(x,y);
+
+C=zeros(Ny,Nx)+1;
