@@ -1,0 +1,648 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2016 The MathWorks, Inc.
+                   R2016a (9.0.0.341360) 64-bit (glnxa64)
+                             February 11, 2016
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+	Academic License
+
+>> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> 
+________________________________________________________________________________
+
+
+---------------->>                 IB2d                      <<----------------
+
+________________________________________________________________________________
+
+If using the code for research purposes please cite the following two papers: 
+     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-911 (2015)
+     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+     [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method, Math. Method. Appl. Sci. 41(18):8455-8480 (2018).
+________________________________________________________________________________
+
+
+ |****** Prepping Immersed Boundary Simulation ******|
+
+
+--> Reading input data for simulation...
+
+
+--> FIBER MODEL INCLUDES: 
+  -Specified Geometric Connections
+  -Springs and NOT dynamically updating spring properties
+
+
+--> Background Flow Items
+  -Background concentration included
+
+ |****** Begin IMMERSED BOUNDARY SIMULATION! ******| 
+
+Current Time(s): 0.000000
+
+Current Time(s): 0.010000
+CFL: 6.154826e-03
+
+Current Time(s): 0.020000
+CFL: 5.708745e-03
+
+Current Time(s): 0.030000
+CFL: 4.340504e-03
+
+Current Time(s): 0.040000
+CFL: 4.426873e-03
+
+Current Time(s): 0.050000
+CFL: 4.754631e-03
+
+Current Time(s): 0.060000
+CFL: 4.518272e-03
+
+Current Time(s): 0.070000
+CFL: 5.060423e-03
+
+Current Time(s): 0.080000
+CFL: 4.919971e-03
+
+Current Time(s): 0.090000
+CFL: 4.370967e-03
+
+Current Time(s): 0.100000
+CFL: 3.599410e-03
+
+Current Time(s): 0.110000
+CFL: 2.913909e-03
+
+Current Time(s): 0.120000
+CFL: 2.383719e-03
+
+Current Time(s): 0.130000
+CFL: 1.799198e-03
+
+Current Time(s): 0.140000
+CFL: 2.022508e-03
+
+Current Time(s): 0.150000
+CFL: 2.509083e-03
+
+Current Time(s): 0.160000
+CFL: 2.924133e-03
+
+Current Time(s): 0.170000
+CFL: 3.157110e-03
+
+Current Time(s): 0.180000
+CFL: 3.288183e-03
+
+Current Time(s): 0.190000
+CFL: 3.607294e-03
+
+Current Time(s): 0.200000
+CFL: 3.713961e-03
+
+Current Time(s): 0.210000
+CFL: 3.540885e-03
+
+Current Time(s): 0.220000
+CFL: 3.325571e-03
+
+Current Time(s): 0.230000
+CFL: 3.157366e-03
+
+Current Time(s): 0.240000
+CFL: 2.975321e-03
+
+Current Time(s): 0.250000
+CFL: 2.508816e-03
+
+Current Time(s): 0.260000
+CFL: 1.867003e-03
+
+Current Time(s): 0.270000
+CFL: 1.217861e-03
+
+Current Time(s): 0.280000
+CFL: 1.131111e-03
+
+Current Time(s): 0.290000
+CFL: 1.424655e-03
+
+Current Time(s): 0.300000
+CFL: 1.559721e-03
+
+Current Time(s): 0.310000
+CFL: 1.876536e-03
+
+Current Time(s): 0.320000
+CFL: 2.127156e-03
+
+Current Time(s): 0.330000
+CFL: 2.263741e-03
+
+Current Time(s): 0.340000
+CFL: 2.418753e-03
+
+Current Time(s): 0.350000
+CFL: 2.463949e-03
+
+Current Time(s): 0.360000
+CFL: 2.389961e-03
+
+Current Time(s): 0.370000
+CFL: 2.173293e-03
+
+Current Time(s): 0.380000
+CFL: 1.934620e-03
+
+Current Time(s): 0.390000
+CFL: 1.656871e-03
+
+Current Time(s): 0.400000
+CFL: 1.319132e-03
+
+Current Time(s): 0.410000
+CFL: 9.692476e-04
+
+Current Time(s): 0.420000
+CFL: 8.992687e-04
+
+Current Time(s): 0.430000
+CFL: 1.171930e-03
+
+Current Time(s): 0.440000
+CFL: 1.370587e-03
+
+Current Time(s): 0.450000
+CFL: 1.586397e-03
+
+Current Time(s): 0.460000
+CFL: 1.732463e-03
+
+Current Time(s): 0.470000
+CFL: 1.840395e-03
+
+Current Time(s): 0.480000
+CFL: 1.843121e-03
+
+Current Time(s): 0.490000
+CFL: 1.846133e-03
+
+Current Time(s): 0.500000
+CFL: 1.850813e-03
+
+Current Time(s): 0.510000
+CFL: 1.721140e-03
+
+Current Time(s): 0.520000
+CFL: 1.511878e-03
+
+Current Time(s): 0.530000
+CFL: 1.226292e-03
+
+Current Time(s): 0.540000
+CFL: 9.588094e-04
+
+Current Time(s): 0.550000
+CFL: 7.130754e-04
+
+Current Time(s): 0.560000
+CFL: 8.050069e-04
+
+Current Time(s): 0.570000
+CFL: 9.283586e-04
+
+Current Time(s): 0.580000
+CFL: 1.020315e-03
+
+Current Time(s): 0.590000
+CFL: 1.145979e-03
+
+Current Time(s): 0.600000
+CFL: 1.257324e-03
+
+Current Time(s): 0.610000
+CFL: 1.405186e-03
+
+Current Time(s): 0.620000
+CFL: 1.456979e-03
+
+Current Time(s): 0.630000
+CFL: 1.423761e-03
+
+Current Time(s): 0.640000
+CFL: 1.402313e-03
+
+Current Time(s): 0.650000
+CFL: 1.321279e-03
+
+Current Time(s): 0.660000
+CFL: 1.175272e-03
+
+Current Time(s): 0.670000
+CFL: 9.569007e-04
+
+Current Time(s): 0.680000
+CFL: 7.727888e-04
+
+Current Time(s): 0.690000
+CFL: 6.598964e-04
+
+Current Time(s): 0.700000
+CFL: 7.743309e-04
+
+Current Time(s): 0.710000
+CFL: 8.629160e-04
+
+Current Time(s): 0.720000
+CFL: 9.155040e-04
+
+Current Time(s): 0.730000
+CFL: 9.821700e-04
+
+Current Time(s): 0.740000
+CFL: 1.039291e-03
+
+Current Time(s): 0.750000
+CFL: 1.090084e-03
+
+Current Time(s): 0.760000
+CFL: 1.137737e-03
+
+Current Time(s): 0.770000
+CFL: 1.146891e-03
+
+Current Time(s): 0.780000
+CFL: 1.092478e-03
+
+Current Time(s): 0.790000
+CFL: 1.013877e-03
+
+Current Time(s): 0.800000
+CFL: 8.805179e-04
+
+Current Time(s): 0.810000
+CFL: 7.321176e-04
+
+Current Time(s): 0.820000
+CFL: 5.841392e-04
+
+Current Time(s): 0.830000
+CFL: 5.612101e-04
+
+Current Time(s): 0.840000
+CFL: 6.541139e-04
+
+Current Time(s): 0.850000
+CFL: 7.098824e-04
+
+Current Time(s): 0.860000
+CFL: 7.568122e-04
+
+Current Time(s): 0.870000
+CFL: 7.838976e-04
+
+Current Time(s): 0.880000
+CFL: 8.276985e-04
+
+Current Time(s): 0.890000
+CFL: 8.830873e-04
+
+Current Time(s): 0.900000
+CFL: 9.385390e-04
+
+Current Time(s): 0.910000
+CFL: 9.415334e-04
+
+Current Time(s): 0.920000
+CFL: 8.853201e-04
+
+Current Time(s): 0.930000
+CFL: 8.113004e-04
+
+Current Time(s): 0.940000
+CFL: 7.103069e-04
+
+Current Time(s): 0.950000
+CFL: 5.836405e-04
+
+Current Time(s): 0.960000
+CFL: 4.631844e-04
+
+Current Time(s): 0.970000
+CFL: 5.142599e-04
+
+Current Time(s): 0.980000
+CFL: 5.640347e-04
+
+Current Time(s): 0.990000
+CFL: 5.956743e-04
+
+Current Time(s): 1.000000
+CFL: 6.443774e-04
+
+Current Time(s): 1.010000
+CFL: 6.602835e-04
+
+Current Time(s): 1.020000
+CFL: 7.130591e-04
+
+Current Time(s): 1.030000
+CFL: 7.824904e-04
+
+Current Time(s): 1.040000
+CFL: 7.613850e-04
+
+Current Time(s): 1.050000
+CFL: 7.632640e-04
+
+Current Time(s): 1.060000
+CFL: 7.106186e-04
+
+Current Time(s): 1.070000
+CFL: 6.583327e-04
+
+Current Time(s): 1.080000
+CFL: 5.690611e-04
+
+Current Time(s): 1.090000
+CFL: 4.791255e-04
+
+Current Time(s): 1.100000
+CFL: 4.638183e-04
+
+Current Time(s): 1.110000
+CFL: 4.913155e-04
+
+Current Time(s): 1.120000
+CFL: 5.132007e-04
+
+Current Time(s): 1.130000
+CFL: 5.305969e-04
+
+Current Time(s): 1.140000
+CFL: 5.527800e-04
+
+Current Time(s): 1.150000
+CFL: 5.828953e-04
+
+Current Time(s): 1.160000
+CFL: 6.336781e-04
+
+Current Time(s): 1.170000
+CFL: 6.562717e-04
+
+Current Time(s): 1.180000
+CFL: 6.520351e-04
+
+Current Time(s): 1.190000
+CFL: 6.404420e-04
+
+Current Time(s): 1.200000
+CFL: 5.927292e-04
+
+Current Time(s): 1.210000
+CFL: 5.432224e-04
+
+Current Time(s): 1.220000
+CFL: 4.812669e-04
+
+Current Time(s): 1.230000
+CFL: 4.549469e-04
+
+Current Time(s): 1.240000
+CFL: 4.907161e-04
+
+Current Time(s): 1.250000
+CFL: 5.095363e-04
+
+Current Time(s): 1.260000
+CFL: 5.259823e-04
+
+Current Time(s): 1.270000
+CFL: 5.428482e-04
+
+Current Time(s): 1.280000
+CFL: 5.579506e-04
+
+Current Time(s): 1.290000
+CFL: 5.536558e-04
+
+Current Time(s): 1.300000
+CFL: 5.747355e-04
+
+Current Time(s): 1.310000
+CFL: 5.624880e-04
+
+Current Time(s): 1.320000
+CFL: 5.476196e-04
+
+Current Time(s): 1.330000
+CFL: 5.328665e-04
+
+Current Time(s): 1.340000
+CFL: 4.995343e-04
+
+Current Time(s): 1.350000
+CFL: 4.956744e-04
+
+Current Time(s): 1.360000
+CFL: 4.926134e-04
+
+Current Time(s): 1.370000
+CFL: 4.449071e-04
+
+Current Time(s): 1.380000
+CFL: 4.677703e-04
+
+Current Time(s): 1.390000
+CFL: 4.790584e-04
+
+Current Time(s): 1.400000
+CFL: 4.983836e-04
+
+Current Time(s): 1.410000
+CFL: 5.166134e-04
+
+Current Time(s): 1.420000
+CFL: 5.101901e-04
+
+Current Time(s): 1.430000
+CFL: 5.347437e-04
+
+Current Time(s): 1.440000
+CFL: 5.337765e-04
+
+Current Time(s): 1.450000
+CFL: 4.993983e-04
+
+Current Time(s): 1.460000
+CFL: 4.934437e-04
+
+Current Time(s): 1.470000
+CFL: 4.808130e-04
+
+Current Time(s): 1.480000
+CFL: 4.644404e-04
+
+Current Time(s): 1.490000
+CFL: 4.622381e-04
+
+Current Time(s): 1.500000
+CFL: 4.441823e-04
+
+Current Time(s): 1.510000
+CFL: 4.599494e-04
+
+Current Time(s): 1.520000
+CFL: 4.778140e-04
+
+Current Time(s): 1.530000
+CFL: 4.917554e-04
+
+Current Time(s): 1.540000
+CFL: 4.991911e-04
+
+Current Time(s): 1.550000
+CFL: 4.977357e-04
+
+Current Time(s): 1.560000
+CFL: 4.833818e-04
+
+Current Time(s): 1.570000
+CFL: 4.818088e-04
+
+Current Time(s): 1.580000
+CFL: 4.873251e-04
+
+Current Time(s): 1.590000
+CFL: 4.851445e-04
+
+Current Time(s): 1.600000
+CFL: 4.766915e-04
+
+Current Time(s): 1.610000
+CFL: 4.653305e-04
+
+Current Time(s): 1.620000
+CFL: 4.574511e-04
+
+Current Time(s): 1.630000
+CFL: 4.452164e-04
+
+Current Time(s): 1.640000
+CFL: 4.481578e-04
+
+Current Time(s): 1.650000
+CFL: 4.450436e-04
+
+Current Time(s): 1.660000
+CFL: 4.604672e-04
+
+Current Time(s): 1.670000
+CFL: 4.684872e-04
+
+Current Time(s): 1.680000
+CFL: 4.664368e-04
+
+Current Time(s): 1.690000
+CFL: 4.778717e-04
+
+Current Time(s): 1.700000
+CFL: 4.858385e-04
+
+Current Time(s): 1.710000
+CFL: 4.845706e-04
+
+Current Time(s): 1.720000
+CFL: 4.872958e-04
+
+Current Time(s): 1.730000
+CFL: 4.775546e-04
+
+Current Time(s): 1.740000
+CFL: 4.524502e-04
+
+Current Time(s): 1.750000
+CFL: 4.500967e-04
+
+Current Time(s): 1.760000
+CFL: 4.431622e-04
+
+Current Time(s): 1.770000
+CFL: 4.321289e-04
+
+Current Time(s): 1.780000
+CFL: 4.324529e-04
+
+Current Time(s): 1.790000
+CFL: 4.415752e-04
+
+Current Time(s): 1.800000
+CFL: 4.464515e-04
+
+Current Time(s): 1.810000
+CFL: 4.474022e-04
+
+Current Time(s): 1.820000
+CFL: 4.440925e-04
+
+Current Time(s): 1.830000
+CFL: 4.369310e-04
+
+Current Time(s): 1.840000
+CFL: 4.300050e-04
+
+Current Time(s): 1.850000
+CFL: 4.248625e-04
+
+Current Time(s): 1.860000
+CFL: 4.241842e-04
+
+Current Time(s): 1.870000
+CFL: 4.309774e-04
+
+Current Time(s): 1.880000
+CFL: 4.344239e-04
+
+Current Time(s): 1.890000
+CFL: 4.356557e-04
+
+Current Time(s): 1.900000
+CFL: 4.353240e-04
+
+Current Time(s): 1.910000
+CFL: 4.337430e-04
+
+Current Time(s): 1.920000
+CFL: 4.308177e-04
+
+Current Time(s): 1.930000
+CFL: 4.317057e-04
+
+Current Time(s): 1.940000
+CFL: 4.337459e-04
+
+Current Time(s): 1.950000
+CFL: 4.355007e-04
+
+Current Time(s): 1.960000
+CFL: 4.366625e-04
+
+Current Time(s): 1.970000
+CFL: 4.366967e-04
+
+Current Time(s): 1.980000
+CFL: 4.344689e-04
+
+Current Time(s): 1.990000
+CFL: 4.295842e-04
+
+>> >> >> >> >> >> 
+
+>>  |****** IMMERSED BOUNDARY SIMULATION HAS FINISHED! ******|
+
+>> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> 
