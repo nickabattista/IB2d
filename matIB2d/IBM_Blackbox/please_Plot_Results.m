@@ -77,7 +77,7 @@ clf; %Clear previous plots :)
 
 
 
-[N1,N2,num_con]=size(C)
+[N1,N2,num_con]=size(C);
 figure(1) 
 numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot+conPlot+(num_con-1);
 

@@ -124,8 +124,6 @@ rho = Fluid_Params(2);     % Density
 T_FINAL = Time_Params(1);      % Final simulation time
 dt = Time_Params(2);           % Time-step
 restart_Flag = Time_Params(3); % Restart Flag (1=YES, RESTART FROM PREVIOUS DATA, 0=No)
-%NTime = floor(T_FINAL/dt)+1;  % # of total time-steps (floor'd so exact number of time-steps)
-%dt = T_FINAL/NTime;           % revised time-step (slightly perturbed dt, so exact # of time-steps are used)
 current_time = 0.0;            % initialize start of simulation to time, 0 
 
 % GRID INFO %
@@ -180,8 +178,16 @@ brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 
 concentration_Yes = Con_Params{1};    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
 kDiff = Con_Params{2};                % Diffusion Coefficient
 adv_scheme = Con_Params{3};           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
-source_Yes = Con_Params{4};    % Do we have source model to use: 0 (for no) or 1 (for yes)
-C_num = Con_Params{5};         % Number of Concentrations 
+source_Yes = Con_Params{4};           % Do we have source model to use: 0 (for no) or 1 (for yes)
+C_num = Con_Params{5};                % Number of Concentrations 
+
+%--------------------------------------------
+% Added in case no concentration being used;
+%       sets concentration_Yes to 'none'
+%--------------------------------------------
+if isempty(concentration_Yes)
+    concentration_Yes = 0;
+end
 
 % CLEAR INPUT DATA %
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params Con_Params;
@@ -886,7 +892,6 @@ while current_time < T_FINAL
     %***************** STEP 4: Update Position of Boundary of membrane again for a half time-step *******
     %
     %
-    
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     %Uh, Vh instead of U,V?
@@ -923,8 +928,6 @@ while current_time < T_FINAL
         
         % Update concentration (solve advection-diffusion eq) w/ either UPWIND
         %   or WENO advection scheme
-        
-        
         [N1,N2,num_con]=size(C);
         % iterate over concentrations
         for ic=1:num_con
@@ -975,9 +978,6 @@ while current_time < T_FINAL
         
         %Update print counter for filename index
         ctsave=ctsave+1; firstPrint = 0;
-        %electro_potent?ial(ePhys_Ct,:)'
-        %springs_info(ePhys_Start:ePhys_End,3)
-        %springs_info(:,3)
         
     end
 
