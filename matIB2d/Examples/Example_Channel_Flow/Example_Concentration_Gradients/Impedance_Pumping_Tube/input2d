@@ -74,7 +74,7 @@ kDiff = 5e-5             % Diffusion coefficient
 %
 Output_Info {
 print_dump = 5           % How often to print (PLOT) to screen
-plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
+plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab

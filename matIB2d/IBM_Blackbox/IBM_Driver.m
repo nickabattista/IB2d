@@ -175,6 +175,15 @@ poroelastic_Yes = Lag_Struct_Params(24);      % Poro-elastic Boundary: 0 (for no
 coagulation_Yes = Lag_Struct_Params(25);      % Coagulation Model: 0 (for no) or 1 (for yes)
 brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 (for yes)
 
+
+try(Con_Params)
+catch
+    Con_Params{1}=0;
+    Con_Params{2}=0;
+    Con_Params{3}=0;
+    Con_Params{4}=0;
+    Con_Params{5}=0;
+end
 concentration_Yes = Con_Params{1};    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
 kDiff = Con_Params{2};                % Diffusion Coefficient
 adv_scheme = Con_Params{3};           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
@@ -699,7 +708,7 @@ if brinkman_Yes == 1
     cd('viz_IB2d');
     strNUM = give_String_Number_For_VTK(ctsave);
     brinkName = ['Brink.' strNUM '.vtk'];
-    savevtk_scalar(Brink', brinkName, 'Brink',dx,dy);
+    savevtk_scalar(Brink', brinkName, 'Brink',dx,dy,0);
     clear brinkName strNUM;
     cd ..;
 end
@@ -792,7 +801,7 @@ end
 %
 while current_time < T_FINAL
    
-    
+    current_time
     %
     %
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************

@@ -1,0 +1,351 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2016 The MathWorks, Inc.
+                   R2016b (9.1.0.441655) 64-bit (glnxa64)
+                             September 7, 2016
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+Number of Pts. on ONE tentacle: 27
+
+Number of Pts. in full CORAL POLYP: 59
+
+---> Make sure the UPDATE_TARGET_POINT_POSITIONS.m
+     has the correct Nx and Lx
+    (the same as in this file and input2d)
+
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2016 The MathWorks, Inc.
+                   R2016b (9.1.0.441655) 64-bit (glnxa64)
+                             September 7, 2016
+
+ 
+To get started, type one of these: helpwin, helpdesk, or demo.
+For product information, visit www.mathworks.com.
+ 
+
+________________________________________________________________________________
+
+
+---------------->>                 IB2d                      <<----------------
+
+________________________________________________________________________________
+
+If using the code for research purposes please cite the following three papers: 
+     [1] N.A. Battista, A.J. Baird, L.A. Miller, A mathematical model and MATLAB code for muscle-fluid-structure simulations, Integ. Comp. Biol. 55(5):901-911 (2015)
+     [2] N.A. Battista, W.C. Strickland, L.A. Miller, IB2d a Python and MATLAB implementation of the immersed boundary method, Bioinspir. Biomim. 12(3):036003 (2017)
+     [3] N.A. Battista, W.C. Strickland, A. Barrett, L.A. Miller, IB2d Reloaded: A more powerful Python and MATLAB implementation of the immersed boundary method, Math. Method. Appl. Sci. 41(18):8455-8480 (2018).
+________________________________________________________________________________
+
+
+ |****** Prepping Immersed Boundary Simulation ******|
+
+
+--> Reading input data for simulation...
+
+
+--> FIBER MODEL INCLUDES: 
+  -Specified Geometric Connections
+  -Target Pts. and dynamically updating target point properties
+
+
+--> Background Flow Items
+  -Background concentration included
+
+ |****** Begin IMMERSED BOUNDARY SIMULATION! ******| 
+
+Current Time(s): 0.000000
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.100000
+CFL: 1.936374e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.200000
+CFL: 2.057503e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.300000
+CFL: 1.719374e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.400000
+CFL: 1.562817e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.500000
+CFL: 1.412504e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.600000
+CFL: 1.322040e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.700000
+CFL: 1.526439e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.800000
+CFL: 1.512847e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 0.900000
+CFL: 1.619692e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.000000
+CFL: 1.547122e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.100000
+CFL: 1.384014e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.200000
+CFL: 1.163160e-02
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.300000
+CFL: 9.371651e-03
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.400000
+CFL: 7.888409e-03
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.500000
+CFL: 6.797127e-03
+
+
+N1 =
+
+   160
+
+
+N2 =
+
+    64
+
+
+num_con =
+
+     2
+
+Current Time(s): 1.600000
+CFL: 5.890911e-03
+
+slurmstepd: error: *** JOB 2340018 ON mrcd105 CANCELLED AT 2021-10-07T10:44:25 ***

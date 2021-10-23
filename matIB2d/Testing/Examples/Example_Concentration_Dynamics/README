@@ -1,0 +1,94 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ** To run a simulation... **
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[1] Go into particular example folder
+
+[2] Run the 'main2d.m' file
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ** To visualize the VTK simulation data... **
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+[1] Use either open-source software:
+         VisIt: https://wci.llnl.gov/simulation/computer-codes/visit
+         Paraview: https://www.paraview.org
+
+[2] Video tutorial on data visualization in VisIt:
+         https://www.youtube.com/watch?v=4D4ruXbeCiQ
+
+---> NOTE: on MACOS 11 and 12, you may get the following error in VisIt
+         when trying to open the viz_IB2d folder:
+
+    "The MetaData server running on localhost could not get the file list
+        for the current directory"
+
+    if that happens, you will need to open VisIt from the command to 
+    circumvent this issue, e.g., 
+
+    1) Open a terminal window
+    2) Change directory to your viz_IB2d simulation data
+    3) In your terminal, open VisIt, type: 
+            /Applications/VisIt.app/Contents/Resources/bin/visit -gui 
+                    (or the correct path based on where you installed VisIt)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ** The following simulations are in this directory **
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+[1] Rubberband_Constant_64:
+
+    - a rubber band simulation with *constant* desorption rate of a 
+        concentration gradient at a grid resolution of Nx=Ny=64 using an
+        upwind advection scheme
+
+
+[2] Rubberband_Limited_64:
+
+    - a rubber band simulation with *limited* desorption rate of a 
+        concentration gradient at a grid resolution of Nx=Ny=64
+        with k_source = 0.1 and c_inf = 0.1 (see input2d file) using an
+        upwind advection scheme
+
+[3] Rubberband_Sink_64:
+
+    - a rubber band simulation with *limited* desorption rate of a 
+        concentration gradient at a grid resolution of Nx=Ny=64
+        with k_source = -2.0 (see input2d file) using an upwind
+        advection scheme
+
+[4] Moving_Cylinders_64:
+
+    - a simulation of horizontally moving cylinders through a vertical 
+        concentration strip while absorbing the concentration with a grid 
+        resolution of Nx=Ny=64 with k_source = -1.0 (see input2d file) 
+        using a 3rd-order WENO advection scheme
+
+[5] Leaf_64:
+
+    - a simulation of flow past a flexible plate behind a tiny rigid cylinder,
+      in the vein of Turok-Hron, where the geometry gives off heat at a 
+      constant rate with k_source = 1.0 (see input2d file) using an
+      upwind advection scheme in a Eulerian (fluid) grid of size [Lx,Ly]=[5,30] 
+      and resolution (Nx,Ny)=(64,384)
+
+    - NOTE: from the manuscript simulation, the following changes were made
+            in input2d (besides the grid resolutions):
+                - the final time was reduced from 15s to 3.25s
+                - k_source was reduced from 204400 to 2
+                - kDiff was reduced from 0.23 to 0.01
+
+[6] Coral_64:
+
+    - a simulation of a pulsing coral polyp, where polyp emits a chemical 
+      using a limited rate model with k_source = 0.0215 (see input2d file) using an
+      upwind advection scheme in a Eulerian (fluid) grid of size [Lx,Ly]=[2,5] 
+      and resolution (Nx,Ny)=(64,160)

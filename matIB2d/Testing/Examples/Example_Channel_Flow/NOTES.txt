@@ -1,0 +1,11 @@
+NOTE:
+
+-The working simulations are:
+    a. EXAMPLE_PARABOLIC_FLOW_IN_EMPTY_CHANNEL
+    b. EXAMPLE_MIDDLE_CHANNEL_FLOW
+    c. EXAMPLE_FLOW_AROUND_CYLINDER
+    d. EXAMPLE_1_WALL_FLOW_AROUND_CYLINDER
+    e. EXAMPLE_ANEURYSM
+
+-If visualizing VELOCITY VECTOR data in VisIT, you need to scale the vectors appropriately, 
+    e.g., multiple orders of magnitude, since velocities are rather small. 

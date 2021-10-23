@@ -36,7 +36,7 @@ function [Fluid_Params, Grid_Params, Time_Params, Lag_Struct_Params, Output_Para
 % [Lag_Struct_Params,Output_Params] = please_Initialize_Off();
 
 % READ IN ALL INPUTS INTO CELLS FROM INPUT2D %
-params = please_Read_input2d_File('input2d');
+params = please_Read_input2d_File('input2d')
 
 % EXTRACT INDIVIDUAL CELL GROUPS %
 Fluid_Input = params{find(strcmp({params{:,1}},'Fluid_Parameters')),2};
