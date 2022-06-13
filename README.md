@@ -48,7 +48,7 @@ The basics of visualizing data using open source visualization software called <
 
 --> Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link: 
 
-<p style="margin-left:50px; margin-right:50px;">M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a ref="https://doi.org/10.1088/1748-3190/ac4afa">Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method </a>, Bioinspiration & Biomimetics 17: 036003 (2022) </p>
+<p style="margin-left:50px; margin-right:50px;">M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a href="https://doi.org/10.1088/1748-3190/ac4afa"> Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method </a>, Bioinspiration & Biomimetics 17: 036003 (2022) </p>
 
 -->  <a href="https://www.mateasantiago.com"> Matea Santiago </a>  has updated the advection-diffusion solver to a third-order WENO scheme.
 
