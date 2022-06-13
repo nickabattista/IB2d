@@ -7,7 +7,7 @@
 % Author: Nicholas A. Battista
 % Email:  nickabattista@gmail.com
 % Date Created: May 27th, 2015
-% Institution: UNC-CH
+% Institution Created: UNC-CH
 % Current Institution: The College of New Jersey (TCNJ)
 %
 % This code is capable of creating Lagrangian Structures using:
@@ -792,17 +792,25 @@ end
 %
 while current_time < T_FINAL
    
+    %--------------------------------------------------------------------
+    % DEFINE VARIABLES TO HOLD PREVIOUS DATA FOR CONCENTRATION DYNAMICS
+    %--------------------------------------------------------------------
+    if concentration_Yes == 1 && source_Yes(1)>0
+        xLag_prev=xLag;
+        yLag_prev=yLag;
+        U_prev=U;
+        V_prev=V;
+    elseif concentration_Yes == 1
+        U_prev=U;
+        V_prev=V;
+    end
     
-    %
+    %--------------------------------------------------------------------------------
     %
     %**************** Step 1: Update Position of Boundary of membrane at half time-step *******************
     %                           (Variables end with h if it is a half-step)
     %
-    xLag_prev=xLag;
-    yLag_prev=yLag;
-    U_prev=U;
-    V_prev=V;
-
+    %--------------------------------------------------------------------------------
     [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
     
     if mass_Yes == 1
@@ -835,11 +843,11 @@ while current_time < T_FINAL
     end
     
     
-    %
+    %--------------------------------------------------------------------------------
     %
     %**************** STEP 2: Calculate Force coming from membrane at half time-step ****************
     %
-    %
+    %--------------------------------------------------------------------------------
    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list, flag_Geo_Connect, geo_Connect_MAT);
     
     % Once force is calculated, can finish time-step for massive boundary
@@ -864,11 +872,11 @@ while current_time < T_FINAL
     end
     
     
-    %
+    %--------------------------------------------------------------------------------
     %
     %***************** STEP 3: Solve for Fluid motion ******************************************
     %
-    %
+    %--------------------------------------------------------------------------------
     
     % Add in effect from BOUSSINESQ
     if boussinesq_Yes == 1
@@ -887,11 +895,11 @@ while current_time < T_FINAL
     [Uh, Vh, U, V, p] =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY);
     
     
-    %
+    %--------------------------------------------------------------------------------
     %
     %***************** STEP 4: Update Position of Boundary of membrane again for a half time-step *******
     %
-    %
+    %--------------------------------------------------------------------------------
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     %Uh, Vh instead of U,V?
@@ -929,24 +937,31 @@ while current_time < T_FINAL
         % Update concentration (solve advection-diffusion eq) w/ either UPWIND
         %   or WENO advection scheme
         [N1,N2,num_con]=size(C);
+        
         % iterate over concentrations
         for ic=1:num_con
             [C1,~] = please_Update_Adv_Diff_Concentration(C(:,:,ic),dt,dx,dy,U_prev,V_prev,kDiff(ic),adv_scheme,Lx,Ly);
             C(:,:,ic)=C1;
         end
+        
     elseif concentration_Yes == 1 && source_Yes(1)>0
+        
+        % initialize info
         [N1,N2,num_con]=size(C);
+        
         % interate over concentrations
         for ic=1:num_con
         % Compute force term for advection-diffusion with a source term
         
             fs = please_Find_Source_For_Concentration(dt, current_time, xLag_prev, yLag_prev, x, y, grid_Info, C, flag_Geo_Connect, geo_Connect_MAT,ic);
 
-        % Update concentration (solver advection-diffusion eq) w/ either UPWIND
-        %   or WENO advection scheme
+            % Update concentration (solver advection-diffusion eq) w/ either UPWIND
+            %   or WENO advection scheme
             [C1,~] = please_Update_Adv_Diff_Concentration_Source(C(:,:,ic),dt,dx,dy,U_prev,V_prev,kDiff(ic),fs,Lx,Ly,adv_scheme);
             C(:,:,ic)=C1;
+            
         end
+        
    end
         
     % Plot Lagrangian/Eulerian Dynamics! %
