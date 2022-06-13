@@ -7,7 +7,7 @@
 %
 Fluid_Parameters {
 mu =  18e-6                % Dynamic Viscosity of Air (N*s/m^2) 
-rho = 1.225                % Density of Air (kg/m^2)
+rho = 1.225                % Density of Air (kg/m^3)
 }
 
 
