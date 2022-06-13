@@ -46,11 +46,15 @@ The basics of visualizing data using open source visualization software called <
 
 <H3> IB2d News</H3>
 
+--> Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link: 
+
+<p style="margin-left:50px; margin-right:50px;">M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a ref="https://doi.org/10.1088/1748-3190/ac4afa">Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method </a>, Bioinspiration & Biomimetics 17: 036003 (2022) </p>
+
 -->  <a href="https://www.mateasantiago.com"> Matea Santiago </a>  has updated the advection-diffusion solver to a third-order WENO scheme.
 
 --> We have released a semi-automatic meshing tool, <a href="https://github.com/dmsenter89/MeshmerizeMe"> MeshmerizeMe </a>, to help discretize Lagrangian geometries. More information can be found in our software release paper: 
 
-<p style="margin-left:50px; margin-right:50px;">D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR, Bioinspiration and Biomimetics 16(1): 016008 (2021)</p>
+<p style="margin-left:50px; margin-right:50px;">D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, <a href="https://doi.org/10.1088/1748-3190/ababb0"> A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR </a>, Bioinspiration and Biomimetics 16(1): 016008 (2021)</p>
 
 --> The MATLAB plotting routine is incompatible with MATLAB R2020a and R2020b. If you run into this issue, please consider visualizing the .vtk data with <a href="https://wci.llnl.gov/simulation/computer-codes/visit/"> VisIt </a> or <a href="https://www.paraview.org/"> ParaView </a> instead.   
 
