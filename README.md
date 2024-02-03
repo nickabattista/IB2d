@@ -46,7 +46,7 @@ The basics of visualizing data using open source visualization software called <
 
 <H3> IB2d News</H3>
 
---> Substantial speed-ups in fluid solver and force spreading operations (February 2024)
+--> Substantial speed-ups in performance for fluid solver and force spreading operations (February 2024)
 
 --> Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link: 
 
