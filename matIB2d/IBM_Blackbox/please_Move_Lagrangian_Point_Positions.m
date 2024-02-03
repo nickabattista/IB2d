@@ -5,21 +5,19 @@
 %	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 %
 % Author: Nicholas A. Battista
-% Email:  nick.battista@unc.edu
-% Date Created: May 27th, 2015
-% Institution: UNC-CH
+% Email:  battistn[@]tcnj[.]edu
+% 
+% IB2d was Created: May 27th, 2015 at UNC-CH
 %
 % This code is capable of creating Lagrangian Structures using:
 % 	1. Springs
 % 	2. Beams (*torsional springs)
 % 	3. Target Points
-%	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-%
-% One is able to update those Lagrangian Structure parameters, e.g., spring constants, resting %%	lengths, etc
+% 	4. Muscle-Model (combined Force-Length-Velocity model, "Hill+(Length-Tension)")
+%   .
+%   .
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
-% 
-% If you would like us %to add a specific muscle model, please let Nick (nick.battista@unc.edu) know.
 %
 %--------------------------------------------------------------------------------------------------------------------%
 
@@ -28,6 +26,8 @@
 % FUNCTION: Moves Lagrangian Point Positions by doing the integral,
 %
 %           " xLag_Next = xLag_Prev + dt* int( u(x,t) delta( x - xLag_n ) dX ) "
+%
+%      NOTE: (i) Lots of old implementation included (but commented out) for teaching purposes.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -46,19 +46,42 @@ supp = grid_Info(7);
 %ds =   grid_Info(9);
 
 
-% Find indices where the delta-function kernels are non-zero for both x and y.
+%--------------------------------------------------------------------------------
+% Find indices where the delta-function kernels are non-zero for both x and y
+%--------------------------------------------------------------------------------
 [xInds,yInds] = give_NonZero_Delta_Indices_XY(xL_H, yL_H, Nx, Ny, dx, dy, supp);
 
+
+%--------------------------------------------------------------------------------
 % ReSize the xL_H and yL_H matrices for use in the Dirac-delta function
 %        values to find distances between corresponding Eulerian data and them
-xLH_aux = mod(xL_H,Lx); xL_H_ReSize = [];
-yLH_aux = mod(yL_H,Ly); yL_H_ReSize = [];
-for i=1:supp^2
-   xL_H_ReSize = [xL_H_ReSize xLH_aux];
-   yL_H_ReSize = [yL_H_ReSize yLH_aux];
-end
+%--------------------------------------------------------------------------------
+xLH_aux = mod(xL_H,Lx); 
+yLH_aux = mod(yL_H,Ly); 
 
+
+%----------------------------------------
+%        ORIGINAL IMPLEMENTATION
+%  --> Slightly slower
+%----------------------------------------
+% xL_H_ReSize = []; 
+% yL_H_ReSize = [];
+% for i=1:supp^2
+%    xL_H_ReSize = [xL_H_ReSize xLH_aux];
+%    yL_H_ReSize = [yL_H_ReSize yLH_aux];
+% end
+
+%------------------------------------------
+%   USE REP MAT TO MAKE COPIES QUICKLY
+%   --> Slightly faster
+%------------------------------------------
+xL_H_ReSize = repmat(xLH_aux,1,supp^2);
+yL_H_ReSize = repmat(yLH_aux,1,supp^2);
+
+
+%----------------------------------------------------------------------------
 % Checks if only one Lagrangian Point (ensures dimensions line up)
+%----------------------------------------------------------------------------
 if ( length(xL_P) == 1 )
     % Finds distance between specified Eulerian data and nearby Lagrangian data
     try
@@ -72,10 +95,12 @@ if ( length(xL_P) == 1 )
         error('BLOW UP! (*forces TOO large*) -> try decreasing the time-step or decreasing material property stiffnesses');
     end
 else
+    
     % Finds distance between specified Eulerian data and nearby Lagrangian data
     try 
         distX = give_Eulerian_Lagrangian_Distance(x(xInds), xL_H_ReSize, Lx);
         distY = give_Eulerian_Lagrangian_Distance(y(yInds), yL_H_ReSize, Ly);
+        %size(distX)
     catch
         fprintf('\n\n\n - ERROR - \n');
         fprintf('\n\n - ERROR ERROR - \n');
@@ -85,18 +110,26 @@ else
     end
 end
 
-% Obtain the Dirac-delta function values.
+%------------------------------------------
+% Obtain the Dirac-delta function values
+%------------------------------------------
 delta_X = give_Delta_Kernel( distX, dx);
 delta_Y = give_Delta_Kernel( distY, dy);
 
+%------------------------------------------
 % Perform Integral
+%------------------------------------------
 [move_X, move_Y] = give_Me_Perturbed_Distance(u,v,dx,dy,delta_X,delta_Y,xInds,yInds);
 
-% Update the Lagrangian Point Position.
+%------------------------------------------
+% Update the Lagrangian Point Position
+%------------------------------------------
 xL_Next = xL_P + (dt) * move_X;
 yL_Next = yL_P + (dt) * move_Y;
 
-% Update the Lagrangian Point Positions with poroelasticity.
+%----------------------------------------------------------------
+% Update the Lagrangian Point Positions with poroelasticity
+%----------------------------------------------------------------
 if poroelastic_Yes
     %
     % poroelastic_info(:,1): index of poroelastic point
@@ -107,9 +140,9 @@ if poroelastic_Yes
 
 end
 
-%
+%----------------------------------------------------------------
 % TESTING FOR LAG. PTS. MOVING THRU BOUNDARIES
-%
+%----------------------------------------------------------------
 %xL_NextB = xL_Next;
 % if find(xL_NextB>Lx)
 %     mat(:,1)=xL_NextB;
@@ -119,7 +152,9 @@ end
 %     error('problem with lag pts moving through boundary');
 % end
 
-% Shift so that all values are in [0,Lx) or [0,Ly).
+%----------------------------------------------------------------
+% Shift so that all values are in [0,Lx) or [0,Ly)
+%----------------------------------------------------------------
 if porous_Yes == 0
     xL_Next = mod(xL_Next, Lx);
     yL_Next = mod(yL_Next, Ly);
@@ -153,13 +188,15 @@ for i=1:row
         xID = xInds(i,j);
         yID = yInds(i,j);
         
-        % Compute integrand 'stencil' of velocity x delta for each Lagrangian Pt!
+        % Compute integrand 'stencil' of velocity * delta for each Lagrangian Pt!
         mat_X(i,j) = u(yID,xID)*delta_X(i,j)*delta_Y(i,j);
         mat_Y(i,j) = v(yID,xID)*delta_X(i,j)*delta_Y(i,j);
 
     end
 end
 
+%--------------------------------------------------------------------
 % Approximate Integral of Velocity x Delta for each Lagrangian Pt!
+%--------------------------------------------------------------------
 move_X = sum( mat_X , 2) * (dx*dy);
 move_Y = sum( mat_Y , 2) * (dx*dy);

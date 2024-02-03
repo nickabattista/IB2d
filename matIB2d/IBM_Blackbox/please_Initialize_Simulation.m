@@ -379,38 +379,46 @@ try
 
     % CONCENTRATION GRADIENT %
     if find(strcmp({Con_Input{:,1}},'concentration')) > 0
-        Con_Params{1} = Con_Input{find(strcmp({Con_Input{:,1}},'concentration')),2};
+        Con_Params(1) = Con_Input{find(strcmp({Con_Input{:,1}},'concentration')),2};
     else
         Lag_Struct_Params(1) = 0;
     end
 
     % DIFFUSION COEFFICIENT %
     if find(strcmp({Con_Input{:,1}},'kDiff')) > 0
-        Con_Params{2} = Con_Input{find(strcmp({Con_Input{:,1}},'kDiff')),2};
+        Con_Params(2) = Con_Input{find(strcmp({Con_Input{:,1}},'kDiff')),2};
     else
-        Con_Params{2} = 0;
+        Con_Params(2) = 0;
     end
     % CONCENTRATION GRADIENT %
     if find(strcmp({Con_Input{:,1}},'advection')) > 0
-        Con_Params{3} = Con_Input{find(strcmp({Con_Input{:,1}},'advection')),2};
+        Con_Params(3) = Con_Input{find(strcmp({Con_Input{:,1}},'advection')),2};
     else
-        Con_Params{3} = 0;
+        Con_Params(3) = 0;
     end
 
 
     % CONCENTRATION SOURCE TERM %
     if find(strcmp({Con_Input{:,1}},'source')) > 0
-        Con_Params{4} = Con_Input{find(strcmp({Con_Input{:,1}},'source')),2};
+        Con_Params(4) = Con_Input{find(strcmp({Con_Input{:,1}},'source')),2};
     else
-        Con_Params{4} = 0;
+        Con_Params(4) = 0;
+    end
+
+    % CONCENTRATION SOURCE TERM %
+    if find(strcmp({Con_Input{:,1}},'k_source')) > 0
+        Con_Params(5) = Con_Input{find(strcmp({Con_Input{:,1}},'k_source')),2};
+    else
+        Con_Params(5) = 0;
+    end
+
+    % CONCENTRATION SATURATION LIMIT %
+    if find(strcmp({Con_Input{:,1}},'c_inf')) > 0
+        Con_Params(6) = Con_Input{find(strcmp({Con_Input{:,1}},'c_inf')),2};
+    else
+        Con_Params(6) = 0;
     end
     
-    % NUMBER OF CONCENTRATIONS
-    if find(strcmp({Con_Input{:,1}},'num_con')) > 0
-        Con_Params{5} = Con_Input{find(strcmp({Con_Input{:,1}},'num_con')),2};
-    else
-        Con_Params{5} = 0;
-    end
     % CONCENTRATION PERIODIC BOUNDARY % 
     %if find(strcmp({Con_Input{:,1}},'periodic_boundary')) > 0
     %    Con_Params(7) = Con_Input{find(strcmp({Con_Input{:,1}},'periodic_boundary')),2};
@@ -635,8 +643,9 @@ Lag_Struct_Params(25)= 0;         % coagulation model: 0 (for no) or 1 (for yes)
 Con_Params(1)= 0;         % Background Concentration Gradient: 0 (for no) or 1 (for yes)
 Con_Params(2)= 0;         % Diffusion Coefficient
 Con_Params(3)= 0;         % Advection scheme: 0 (for 1st O Upwind) or 1 (for 3rd O WENO))
-Con_Params(4)= 0;         % Concentration source: 0 (for no) or 1 (for yes)
-Con_Params(5)= 0;         % Number of concentrations
+Con_Params(4)= 0;         % Concentration source: 0 (for no) or 1 (for constant) or 2 (for limited))
+Con_Params(5)= 0;         % Concentration source rate
+Con_Params(6)= 0;         % Concentration saturation limit
 %Con_Params(7)= 0;         % Concentration periodic boundary: 0 (for no) or 1 (for yes) 
 
 
