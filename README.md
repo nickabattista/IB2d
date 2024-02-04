@@ -45,18 +45,16 @@ The basics of visualizing data using open source visualization software called <
 
 <H3> IB2d News</H3>
 
-- Substantial speed-ups in performance for fluid solver and force spreading operations (February 2024): 
+- Substantial speed-ups in performance for fluid solver and force spreading operations in MATLAB implementation. Speeds-ups in Python implementation forthcoming (February 2024): 
 <br/><br/>
 <p align="center">
   <img width="464" height="273" src="https://static.wixstatic.com/media/50968c_1c29f0b383544da79b47167d551a199c~mv2.webp">
 </p> 
 
-<H5>
- <p align="center"> 
+<H5 align="center"> 
   <ins> Figure</ins>: Showing the percent runtimes when compared to IB2d's previous implementations, i.e., the</br>
   ratio of runtimes x 100. The simulation involved a square grid with an equal number of grid </br>
   cells (Nx) in the x- and y- directions. The corresponding # of Lagrangian points for each case was 2*Nx. </br></br>
- </p>
 </H5>
 
 
