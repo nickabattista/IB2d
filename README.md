@@ -48,6 +48,11 @@ The basics of visualizing data using open source visualization software called <
 
 --> Substantial speed-ups in performance for fluid solver and force spreading operations (February 2024)
 
+<a href="https://github.com/nickabattista/IB2d"><img src="https://static.wixstatic.com/media/50968c_37f6eadf790540b58bbfaf1914524d8a~mv2.png
+![image](https://github.com/nickabattista/IB2d/assets/10763676/334c2c31-d909-4502-aa40-f290ffb6417c)
+" align="right" height="822" width="1408" ></a>
+
+
 --> Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link: 
 
 <p style="margin-left:50px; margin-right:50px;">M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a href="https://doi.org/10.1088/1748-3190/ac4afa"> Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method </a>, Bioinspiration & Biomimetics 17: 036003 (2022) </p>
