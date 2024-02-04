@@ -45,30 +45,33 @@ The basics of visualizing data using open source visualization software called <
 
 <H3> IB2d News</H3>
 
---> Substantial speed-ups in performance for fluid solver and force spreading operations (February 2024): 
+- Substantial speed-ups in performance for fluid solver and force spreading operations (February 2024): 
 <br/><br/>
-
 <p align="center">
   <img width="464" height="273" src="https://static.wixstatic.com/media/50968c_1c29f0b383544da79b47167d551a199c~mv2.webp">
 </p> 
 
-<H5 style="font-size:25px;color:red";> <ins> Figure</ins>: Showing the percent runtimes when compared to IB2d's previous implementations, i.e., the ratio of runtimes x 100. 
-  The simulation involved a square grid with an equal number of grid cells (Nx) in the x- and y- directions. 
-  The corresponding # of Lagrangian points for each case was 2*Nx. </H5>
-<br/>
+<H5>
+ <p align="center"> 
+  <ins> Figure</ins>: Showing the percent runtimes when compared to IB2d's previous implementations, i.e., the</br>
+  ratio of runtimes x 100. The simulation involved a square grid with an equal number of grid </br>
+  cells (Nx) in the x- and y- directions. The corresponding # of Lagrangian points for each case was 2*Nx. </br></br>
+ </p>
+</H5>
 
 
---> Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link: 
+- Our software release paper on the recenty added concentration dynamics infrastructure was published in Bioinspiration & Biomimetics. More information can be found at the following link:
+  
+  M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a href="https://doi.org/10.1088/1748-3190/ac4afa"> *Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method* </a>, Bioinspiration & Biomimetics 17: 036003 (2022)
 
-<p style="margin-left:50px; margin-right:50px;">M. Santiago, N.A. Battista, L.A. Miller, S. Khatri, <a href="https://doi.org/10.1088/1748-3190/ac4afa"> Passive concentration dynamics incorporated into the library IB2d, a two-dimensional implementation of the immersed boundary method </a>, Bioinspiration & Biomimetics 17: 036003 (2022) </p>
+- <a href="https://www.mateasantiago.com"> Matea Santiago </a>  has updated the advection-diffusion solver to a third-order WENO scheme.
 
--->  <a href="https://www.mateasantiago.com"> Matea Santiago </a>  has updated the advection-diffusion solver to a third-order WENO scheme.
+- We have released a semi-automatic meshing tool, <a href="https://github.com/dmsenter89/MeshmerizeMe"> MeshmerizeMe </a>, to help discretize Lagrangian geometries. More information can be found in our software release paper:
+  
+  D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, <a href="https://doi.org/10.1088/1748-3190/ababb0"> *A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR* </a>, Bioinspiration and Biomimetics 16(1): 016008 (2021)
+  </br>
 
---> We have released a semi-automatic meshing tool, <a href="https://github.com/dmsenter89/MeshmerizeMe"> MeshmerizeMe </a>, to help discretize Lagrangian geometries. More information can be found in our software release paper: 
-
-<p style="margin-left:50px; margin-right:50px;">D.M. Senter, D.R. Douglas, W.C. Strickland, S. Thomas, A. Talkington, L.A. Miller, N.A. Battista, <a href="https://doi.org/10.1088/1748-3190/ababb0"> A Semi-Automated Finite Difference Mesh Creation Method for Use with Immersed Boundary Software IB2d and IBAMR </a>, Bioinspiration and Biomimetics 16(1): 016008 (2021)</p>
-
---> The MATLAB plotting routine is incompatible with MATLAB R2020a and R2020b. If you run into this issue, please consider visualizing the .vtk data with <a href="https://wci.llnl.gov/simulation/computer-codes/visit/"> VisIt </a> or <a href="https://www.paraview.org/"> ParaView </a> instead.   
+- The MATLAB plotting routine is incompatible with MATLAB R2020a and R2020b. If you run into this issue, please consider visualizing the .vtk data with <a href="https://wci.llnl.gov/simulation/computer-codes/visit/"> VisIt </a> or <a href="https://www.paraview.org/"> ParaView </a> instead.   
 
 <hr> </hr>
 
