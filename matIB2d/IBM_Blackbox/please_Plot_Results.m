@@ -77,9 +77,9 @@ clf; %Clear previous plots :)
 
 
 
-[N1,N2,num_con]=size(C);
+
 figure(1) 
-numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot+conPlot+(num_con-1);
+numPlots = lagPlot+velPlot+vortPlot+pressPlot+uMagPlot+conPlot;
 
 ct = 1;
 
@@ -228,33 +228,33 @@ if velPlot == 1
 end
 
 if conPlot == 1
-    % plotting all concentrations
-    for ic=1:num_con   
-        subplot(1,numPlots,ct)
-    %
-        axis([0 Lx 0 Ly]);
-        title(sprintf('Concentration%g',ic));
-        xlabel('x'); ylabel('y'); 
-        hold all;
-
-        x = X(1,:); y = Y(:,1);
-        pcolor(X,Y,C(:,:,ic));
-        shading interp;
-
-        loc = [0;loc;length(chiX)];
-        for i=2:length(loc)
-            plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
-        end
-        if diffy < 5*ds
-            xTemp = [chiX(1) chiX(end)];
-            yTemp = [chiY(1) chiY(end)];
-            plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
-        end
     
-        axis square;
+    subplot(1,numPlots,ct)
+    %
+    axis([0 Lx 0 Ly]);
+    title('Concentration');
+    xlabel('x'); ylabel('y'); 
+    hold all;
 
-        ct=ct+1;
+    %Compute Vorticity and Plot It against Lagrangian Grid!
+    x = X(1,:); y = Y(:,1);
+    %contourf(x,y,flipud(rot90(vort)),10); hold on;
+    pcolor(X,Y,C);
+    shading interp;
+
+    loc = [0;loc;length(chiX)];
+    for i=2:length(loc)
+        plot(chiX(loc(i-1)+1:loc(i)),chiY(loc(i-1)+1:loc(i)),'m','LineWidth',3);
     end
+    if diffy < 5*ds
+        xTemp = [chiX(1) chiX(end)];
+        yTemp = [chiY(1) chiY(end)];
+        plot(xTemp(1:2),yTemp(1:2),'m','LineWidth',3);
+    end
+    
+    axis square;
+
+    ct=ct+1;
 end
 
 drawnow;

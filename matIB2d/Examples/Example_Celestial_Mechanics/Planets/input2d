@@ -4,7 +4,7 @@
 
 % FLUID PARAMETER VALUES %
 mu = 0.1                % Dynamic Viscosity (N*s/m^2) 
-rho = 1                 % Density (kg/m^2)
+rho = 1                 % Density (kg/m^3)
 
 % TEMPORAL INFORMATION %
 Tfinal = 0.05           % Final time of simulation (s)
