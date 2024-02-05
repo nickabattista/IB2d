@@ -206,13 +206,13 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
     #         ORIGINAL SLOWER IMPLEMENTATION!!!
     # Find derivatives of products U^2, V^2, and U.*V
     #-----------------------------------------------------
-    U_h_sq = U_h**2
-    V_h_sq = V_h**2
-    U_h_V_h = U_h*V_h
-    U_h_sq_x = D(U_h_sq,dx,'x')
-    V_h_sq_y = D(V_h_sq,dy,'y')
-    U_h_V_h_x = D(U_h_V_h,dx,'x')
-    U_h_V_h_y = D(U_h_V_h,dy,'y')
+    #U_h_sq = U_h**2
+    #V_h_sq = V_h**2
+    #U_h_V_h = U_h*V_h
+    #U_h_sq_x = D(U_h_sq,dx,'x')
+    #V_h_sq_y = D(V_h_sq,dy,'y')
+    #U_h_V_h_x = D(U_h_V_h,dx,'x')
+    #U_h_V_h_y = D(U_h_V_h,dy,'y')
 
     #----------------------------------------------------------------
     #               MORE EFFICIENT IMPLEMENTATION
