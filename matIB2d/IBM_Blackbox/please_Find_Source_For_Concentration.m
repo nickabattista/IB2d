@@ -31,7 +31,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, C, flag_Geo_Connect, geo_Connect_MAT,Nc)
+function [Fs] = please_Find_Source_For_Concentration(dt, current_time, xLag, yLag, x, y, grid_Info, model_Info, k, C, ci, flag_Geo_Connect, geo_Connect_MAT)
 
 %
 % dt:             time step
@@ -110,30 +110,24 @@ delta_X = give_Delta_Kernel( distX, dx);
 delta_Y = give_Delta_Kernel( distY, dy);
 
 % Perform Integral finding concentration on the Lagrangian boundary
-[N1,N2,num_c]=size(C);
+CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
 
-for ic=1:num_c
-    CL1 = give_Lagrangian_Concentration(C(:,:,ic),dx,dy,delta_X,delta_Y,xInds,yInds);
-    CL(:,ic)=CL1;
-end
+    if model_Info==1 
+    fs = zeros(Nb,1)+k;        %constant
+    elseif model_Info==2
 
-fs=give_me_source_model(CL,Nc);
-%     if model_Info==1 
-%     fs = zeros(Nb,1)+k;        %constant
-%     elseif model_Info==2
-% 
-% % Perform Integral
-% %CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
-% 
-%     fs=k*(ci-CL);         % limited
-% 
-%     elseif model_Info ==3
-% 
-%     fs=k*CL;
-%     else
-%   
-%     'Invalid source model!' 
-%     end 
+% Perform Integral
+%CL = give_Lagrangian_Concentration(C,dx,dy,delta_X,delta_Y,xInds,yInds);
+
+    fs=k*(ci-CL);         % limited
+
+    elseif model_Info ==3
+
+    fs=k*CL;
+    else
+  
+    'Invalid source model!' 
+    end 
     
 % Give me delta-function approximations!
 [delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
