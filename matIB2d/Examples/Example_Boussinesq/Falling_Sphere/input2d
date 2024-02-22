@@ -7,7 +7,7 @@
 %
 Fluid_Parameters {
 mu = 0.25              % Dynamic Viscosity (N*s/m^2) 
-rho = 1.0              % Density (kg/m^2)
+rho = 1.0              % Density (kg/m^3)
 }
 
 
