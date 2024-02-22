@@ -885,11 +885,7 @@ while current_time < T_FINAL
     %   --> USING product/chain rules for U^2,V^2, and UV
     %             differentiations
     %-----------------------------------------------------------
-<<<<<<< HEAD
     [Uh, Vh, U, V, p] = please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, SIN_IDX, SIN_IDY, A_hat);
-=======
-    [Uh, Vh, U, V, ~] = please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, SIN_IDX, SIN_IDY, A_hat);
->>>>>>> 6f841f208725dbc48321e6107cbee14cf5f9ec5b
     
     
     %-----------------------------------------------------------------------------------------------------
