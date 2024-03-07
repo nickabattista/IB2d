@@ -25,8 +25,8 @@
 %
 % This function solves the incompressible Navier-Stokes (NS) equations using Fast-Fourier Transform (FFT)
 %      
-%      x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + Fx
-%      y-Momentum Conservation: rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) - p_y + Fy
+%      x-Momentum Conservation: rho*u_t = -rho*u*u_x - rho*v*u_y + mu*laplacian(u) - p_x + Fx
+%      y-Momentum Conservation: rho*v_t = -rho*u*v_x - rho*v*v_y + mu*laplacian(v) - p_y + Fy
 %      Incompressibility:       u_x + v_y = 0
 %
 %      NOTE: (i) Lots of old implementation included (but commented out) for teaching purposes.
