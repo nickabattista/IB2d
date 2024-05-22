@@ -70,6 +70,9 @@ concentration = 1       % 0 (for no) or 1 (for yes)
 kDiff = 0.000072        % Diffusion coefficient
 advection = 1           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
 source = 1              % 0 (for no) or 1 (for yes)
+source = 3              % 0 (for no) or 1 (for constant) or 2 (for limited) or 3 (for reaction)
+k_source = -1           % rate of source term for concentration
+c_inf = 1               % saturation limit for concentration (when source = 2)
 }
 
 
@@ -88,7 +91,7 @@ save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
 save_fY = 0              % Save y-Force Component Scalar Data to .vtk format
 save_hier = 1            % Save Scalar Force Data on Lag. Structure to .vtk format
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 1          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 1        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab

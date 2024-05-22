@@ -14,7 +14,7 @@ rho = 1                % Density (kg/m^3)
 % TEMPORAL INFORMATION %
 %
 Temporal_Information {
-Tfinal = 1.9        % Final time of simulation (s)
+Tfinal = 19.0        % Final time of simulation (s)
 dt =     2.5e-4      % Time-step (s)
 }
 
@@ -65,10 +65,11 @@ user_force_model = 0    % 0 (for no) or 1 (for yes)
 %
 Concentration_Info {
 concentration = 1       % 0 (for no) or 1 (for yes)
-kDiff = [8.7546e-04 8.7546e-04]      % Diffusion Coefficient
+kDiff = 8.7546e-04      % Diffusion Coefficient
 advection = 0           % 0 (for 1st order upwind) or 1 (for 3rd order WENO)
-source = 1             % 0 (for no) or 1 (for yes)
-num_con=2               % number of concentrations
+source = 2              % 0 (for no) or 1 (for yes) or 2 (for limited) or 3 (reaction)
+k_source = 0.0215       % rate of source term for concentration
+c_inf = 1               % saturation limit for concentration (when source = 2)
 }
 
 %
@@ -86,7 +87,7 @@ save_fMag = 0            % Save Force Magnitude Scalar Data to .vtk format
 save_fX = 0              % Save x-Force Component Scalar Data to .vtk format
 save_fY = 0              % Save y-Force Component Scalar Data to .vtk format
 save_hier = 1            % Save Scalar Force Data on Lag. Structure to .vtk format
-plot_Matlab = 1          % Plot in Matlab? (1=YES, 0=NO)
+plot_Matlab = 0          % Plot in Matlab? (1=YES, 0=NO)
 plot_LagPts = 0          % Plot Lagrangian Points ONLY in Matlab
 plot_Velocity = 0        % Plot Lagrangian Points + VELOCITY FIELD in Matlab
 plot_Vorticity = 1       % Plot Lagrangian Points + VORTICITY colormap in Matlab
