@@ -133,10 +133,13 @@ if ( springs_Yes == 1 )
 
     % Compute the Lagrangian SPRING force densities!
     [fx_springs, fy_springs] = give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs,Lx,Ly);
-    
+elseif poroelastic_Yes 
+    % Need full lag-pt-vector of zeros for poroelastic structure
+    fx_springs = zeros(length(xLag),1); % No x-forces coming from springs
+    fy_springs = fx_springs;            % No y-forces coming from springs    
 else
-    fx_springs = 0;%zeros(length(xLag),1); % No x-forces coming from springs
-    fy_springs = fx_springs;               % No y-forces coming from springs
+    fx_springs = 0;            % No x-forces coming from springs
+    fy_springs = fx_springs;   % No y-forces coming from springs
 end
 
 
@@ -192,10 +195,13 @@ if ( nonInv_beams_Yes == 1 )
 
     % Compute the Lagrangian NON-INVARIANT BEAM force densities!
     [fx_nonInv_beams, fy_nonInv_beams] = give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams,Lx,Ly);
-    
+elseif poroelastic_Yes  
+    % Need full lag-pt-vector of zeros for poroelastic structure
+    fx_nonInv_beams = zeros(length(xLag),1); % No x-forces coming from beams
+    fy_nonInv_beams = fx_nonInv_beams;       % No y-forces coming from beams
 else
-    fx_nonInv_beams = 0;%zeros(length(xLag),1); % No x-forces coming from beams
-    fy_nonInv_beams = fx_nonInv_beams;          % No y-forces coming from beams
+    fx_nonInv_beams = 0;                 % No x-forces coming from beams
+    fy_nonInv_beams = fx_nonInv_beams;   % No y-forces coming from beams
 end
 
 

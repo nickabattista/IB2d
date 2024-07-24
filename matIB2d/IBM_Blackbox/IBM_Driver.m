@@ -674,7 +674,7 @@ if brinkman_Yes == 1
     cd('viz_IB2d');
     strNUM = give_String_Number_For_VTK(ctsave);
     brinkName = ['Brink.' strNUM '.vtk'];
-    savevtk_scalar(Brink', brinkName, 'Brink',dx,dy);
+    savevtk_scalar(Brink', brinkName, 'Brink',dx,dy,current_time);
     clear brinkName strNUM;
     cd ..;
 end
