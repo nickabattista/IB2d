@@ -88,10 +88,9 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         yLag: they do?
         
 
-    x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) 
-                                       - p_x + F_x
-    y-Momentum Convervation: rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) 
-                                       - p_y + F_y
+    x-Momentum Conservation: rho*(u_t + u*u_x + v*u_y) = -p_x + mu*laplacian(u) + Fx 
+                                      
+    y-Momentum Convervation: rho*(v_t + u*v_x + v*v_y) = -p_y + mu*laplacian(v) + Fy 
                                        
     Incompressibility: u_x + v_y = 0
 
@@ -220,12 +219,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     poroelastic_Yes = Lag_Struct_Params[24]      # Poroelastic media 0 [for no] or 1 [for yes]
     brinkman_Yes = Lag_Struct_Params[25]         # Brinkman term in Momentum equation 0 [for no] or 1 [for yes]
 
-    print(Lag_Struct_Params)
-
     # CLEAR INPUT DATA #
-
-
- 
 
     #---------------------------------------------------------------------
     # Create EULERIAN Mesh (these assume periodicity in x and y)
