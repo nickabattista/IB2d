@@ -1,29 +1,25 @@
-'''-------------------------------------------------------------------------
+'''-------------------------------------------------------------------------------------------------
 
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
- 	fluid-structure interaction models. This version of the code is based off of
-	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
+ 	  fluid-structure interaction models. This version of the code is based off of
+	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
  Author: Nicholas A. Battista
- Email:  nick.battista@unc.edu
- Date Created: May 27th, 2015
+ Email:  battistn[@]tcnj[.]edu
+ IB2d was Created: May 27th, 2015 at UNC-CH
  Initial Python 3.5 port by: Christopher Strickland
- Institution: UNC-CH
 
  This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-
- One is able to update those Lagrangian Structure parameters, e.g., 
- spring constants, resting lengths, etc
+ 	4. Muscle-Model (combined Force-Length-Velocity model, "Hill+(Length-Tension)")
+    .
+    .
  
  There are a number of built in Examples, mostly used for teaching purposes. 
- 
- If you would like us to add a specific muscle model, 
- please let Nick (nick.battista@unc.edu) know.
- ----------------------------------------------------------------------------'''
+
+----------------------------------------------------------------------------------------------------'''
 
 from math import sqrt
 import numpy as np
@@ -56,7 +52,7 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
             grid_Info:    holds lots of geometric pieces about grid / simulations
             model_Info:   Stores if springs, if update_springs, if target_pts, if 
                 update_target_pts (as 0 (no) or 1 (yes) )
-            springs:      Stores Master Node, Slave Node, Spring Stiffness, 
+            springs:      Stores Leader Node, Follower Node, Spring Stiffness, 
                 Restling-Lengths, all in column vecs
             targets:      Stores target point index, correponding xLag, yLag and 
                 target point stiffness
@@ -77,14 +73,10 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
             F_Mass:
             F_Lag:
             
-    The components of the force are given by
-    F(x,y) = int{ f(s) * delta(x - xLag(s)) * delta(y - yLag(s)) * ds }
-     
-    where s parameteriizes the Lagrangian structure.
-
-    Force density is computed using a SIMPLE LINEAR SPRING model w/ resting length L.  
-    This leads to a force density of the form,
-                   f = ( \LagPts_s * ( 1 - L / abs(\LagPts_s) )  )/ds^2'''
+        The components of the force are given by
+                   F(x,y) = int{ f(s) * delta(x - xLag(s)) * delta(y - yLag(s)) * ds }
+                               where s parameteriizes the Lagrangian structure.
+    '''
 
     # Grid Info - list#
     Nx =    grid_Info[0] # # of Eulerian pts. in x-direction
@@ -113,14 +105,15 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     poroelastic_Yes = model_Info[24]    # Poroelastic Media: 0 (for no) or 1 (for yes)
 
 
+    
     if gen_force_Yes:
         from give_Me_General_User_Defined_Force_Densities import give_Me_General_User_Defined_Force_Densities
 
 
-    #
-    # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY #
-    #(if using combined length/tension-Hill model) #
-    #
+    #------------------------------------------------------------
+    # Compute MUSCLE LENGTH-TENSION/FORCE-VELOCITY 
+    #  (if using combined length/tension-Hill model) 
+    #------------------------------------------------------------
     if ( muscle_LT_FV_Yes == 1):
         fx_muscles, fy_muscles = give_Muscle_Force_Densities(Nb,xLag,yLag,\
             xLag_P,yLag_P,muscles,current_time,dt)
@@ -130,9 +123,10 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
     
 
-    #
-    # Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES (if using combined 3-HILL + LT/FV) #
-    #
+    #------------------------------------------------------------
+    # Compute 3-ELEMENT HILL MUSCLE MODEL FORCE DENSITIES 
+    #    (if using combined 3-HILL + LT/FV) 
+    #------------------------------------------------------------
     if ( muscle_3_Hill_Yes == 1):
         fx_muscles3, fy_muscles3 = give_3_Element_Muscle_Force_Densities(Nb,\
             xLag,yLag,xLag_P,yLag_P,muscles3,current_time,dt)
@@ -141,8 +135,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_muscles3 = np.zeros(xLag.size)
 
 
-
+    #------------------------------------------------------------
     # Compute SPRING FORCE DENSITIES (if there are springs!)
+    #------------------------------------------------------------
     if ( springs_Yes == 1 ):
         
         # Compute "Connections Matrix" for what springs are attached to whom     #
@@ -165,8 +160,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_springs = np.zeros(Nb) #No y-forces coming from springs
 
         
-
+    #------------------------------------------------------------
     # Compute MASS PT FORCE DENSITIES (if there are mass points!)
+    #------------------------------------------------------------
     if ( mass_Yes == 1):
         # Compute the Lagrangian MASS PT force densities!
         fx_mass, fy_mass, F_Mass = give_Me_Mass_Lagrangian_Force_Densities(ds,\
@@ -177,8 +173,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         F_Mass = 0             #Dummy to pass along  
 
 
-
+    #--------------------------------------------------------------
     # Compute TARGET FORCE DENSITIES (if there are target points!)
+    #--------------------------------------------------------------
     if ( target_pts_Yes == 1):
         # Compute the Lagrangian TARGET force densities!
         fx_target, fy_target = give_Me_Target_Lagrangian_Force_Densities(ds,\
@@ -190,8 +187,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
 
 
 
-
+    #------------------------------------------------------------------------
     # Compute BEAM (TORSIONAL SPRING) FORCE DENSITIES (if there are beams!)
+    #------------------------------------------------------------------------
     if ( beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
@@ -203,7 +201,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_beams = np.zeros(Nb) #No y-forces coming from beams
 
 
+    #------------------------------------------------------------------------
     # Compute BEAM (NON-INVARIANT) FORCE DENSITIES (if there are beams!)
+    #------------------------------------------------------------------------
     if ( nonInv_beams_Yes == 1 ):
 
         # Compute the Lagrangian SPRING force densities!
@@ -215,8 +215,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_nonInv_beams = np.zeros(Nb) #No y-forces coming from beams
 
 
-
+    #------------------------------------------------------------------------
     # Compute DAMPED SPRING FORCE DENSITIES (if there are springs!)
+    #------------------------------------------------------------------------
     if ( d_Springs_Yes == 1 ):
      
         fx_dSprings, fy_dSprings = give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
@@ -226,7 +227,9 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fx_dSprings = np.zeros(Nb) #No x-forces coming from damped springs
         fy_dSprings = np.zeros(Nb) #No y-forces coming from damped springs
 
+    #-----------------------------------------------------------------------------------
     # Compute GENERAL USER-DEFINED FORCE DENSITIES (if there is a user-defined force!)
+    #-----------------------------------------------------------------------------------
     if ( gen_force_Yes == 1 ):
         fx_genForce, fy_genForce = give_Me_General_User_Defined_Force_Densities(ds,Nb,xLag,yLag,\
             xLag_P,yLag_P,dt,current_time,general_force)
@@ -236,13 +239,16 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
         fy_genForce = np.zeros(Nb) #No y-forces coming from damped springs
 
 
-
-    # SUM TOTAL FORCE DENSITY! #
+    #-----------------------------------------------------
+    #     ******** SUM TOTAL FORCE DENSITY! ********
+    #------------------------------------------------------
     fx = fx_springs + fx_target + fx_beams + fx_nonInv_beams + fx_muscles + fx_muscles3 + fx_mass + fx_dSprings + fx_genForce
     fy = fy_springs + fy_target + fy_beams + fy_nonInv_beams + fy_muscles + fy_muscles3 + fy_mass + fy_dSprings + fy_genForce
 
 
+    #-----------------------------------------------------
     # Save Poro-Elastic Forces, if poroelastic elements #
+    #-----------------------------------------------------
     if poroelastic_Yes:
         F_Poro = np.zeros( ( len(poroelastic_info) , 2) )
         F_Poro[0:,0] = fx_springs[poroelastic_info[0:,0].astype(int)]
@@ -250,27 +256,65 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     else:
         F_Poro = np.zeros((1,1))
 
-
+    #-----------------------------------------------------
     # SAVE LAGRANGIAN FORCES
+    #-----------------------------------------------------
     F_Lag = np.empty((fx.size,2))
     F_Lag[:,0] = fx
     F_Lag[:,1] = fy
         
 
+    #-----------------------------------------------------
     # Give me delta-function approximations!
+    #-----------------------------------------------------
     delta_X, delta_Y = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,\
     grid_Info,xLag,yLag)
 
-
+    #---------------------------------------------------------------
     # Transform the force density vectors into diagonal matrices
-    fxds = np.diag(fx*ds)
-    fyds = np.diag(fy*ds)
+    #       --> NO LONGER NEED AFTER WRITING MORE EFFICIENT
+    #           DIAGONAL MATRIX MULTIPLICATION BELOW
+    #---------------------------------------------------------------
+    #fxds = np.diag(fx*ds)
+    #fyds = np.diag(fy*ds)
 
 
+
+    #-----------------------------------------------------------------------
+    #   ORIGINAL --> DOESN'T USE EFFICIENT MATRIX MULTIPLICATION W/ 
+    #                INVOLVING DIAGONAL MATRIX
+    #
     # Find Eulerian forces on grids by approximating the line integral, 
     #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    Fx = delta_Y @ fxds @ delta_X
-    Fy = delta_Y @ fyds @ delta_X
+    #-----------------------------------------------------------------------
+    #Fx = delta_Y @ fxds @ delta_X
+    #Fy = delta_Y @ fyds @ delta_X
+
+
+
+    #-----------------------------------------------------------------------
+    #    USES MORE EFFICIENT MATRIX MULTIPLICATION W/ A DIAGONAL MATRIX
+    #
+    # Find Eulerian forces on grids by approximating the line integral, 
+    #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
+    #
+    #             eg, if vec is a COLUMN VECTOR
+    #                    A*diag(vec) = ( (diag(vec)).*A^T )^T
+    #                 (note the transposes in the above line)
+    #
+    #       THEREFORE, the MATLAB implementation is the following:
+    #               Fx = ( ( fx(:,1) ).*delta_Y' )' * delta_X;   <<--- MATLAB
+    #               Fy = ( ( fy(:,1) ).*delta_Y' )' * delta_X;   <<--- MATLAB
+    #
+    #       FOR PYTHON: since fx,fy are 1D numpy arrays, they are considered 
+    #                   "row" vectors. Therefore we can get rid of the tranposes
+    #                   in previous line and depend on numpy broadcasting
+    #                   to component-wise multiply the ROW VECTOR into each
+    #                   ROW of the matrix
+    #   
+    #-----------------------------------------------------------------------
+    Fx = ( ( fx*ds ) * delta_Y ) @ delta_X
+    Fy = ( ( fy*ds ) * delta_Y ) @ delta_X
 
     return (Fx, Fy, F_Mass, F_Lag, F_Poro)
     
@@ -303,31 +347,31 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
     # These just provide views (by reference) into slices of muscles.
     #   They are not assigned to, so aliasing is faster.
     
-    Nmuscles = muscles.shape[0]      # # of Muscles
-    id_Master = muscles[:,0].astype('int')     # MASTER NODE Muscle Connections
-    id_Slave = muscles[:,1].astype('int')      # SLAVE NODE Muscle Connections
-    LFO_Vec = muscles[:,2] # Stores length for max. muscle tension
-    SK_Vec = muscles[:,3]  # Stores muscle constant
-    a_Vec = muscles[:,4]   # Stores Hill Parameter, a
-    b_Vec = muscles[:,5]   # Stores Hill Parameter, b
-    FMAX_Vec = muscles[:,6]# Stores Force-Maximum for Muscle
+    Nmuscles = muscles.shape[0]                # # of Muscles
+    id_Leader = muscles[:,0].astype('int')     # LEADER NODE Muscle Connections
+    id_Follower = muscles[:,1].astype('int')   # FOLLOWER NODE Muscle Connections
+    LFO_Vec = muscles[:,2]                     # Stores length for max. muscle tension
+    SK_Vec = muscles[:,3]                      # Stores muscle constant
+    a_Vec = muscles[:,4]                       # Stores Hill Parameter, a
+    b_Vec = muscles[:,5]                       # Stores Hill Parameter, b
+    FMAX_Vec = muscles[:,6]                    # Stores Force-Maximum for Muscle
 
-    fx = np.zeros(Nb)                 # Initialize storage for x-forces
-    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    fx = np.zeros(Nb)                          # Initialize storage for x-forces
+    fy = np.zeros(Nb)                          # Initialize storage for y-forces
     
-    xPt = xLag[id_Master]        # x-Pt of interest at the moment to drive 
-                                 #  muscle contraction
+    xPt = xLag[id_Leader]                      # x-Pt of interest at the moment to drive 
+                                               #  muscle contraction
     
-    dx = xLag[id_Slave] - xLag[id_Master]  # x-Distance btwn slave and master node
-    dy = yLag[id_Slave] - yLag[id_Master]  # y-Distance btwn slave and master node
-    LF = np.sqrt( dx**2 + dy**2 )          # Euclidean DISTANCE between master and slave node
+    dx = xLag[id_Follower] - xLag[id_Leader]   # x-Distance btwn follower and leader node
+    dy = yLag[id_Follower] - yLag[id_Leader]   # y-Distance btwn follower and leader node
+    LF = np.sqrt( dx**2 + dy**2 )              # Euclidean DISTANCE between leader and follower node
     
     
-    dx_P = xLag_P[id_Slave] - xLag_P[id_Master]  # x-Distance btwn slave and master node
-    dy_P = yLag_P[id_Slave] - yLag_P[id_Master]  # y-Distance btwn slave and master node
-    LF_P = np.sqrt( dx_P**2 + dy_P**2 )          # Euclidean DISTANCE between master and slave node
+    dx_P = xLag_P[id_Follower] - xLag_P[id_Leader]  # x-Distance btwn follower and leader node
+    dy_P = yLag_P[id_Follower] - yLag_P[id_Leader]  # y-Distance btwn follower and leader node
+    LF_P = np.sqrt( dx_P**2 + dy_P**2 )             # Euclidean DISTANCE between leader and follower node
     
-    v =  np.abs(LF-LF_P)/dt        # How fast the muscle is contracting/expanding
+    v =  np.abs(LF-LF_P)/dt                     # How fast the muscle is contracting/expanding
     
     # Find actual muscle activation magnitude
     # This function is user defined and included with main2d.
@@ -344,15 +388,15 @@ def give_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles,current_time,
 
     for ii in range(Nmuscles):
         
-        fx[id_Master[ii]] += mF_x[ii]  # Sum total forces for node,
-                        # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master[ii]] += mF_y[ii]  # Sum total forces for node,
-                        # i in y-direction (this is MASTER node for this spring)
+        fx[id_Leader[ii]] += mF_x[ii]  # Sum total forces for node,
+                        # i in x-direction (this is LEADER node for this spring)
+        fy[id_Leader[ii]] += mF_y[ii]  # Sum total forces for node,
+                        # i in y-direction (this is LEADER node for this spring)
         
-        fx[id_Slave[ii]] -= mF_x[ii]    # Sum total forces for node,
-                        # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave[ii]] -= mF_y[ii]    # Sum total forces for node,
-                        # i in y-direction (this is SLAVE node for this spring)
+        fx[id_Follower[ii]] -= mF_x[ii]    # Sum total forces for node,
+                        # i in x-direction (this is FOLLOWER node for this spring)
+        fy[id_Follower[ii]] -= mF_y[ii]    # Sum total forces for node,
+                        # i in y-direction (this is FOLLOWER node for this spring)
                         
     return (fx,fy)
         
@@ -387,28 +431,28 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
     # These just provide views (by reference) into slices of muscles3.
     #   They are not assigned to, so aliasing is faster.
         
-    Nmuscles = muscles3.shape[0]       # # of Muscles
-    id_Master = muscles3[:,0].astype('int')      # MASTER NODE Muscle Connections
-    id_Slave = muscles3[:,1].astype('int')       # SLAVE NODE Muscle Connections
-    LFO_Vec = muscles3[:,2]  # Stores length for max. muscle tension
-    SK_Vec = muscles3[:,3]   # Stores muscle constant
-    a_Vec = muscles3[:,4]    # Stores Hill Parameter, a
-    b_Vec = muscles3[:,5]    # Stores Hill Parameter, b
-    FMAX_Vec = muscles3[:,6] # Stores Force-Maximum for Muscle
+    Nmuscles = muscles3.shape[0]                 # # of Muscles
+    id_Leader = muscles3[:,0].astype('int')      # LEADER NODE Muscle Connections
+    id_Follower = muscles3[:,1].astype('int')    # FOLLOWER NODE Muscle Connections
+    LFO_Vec = muscles3[:,2]                      # Stores length for max. muscle tension
+    SK_Vec = muscles3[:,3]                       # Stores muscle constant
+    a_Vec = muscles3[:,4]                        # Stores Hill Parameter, a
+    b_Vec = muscles3[:,5]                        # Stores Hill Parameter, b
+    FMAX_Vec = muscles3[:,6]                     # Stores Force-Maximum for Muscle
 
-    fx = np.zeros(Nb)                 # Initialize storage for x-forces
-    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    fx = np.zeros(Nb)                            # Initialize storage for x-forces
+    fy = np.zeros(Nb)                            # Initialize storage for y-forces
     
-    xPt = xLag[id_Master]     # x-Pt of interest at the moment to drive muscle contraction
+    xPt = xLag[id_Leader]     # x-Pt of interest at the moment to drive muscle contraction
     
-    dx = xLag[id_Slave] - xLag[id_Master] # x-Distance btwn slave and master node
-    dy = yLag[id_Slave] - yLag[id_Master] # y-Distance btwn slave and master node
-    LF = np.sqrt( dx**2 + dy**2 )         # Euclidean DISTANCE between
+    dx = xLag[id_Follower] - xLag[id_Leader] # x-Distance btwn follower and leader node
+    dy = yLag[id_Follower] - yLag[id_Leader] # y-Distance btwn follower and leader node
+    LF = np.sqrt( dx**2 + dy**2 )            # Euclidean DISTANCE between
     
-    dx_P = xLag_P[id_Slave] - xLag_P[id_Master] # x-Distance btwn slave and master node
-    dy_P = yLag_P[id_Slave] - yLag_P[id_Master] # y-Distance btwn slave and master node
-    LF_P = np.sqrt( dx_P**2 + dy_P**2 )         # Euclidean DISTANCE between 
-                                                #   master and slave node
+    dx_P = xLag_P[id_Follower] - xLag_P[id_Leader] # x-Distance btwn follower and leader node
+    dy_P = yLag_P[id_Follower] - yLag_P[id_Leader] # y-Distance btwn follower and leader node
+    LF_P = np.sqrt( dx_P**2 + dy_P**2 )            # Euclidean DISTANCE between 
+                                                   #   leader and follower node
                                                 
     v =  np.abs(LF-LF_P)/dt         # How fast the muscle is contracting/expanding
     
@@ -426,15 +470,15 @@ def give_3_Element_Muscle_Force_Densities(Nb,xLag,yLag,xLag_P,yLag_P,muscles3,\
     
     for ii in range(Nmuscles):
         
-        fx[id_Master[ii]] += mF_x[ii]  # Sum total forces for node,
-                        # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master[ii]] += mF_y[ii]  # Sum total forces for node, 
-                        # i in y-direction (this is MASTER node for this spring)
+        fx[id_Leader[ii]] += mF_x[ii]  # Sum total forces for node,
+                        # i in x-direction (this is LEADER node for this spring)
+        fy[id_Leader[ii]] += mF_y[ii]  # Sum total forces for node, 
+                        # i in y-direction (this is LEADER node for this spring)
         
-        fx[id_Slave[ii]] -= mF_x[ii]    # Sum total forces for node, 
-                        # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave[ii]] -= mF_y[ii]    # Sum total forces for node, 
-                        # i in y-direction (this is SLAVE node for this spring)
+        fx[id_Follower[ii]] -= mF_x[ii]    # Sum total forces for node, 
+                        # i in x-direction (this is FOLLOWER node for this spring)
+        fy[id_Follower[ii]] -= mF_y[ii]    # Sum total forces for node, 
+                        # i in y-direction (this is FOLLOWER node for this spring)
         
     return (fx,fy)
     
@@ -461,21 +505,21 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs,Lx,Ly):
         fy:'''
 
 
-    Nsprings = springs.shape[0]  # # of Springs
-    id_Master = springs[:,0].astype('int')   # MASTER NODE Spring Connections
-    id_Slave = springs[:,1].astype('int')    # SLAVE NODE Spring Connections
-    K_Vec = springs[:,2]  # Stores spring stiffness associated with each spring
-    RL_Vec = springs[:,3] # Stores spring resting length associated with each spring
-    alpha = springs[:,4]  # Stores deg. of non-linearity of spring
+    Nsprings = springs.shape[0]              # # of Springs
+    id_Leader = springs[:,0].astype('int')   # LEADER NODE Spring Connections
+    id_Follower = springs[:,1].astype('int') # FOLLOWER NODE Spring Connections
+    K_Vec = springs[:,2]                     # Stores spring stiffness associated with each spring
+    RL_Vec = springs[:,3]                    # Stores spring resting length associated with each spring
+    alpha = springs[:,4]                     # Stores deg. of non-linearity of spring
 
-    fx = np.zeros(Nb)                 # Initialize storage for x-forces
-    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    fx = np.zeros(Nb)                        # Initialize storage for x-forces
+    fy = np.zeros(Nb)                        # Initialize storage for y-forces
     
     #import pdb; pdb.set_trace()
     for ii in range(Nsprings):
 
-        dx = xLag[id_Slave[ii]] - xLag[id_Master[ii]] # x-Distance btwn slave and master node
-        dy = yLag[id_Slave[ii]] - yLag[id_Master[ii]] # y-Distance btwn slave and master node
+        dx = xLag[id_Follower[ii]] - xLag[id_Leader[ii]] # x-Distance btwn follower and leader node
+        dy = yLag[id_Follower[ii]] - yLag[id_Leader[ii]] # y-Distance btwn follower and leader node
     
         #
         # TESTING FOR LAG PT. PASSED THRU BNDRY; MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
@@ -495,15 +539,15 @@ def give_Me_Spring_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,springs,Lx,Ly):
         sF_x = 0.5 * (alpha[ii]+1.0) * K_Vec[ii] * np.power( (np.sqrt(dx**2 + dy**2)-RL_Vec[ii]), alpha[ii] ) * (dx/np.sqrt(dx**2+dy**2))
         sF_y = 0.5 * (alpha[ii]+1.0) * K_Vec[ii] * np.power( (np.sqrt(dx**2 + dy**2)-RL_Vec[ii]), alpha[ii] ) * (dy/np.sqrt(dx**2+dy**2))
         
-        fx[id_Master[ii]] += sF_x  # Sum total forces for node,
-                        # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master[ii]] += sF_y  # Sum total forces for node, 
-                        # i in y-direction (this is MASTER node for this spring)
+        fx[id_Leader[ii]] += sF_x  # Sum total forces for node,
+                        # i in x-direction (this is LEADER node for this spring)
+        fy[id_Leader[ii]] += sF_y  # Sum total forces for node, 
+                        # i in y-direction (this is LEADER node for this spring)
         
-        fx[id_Slave[ii]] -= sF_x    # Sum total forces for node, 
-                        # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave[ii]] -= sF_y    # Sum total forces for node, 
-                        # i in y-direction (this is SLAVE node for this spring)
+        fx[id_Follower[ii]] -= sF_x    # Sum total forces for node, 
+                        # i in x-direction (this is FOLLOWER node for this spring)
+        fy[id_Follower[ii]] -= sF_y    # Sum total forces for node, 
+                        # i in y-direction (this is FOLLOWER node for this spring)
 
     # MIGHT NOT NEED THESE!
     #fx = fx/ds**2
@@ -544,28 +588,28 @@ def give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
 
     #leng = Tx.shape[0]               # # of Lagrangian Pts.
 
-    Nsprings = d_Springs.shape[0]              # # of Damped Springs
-    sp_1 = d_Springs[:,0].astype('int')   # MASTER NODE DAMPED Spring Connections
-    sp_2 = d_Springs[:,1].astype('int')    # SLAVE NODE DAMPED Spring Connections
-    K_Vec = d_Springs[:,2]  # Stores spring stiffness associated with each Damped spring
-    RL_Vec = d_Springs[:,3] # Stores spring resting length associated with each Damped spring
-    b_Vec = d_Springs[:,4]  # Store damping coefficient for each Damped spring
+    Nsprings = d_Springs.shape[0]         # # of Damped Springs
+    sp_1 = d_Springs[:,0].astype('int')   # LEADER NODE DAMPED Spring Connections
+    sp_2 = d_Springs[:,1].astype('int')   # FOLLOWER NODE DAMPED Spring Connections
+    K_Vec = d_Springs[:,2]                # Stores spring stiffness associated with each Damped spring
+    RL_Vec = d_Springs[:,3]               # Stores spring resting length associated with each Damped spring
+    b_Vec = d_Springs[:,4]                # Store damping coefficient for each Damped spring
 
-    fx = np.zeros(Nb)                 # Initialize storage for x-forces
-    fy = np.zeros(Nb)                 # Initialize storage for y-forces
+    fx = np.zeros(Nb)                     # Initialize storage for x-forces
+    fy = np.zeros(Nb)                     # Initialize storage for y-forces
     
     
     #import pdb; pdb.set_trace()
     for ii in range(Nsprings):
 
-        id_Master = sp_1[ii]          # Master Node index
-        id_Slave = sp_2[ii]           # Slave Node index
+        id_Leader = sp_1[ii]          # Leader Node index
+        id_Follower = sp_2[ii]        # Follower Node index
         k_Spring = K_Vec[ii]          # Spring stiffness of i-th spring
         L_r = RL_Vec[ii]              # Resting length of i-th spring
         b = b_Vec[ii]                 # Damping Coefficient
 
-        dx = xLag[id_Slave] - xLag[id_Master]      # x-Distance btwn slave and master node
-        dy = yLag[id_Slave] - yLag[id_Master]      # y-Distance btwn slave and master node
+        dx = xLag[id_Follower] - xLag[id_Leader]   # x-Distance btwn follower and leader node
+        dy = yLag[id_Follower] - yLag[id_Leader]   # y-Distance btwn follower and leader node
 
         #
         # TESTING FOR LAG PT. PASSED THRU BNDRY MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
@@ -576,8 +620,8 @@ def give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
         if np.abs(dy) > Lx/2:
             dy = np.sign(dy)*( Ly - np.sign(dy)*dy )
 
-        dV_x = ( xLag[id_Master] - xLag_P[id_Master] ) # dt*(x-Velocity) between current and prev. steps
-        dV_y = ( yLag[id_Master] - yLag_P[id_Master] ) # dt*(y-Velocity) between current and prev. steps
+        dV_x = ( xLag[id_Leader] - xLag_P[id_Leader] ) # dt*(x-Velocity) between current and prev. steps
+        dV_y = ( yLag[id_Leader] - yLag_P[id_Leader] ) # dt*(y-Velocity) between current and prev. steps
 
         #
         # TESTING FOR LAG PT. PASSED THRU BNDRY MAY NEED TO CHANGE TOLERANCE HERE, DEPENDENT ON APPLICATION
@@ -596,15 +640,15 @@ def give_Me_Damped_Springs_Lagrangian_Force_Densities(ds,Nb,\
         sF_y = k_Spring * ( np.sqrt( dx**2 + dy**2 ) - L_r ) * ( dy / np.sqrt(dx**2+dy**2) ) - b*dV_y
 
         
-        fx[id_Master] += sF_x  # Sum total forces for node,
-                        # i in x-direction (this is MASTER node for this spring)
-        fy[id_Master] += sF_y  # Sum total forces for node, 
-                        # i in y-direction (this is MASTER node for this spring)
+        fx[id_Leader] += sF_x  # Sum total forces for node,
+                        # i in x-direction (this is LEADER node for this spring)
+        fy[id_Leader] += sF_y  # Sum total forces for node, 
+                        # i in y-direction (this is LEADER node for this spring)
         
-        fx[id_Slave] -= sF_x    # Sum total forces for node, 
-                        # i in x-direction (this is SLAVE node for this spring)
-        fy[id_Slave] -= sF_y    # Sum total forces for node, 
-                        # i in y-direction (this is SLAVE node for this spring)
+        fx[id_Follower] -= sF_x    # Sum total forces for node, 
+                        # i in x-direction (this is FOLLOWER node for this spring)
+        fy[id_Follower] -= sF_y    # Sum total forces for node, 
+                        # i in y-direction (this is FOLLOWER node for this spring)
 
     # MIGHT NOT NEED THESE!
     #fx = fx/ds**2
@@ -646,7 +690,7 @@ def give_Me_Mass_Lagrangian_Force_Densities(ds,xLag,yLag,masses):
     yPts= masses[:,2]                 # Original y-Values of y-Mass Pts.
     kStiffs = masses[:,3]             # Stores "spring" stiffness parameter
 
-    N_masses = masses.shape[0]            # # of target points!
+    N_masses = masses.shape[0]        # # of target points!
 
     fx = np.zeros(xLag.size) # Initialize storage for x-force density from TARGET PTS
     fy = np.zeros(xLag.size) # Initialize storage for y-force density from TARGET PTS
@@ -730,16 +774,16 @@ def give_Me_Target_Lagrangian_Force_Densities(ds,xLag,yLag,targets,Lx,Ly):
 def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams,Lx,Ly):    
 
 
-    Nbeams = nonInv_beams.shape[0]     # # of Beams
+    Nbeams = nonInv_beams.shape[0]           # # of Beams
     pts_1 = nonInv_beams[:,0].astype('int')  # 1ST NODES for BEAM
     pts_2 = nonInv_beams[:,1].astype('int')  # MIDDLE NODES (2ND Node) for BEAM
     pts_3 = nonInv_beams[:,2].astype('int')  # 3RD NODES for BEAM
-    K_Vec = nonInv_beams[:,3]   # Stores beam stiffness associated with each spring
-    CX_Vec = nonInv_beams[:,4]  # Stores x-Curvature 
-    CY_Vec = nonInv_beams[:,5]  # Stores y-Curvature 
+    K_Vec = nonInv_beams[:,3]                # Stores beam stiffness associated with each spring
+    CX_Vec = nonInv_beams[:,4]               # Stores x-Curvature 
+    CY_Vec = nonInv_beams[:,5]               # Stores y-Curvature 
 
-    fx = np.zeros(Nb)                # Initialize storage for x-forces
-    fy = np.zeros(Nb)                # Initialize storage for y-forces
+    fx = np.zeros(Nb)                        # Initialize storage for x-forces
+    fy = np.zeros(Nb)                        # Initialize storage for y-forces
     
     for ii in range(Nbeams):
 
@@ -750,9 +794,9 @@ def give_Me_nonInv_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,nonInv_beams,
         Cx = CX_Vec[ii]         # x-Curvature
         Cy = CY_Vec[ii]         # y-Curvature
 
-        Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
-        Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
-        Xr = xLag[id_3]          # xPt of 3RD Node Pt. in beam
+        Xp = xLag[id_1]         # xPt of 1ST Node Pt. in beam
+        Xq = xLag[id_2]         # xPt of 2ND (MIDDLE) Node Pt. in beam
+        Xr = xLag[id_3]         # xPt of 3RD Node Pt. in beam
     
         Yp = yLag[id_1]         # yPt of 1ST Node Pt. in beam
         Yq = yLag[id_2]         # yPt of 2ND (MIDDLE) Node Pt. in beam
@@ -798,25 +842,25 @@ def give_Me_Beam_Lagrangian_Force_Densities(ds,Nb,xLag,yLag,beams,Lx,Ly):
         fy:'''
 
 
-    Nbeams = beams.shape[0]     # # of Beams
+    Nbeams = beams.shape[0]           # # of Beams
     pts_1 = beams[:,0].astype('int')  # 1ST NODES for BEAM
     pts_2 = beams[:,1].astype('int')  # MIDDLE NODES (2ND Node) for BEAM
     pts_3 = beams[:,2].astype('int')  # 3RD NODES for BEAM
-    K_Vec = beams[:,3]  # Stores spring stiffness associated with each spring
-    C_Vec = beams[:,4]  # Stores spring resting length associated with each spring
+    K_Vec = beams[:,3]                # Stores spring stiffness associated with each spring
+    C_Vec = beams[:,4]                # Stores spring resting length associated with each spring
 
-    fx = np.zeros(Nb)                # Initialize storage for x-forces
-    fy = np.zeros(Nb)                # Initialize storage for y-forces
+    fx = np.zeros(Nb)                 # Initialize storage for x-forces
+    fy = np.zeros(Nb)                 # Initialize storage for y-forces
     
     # Want to preserve the ability for the same id_2 to be assigned twice, so
     #   need a loop here.
     for ii in range(Nbeams):
 
-        id_1 = pts_1[ii]          # 1ST Node index
-        id_2 = pts_2[ii]          # (MIDDLE) 2nd Node index -> index that gets force applied to it!
-        id_3 = pts_3[ii]          # 3RD Node index
-        k_Beam = K_Vec[ii]        # Beam stiffness of i-th spring
-        C = C_Vec[ii]             # Curvature of the beam between these three nodes 
+        id_1 = pts_1[ii]         # 1ST Node index
+        id_2 = pts_2[ii]         # (MIDDLE) 2nd Node index -> index that gets force applied to it!
+        id_3 = pts_3[ii]         # 3RD Node index
+        k_Beam = K_Vec[ii]       # Beam stiffness of i-th spring
+        C = C_Vec[ii]            # Curvature of the beam between these three nodes 
 
         Xp = xLag[id_1]          # xPt of 1ST Node Pt. in beam
         Xq = xLag[id_2]          # xPt of 2ND (MIDDLE) Node Pt. in beam
@@ -921,10 +965,17 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     delta_X = np.zeros((Nb, Nx))
     delta_Y = np.zeros((Ny, Nb))
     
-
+    #-----------------------------------------------
+    # Get delta function kernels
+    #-----------------------------------------------
     delta_1D_x = give_Delta_Kernel(distX, dx)
     delta_1D_y = give_Delta_Kernel(distY, dy)
 
+    #-----------------------------------------------------------------------------
+    # Get Eulerian/Lagrangian indices to use for saving non-zero delta-function 
+    #     values and store non-zero delta-function values into delta_X / delta_Y 
+    #     matrices at correct indices!
+    #-----------------------------------------------------------------------------
     delta_X[ind_Lag,indX.astype('int')] = delta_1D_x
     delta_Y[indY.astype('int'),ind_Lag] = delta_1D_y
     row,col = ind_Lag.shape

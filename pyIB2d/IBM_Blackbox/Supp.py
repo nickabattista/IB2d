@@ -1,43 +1,38 @@
-'''-------------------------------------------------------------------------
+'''-------------------------------------------------------------------------------------------------
 
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
- 	fluid-structure interaction models. This version of the code is based off of
-	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
+ 	  fluid-structure interaction models. This version of the code is based off of
+	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
  Author: Nicholas A. Battista
- Email:  nick.battista@unc.edu
- Date Created: May 27th, 2015\
- Python 3.5 port by: Christopher Strickland
- Institution: UNC-CH
+ Email:  battistn[@]tcnj[.]edu
+ IB2d was Created: May 27th, 2015 at UNC-CH
+ Initial Python 3.5 port by: Christopher Strickland
 
  This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-	4. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-
- One is able to update those Lagrangian Structure parameters, e.g., 
- spring constants, resting lengths, etc
+ 	4. Muscle-Model (combined Force-Length-Velocity model, "Hill+(Length-Tension)")
+    .
+    .
  
  There are a number of built in Examples, mostly used for teaching purposes. 
- 
- If you would like us to add a specific muscle model, 
- please let Nick (nick.battista@unc.edu) know.
- 
- For the Python port, I am going to throw a lot of supporting functions into
-    here for convinence. That way they get loaded all at once, and are called
+  
+ For the Python port, WCS threw a lot of supporting functions into this file
+    here for convenience. That way they get loaded all at once, and are called
     by their name in an intuitive way. The functions (with their subfunctions
     following) are here in this order:
-    -- please_Move_Lagrangian_Point_Positions
-    -- give_NonZero_Delta_Indices_XY
-    -- give_Eulerian_Lagrangian_Distance
-    -- give_Delta_Kernel
-    -- give_1D_NonZero_Delta_Indices
-    -- please_Move_Massive_Boundary
-    -- please_Update_Massive_Boundary_Velocity
-    -- D
-    -- DD
-    -- please_Update_Adv_Diff_Concentration
+        -- please_Move_Lagrangian_Point_Positions
+        -- give_NonZero_Delta_Indices_XY
+        -- give_Eulerian_Lagrangian_Distance
+        -- give_Delta_Kernel
+        -- give_1D_NonZero_Delta_Indices
+        -- please_Move_Massive_Boundary
+        -- please_Update_Massive_Boundary_Velocity
+        -- D
+        -- DD
+        -- please_Update_Adv_Diff_Concentration
 
 ----------------------------------------------------------------------------'''
 
@@ -199,7 +194,6 @@ def give_NonZero_Delta_Indices_XY(xLag, yLag, Nx, Ny, dx, dy, supp):
     #Sets up x-INDEX matrix bc we consider BOTH dimensions
     xInds = np.tile(xIndsAux,(1,supp)) #tiles matrix in horiz direction
     
-
     #Give y-dimension Non-Zero Delta Indices
     yIndsAux = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp)
 
@@ -319,7 +313,7 @@ def give_1D_NonZero_Delta_Indices(lagPts_j, N, dx, supp):
     indices = np.tile(ind_Aux,(supp,1)).T #stack row vectors then transpose
 
     #
-    indices += -supp/2+1+np.arange(supp) #arange returns row array, which
+    indices += -supp/2+1+np.arange(supp) # arange returns row array, which
                                          # broadcasts down each column.
 
     # Translate indices between {0,2,..,N-1}
@@ -494,14 +488,12 @@ def DD(u,dz,string):
 
         length = u.shape[1]      # number of pts along X direction
 
-
         #For periodicity on ends
         u_zz[:,0] =  ( u[:,1] - 2*u[:,0]   + u[:,length-1] )   / (dz**2)
         u_zz[:,-1] = ( u[:,0] - 2*u[:,length-1] + u[:,length-2] ) / (dz**2)
 
         #Standard Upwind Scheme (Centered Difference)
-        u_zz[:,1:length-1] = (u[:,2:length]-2*u[:,1:length-1]+u[:,:length-2])\
-                                / (dz**2)
+        u_zz[:,1:length-1] = (u[:,2:length]-2*u[:,1:length-1]+u[:,:length-2]) / (dz**2)
 
     elif string=='y':
 
@@ -512,8 +504,7 @@ def DD(u,dz,string):
         u_zz[-1,:]= ( u[0,:] - 2*u[length-1,:] + u[length-2,:] ) / (dz**2)
 
         #Standard Upwind Scheme (Centered Difference)
-        u_zz[1:length-1,:] = (u[2:length,:]-2*u[1:length-1,:]+u[:length-2,:])\
-                                / (dz**2)
+        u_zz[1:length-1,:] = (u[2:length,:]-2*u[1:length-1,:]+u[:length-2,:]) / (dz**2)
 
     else:
         

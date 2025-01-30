@@ -1,33 +1,26 @@
-'''-------------------------------------------------------------------------
+'''-------------------------------------------------------------------------------------------------
 
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
- 	fluid-structure interaction models. This version of the code is based off of
-	Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
+ 	  fluid-structure interaction models. This version of the code is based off of
+	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
 
  Author: Nicholas A. Battista
- Email:  nickabattista@gmail.com
- Date Created: May 27th, 2015
- Initial Python 3.5 port and VTK writes by Christopher Strickland
- Institution: UNC-CH
+ Email:  battistn[@]tcnj[.]edu
+ IB2d was Created: May 27th, 2015 at UNC-CH
+ Initial Python 3.5 port by: Christopher Strickland
 
  This code is capable of creating Lagrangian Structures using:
  	1. Springs
  	2. Beams (*torsional springs)
  	3. Target Points
-    4. Mass Points
-    5. Porous Points
-	6. Muscle-Model (combined Force-Length-Velocity model, "HIll+(Length-Tension)")
-    7. 3-Element Hill Muscle Model
-
- One is able to update those Lagrangian Structure parameters, e.g., 
- spring constants, resting lengths, etc
+ 	4. Muscle-Model (combined Force-Length-Velocity model, "Hill+(Length-Tension)")
+    .
+    .
  
  There are a number of built in Examples, mostly used for teaching purposes. 
- 
- If you would like us to add a specific muscle model, 
- please let Nick (nickabattista@gmail.com) know.
 
-----------------------------------------------------------------------------'''
+----------------------------------------------------------------------------------------------------'''
+
 import numpy as np
 from math import sqrt
 import os
@@ -232,34 +225,24 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     # CLEAR INPUT DATA #
 
 
-    # Temporal Information
-    #NTime = np.floor(T_FINAL/dt)+1 # number of total time-steps,
-                                # (floored, so exact number of time-steps)
-    #dt = T_FINAL/NTime #time-step (slightly perturbed dt, so exact number of 
-                       #time-steps are used
-    #current_time = 0.0
-    
+ 
 
-
-    
-
-    
-    
+    #---------------------------------------------------------------------
     # Create EULERIAN Mesh (these assume periodicity in x and y)
+    #---------------------------------------------------------------------
     x = np.arange(0,Lx,dx)
     y = np.arange(0,Ly,dy)
-    # Create x-Mesh
-    #X = np.empty((Nx,x.size))
-    #for ii in range(Nx):
-    #    X[ii,] = x
-    # Create y-Mesh
-    #Y = np.empty((y.size,Ny))
-    #for ii in range(Ny):
-    #    Y[:,ii] = y
-    # MATLAB SYNTAX: [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy)
-    X,Y = np.meshgrid(x,y)
-    # MATLAB SYNTAX: [idX,idY] = meshgrid(0:Nx-1,0:Ny-1)  <--- INITIALIZE FOR FLUID SOLVER FFT FUNCTION    
-    idX,idY = np.meshgrid(np.arange(0,Nx,1),np.arange(0,Ny,1)) # <- INITIALIZES FOR FLUID SOLVER FFT OPERATORS
+    
+    #---------------------------------------------------------------------
+    # INITIALIZE FOR FFT OPERATORS IN FLUID SOLVER
+    #     --> MATLAB SYNTAX: [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy)
+    #     --> MATLAB SYNTAX: [idX,idY] = meshgrid(0:Nx-1,0:Ny-1) 
+    #---------------------------------------------------------------------
+    X,Y = np.meshgrid(x,y)    
+    idX,idY = np.meshgrid(np.arange(0,Nx,1),np.arange(0,Ny,1))
+    SIN_IDX = np.sin(2*np.pi*idX/Nx)
+    SIN_IDY = np.sin(2*np.pi*idY/Ny) 
+    A_hat = 1 + 2*mu*dt/rho*( (np.sin(np.pi*idX/Nx)/dx)**2 + (np.sin(np.pi*idY/Ny)/dy)**2 )
 
     # # # # # HOPEFULLY WHERE I CAN READ IN INFO!!! # # # # #
 
@@ -621,8 +604,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     # Initialize the initial velocities to zero.
     U = np.zeros((Ny,Nx))                           # x-Eulerian grid velocity
     V = np.zeros((Ny,Nx))                           # y-Eulerian grid velocity
-    U.shape
-    mVelocity = np.zeros((mass_info.shape[0],2))  # mass-Pt velocity 
+    mVelocity = np.zeros((mass_info.shape[0],2))    # mass-Pt velocity 
 
     if arb_ext_force_Yes:
         print('  -Artificial External Forcing Onto Fluid Grid\n')
@@ -689,19 +671,24 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
     
+    #-----------------------------------------------------------------------------------------------
     #
     #
-    # * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * *
+    #       **************************************************************************
+    #       * * * * * * * * * * * * * BEGIN TIME-STEPPING! * * * * * * * * * * * * * *
+    #       **************************************************************************
     #
     #
-    
+    #------------------------------------------------------------------------------------------------
+    #
     while current_time < T_FINAL:
         
+        #--------------------------------------------------------------------------------------------
         #
+        #   ********* Step 1: Update Position of Boundary of membrane at half time-step *********
+        #                       (Variables end with h if it is a half-step)
         #
-        #******Step 1: Update Position of Boundary of membrane at half time-step ******
-        #                 (Variables end with h if it is a half-step)
-        #
+        #--------------------------------------------------------------------------------------------
         xLag_h,yLag_h = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag,\
             xLag, yLag, x, y, dt/2, grid_Info, 0, poroelastic_Yes, poroelastic_info, F_Poro)
             
@@ -735,11 +722,12 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             d_springs_info = update_Damped_Springs(dt,current_time,d_springs_info)    
         
 
-        #    
+        #--------------------------------------------------------------------------------------------    
         #
-        #*******STEP 2: Calculate Force coming from membrane at half time-step ********
+        #   ********* STEP 2: Calculate Force coming from membrane at half time-step **********
         #
-        #
+        #--------------------------------------------------------------------------------------------
+
         Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro = please_Find_Lagrangian_Forces_On_Eulerian_grid(\
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params,\
         springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
@@ -773,11 +761,11 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             Fyh = Fyh + Fy_Arb
 
 
-        #  
+        #--------------------------------------------------------------------------------------------
+        # 
+        #       ******************* STEP 3: Solve for Fluid motion ************************
         #
-        #******************* STEP 3: Solve for Fluid motion ************************
-        #
-        #
+        #--------------------------------------------------------------------------------------------
 
         # Add in effect from BOUSSINESQ
         if boussinesq_Yes:
@@ -791,19 +779,24 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             Fxh = Fxh - mu*Brink*U; # ADD BRINKMAN TERM!
             Fyh = Fyh - mu*Brink*V; # ADD BRINKMAN TERM!
         
-        # Update fluid motion
-        Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY)
+        #-----------------------------------------------------------
+        #                   Update fluid motion
+        #   --> USING stored sine values for speed-up 
+        #   --> USING product/chain rules for U^2,V^2, and UV
+        #             differentiations
+        #-----------------------------------------------------------
+        Uh, Vh, U, V, p =   please_Update_Fluid_Velocity(U, V, Fxh, Fyh, rho, mu, grid_Info, dt, idX, idY, SIN_IDX, SIN_IDY, A_hat)
 
 
         
+        #--------------------------------------------------------------------------------------------
         #
+        # ******* STEP 4: Update Position of Boundary of membrane again for a half time-step *******
         #
-        #**** STEP 4: Update Position of Boundary of membrane again for a half time-step ****
-        #
-        #
+        #--------------------------------------------------------------------------------------------
+
         xLag_P = np.array(xLag_h)   # Stores old Lagrangian x-Values (for muscle model)
         yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
-        #Uh, Vh instead of U,V?
         xLag, yLag = please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag,\
             xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes, poroelastic_Yes, poroelastic_info, F_Poro)
             
@@ -825,7 +818,6 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             
         # If there are tracers, update tracer positions #
         if tracers_Yes:
-            #Uh, Vh instead of U,V?
             xT, yT = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT,\
                 x, y, dt, grid_Info,0) #0 for always no porous tracers
             tracers[:,1] = xT
@@ -835,8 +827,10 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         # Note, C is mutable
         if concentration_Yes: #need to test
            C = please_Update_Adv_Diff_Concentration(C,dt,dx,dy,U,V,kDiffusion)
-           
-        # Save/Plot Lagrangian/Eulerian Dynamics! #
+
+        #-------------------------------------------------------------------   
+        #     ******** Save/Plot Lagrangian/Eulerian Dynamics! ********
+        #-------------------------------------------------------------------   
         if ( ( cter % pDump == 0) and (cter >= pDump) ):
             
             #Compute vorticity, uMagnitude
