@@ -44,9 +44,9 @@ from Supp import D, DD
 #      Fast-Fourier Transform (FFT)
 #      
 #      x-Momentum Conservation: 
-#           rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + Fx
+#           rho*(u_t + u*u_x + v*u_y) = -p_x + mu*laplacian(u) + Fx
 #      y-Momentum Conservation: 
-#           rho*v_t = -rho*u*v_x + rho*v*v_y + mu*laplacian(v) - p_y + Fy
+#           rho*(v_t + u*v_x + v*v_y) = -p_y + mu*laplacian(v) + Fy
 #      Incompressibility:   u_x + v_y = 0.
 #
 ################################################################################
