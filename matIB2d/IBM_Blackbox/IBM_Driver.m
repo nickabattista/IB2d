@@ -31,18 +31,17 @@
 function [X,Y,U,V,xLag,yLag,C] = IBM_Driver(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,Con_Params)
 
 
-%
-%    2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
+%--------------------------------------------------------------------------------
+%   2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 %    
-%    x-Momentum Conservation: rho*u_t = -rho*u*u_x + rho*v*u_y + mu*laplacian(u) - p_x + F_x
-%    y-Momentum 
+%      x-Momentum Conservation: rho*(u_t + u*u_x + v*u_y) = -p_x + mu*laplacian(u) + Fx
+%      y-Momentum Conservation: rho*(v_t + u*v_x + v*v_y) = -p_y + mu*laplacian(v) + Fy
+%      Incompressibility:       u_x + v_y = 0
 %
-%    Incompressibility: u_x + v_y = 0
-%
-%    LagPts/dt = int{ u(x,t) delta( x - LagPts(s,t) ) dx }
-%    F_x = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
-%    F_y = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
-%
+%    dLagPts/dt = int{ u(x,t) delta( x - LagPts(s,t) ) dx }
+%    Fx = int{ fx(s,t) delta(x - LagPts(s,t)) ds }
+%    Fy = int{ fy(s,t) delta(x - LagPts(s,t)) ds }
+%--------------------------------------------------------------------------------
 
 
 fprintf('\n________________________________________________________________________________\n\n');
