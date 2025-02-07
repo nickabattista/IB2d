@@ -1,4 +1,4 @@
-%-------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 %
 % IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
 % 	fluid-structure interaction models. This version of the code is based off of
@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 %
-%--------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -56,8 +56,8 @@ fprintf('\n_____________________________________________________________________
 fprintf('\n\n\n |****** Prepping Immersed Boundary Simulation ******|\n');
 fprintf('\n\n--> Reading input data for simulation...\n\n');
 
-%
-% ** IBM_DRIVER INPUT DEFINITIONS ** :
+%---------------------------------------------------------------------
+%                 ** IBM_DRIVER INPUT DEFINITIONS ***
 %
 %               Fluid_Params(1): mu
 %                           (2): density
@@ -106,15 +106,22 @@ fprintf('\n\n--> Reading input data for simulation...\n\n');
 %                         (4): source
 %                         (5): k_source
 %                         (6): c_inf
+%----------------------------------------------------------
 
+%----------------------------------------------------------
 % SIMULATION NAME STRING TO RUN .vertex, .spring, etc. %
+%----------------------------------------------------------
 struct_name = char(Lag_Name_Params);
 
+%--------------------------------------------------
 % FLUID PARAMETER VALUES STORED %
+%--------------------------------------------------
 mu = Fluid_Params(1);      % Dynamic Viscosity
 rho = Fluid_Params(2);     % Density
 
+%--------------------------------------------------
 % TEMPORAL INFORMATION VALUES STORED %
+%--------------------------------------------------
 T_FINAL = Time_Params(1);      % Final simulation time
 dt = Time_Params(2);           % Time-step
 restart_Flag = Time_Params(3); % Restart Flag (1=YES, RESTART FROM PREVIOUS DATA, 0=No)
@@ -122,7 +129,9 @@ restart_Flag = Time_Params(3); % Restart Flag (1=YES, RESTART FROM PREVIOUS DATA
 %dt = T_FINAL/NTime;           % revised time-step (slightly perturbed dt, so exact # of time-steps are used)
 current_time = 0.0;            % initialize start of simulation to time, 0 
 
+%--------------------------------------------------
 % GRID INFO %
+%--------------------------------------------------
 Nx =   Grid_Params(1);                % # of Eulerian pts. in x-direction
 Ny =   Grid_Params(2);                % # of Eulerian pts. in y-direction
 Lx =   Grid_Params(3);                % Length of Eulerian grid in x-coordinate
@@ -132,8 +141,10 @@ dy =   Grid_Params(4)/Grid_Params(2); % Spatial-size in y
 supp = Grid_Params(5);                % Delta-function support
 grid_Info = [Nx Ny Lx Ly dx dy supp]; % Store for passing values into IB time-loop sub-functions
                                       % NOTE: grid_Info(8) = Nb, grid_Info(9) = ds [THEY GET STORED LATER]
-
+                                      
+%--------------------------------------------------
 % PRINTING/PLOTTING INFO %
+%--------------------------------------------------
 pDump = Output_Params(1);          % Print (Plot) Dump interval
 pMatlab = Output_Params(2);        % Plot in Matlab? (1=YES,0=NO)
 lagPlot = Output_Params(3);        % Plot LAGRANGIAN PTs ONLY in Matlab
@@ -143,8 +154,9 @@ uMagPlot = Output_Params(6);       % Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY
 pressPlot = Output_Params(7);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 conPlot = Output_Params(8);      % Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
-
+%--------------------------------------------------
 % MODEL STRUCTURE DATA STORED %
+%--------------------------------------------------
 springs_Yes = Lag_Struct_Params(1);           % Springs: 0 (for no) or 1 (for yes) 
 update_Springs_Flag = Lag_Struct_Params(2);   % Update_Springs: 0 (for no) or 1 (for yes)
 target_pts_Yes = Lag_Struct_Params(3);        % Target_Pts: 0 (for no) or 1 (for yes)
@@ -170,7 +182,7 @@ general_force_Yes = Lag_Struct_Params(23);    % General User-Defined Force Term:
 poroelastic_Yes = Lag_Struct_Params(24);      % Poro-elastic Boundary: 0 (for no) or 1 (for yes)
 coagulation_Yes = Lag_Struct_Params(25);      % Coagulation Model: 0 (for no) or 1 (for yes)
 brinkman_Yes= Lag_Struct_Params(26);          % Brinkman fluid: 0 (for no) or 1 (for yes)
-
+%
 concentration_Yes = Con_Params(1);    % Background Concentration Gradient: 0 (for no) or 1 (for yes)
 kDiff = Con_Params(2);                % Diffusion Coefficient
 adv_scheme = Con_Params(3);           % Which advection scheme to use: 0 (for 1st O upwind) or 1 (for 3rd O WENO)
@@ -179,20 +191,29 @@ ksource = Con_Params(5);       % Concentration Source Rate
 Cinf = Con_Params(6);          % Concentration Saturation Limit 
 
 
+%--------------------------------------------------
 % CLEAR INPUT DATA %
+%--------------------------------------------------
 clear Fluid_Params Grid_Params Time_Params Lag_Name_Params Con_Params;
 
 
-%Lagrangian Structure Data
+%--------------------------------------------------
+% Lagrangian Structure Data
+%--------------------------------------------------
 ds = min( Lx/(2*Nx), Ly/(2*Ny) );   % Lagrangian Spacing
 grid_Info(9) = ds;                  % Store Lagrangian resolution, ds
 
 
+%-----------------------------------------------------------
 % Create EULERIAN Mesh (these assume periodicity in x and y)
+%-----------------------------------------------------------
 x = (0:dx:Lx-dx); 
 y = (0:dy:Ly-dy)';
 
+
+%--------------------------------------------------
 % INITIALIZE FOR FLUID SOLVER FFT FUNCTION
+%--------------------------------------------------
 [X,Y] = meshgrid(0:dx:Lx-dx,0:dy:Ly-dy);
 [idX,idY] = meshgrid(0:Nx-1,0:Ny-1);                                            
 A_hat = 1 + 2*mu*dt/rho*( (sin(pi*idX/Nx)/dx).^2 + (sin(pi*idY/Ny)/dy).^2 );
@@ -200,9 +221,13 @@ SIN_IDX = sin(2*pi*idX/Nx);
 SIN_IDY = sin(2*pi*idY/Ny);
 
 
-% % % % % HOPEFULLY WHERE I CAN READ IN INFO!!! % % % % %
 
 
+%---------------------------------------------------------------------
+% 
+%     % % % % % READ IN LAGRANGIAN STRUCTURE INFO!!! % % % % % %
+%
+%---------------------------------------------------------------------
 
 
 %--------------------------------------------------
@@ -393,6 +418,7 @@ if gravity_Yes == 1
 else
     gravity_Info = 0;
 end
+
 
 %----------------------------------------------------
 % READ IN POROUS MEDIA INFO (IF THERE IS POROSITY) %
@@ -595,6 +621,7 @@ else
    tracers = 0; 
 end
 
+
 %------------------------------------------------------------------
 % READ IN CONCENTRATION (IF THERE IS A BACKGROUND CONCENTRATION) %
 %------------------------------------------------------------------
@@ -646,29 +673,32 @@ end
 
 
 
-
-
-
-
-
+%----------------------------------------------------------
 % Initialize external fluid forcing flags
+%----------------------------------------------------------
 if arb_ext_force_Yes == 1 
     firstExtForce = 1;                           % initialize external forcing
     indsExtForce = 0;                            % initialize for external forcing computation
 end
 
-% ACTUAL TIME-STEPPING IBM SCHEME! 
-%(flags for storing structure connects for printing and printing to .vtk)
+%------------------------------------------------------------------------
+% Initialize flags for storing structure connects and printing to .vtk)
+%------------------------------------------------------------------------
 cter = 0; ctsave = 0; firstPrint = 1; loc = 1; diffy = 1;
 
 
+%----------------------------------------------------------
 % CREATE VIZ_IB2D/HIER_IB2d_DATA FOLDER for .VTK FILES
+%     Note: always stores Lagrangian Point Positions
+%----------------------------------------------------------
 mkdir('viz_IB2d');
 if Output_Params(18) == 1
     mkdir('hier_IB2d_data'); 
 end
 
+%------------------------------------------------------------------
 % PRINT BRINKMAN PERMEABILITY TO MATRIX (*if BRINKMAN TERM*) %
+%------------------------------------------------------------------
 if brinkman_Yes == 1
     cd('viz_IB2d');
     strNUM = give_String_Number_For_VTK(ctsave);
@@ -790,7 +820,12 @@ while current_time < T_FINAL
     %                           (Variables end with h if it is a half-step)
     %
     %-----------------------------------------------------------------------------------------------------
-    [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
+    if ctsave==1
+        xLag_h = xLag; % Upon starting time-loop, U=0, so x-Positions do not change
+        yLag_h = yLag; % Upon starting time-loop, V=0, so y-Positions do not change
+    else
+        [xLag_h, yLag_h] = please_Move_Lagrangian_Point_Positions(SpreadOperator, mu, U, V, xLag, yLag, xLag, yLag, x, y, dt/2, grid_Info,0,poroelastic_Yes,poroelastic_info,F_Poro);
+    end
     
     if mass_Yes == 1
        [mass_info, massLagsOld] = please_Move_Massive_Boundary(dt/2,mass_info,mVelocity); 
@@ -824,10 +859,10 @@ while current_time < T_FINAL
     
     %-----------------------------------------------------------------------------------------------------
     %
-    %***************** STEP 2: Calculate Force coming from membrane at half time-step ********************
+    %****************** STEP 2: Calculate Force coming from membrane at half time-step *******************
     %
     %-----------------------------------------------------------------------------------------------------
-    [Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] =    please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list, flag_Geo_Connect, geo_Connect_MAT);
+    [SpreadOperator, Fxh, Fyh, F_Mass_Bnd, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params, springs_info, target_info, beams_info, nonInv_beams_info ,muscles_info, muscles3_info, mass_info, electro_potential, d_springs_info, gen_force_info, poroelastic_info, coagulation_info, aggregate_list, flag_Geo_Connect, geo_Connect_MAT);
    
     % Once force is calculated, can finish time-step for massive boundary
     if mass_Yes == 1    
@@ -853,7 +888,7 @@ while current_time < T_FINAL
     
     %-----------------------------------------------------------------------------------------------------
     %
-    %*************************** STEP 3: Solve for Fluid motion ******************************************
+    %******************************* STEP 3: Solve for Fluid motion **************************************
     %
     %-----------------------------------------------------------------------------------------------------
     
@@ -889,15 +924,16 @@ while current_time < T_FINAL
     
     %-----------------------------------------------------------------------------------------------------
     %
-    %***************** STEP 4: Update Position of Boundary of membrane again for a half time-step *******
+    %************* STEP 4: Update Position of Boundary of membrane again for a half time-step ***********
     %
     %-----------------------------------------------------------------------------------------------------
 
     xLag_P = xLag_h;   % Stores old Lagrangian x-Values (for muscle model)
     yLag_P = yLag_h;   % Stores old Lagrangian y-Values (for muscle model)
     
-    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro);
+    [xLag, yLag] =     please_Move_Lagrangian_Point_Positions(SpreadOperator, mu, Uh, Vh, xLag, yLag, xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro);
 
+    
     %IF POROUS NODES, NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
     if porous_Yes == 1
        [Por_Mat,nX,nY] = please_Compute_Porous_Slip_Velocity(ds,xLag,yLag,porous_info,F_Lag);
@@ -941,7 +977,10 @@ while current_time < T_FINAL
     end
         
     %---------------------------------------------------
-    % Plot Lagrangian/Eulerian Dynamics! %
+    % Plotting/storing data options:
+    %    [1] Plot Lagrangian/Eulerian Dynamics 
+    %    [2] Save data to .vtk format
+    %    [3] Print CFL (advection) to screen
     %---------------------------------------------------
     if ( ( mod(cter,pDump) == 0  ) && ( cter >= pDump ) )
         
@@ -991,7 +1030,7 @@ end %ENDS TIME-STEPPING LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: gives appropriate string number for filename in printing the
-% .vtk files. for viz_IB2d and hier_IB2d_data folders
+%           .vtk files. for viz_IB2d and hier_IB2d_data folders
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -1,4 +1,4 @@
-%-------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 %
 % IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
 % 	fluid-structure interaction models. This version of the code is based off of
@@ -19,7 +19,7 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 %
-%--------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -51,23 +51,16 @@ delta = RMAT;
 for i=1:row
     for j=1:col
         
-        r = RMAT(i,j);
-        
-        % OLD DELTA FUNCTION APPROXIMATION
-        %if r<=2
-        %    delta(i,j) = 0.25*(1+cos(pi*r/2));
-        %else
-        %    delta(i,j) = 0;
-        %end
-        
-        % PESKIN 4-PT DISCRETE DELTA FUNCTION
-        if r<1
-            delta(i,j) = ( (3 - 2*r + sqrt(1 + 4*r - 4*r.*r) ) / (8*dx) );
-        elseif ( (r<2) && (r>=1) )
-            delta(i,j) = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r.*r) ) / (8*dx) );
-        else
-            delta(i,j) = 0;
-        end
+        %-----------------------------------------------------------------
+        % Compute chosen regularized delta function at radius r=RMAT(i,j)
+        %   --> Note: (1) divides by dx (or dy) 
+        %             (2) default is Peskin 4-pt Delta function 
+        %                 (as described in Peskin 2002)
+        %             (3) the regularized delta function is also called 
+        %                 when constructing the SPREAD OPERATOR for taking
+        %                 information from LAGRANGIAN -> EULERIAN GRID
+        %-----------------------------------------------------------------
+        delta(i,j) = choose_and_Evaluate_Delta_Function( RMAT(i,j) ,dx);
         
     end
 end

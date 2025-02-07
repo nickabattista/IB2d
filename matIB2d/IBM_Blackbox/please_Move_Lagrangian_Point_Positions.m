@@ -1,4 +1,4 @@
-%-------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 %
 % IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
 % 	fluid-structure interaction models. This version of the code is based off of
@@ -19,9 +19,9 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 %
-%--------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % FUNCTION: Moves Lagrangian Point Positions by doing the integral,
 %
@@ -29,9 +29,9 @@
 %
 %      NOTE: (i) Lots of old implementation included (but commented out) for teaching purposes.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [xL_Next, yL_Next] = please_Move_Lagrangian_Point_Positions(mu, u, v, xL_P, yL_P, xL_H, yL_H, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro)
+function [xL_Next, yL_Next] = please_Move_Lagrangian_Point_Positions(SpreadOperator, mu, u, v, xL_P, yL_P, xL_H, yL_H, x, y, dt, grid_Info,porous_Yes,poroelastic_Yes,poroelastic_info,F_Poro)
 
 
 % Grid Info
@@ -126,6 +126,26 @@ delta_Y = give_Delta_Kernel( distY, dy);
 %------------------------------------------
 xL_Next = xL_P + (dt) * move_X;
 yL_Next = yL_P + (dt) * move_Y;
+
+
+%------------------------------------------------------------------------
+% ALTERNATIVELY, COULD INSTEAD USE THE ADJOINT OF THE 
+%               SPREAD OPERATOR TO MOVE THE LAGRANGIAN POINTS.
+%
+%    NOTE: (1) preliminary tests with [Ny,Nx]=[1024,2048] w/ NLags=2048
+%              suggest this is actually a bit slower than original
+%              implementation:      Time Original ~ 0.011s 
+%                             Time Spread Adjoint ~ 0.023s
+%          
+%          (2) May be a bit faster for smaller grid resolution cases
+%          (3) If trying to restart simulation, would need to have
+%              saved the SpreadOperator from previous time-step. This 
+%              would require immense computational storage.
+%------------------------------------------------------------------------
+%xL_Next = xL_P + dt*SpreadOperator'*u(:)*dx*dy;
+%yL_Next = yL_P + dt*SpreadOperator'*v(:)*dx*dy;
+
+
 
 %----------------------------------------------------------------
 % Update the Lagrangian Point Positions with poroelasticity

@@ -1,4 +1,4 @@
-%-------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 %
 % IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
 % 	fluid-structure interaction models. This version of the code is based off of
@@ -19,20 +19,22 @@
 % 
 % There are a number of built in Examples, mostly used for teaching purposes. 
 %
-%--------------------------------------------------------------------------------------------------------------------%
+%--------------------------------------------------------------------------------------------%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% FUNCTION: Computes the components of the force term in Navier-Stokes from
-%           deformations of the boundary of the immersed boundary
+% FUNCTION: Computes the components of the force term in the Navier-Stokes (momentum) equation 
+%           due to deformations of the immersed boundary
 %
-%       NOTE: (1) Commented out implementations illustrating attempts to make code more efficient
-%             (2) Lots of old implementation included (but commented out) for teaching purposes.
+%       NOTE: (1)[Feb 2024] Commented out implementation trials illustrating attempts to make code more efficient
+%             (2)[Feb 2024] Lots of old implementation included (but commented out) for teaching purposes.
+%             (3)[Feb 2025] Introduced explicitly forming Spreading Operator for taking information from  
+%                           Lagrangian -> Eulerian Grid, to expedite force spreading operation. 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-function [Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info, coagulation, aggregate_list, flag_Geo_Connect, geo_Connect_MAT)
+function [S, Fx, Fy, F_Mass, F_Lag, F_Poro, aggregate_list] = please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,xLag_P,yLag_P, x, y, grid_Info, model_Info, springs, targets, beams, nonInv_beams, muscles, muscles3, masses, electro_potential, d_Springs, general_force,poroelastic_info, coagulation, aggregate_list, flag_Geo_Connect, geo_Connect_MAT)
 
 
 %-----------------------------------------------------------------------------------------
@@ -273,12 +275,6 @@ F_Lag(:,1) = fx;
 F_Lag(:,2) = fy;
     
 
-%-----------------------------------------
-% Give me delta-function approximations!
-%-----------------------------------------
-[delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
-
-
 %------------------------------------------------------------
 % Transform the force density vectors into diagonal matrices
 %------------------------------------------------------------
@@ -343,6 +339,14 @@ end
 
 
 %-----------------------------------------------------------------------
+% Give me delta-function approximations!
+%    --> Note: not necessary if using SPREADING OPERATOR to spread
+%              Lagrangian Forces from Lagrangian -> Eulerian Grid           
+%-----------------------------------------------------------------------
+%[delta_X, delta_Y] = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag);
+
+
+%-----------------------------------------------------------------------
 %   ORIGINAL --> DOESN'T USE EFFICIENT MATRIX MULTIPLICATION W/ 
 %                INVOLVING DIAGONAL MATRIX
 %
@@ -364,14 +368,34 @@ end
 %                 A*diag(vec) = ( (diag(vec)).*A' )'
 %             (note the transposes in the above line)
 %-----------------------------------------------------------------------
-Fx = ( ( fx(:,1) ).*delta_Y' )' * delta_X;
-Fy = ( ( fy(:,1) ).*delta_Y' )' * delta_X;
+%Fx = ( ( fx(:,1) ).*delta_Y' )' * delta_X;
+%Fy = ( ( fy(:,1) ).*delta_Y' )' * delta_X;
 
 
-
-
-
-
+%---------------------------------------------------------------------------
+%   EXPLICITLY FORMS THE SPREADING OPERATOR TO SPREAD FORCES FROM
+%                  LAGRANGIAN GRID TO EULERIAN GRID 
+%
+%   --> The default delta function is the Peskin 4-Pt Stencil
+%       (as in Peskin 2002) when forming the Spreading Operator
+%
+%                       RUBBERBAND SPEED TRIALS
+%          (comparing force spreading operation times only)
+%   
+%   --> For Tests with (Nx,Ny)=(4096,4096) w/ Nb=8192, there was roughly a
+%       15x speed up when compared with previous method above
+%   --> For Tests with (Nx,Ny)=(1024,1024) w/ Nb=2048, there was roughly a 
+%       ~3x speed up when compared with previous method above
+%   --> For Tests with (Nx,Ny)=(512,512) w/ Nb = 1024, there wasn't 
+%       any noticeable speed up when compared with previous method above
+%   --> For tests with (Nx,Ny)<=(256,256) w/ Nb=512, there was a moderate 
+%       slow down
+%   --> Forming the Spreading Operator seems to be more efficient when the
+%       total # of grid cells and Lagrangian pts is "high" 
+%---------------------------------------------------------------------------
+S = give_Spreading_Operator(xLag,yLag,dx,dy,Nb,Nx,Ny);
+Fx = reshape( (S*fx(:,1)), Ny, Nx);
+Fy = reshape( (S*fy(:,1)), Ny, Nx);
 
 
 
