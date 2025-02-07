@@ -48,7 +48,7 @@ The basics of visualizing data using open source visualization software called <
 - Sped up force spreading operations in MATLAB implementation for larger grids and numbers of Lagrangian points (February 2025): 
 <br/><br/>
 <p align="center">
-  <img width="464" height="271" src="https://static.wixstatic.com/media/50968c_1c29f0b383544da79b47167d551a199c~mv2.webp">
+  <img width="464" height="271" src="https://static.wixstatic.com/media/50968c_90a0581ffe6f40049b1d3911b31c55dc~mv2.png">
 </p> 
 
 <H5 align="center"> 
