@@ -183,13 +183,13 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
                                          # NOTE: grid_Info[8] = Nb, grid_Info[9] = ds [THEY GET STORED LATER]
 
     # PRINTING/PLOTTING INFO #
-    pDump = Output_Params[0]          # Print [Plot] Dump interval
-    pMatplotlib = Output_Params[1]    # Plot in Matlab? [1=YES,0=NO]
-    lagPlot = Output_Params[2]        # Plot LAGRANGIAN PTs ONLY in Matlab
-    velPlot = Output_Params[3]        # Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
-    vortPlot = Output_Params[4]       # Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
-    uMagPlot = Output_Params[5]       # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
-    pressPlot = Output_Params[6]      # Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
+    pDump = int(Output_Params[0])        # Print [Plot] Dump interval
+    pMatplotlib = int(Output_Params[1])  # Plot in Matlab? [1=YES,0=NO]
+    lagPlot = int(Output_Params[2])      # Plot LAGRANGIAN PTs ONLY in Matlab
+    velPlot = int(Output_Params[3])      # Plot LAGRANGIAN PTs + VELOCITY FIELD in Matlab
+    vortPlot =int( Output_Params[4])     # Plot LAGRANGIAN PTs + VORTICITY colormap in Matlab
+    uMagPlot = int(Output_Params[5])     # Plot LAGRANGIAN PTs + MAGNITUDE OF VELOCITY colormap in Matlab
+    pressPlot = int(Output_Params[6])    # Plot LAGRANGIAN PTs + PRESSURE colormap in Matlab
 
 
     # MODEL STRUCTURE DATA STORED #
