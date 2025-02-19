@@ -101,14 +101,11 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
             ifft2 = pyfftw.builders.ifft2(ifft_mat)
             
 
-    #-----------------------------------------------------------------------------
-    #           **** NOW INITIALIZED BEFORE TIME-LOOP STARTS!!! ****
-    # Create FFT Operator (used for both half time-step and full time-step computations)
-    #-----------------------------------------------------------------------------
-    #A_hat = 1 + 2*mu*dt/rho*( (sin(PI*idX/Nx)/dx)**2 + (sin(PI*idY/Ny)/dy)**2 )
-
-
+    #------------------------------------------------------------------
+    #------------------------------------------------------------------
     # # # # # # EVOLVE THE FLUID THROUGH HALF A TIME-STEP # # # # # # #
+    #------------------------------------------------------------------
+    #------------------------------------------------------------------
 
     #----------------------------------------------------------------
     # Compute 1ST and 2ND derivatives (using centered differencing)
@@ -148,30 +145,36 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
     UV_y = np.multiply(V,Uy) + np.multiply(U,Vy)
 
 
-    #----------------------------------------------------------------
-    # Construct right hand side in linear system and perform FFT to
-    #   take velocities to state space
-    ##----------------------------------------------------------------
-    rhs_u = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,'x')
+    #-----------------------------------------------------------------
+    # Construct right hand side in linear system, involving:
+    #         (i) fluid velocity at previous step
+    #        (ii) forces at half-step
+    #       (iii) skew-symmetric convective term at previous step
+    #        (iv) Apply FFT to take RHS term to frequency space
+    #-----------------------------------------------------------------
+    rhs_u = give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,'x')
     if FFTW:
         rhs_u_hat = np.array(fft2())
-    rhs_v = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,'y')
+    rhs_v = give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,'y')
     if FFTW:
         rhs_v_hat = fft2()
     if not FFTW:
         rhs_u_hat = np.fft.fft2(rhs_u)
         rhs_v_hat = np.fft.fft2(rhs_v)
 
-    #----------------------------------------------------------------
-    # Calculate Fluid Pressure (uses stored FOURIER matrices)
-    #----------------------------------------------------------------
-    #p_hat = give_Fluid_Pressure(0.5*dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat)
+    #--------------------------------------------------------------
+    # Calculate Fluid Pressure (uses stored FOURIER matrices):
+    #      (i) Take divergence of both sides of momentum eqn.
+    #     (ii) Solve resulting Poisson problem for pressure
+    #--------------------------------------------------------------
     p_hat = give_Fluid_Pressure(0.5*dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat)
 
-    #-------------------------------------------------------------------------
-    # Calculate Fluid Velocity and take IFFT to get velocities in real space
-    #           --> uses stored sine function values for modes
-    #-------------------------------------------------------------------------
+    #------------------------------------------------------------------
+    # Calculate Fluid Velocity (USING stored SINE vals) in FREQ space
+    #      (i) Solve for half-step velocity via explicit scheme
+    #          using auxiliary pressure
+    #     (ii) Apply inverse FFT to take velocities to real space
+    #------------------------------------------------------------------
     u_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,sinIDX,'x')
     if FFTW:
         U_h = np.real(np.array(ifft2(u_hat))) # the last here ifft2 replaces ifft_mat.
@@ -224,15 +227,19 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
     U_h_V_h_x = np.multiply(U_h_x,V_h) + np.multiply(U_h,V_h_x)
     U_h_V_h_y = np.multiply(U_h_y,V_h) + np.multiply(U_h,V_h_y)
 
-    #----------------------------------------------------------------
-    # Construct right hand side in linear system and peform FFT to take
-    #   velocities to state space
-    #----------------------------------------------------------------
-    rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,
+    #-----------------------------------------------------------------
+    # Construct right hand side in linear system, involving:
+    #         (i) fluid velocity at previous step and half-step
+    #        (ii) forces at half-step
+    #       (iii) skew-symmetric convective term from half-step velocity
+    #        (iv) Trapezoid rule for viscous terms
+    #         (v) Apply FFT to take RHS term to frequency space
+    #-----------------------------------------------------------------
+    rhs_u = give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,
                                         U_h_sq_x,U_h_V_h_y,V,Fx,Uxx,Uyy,'x')
     if FFTW:
         rhs_u_hat = np.array(fft2()) #overwrites rhs_v_hat from before
-    rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,
+    rhs_v = give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,
                                         V_h_sq_y,U_h_V_h_x,U,Fy,Vxx,Vyy,'y')
     if FFTW:
         rhs_v_hat = fft2()
@@ -241,16 +248,19 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
         rhs_v_hat = np.fft.fft2(rhs_v)  
 
 
-    #----------------------------------------------------------------
-    # Calculate Fluid Pressure (uses stored FOURIER matrices)
-    #----------------------------------------------------------------
-    #p_hat  = give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,idX,idY,rhs_u_hat,rhs_v_hat)
+    #--------------------------------------------------------------
+    # Calculate Fluid Pressure (uses stored FOURIER matrices):
+    #      (i) Take divergence of both sides of momentum eqn.
+    #     (ii) Solve resulting Poisson problem for pressure
+    #--------------------------------------------------------------
     p_hat  = give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat)
             
-    #-------------------------------------------------------------------------
-    # Calculate Fluid Velocity and take IFFT to get real velocities/pressure
-    #           --> uses stored sine function values for modes
-    #-------------------------------------------------------------------------
+    #------------------------------------------------------------------------
+    # Calculate Fluid Velocity (USING stored SINE vals) in FREQ space
+    #      (i) Solve for full-step velocity via explicit scheme
+    #          using auxiliary pressure
+    #     (ii) Apply inverse FFT to take velocities/pressure to REAL space
+    #------------------------------------------------------------------------
     u_hat = give_Me_Fluid_Velocity(dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,sinIDX,'x')
     if FFTW:
         U = np.real(np.array(ifft2()))
@@ -273,7 +283,6 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
 #
 ################################################################################
 
-#def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string):
 def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,sinIDXorIDY,string):
     ''' Calculates the fluid velocity. Assigns result to FFTW plan if applicable.
 
@@ -313,7 +322,7 @@ def give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,sinIDXorIDY,s
 #
 ################################################################################
 
-def give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,\
+def give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,\
     Axx,Ayy,string):
     ''' Creates RHS with fluid velocity in FULL STEP computation.
         Assigns result to FFTW plan if applicable.
@@ -365,7 +374,7 @@ def give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,\
 #
 ###########################################################################################
 
-def give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,string):
+def give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,string):
     ''' Creates RHS with fluid velocity in HALF computation.
         Assigns result to FFTW plan if applicable.
     
