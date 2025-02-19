@@ -25,9 +25,12 @@
 %
 % This function solves the incompressible Navier-Stokes (NS) equations using Fast-Fourier Transform (FFT)
 %      
-%      x-Momentum Conservation: rho*u_t = -rho*u*u_x - rho*v*u_y + mu*laplacian(u) - p_x + Fx
-%      y-Momentum Conservation: rho*v_t = -rho*u*v_x - rho*v*v_y + mu*laplacian(v) - p_y + Fy
-%      Incompressibility:       u_x + v_y = 0
+%      x-Momentum Conservation: 
+%                   rho*(u_t + u*u_x + v*u_y) = -p_x + mu*laplacian(u) + Fx
+%      y-Momentum Conservation: 
+%                   rho*(v_t + u*v_x + v*v_y) = -p_y + mu*laplacian(v) + Fy
+%      Incompressibility:   
+%                   u_x + v_y = 0.
 %
 %      NOTE: (i) Lots of old implementation included (but commented out) for teaching purposes.
 %
@@ -135,7 +138,7 @@ rhs_v_hat = fft2(rhs_v);
 
 %--------------------------------------------------------------
 % Calculate Fluid Pressure (uses stored FOURIER matrices):
-%      (i) Take divergence of both sides of momentum
+%      (i) Take divergence of both sides of momentum eqn.
 %     (ii) Solve resulting Poisson problem for pressure
 %--------------------------------------------------------------
 p_hat = give_Fluid_Pressure(0.5*dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat);
@@ -219,7 +222,7 @@ rhs_v_hat = fft2(rhs_v);
 
 %--------------------------------------------------------------
 % Calculate Fluid Pressure (uses stored FOURIER matrices):
-%      (i) Take divergence of both sides of momentum
+%      (i) Take divergence of both sides of momentum eqn.
 %     (ii) Solve resulting Poisson problem for pressure
 %--------------------------------------------------------------
 p_hat  = give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat);
