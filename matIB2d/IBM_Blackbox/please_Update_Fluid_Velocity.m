@@ -33,13 +33,13 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY, A_hat)
 function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, sinIDX, sinIDY, A_hat)
  
 
+%------------------------------------------------------------------------------------------------
 % Fluid (Eulerian) Grid updated using Peskin's two-step algorithm, where the advection terms
 % are written in skew symmetric form.
-%
+%------------------------------------------------------------------------------------------------
 % U:         Eulerian grid of x-Velocities
 % V:         Eulerian grid of y-Velocities
 % Fx:        x-Forces arising from deformations in Lagrangian structure
@@ -51,24 +51,20 @@ function [U_h, V_h, U, V, p] = please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, m
 % idX/idY:   EULERIAN Index Matrices for FFT Operators
 
 
+%----------------------------------------
 % Initialize %
+%----------------------------------------
 Nx =   grid_Info(1);
 Ny =   grid_Info(2);
-Lx =   grid_Info(3);
-Ly =   grid_Info(4);
+%Lx =   grid_Info(3);
+%Ly =   grid_Info(4);
 dx =   grid_Info(5);
 dy =   grid_Info(6);
-supp = grid_Info(7);
-Nb =   grid_Info(8);
-ds =   grid_Info(9);
+%supp = grid_Info(7);
+%Nb =   grid_Info(8);
+%ds =   grid_Info(9);
 
 
-
-%-----------------------------------------------------------------------------
-%           **** NOW INITIALIZED BEFORE TIME-LOOP STARTS!!! ****
-% Create FFT Operator (used for both half time-step and full time-step computations)
-%-----------------------------------------------------------------------------
-%A_hat = 1 + 2*mu*dt/rho*( (sin(pi*idX/Nx)/dx).^2 + (sin(pi*idY/Ny)/dy).^2 );
 
 
 %**************************************************************************
@@ -120,29 +116,36 @@ UV_x = V.*Ux + U.*Vx;
 UV_y = V.*Uy + U.*Vy;
 
 
-%-----------------------------------------------------
-% Construct right hand side in linear system
-%-----------------------------------------------------
-rhs_u = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,'x');
-rhs_v = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,'y');
+%-----------------------------------------------------------------
+% Construct right hand side in linear system, involving:
+%         (i) fluid velocity at previous step
+%        (ii) forces at half-step
+%       (iii) skew-symmetric convective term at previous step
+%-----------------------------------------------------------------
+rhs_u = give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,'x');
+rhs_v = give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,'y');
 
 
-%-----------------------------------------------------
-% Perform FFT to take velocities to state space
-%-----------------------------------------------------
+%------------------------------------------------------------
+% Perform FFT to take RHS Term to frequency space
+%------------------------------------------------------------
 rhs_u_hat = fft2(rhs_u);
 rhs_v_hat = fft2(rhs_v);  
 
 
 %--------------------------------------------------------------
-% Calculate Fluid Pressure (uses stored FOURIER matrices)
+% Calculate Fluid Pressure (uses stored FOURIER matrices):
+%      (i) Take divergence of both sides of momentum
+%     (ii) Solve resulting Poisson problem for pressure
 %--------------------------------------------------------------
 p_hat = give_Fluid_Pressure(0.5*dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat);
 
 
-%--------------------------------------------------------------
-% Calculate Fluid Velocity (USING stored SINE vals)
-%--------------------------------------------------------------
+%------------------------------------------------------------------
+% Calculate Fluid Velocity (USING stored SINE vals) in FREQ space
+%      (i) Solve for half-step velocity via explicit scheme
+%          using auxiliary pressure
+%------------------------------------------------------------------
 u_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,sinIDX,'x');
 v_hat = give_Me_Fluid_Velocity(0.5*dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,sinIDY,'y');
 
@@ -196,31 +199,37 @@ U_h_V_h_x = (U_h_x .* V_h) + (U_h .* V_h_x);
 U_h_V_h_y = (U_h_y .* V_h) + (U_h .* V_h_y);
 
 
-%---------------------------------------------------
-% Construct right hand side in linear system
-%---------------------------------------------------
-%rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,Ux,Uy,U_sq_x,UV_y,V,Fx,Uxx,Uyy,'x');
-%rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,Vx,Vy,V_sq_y,UV_x,U,Fy,Vxx,Vyy,'y');
-rhs_u = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,U_h_sq_x,U_h_V_h_y,V,Fx,Uxx,Uyy,'x');
-rhs_v = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,V_h_sq_y,U_h_V_h_x,U,Fy,Vxx,Vyy,'y');
+%-----------------------------------------------------------------
+% Construct right hand side in linear system, involving:
+%         (i) fluid velocity at previous step and half-step
+%        (ii) forces at half-step
+%       (iii) skew-symmetric convective term from half-step velocity
+%        (iv) Trapezoid rule for viscous terms
+%-----------------------------------------------------------------
+rhs_u = give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,U,U_h_x,U_h_y,U_h_sq_x,U_h_V_h_y,V,Fx,Uxx,Uyy,'x');
+rhs_v = give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,V,V_h_x,V_h_y,V_h_sq_y,U_h_V_h_x,U,Fy,Vxx,Vyy,'y');
 
 
-%---------------------------------------------------
-% Perform FFT to take velocities to state space
-%---------------------------------------------------
+%------------------------------------------------------------
+% Perform FFT to take RHS Term to frequency space
+%------------------------------------------------------------
 rhs_u_hat = fft2(rhs_u);
 rhs_v_hat = fft2(rhs_v);  
 
 
-%-------------------------------------------------------------
-% Calculate Fluid Pressure (uses stored FOURIER matrices)
-%-------------------------------------------------------------
+%--------------------------------------------------------------
+% Calculate Fluid Pressure (uses stored FOURIER matrices):
+%      (i) Take divergence of both sides of momentum
+%     (ii) Solve resulting Poisson problem for pressure
+%--------------------------------------------------------------
 p_hat  = give_Fluid_Pressure(dt,rho,dx,dy,Nx,Ny,sinIDX,sinIDY,rhs_u_hat,rhs_v_hat);
         
 
-%-------------------------------------------------------------
-% Calculate Fluid Velocity (using stored sine values)
-%-------------------------------------------------------------
+%------------------------------------------------------------------
+% Calculate Fluid Velocity (USING stored SINE vals) in FREQ space
+%      (i) Solve for full-step velocity via explicit scheme
+%          using auxiliary pressure
+%------------------------------------------------------------------
 u_hat = give_Me_Fluid_Velocity(dt,rho,dx,Nx,Ny,rhs_u_hat,p_hat,A_hat,sinIDX,'x');
 v_hat = give_Me_Fluid_Velocity(dt,rho,dy,Nx,Ny,rhs_v_hat,p_hat,A_hat,sinIDY,'y');
 
@@ -239,7 +248,6 @@ p = real(ifft2(p_hat));
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%function vel_hat = give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,idMat,string)
 function vel_hat = give_Me_Fluid_Velocity(dt,rho,dj,Nx,Ny,rhs_VEL_hat,p_hat,A_hat,sinIDXorIDY,string)
 
 
@@ -287,7 +295,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function rhs = give_RHS_FULL_Step_Velocity(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,Axx,Ayy,string)
+function rhs = give_RHS_FULL_Step_Term(dt,mu,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,Axx,Ayy,string)
 
 % Note: Fj -> j corresponds to either x or y.
 
@@ -331,7 +339,7 @@ end
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function rhs = give_RHS_HALF_Step_Velocity(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,string)
+function rhs = give_RHS_HALF_Step_Term(dt,rho,Nx,Ny,A,Ax,Ay,A_sq_j,AB_j,B,Fj,string)
 
 % Note: Fj -> j corresponds to either x or y.
 
