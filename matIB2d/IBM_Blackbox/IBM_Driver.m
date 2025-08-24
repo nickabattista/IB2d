@@ -820,7 +820,7 @@ while current_time < T_FINAL
     %                           (Variables end with h if it is a half-step)
     %
     %-----------------------------------------------------------------------------------------------------
-    if ctsave==1
+    if cter==0
         xLag_h = xLag; % Upon starting time-loop, U=0, so x-Positions do not change
         yLag_h = yLag; % Upon starting time-loop, V=0, so y-Positions do not change
     else
