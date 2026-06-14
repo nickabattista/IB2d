@@ -113,7 +113,7 @@ Vyy = DD(V,dy,'y');
 %               using product and chain rules
 %----------------------------------------------------------------
 U_sq_x = 2*U.*Ux;
-V_sq_y = 2*V.*Vx;
+V_sq_y = 2*V.*Vy;
 %
 UV_x = V.*Ux + U.*Vx;
 UV_y = V.*Uy + U.*Vy;
