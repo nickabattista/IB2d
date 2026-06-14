@@ -140,7 +140,7 @@ def please_Update_Fluid_Velocity(U, V, Fx, Fy, rho, mu, grid_Info, dt, idX, idY,
     #               using product and chain rules
     #----------------------------------------------------------------
     U_sq_x = 2*np.multiply(U,Ux)
-    V_sq_y = 2*np.multiply(V,Vx)
+    V_sq_y = 2*np.multiply(V,Vy)
     UV_x = np.multiply(V,Ux) + np.multiply(U,Vx)
     UV_y = np.multiply(V,Uy) + np.multiply(U,Vy)
 
