@@ -1,5 +1,9 @@
 '''-------------------------------------------------------------------------------------------------
 
+ MODIFICATION NOTICE (2026-10-10): Modified 2026 (Laura Miller's group): the file
+ handles are now actually closed (FID.close() instead of FID.close), which matters
+ for generated case inputs. This file remains licensed under GPLv3.
+
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
  	  fluid-structure interaction models. This version of the code is based off of
 	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
@@ -57,8 +61,8 @@ def removeComments(input_file):
         tline = FID.readline()              # Reads next line in
         num = num+1                         # Iterate counter
 
-    FID.close                               # Closes original input file
-    FID_temp.close                          # Closes temp input file
+    FID.close()                             # Closes original input file
+    FID_temp.close()                        # Closes temp input file
 
     return input_file
 

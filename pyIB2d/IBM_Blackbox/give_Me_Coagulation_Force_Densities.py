@@ -1,4 +1,6 @@
 #-------------------------------------------------------------------------------------------------------------------#
+# MODIFICATION NOTICE (2026-10-10): Modified 2026 (Laura Miller's group): the bond check
+# `if np.where(checkVec == j)` was always true; it is now `np.any`. This file remains licensed under GPLv3.
 #
 # IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
 # 	fluid-structure interaction models. This version of the code is based off of
@@ -189,8 +191,9 @@ def please_Find_Distances_Between_Cells(xC,yC,Ncells,threshold_radius,aggregate_
                    # if indices match i in aggregate list 1st column, check if already a connection
                    else:
                        checkVec = agg_list2[inds_i]
-                       if np.where(checkVec == j):
-                            # do nothing, already a bond between them
+                       if np.any(checkVec == j):
+                            # Do nothing; there is already a bond between them.
+                            pass
                        else:
                             connectNewRow = np.array([i,j])
                             connects = np.vstack((connects,connectNewRow))
