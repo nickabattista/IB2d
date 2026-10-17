@@ -1,5 +1,10 @@
 '''-------------------------------------------------------------------------------------------------
 
+ MODIFICATION NOTICE (2026-10-10): Modified 2026 (Laura Miller's group) for the
+ headless plate validation workflow: force spreading now uses the local
+ four-point stencil instead of dense delta matrices.
+ This file remains licensed under GPLv3.
+
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
  	  fluid-structure interaction models. This version of the code is based off of
 	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
@@ -264,57 +269,14 @@ def please_Find_Lagrangian_Forces_On_Eulerian_grid(dt, current_time, xLag, yLag,
     F_Lag[:,1] = fy
         
 
-    #-----------------------------------------------------
-    # Give me delta-function approximations!
-    #-----------------------------------------------------
-    delta_X, delta_Y = give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,\
-    grid_Info,xLag,yLag)
-
-    #---------------------------------------------------------------
-    # Transform the force density vectors into diagonal matrices
-    #       --> NO LONGER NEED AFTER WRITING MORE EFFICIENT
-    #           DIAGONAL MATRIX MULTIPLICATION BELOW
-    #---------------------------------------------------------------
-    #fxds = np.diag(fx*ds)
-    #fyds = np.diag(fy*ds)
-
-
-
-    #-----------------------------------------------------------------------
-    #   ORIGINAL --> DOESN'T USE EFFICIENT MATRIX MULTIPLICATION W/ 
-    #                INVOLVING DIAGONAL MATRIX
-    #
-    # Find Eulerian forces on grids by approximating the line integral, 
-    #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    #-----------------------------------------------------------------------
-    #Fx = delta_Y @ fxds @ delta_X
-    #Fy = delta_Y @ fyds @ delta_X
-
-
-
-    #-----------------------------------------------------------------------
-    #    USES MORE EFFICIENT MATRIX MULTIPLICATION W/ A DIAGONAL MATRIX
-    #
-    # Find Eulerian forces on grids by approximating the line integral, 
-    #       F(x,y) = int{ f(s) delta(x - xLag(s)) delta(y - yLag(s)) ds }
-    #
-    #             eg, if vec is a COLUMN VECTOR
-    #                    A*diag(vec) = ( (diag(vec)).*A^T )^T
-    #                 (note the transposes in the above line)
-    #
-    #       THEREFORE, the MATLAB implementation is the following:
-    #               Fx = ( ( fx(:,1) ).*delta_Y' )' * delta_X;   <<--- MATLAB
-    #               Fy = ( ( fy(:,1) ).*delta_Y' )' * delta_X;   <<--- MATLAB
-    #
-    #       FOR PYTHON: since fx,fy are 1D numpy arrays, they are considered 
-    #                   "row" vectors. Therefore we can get rid of the tranposes
-    #                   in previous line and depend on numpy broadcasting
-    #                   to component-wise multiply the ROW VECTOR into each
-    #                   ROW of the matrix
-    #   
-    #-----------------------------------------------------------------------
-    Fx = ( ( fx*ds ) * delta_Y ) @ delta_X
-    Fy = ( ( fy*ds ) * delta_Y ) @ delta_X
+    # Spread each marker only to its local support.  The legacy Python port
+    # built dense Ny-by-Nb and Nb-by-Nx matrices and multiplied them, which
+    # scales as O(Nx*Ny*Nb) despite each marker having only supp^2 nonzeros.
+    # The local accumulation below is algebraically equivalent and scales as
+    # O(supp^2*Nb), making refinement studies practical.
+    Fx, Fy = spread_Lagrangian_Forces_To_Eulerian_Grid(
+        fx, fy, ds, x, y, grid_Info, xLag, yLag
+    )
 
     return (Fx, Fy, F_Mass, F_Lag, F_Poro)
     
@@ -981,6 +943,51 @@ def give_Me_Delta_Function_Approximations_For_Force_Calc(x,y,grid_Info,xLag,yLag
     row,col = ind_Lag.shape
 
     return (delta_X, delta_Y)
+
+
+def spread_Lagrangian_Forces_To_Eulerian_Grid(
+        fx, fy, ds, x, y, grid_Info, xLag, yLag):
+    """Spread Lagrangian force densities using only the local delta stencil."""
+
+    if not (
+        np.all(np.isfinite(fx))
+        and np.all(np.isfinite(fy))
+        and np.all(np.isfinite(xLag))
+        and np.all(np.isfinite(yLag))
+    ):
+        raise FloatingPointError(
+            "non-finite Lagrangian state before force spreading; reduce dt or stiffness"
+        )
+
+    Nx = int(grid_Info[0])
+    Ny = int(grid_Info[1])
+    Lx = grid_Info[2]
+    Ly = grid_Info[3]
+    dx = grid_Info[4]
+    dy = grid_Info[5]
+    supp = int(grid_Info[6])
+
+    indX = give_1D_NonZero_Delta_Indices(xLag, Nx, dx, supp).astype(int)
+    indY = give_1D_NonZero_Delta_Indices(yLag, Ny, dy, supp).astype(int)
+
+    distX = give_Eulerian_Lagrangian_Distance(x[indX], xLag[:, None], Lx)
+    distY = give_Eulerian_Lagrangian_Distance(y[indY], yLag[:, None], Ly)
+    deltaX = give_Delta_Kernel(distX, dx)
+    deltaY = give_Delta_Kernel(distY, dy)
+
+    Fx = np.zeros((Ny, Nx), dtype=float)
+    Fy = np.zeros((Ny, Nx), dtype=float)
+    weighted_fx = np.asarray(fx, dtype=float) * ds
+    weighted_fy = np.asarray(fy, dtype=float) * ds
+
+    for y_slot in range(supp):
+        for x_slot in range(supp):
+            kernel_weight = deltaY[:, y_slot] * deltaX[:, x_slot]
+            indices = (indY[:, y_slot], indX[:, x_slot])
+            np.add.at(Fx, indices, weighted_fx * kernel_weight)
+            np.add.at(Fy, indices, weighted_fy * kernel_weight)
+
+    return Fx, Fy
 
 
 ########################################################################################################

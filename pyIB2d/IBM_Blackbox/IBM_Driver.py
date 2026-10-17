@@ -21,6 +21,11 @@
 
 ----------------------------------------------------------------------------------------------------'''
 
+# MODIFICATION NOTICE (2026-10-10, updated 2026-10-14): Modified 2026 (Laura
+# Miller's group) for headless use (force/state callbacks), force-history
+# diagnostics, an exact step count, and an optional, explicitly documented
+# periodic mean-momentum constraint. This file remains licensed under GPLv3.
+
 import numpy as np
 from math import sqrt
 import os
@@ -30,7 +35,6 @@ from please_Find_Lagrangian_Forces_On_Eulerian_grid import\
 from please_Update_Fluid_Velocity import please_Update_Fluid_Velocity
 from please_Compute_Porous_Slip_Velocity import\
     please_Compute_Porous_Slip_Velocity
-from please_Plot_Results import please_Plot_Results
 from please_Compute_Normal_Tangential_Forces_On_Lag_Pts import \
     please_Compute_Normal_Tangential_Forces_On_Lag_Pts
 
@@ -49,6 +53,24 @@ try:
 except:
     C_flag = False
 
+
+def _subtract_spatial_mean_force(force_x, force_y):
+    """Return Eulerian force densities with their discrete means removed.
+
+    A nonzero domain-integrated force accelerates the spatially uniform
+    velocity mode in a doubly periodic domain.  Removing the two force means
+    is equivalent to applying a uniform balancing body force (or imposed mean
+    pressure gradient), and therefore holds the domain-mean momentum fixed.
+
+    The caller records the unmodified immersed-boundary reaction before using
+    this helper, so reported loads remain the force of the fluid on the body.
+    New arrays are returned; the diagnostic force arrays are not mutated.
+    """
+
+    balanced_x = np.asarray(force_x) - np.mean(force_x, dtype=np.float64)
+    balanced_y = np.asarray(force_y) - np.mean(force_y, dtype=np.float64)
+    return balanced_x, balanced_y
+
 #Switch for vtk library writes (this will be overridden by C_flag)
 try:
     import vtk
@@ -66,7 +88,9 @@ except:
 #
 ###############################################################################
 
-def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params):
+def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,Lag_Name_Params,
+         force_callback=None, state_callback=None, state_callback_interval=None,
+         balance_periodic_force=False):
 
     ''' 2D IMMERSED BOUNDARY SOLVER ON RECTANGULAR DOMAIN w/ PERIODIC BOUNDARIES
 
@@ -78,6 +102,11 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         dt: time-step
         T_FINAL: final simulation time
         model_Info: dict of model structure properties
+        balance_periodic_force: if true, remove the spatial mean of the final
+            Eulerian force density before each fluid update.  This optional
+            constraint prevents acceleration of the uniform velocity mode in
+            the periodic box.  Force callbacks still receive the original,
+            unbalanced immersed-boundary reaction.
         
     Returns:
         X: here
@@ -166,8 +195,15 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     # TEMPORAL INFORMATION VALUES STORED #
     T_FINAL = Time_Params[0]     # Final simulation time
     dt = Time_Params[1]          # Time-step
-    #NTime = floor[T_FINAL/dt]+1 # # of total time-steps [floor'd so exact number of time-steps]
-    #dt = T_FINAL/NTime          # revised time-step [slightly perturbed dt, so exact # of time-steps are used]
+    n_steps = int(round(T_FINAL / dt))
+    if n_steps < 1 or not np.isclose(n_steps * dt, T_FINAL, rtol=1e-12, atol=1e-15):
+        raise ValueError('Tfinal must be a positive integer multiple of dt')
+    if state_callback is not None:
+        if state_callback_interval is None:
+            raise ValueError('state_callback_interval is required with state_callback')
+        state_callback_interval = int(state_callback_interval)
+        if state_callback_interval < 1:
+            raise ValueError('state_callback_interval must be a positive integer')
     current_time = 0.0           # initialize start of simulation to time, 0 
 
 
@@ -661,6 +697,20 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     F_Lag = np.zeros((xLag.size,2)) 
     print_vtk_files(Output_Params,ctsave,vort,uMag,p,U,V,Lx,Ly,Nx,Ny,lagPts,springs_Yes,\
     connectsMat,tracers,concentration_Yes,C,Fxh,Fyh,F_Lag)
+    if state_callback is not None:
+        state_callback(
+            step=0,
+            time=0.0,
+            target_time=0.0,
+            velocity_x=U,
+            velocity_y=V,
+            lagrangian_positions=np.column_stack((xLag, yLag)),
+            target_info=target_info,
+            dx=dx,
+            dy=dy,
+            lx=Lx,
+            ly=Ly,
+        )
     print('\n |****** Begin IMMERSED BOUNDARY SIMULATION! ******| \n\n')
     print('Current Time(s): {0}\n'.format(current_time))
     ctsave += 1
@@ -675,7 +725,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
     #
     #------------------------------------------------------------------------------------------------
     #
-    while current_time < T_FINAL:
+    while cter < n_steps:
         
         #--------------------------------------------------------------------------------------------
         #
@@ -726,6 +776,26 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         dt, current_time, xLag_h, yLag_h, xLag_P, yLag_P, x, y, grid_Info, Lag_Struct_Params,\
         springs_info, target_info, beams_info, nonInv_beams_info, muscles_info, muscles3_info,\
         mass_info, d_springs_info, gen_force_info, poroelastic_info)
+
+        # Record the reaction to immersed-boundary forcing before any external,
+        # Boussinesq, or Brinkman terms are added.  Fxh/Fyh are force densities
+        # applied by the structure to the fluid, so the body load has the
+        # opposite sign.  The force is evaluated at the half-step positions.
+        if force_callback is not None:
+            fluid_force = dx * dy * np.array([
+                np.sum(Fxh, dtype=np.float64),
+                np.sum(Fyh, dtype=np.float64),
+            ])
+            force_callback(
+                step=cter,
+                time=current_time + 0.5 * dt,
+                body_force=-fluid_force,
+                fluid_force=fluid_force,
+                lagrangian_force_density=F_Lag,
+                lagrangian_weight=ds,
+                lagrangian_positions=np.column_stack((xLag_h, yLag_h)),
+                target_info=target_info,
+            )
         
         # Once force is calculated, can finish time-step for massive boundary
         if mass_Yes: #need to test
@@ -772,6 +842,13 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         if brinkman_Yes:
             Fxh = Fxh - mu*Brink*U; # ADD BRINKMAN TERM!
             Fyh = Fyh - mu*Brink*V; # ADD BRINKMAN TERM!
+
+        if balance_periodic_force:
+            # The body-load diagnostic above must remain based on the original
+            # IB force.  Only the force supplied to the periodic fluid solver
+            # is balanced here.  This is a uniform counter-force, not a force
+            # localized on the plate.
+            Fxh, Fyh = _subtract_spatial_mean_force(Fxh, Fyh)
         
         #-----------------------------------------------------------
         #                   Update fluid motion
@@ -793,6 +870,25 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
         yLag_P = np.array(yLag_h)   # Stores old Lagrangian y-Values (for muscle model)
         xLag, yLag = please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xLag, yLag,\
             xLag_h, yLag_h, x, y, dt, grid_Info,porous_Yes, poroelastic_Yes, poroelastic_info, F_Poro)
+
+        completed_step = cter + 1
+        if state_callback is not None and (
+            completed_step % state_callback_interval == 0
+            or completed_step == n_steps
+        ):
+            state_callback(
+                step=completed_step,
+                time=current_time + dt,
+                target_time=current_time + 0.5 * dt,
+                velocity_x=U,
+                velocity_y=V,
+                lagrangian_positions=np.column_stack((xLag, yLag)),
+                target_info=target_info,
+                dx=dx,
+                dy=dy,
+                lx=Lx,
+                ly=Ly,
+            )
             
 
         # NOTE: SET UP FOR BOTH CLOSED + OPEN SYSTEMS NOW!!!
@@ -833,6 +929,7 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             
             #Plot in Matplotlib
             if pMatplotlib:
+                from please_Plot_Results import please_Plot_Results
                 loc, diffy = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,\
                     lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,\
                     loc,diffy,spacing)
@@ -851,9 +948,29 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             
             
         # Update current_time value & counter
-        current_time = current_time+dt
         cter += 1
+        current_time = cter * dt
         #wait = input('Press enter to continue...')
+
+    #-------------------------------------------------------------------
+    # The save/plot check above uses the counter before it is incremented, so
+    # the state at Tfinal has not been written when n_steps is a multiple of
+    # pDump.  (The old accumulated-dt loop wrote it only when round-off made
+    # it overshoot Tfinal by one step.)  Save it here, same file numbering.
+    #-------------------------------------------------------------------
+    if n_steps % pDump == 0:
+        vort = give_Me_Vorticity(U,V,dx,dy)
+        uMag = give_Me_Magnitude_Velocity(U,V)
+        if pMatplotlib:
+            from please_Plot_Results import please_Plot_Results
+            loc, diffy = please_Plot_Results(ds,X,Y,U,V,vort,uMag,p,xLag,yLag,
+                lagPlot,velPlot,vortPlot,pressPlot,uMagPlot,firstPrint,
+                loc,diffy,spacing)
+        lagPts = np.vstack((xLag, yLag, np.zeros(xLag.size))).T
+        print_vtk_files(Output_Params,ctsave,vort,uMag.T,p.T,U.T,V.T,Lx,Ly,Nx,Ny,
+            lagPts,springs_Yes,connectsMat,tracers,concentration_Yes,C,Fxh.T,Fyh.T,F_Lag)
+        print('Current Time(s): {0:6.6f}\n'.format(current_time))
+        ctsave+=1
 
     
 ###########################################################################

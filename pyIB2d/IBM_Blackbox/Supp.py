@@ -1,5 +1,10 @@
 '''-------------------------------------------------------------------------------------------------
 
+ MODIFICATION NOTICE (2026-10-10): Modified 2026 (Laura Miller's group) for the
+ headless plate validation workflow: the Peskin four-point delta kernel is now a
+ vectorized NumPy expression, so Numba is no longer required.
+ This file remains licensed under GPLv3.
+
  IB2d is an Immersed Boundary Code (IB) for solving fully coupled non-linear 
  	  fluid-structure interaction models. This version of the code is based off of
 	  Peskin's Immersed Boundary Method Paper in Acta Numerica, 2002.
@@ -38,7 +43,6 @@
 
 import numpy as np
 from math import sqrt
-from numba import jit
     
 ################################################################################
 #
@@ -243,7 +247,6 @@ def give_Eulerian_Lagrangian_Distance(x, y, L):
 #
 ###########################################################################
 
-@jit(nopython=True)
 def give_Delta_Kernel(x,dx):
     ''' Computes discrete approx. to 1D delta func over x in [x-2dx,x+2dx].
     
@@ -254,33 +257,24 @@ def give_Delta_Kernel(x,dx):
     Returns:
         delta: delta function with support [x-2dx,x+2dx]'''
 
-    # Computes Dirac-delta Approximation.
-    RMAT = np.abs(x)/dx
+    # Vectorized Peskin four-point kernel.  The legacy Python port used Numba
+    # for a doubly nested loop here, making Numba a mandatory dependency even
+    # for small headless simulations.  This NumPy form is algebraically
+    # equivalent and keeps the core solver usable in the offline runtime.
+    r = np.abs(np.asarray(x, dtype=float)) / dx
+    delta = np.zeros_like(r)
 
-    #Alias the data for cleaner writing of the following step
-    #   RMAT is altered, but it will not be reused.
-    delta = RMAT
+    inner = r < 1.0
+    ri = r[inner]
+    delta[inner] = (
+        3.0 - 2.0 * ri + np.sqrt(np.maximum(0.0, 1.0 + 4.0 * ri - 4.0 * ri * ri))
+    ) / (8.0 * dx)
 
-    #Loops over to find delta approximation
-    row,col = x.shape
-    for ii in range(row):
-        for jj in range(col):
-            
-            r = RMAT[ii,jj]
-            
-            # Approximate Discrete Delta Function
-            #if r <= 2:
-            #    delta[ii,jj] = 0.25*( 1 + cos(pi*r/2) )    
-            #else:
-            #    delta[ii,jj] = 0        
-
-            # PESKIN 4-Point Discrete Delta Function
-            if r<1:
-                delta[ii,jj] = ( (3 - 2*r + sqrt(1 + 4*r - 4*r*r) ) / (8*dx) )
-            elif (r<2) and (r>=1):
-                delta[ii,jj] = ( (5 - 2*r - sqrt(-7 + 12*r - 4*r*r) ) / (8*dx) )
-            else:
-                delta[ii,jj] = 0
+    outer = (r >= 1.0) & (r < 2.0)
+    ro = r[outer]
+    delta[outer] = (
+        5.0 - 2.0 * ro - np.sqrt(np.maximum(0.0, -7.0 + 12.0 * ro - 4.0 * ro * ro))
+    ) / (8.0 * dx)
     return delta
 
 
