@@ -812,8 +812,8 @@ def main(Fluid_Params,Grid_Params,Time_Params,Lag_Struct_Params,Output_Params,La
             
         # If there are tracers, update tracer positions #
         if tracers_Yes:
-            xT, yT = please_Move_Lagrangian_Point_Positions(Uh, Vh, xT, yT, xT, yT,\
-                x, y, dt, grid_Info,0) #0 for always no porous tracers
+            xT, yT = please_Move_Lagrangian_Point_Positions(mu, Uh, Vh, xT, yT, xT, yT,\
+                x, y, dt, grid_Info, 0, 0, 0, 0) # tracers are never porous/poroelastic
             tracers[:,1] = xT
             tracers[:,2] = yT
             
